@@ -35,11 +35,91 @@ model User {
   updated_at DateTime @updatedAt
 }
 
-model Project {
+enum E_Proyecto_Estado {
+  ACTIVO
+  INACTIVO
+  PENDIENTE
+  FINALIZADO
+}
+
+model Proyecto {
+  id             Int               @id @default(autoincrement())
+  titulo         String
+  descripcion    String?
+  estado         E_Proyecto_Estado
+  fecha_creacion DateTime          @db.Date()
+  // Unnamed: 5 parece ser un campo que no tiene relevancia o es temporal, así que no se incluye en el modelo
+}
+
+model UnidadProduccion {
+  id     Int     @id @default(autoincrement())
+  codigo Int
+  titulo String
+  nota   String?
+}
+
+model Tren {
+  id        Int     @id @default(autoincrement())
+  codigo    Int
+  titulo    String
+  cuadrilla String?
+  nota      String?
+  operario  Int
+  oficial   Int
+  peon      Int
+}
+
+model Partida {
+  id        Int    @id @default(autoincrement())
+  idInterno Int
+  item      String
+  partida   String
+  unidad    String
+  metrado   Float
+  precio    Float
+  parcial   Float?
+}
+
+model ListaPrecio {
   id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  status      Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  fechaInicio DateTime
+  fechaFin    DateTime
+  titulo      String
+}
+
+model DetallePrecioHoraMO {
+  id           Int    @id @default(autoincrement())
+  codigo       Int
+  categoria    String
+  horaNormal   Float
+  horaExtra60  Float
+  horaExtra100 Float
+}
+
+model ReporteTrenes {
+  id            Int      @id @default(autoincrement())
+  trenId        Int // Relación con Tren
+  costoTotal    Float
+  costoAnterior Float
+  costoActual   Float
+  costoParcial  Float
+  saldo         Float?
+  lunes         Float?
+  martes        Float?
+  miercoles     Float?
+  jueves        Float?
+  viernes       Float?
+  sabado        Float?
+  domingo       Float?
+  fechaInicio   DateTime
+  fechaFin      DateTime
+}
+
+model ReportePartidas {
+  id            Int   @id @default(autoincrement())
+  partidaId     Int // Relación con Partida
+  costoTotal    Float
+  costoAnterior Float
+  costoActual   Float
+  costoParcial  Float
 }
