@@ -43,19 +43,23 @@ enum E_Proyecto_Estado {
 }
 
 model Proyecto {
-  id             Int               @id @default(autoincrement())
-  titulo         String
-  descripcion    String?
-  estado         E_Proyecto_Estado
-  fecha_creacion DateTime          @db.Date()
+  id               Int                @id @default(autoincrement())
+  titulo           String
+  descripcion      String?
+  estado           E_Proyecto_Estado
+  fecha_creacion   DateTime           @db.Date()
   // Unnamed: 5 parece ser un campo que no tiene relevancia o es temporal, así que no se incluye en el modelo
+  UnidadProduccion UnidadProduccion[]
 }
 
 model UnidadProduccion {
-  id     Int     @id @default(autoincrement())
-  codigo Int
-  titulo String
-  nota   String?
+  id          Int     @id @default(autoincrement())
+  proyecto_id Int
+  codigo      Int
+  titulo      String
+  nota        String? @db.Text()
+
+  Proyecto Proyecto @relation(fields: [proyecto_id], references: [id])
 }
 
 model Tren {
