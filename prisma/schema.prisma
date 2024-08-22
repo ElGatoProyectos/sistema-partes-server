@@ -23,9 +23,9 @@ model User {
   id       Int    @id @default(autoincrement())
   email    String @unique
   dni      String @unique
-  name     String
-  lastname String
-  phone    String
+  name     String @db.Text()
+  lastname String @db.Text()
+  phone    String @db.Text()
 
   role   ERole_BD
   status Boolean  @default(true)
@@ -44,8 +44,8 @@ enum E_Proyecto_Estado {
 
 model Proyecto {
   id               Int                @id @default(autoincrement())
-  titulo           String
-  descripcion      String?
+  titulo           String             @db.Text()
+  descripcion      String?            @db.Text()
   estado           E_Proyecto_Estado
   fecha_creacion   DateTime           @db.Date()
   // Unnamed: 5 parece ser un campo que no tiene relevancia o es temporal, así que no se incluye en el modelo
@@ -56,7 +56,7 @@ model UnidadProduccion {
   id          Int     @id @default(autoincrement())
   proyecto_id Int
   codigo      Int
-  titulo      String
+  titulo      String  @db.Text()
   nota        String? @db.Text()
 
   Proyecto Proyecto @relation(fields: [proyecto_id], references: [id])
@@ -65,23 +65,27 @@ model UnidadProduccion {
 model Tren {
   id        Int     @id @default(autoincrement())
   codigo    Int
-  titulo    String
-  cuadrilla String?
-  nota      String?
+  titulo    String  @db.Text()
+  cuadrilla String? @db.Text()
+  nota      String? @db.Text()
   operario  Int
   oficial   Int
   peon      Int
+
+  ReporteTrenes ReporteTrenes[]
 }
 
 model Partida {
   id        Int    @id @default(autoincrement())
   idInterno Int
-  item      String
-  partida   String
-  unidad    String
+  item      String @db.Text()
+  partida   String @db.Text()
+  unidad    String @db.Text()
   metrado   Float
   precio    Float
   parcial   Float?
+
+  ReportePartidas ReportePartidas[]
 }
 
 model ListaPrecio {
@@ -94,7 +98,7 @@ model ListaPrecio {
 model DetallePrecioHoraMO {
   id           Int    @id @default(autoincrement())
   codigo       Int
-  categoria    String
+  categoria    String @db.Text()
   horaNormal   Float
   horaExtra60  Float
   horaExtra100 Float
@@ -117,13 +121,15 @@ model ReporteTrenes {
   domingo       Float?
   fechaInicio   DateTime
   fechaFin      DateTime
+  Tren          Tren     @relation(fields: [trenId], references: [id])
 }
 
 model ReportePartidas {
-  id            Int   @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   partidaId     Int // Relación con Partida
   costoTotal    Float
   costoAnterior Float
   costoActual   Float
   costoParcial  Float
+  Partida       Partida @relation(fields: [partidaId], references: [id])
 }
