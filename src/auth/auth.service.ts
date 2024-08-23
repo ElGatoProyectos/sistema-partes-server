@@ -3,9 +3,14 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
     try {
-      return httpResponse.http200("Login successful", null);
+      // buscar usuario
+
+      // validar password
+
+      // retornarjwt
+      return httpResponse.SuccessResponse("Login successful", null);
     } catch (error) {
-      return httpResponse.http500("Error", error);
+      return httpResponse.InternalServerErrorException("Error", error);
     } finally {
     }
   }
