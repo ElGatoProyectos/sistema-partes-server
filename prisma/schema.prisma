@@ -13,26 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ERole_BD {
+enum E_Rol_BD {
   SUPERADMIN
   ADMIN
   USER
 }
 
-model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  dni      String @unique
-  name     String
-  lastname String
-  phone    String
+model Usuario {
+  id              Int    @id @default(autoincrement())
+  email           String @unique
+  dni             String @unique
+  nombre_completo String
+  telefono        String
 
-  role   ERole_BD
-  status Boolean  @default(true)
+  rol     E_Rol_BD
+  estatus Boolean  @default(true)
 
-  password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  contrasena         String
+  fecha_creacion     DateTime @default(now())
+  fecha_modificacion DateTime @updatedAt
 }
 
 enum E_Proyecto_Estado {
@@ -70,56 +69,56 @@ model Tren {
 }
 
 model Partida {
-  id        Int    @id @default(autoincrement())
-  idInterno Int
-  item      String
-  partida   String
-  unidad    String
-  metrado   Float
-  precio    Float
-  parcial   Float?
+  id         Int    @id @default(autoincrement())
+  id_Interno Int
+  item       String
+  partida    String
+  unidad     String
+  metrado    Float
+  precio     Float
+  parcial    Float?
 }
 
 model ListaPrecio {
-  id          Int      @id @default(autoincrement())
-  fechaInicio DateTime
-  fechaFin    DateTime
-  titulo      String
+  id           Int      @id @default(autoincrement())
+  fecha_inicio DateTime
+  fecha_fin    DateTime
+  titulo       String
 }
 
 model DetallePrecioHoraMO {
-  id           Int    @id @default(autoincrement())
-  codigo       Int
-  categoria    String
-  horaNormal   Float
-  horaExtra60  Float
-  horaExtra100 Float
+  id            Int    @id @default(autoincrement())
+  codigo        Int
+  categoria     String
+  hora_normal   Float
+  hora_extra60  Float
+  hora_extra100 Float
 }
 
 model ReporteTrenes {
-  id            Int      @id @default(autoincrement())
-  trenId        Int // Relación con Tren
-  costoTotal    Float
-  costoAnterior Float
-  costoActual   Float
-  costoParcial  Float
-  saldo         Float?
-  lunes         Float?
-  martes        Float?
-  miercoles     Float?
-  jueves        Float?
-  viernes       Float?
-  sabado        Float?
-  domingo       Float?
-  fechaInicio   DateTime
-  fechaFin      DateTime
+  id             Int      @id @default(autoincrement())
+  tren_id        Int // Relación con Tren
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
+  saldo          Float?
+  lunes          Float?
+  martes         Float?
+  miercoles      Float?
+  jueves         Float?
+  viernes        Float?
+  sabado         Float?
+  domingo        Float?
+  fecha_inicio   DateTime
+  fecha_fin      DateTime
 }
 
 model ReportePartidas {
-  id            Int   @id @default(autoincrement())
-  partidaId     Int // Relación con Partida
-  costoTotal    Float
-  costoAnterior Float
-  costoActual   Float
-  costoParcial  Float
+  id             Int   @id @default(autoincrement())
+  partida_id     Int // Relación con Partida
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
 }
