@@ -6,110 +6,86 @@ export type T_HttpResponse = {
 };
 
 class HttpResponse {
-  http200(
-    message: string = "Fetch ok",
-    payload: null | unknown
+  SuccessResponse(
+    message: string = "Success",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: true,
-      message,
       statusCode: 200,
+      message,
       payload,
     };
   }
 
-  http201(
-    message: string = "Entity created",
-    payload: null | unknown
+  CreatedResponse(
+    message: string = "Resource created successfully",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: true,
-      message,
       statusCode: 201,
+      message,
       payload,
     };
   }
 
-  http400(
-    message: string = "Bad Request",
-    payload: null | unknown
+  BadRequestException(
+    message: string = "Bad request exception",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: false,
-      message,
       statusCode: 400,
+      message,
       payload,
     };
   }
 
-  http401(
-    message: string = "Unauthorized",
-    payload: null | unknown
+  UnauthorizedException(
+    message: string = "Unauthorized exception",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: false,
-      message,
       statusCode: 401,
+      message,
       payload,
     };
   }
 
-  http403(
-    message: string = "Forbidden",
-    payload: null | unknown
+  ForbiddenException(
+    message: string = "Forbidden exception",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: false,
-      message,
       statusCode: 403,
+      message,
       payload,
     };
   }
 
-  http404(
-    message: string = "Not Found",
-    payload: null | unknown
+  NotFoundException(
+    message: string = "Not found exception",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: false,
-      message,
       statusCode: 404,
+      message,
       payload,
     };
   }
 
-  http500(
-    message: string = "Internal Server Error",
-    payload: null | unknown
+  InternalServerErrorException(
+    message: string = "Internal server error",
+    payload: any = null
   ): T_HttpResponse {
     return {
       success: false,
-      message,
       statusCode: 500,
-      payload,
-    };
-  }
-
-  http503(
-    message: string = "Service Unavailable",
-    payload: null | unknown
-  ): T_HttpResponse {
-    return {
-      success: false,
       message,
-      statusCode: 503,
-      payload,
-    };
-  }
-
-  http504(
-    message: string = "Gateway Timeout",
-    payload: null | unknown
-  ): T_HttpResponse {
-    return {
-      success: false,
-      message,
-      statusCode: 504,
       payload,
     };
   }
