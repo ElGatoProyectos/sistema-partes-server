@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -60,70 +60,193 @@ model UnidadProduccion {
   nota        String? @db.Text()
 
   Proyecto Proyecto @relation(fields: [proyecto_id], references: [id])
+  Trabajo  Trabajo?
 }
 
 model Tren {
-  id        Int     @id @default(autoincrement())
-  codigo    Int
-  titulo    String
-  cuadrilla String?
-  nota      String?
-  operario  Int
-  oficial   Int
-  peon      Int
+  id            Int             @id @default(autoincrement())
+  codigo        Int
+  titulo        String          @db.Text()
+  cuadrilla     String?         @db.Text()
+  nota          String?         @db.Text()
+  operario      Int
+  oficial       Int
+  peon          Int
+  ReporteTrenes ReporteTrenes[]
+  Trabajo       Trabajo?
 }
 
 model Partida {
-  id        Int    @id @default(autoincrement())
-  idInterno Int
-  item      String
-  partida   String
-  unidad    String
-  metrado   Float
-  precio    Float
-  parcial   Float?
+  id              Int               @id @default(autoincrement())
+  id_interno      Int
+  item            String            @db.Text()
+  partida         String            @db.Text()
+  unidad          String            @db.Text()
+  metrado         Float
+  precio          Float
+  parcial         Float?
+  total           Float?
+  ReportePartidas ReportePartidas[]
+}
+
+model Trabajo {
+  id                 Int              @id @default(autoincrement())
+  tren_id            Int              @unique
+  up_id              Int              @unique
+  codigo             String
+  nombre             String
+  duracion           Int
+  fecha_inicio       DateTime
+  fecha_finalizacion DateTime
+  estado             Boolean
+  costo_partida      Int
+  costo_mano_obra    Int
+  costo_material     Int
+  costo_equipo       Int
+  costo_varios       Int
+  Tren               Tren             @relation(fields: [tren_id], references: [id])
+  UnidadProduccion   UnidadProduccion @relation(fields: [up_id], references: [id])
+  ParteDiario        ParteDiario?
 }
 
 model ListaPrecio {
-  id          Int      @id @default(autoincrement())
-  fechaInicio DateTime
-  fechaFin    DateTime
-  titulo      String
+  id           Int      @id @default(autoincrement())
+  fecha_inicio DateTime
+  fecha_fin    DateTime
+  titulo       String   @db.Text()
 }
 
 model DetallePrecioHoraMO {
-  id           Int    @id @default(autoincrement())
-  codigo       Int
-  categoria    String
-  horaNormal   Float
-  horaExtra60  Float
-  horaExtra100 Float
+  id             Int    @id @default(autoincrement())
+  codigo         Int
+  categoria      String
+  hora_normal    Float
+  hora_extra_60  Float
+  hora_extra_100 Float
 }
 
 model ReporteTrenes {
-  id            Int      @id @default(autoincrement())
-  trenId        Int // Relación con Tren
-  costoTotal    Float
-  costoAnterior Float
-  costoActual   Float
-  costoParcial  Float
-  saldo         Float?
-  lunes         Float?
-  martes        Float?
-  miercoles     Float?
-  jueves        Float?
-  viernes       Float?
-  sabado        Float?
-  domingo       Float?
-  fechaInicio   DateTime
-  fechaFin      DateTime
+  id             Int      @id @default(autoincrement())
+  trenId         Int // Relación con Tren
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
+  saldo          Float?
+  lunes          Float?
+  martes         Float?
+  miercoles      Float?
+  jueves         Float?
+  viernes        Float?
+  sabado         Float?
+  domingo        Float?
+  fecha_inicio   DateTime
+  fecha_fin      DateTime
+  Tren           Tren     @relation(fields: [trenId], references: [id])
 }
 
 model ReportePartidas {
-  id            Int   @id @default(autoincrement())
-  partidaId     Int // Relación con Partida
-  costoTotal    Float
-  costoAnterior Float
-  costoActual   Float
-  costoParcial  Float
+  id             Int     @id @default(autoincrement())
+  partida_id     Int // Relación con Partida
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
+  Partida        Partida @relation(fields: [partida_id], references: [id])
+}
+
+model ManoDeObra {
+  id                     Int                @id @default(autoincrement())
+  dni                    Int                @unique
+  nombres_completos      String
+  categoria_obrero       Int                @unique
+  tipo_obrero_id         Int                @unique
+  origen_obrero_id       Int                @unique
+  especialidad_obrero_id Int                @unique
+  unidad                 Int
+  fecha_inicio           DateTime
+  fecha_cese             DateTime
+  estado                 Boolean
+  cuenta                 String             @db.Text()
+  fecha_nacimiento       DateTime
+  escolaridad            String
+  celular                Int
+  correo                 String
+  CategoriaObrero        CategoriaObrero    @relation(fields: [categoria_obrero], references: [id])
+  EspecialidadObra       EspecialidadObrero @relation(fields: [especialidad_obrero_id], references: [id])
+  TipoObrero             TipoObrero         @relation(fields: [tipo_obrero_id], references: [id])
+  OrigenObrero           OrigenObrero       @relation(fields: [origen_obrero_id], references: [id])
+  Asistencia             Asistencia?
+}
+
+model CategoriaObrero {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  ManoDeObra ManoDeObra?
+}
+
+model TipoObrero {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  ManoDeObra ManoDeObra?
+}
+
+model OrigenObrero {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  ManoDeObra ManoDeObra?
+}
+
+model EspecialidadObrero {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  ManoDeObra ManoDeObra?
+}
+
+model Recursos {
+  id                Int              @id @default(autoincrement())
+  id_indice         Int
+  id_unificado      Int
+  codigo            Int
+  recurso           String
+  categoria_recurso Int              @unique
+  CategoriaRecurso  CategoriaRecurso @relation(fields: [categoria_recurso], references: [id])
+  unidad            Int
+  precio            Int
+}
+
+model CategoriaRecurso {
+  id       Int       @id @default(autoincrement())
+  nombre   String
+  Recursos Recursos?
+}
+
+model Asistencia {
+  id                  Int        @id @default(autoincrement())
+  mano_de_obra_id     Int        @unique
+  fecha               DateTime
+  fecha_inicio        DateTime
+  fecha_fin           DateTime
+  horas               Int
+  asistencia          String
+  horas_extras_estado Boolean
+  horas_extras        Int
+  ManoDeObra          ManoDeObra @relation(fields: [mano_de_obra_id], references: [id])
+}
+
+model ParteDiario {
+  id                    Int      @id @default(autoincrement())
+  trabajo_id            Int      @unique
+  titulo                String
+  fecha                 DateTime
+  etapa                 String
+  jornada               String
+  hora_inicio           Float
+  hora_fin              Float
+  descripcion_actividad String
+  nota                  String
+  distanciamiento       Boolean
+  protocolo_ingreso     Boolean
+  protocolo_salida      Boolean
+  Trabajo               Trabajo  @relation(fields: [trabajo_id], references: [id])
 }
