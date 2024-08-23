@@ -13,26 +13,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ERole_BD {
-  SUPERADMIN
-  ADMIN
+enum E_Rol_BD {
+  ADMIN // Alejandro
   USER
 }
 
-model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  dni      String @unique
-  name     String
-  lastname String
-  phone    String
+enum E_Estado_BD {
+  y
+  n
+}
 
-  role   ERole_BD
-  status Boolean  @default(true)
+model Usuario {
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  dni                   String                  @unique
+  nombre_completo       String
+  telefono              String
+  rol                   E_Rol_BD
+  estatus               E_Estado_BD             @default(y)
+  contrasena            String
+  Empresa               Empresa[]
+  DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
+  ManoDeObra            ManoDeObra[]
+}
 
-  password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model Empresa {
+  id                    Int                     @id @default(autoincrement())
+  nombre_empresa        String
+  descripcion_empresa   String?                 @default("") @db.Text()
+  limite_proyecto       Int                     @default(1)
+  usuarioId             Int
+  DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
+  Proyecto              Proyecto[]
+  Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
+}
+
+model DetalleUsuarioEmpresa {
+  id         Int     @id @default(autoincrement())
+  usuario_id Int
+  empresa_id Int
+  Usuario    Usuario @relation(fields: [usuario_id], references: [id])
+  Empresa    Empresa @relation(fields: [empresa_id], references: [id])
 }
 
 enum E_Proyecto_Estado {
@@ -44,209 +65,251 @@ enum E_Proyecto_Estado {
 
 model Proyecto {
   id               Int                @id @default(autoincrement())
-  titulo           String
-  descripcion      String?
+  nombre           String
+  descripcion      String?            @default("") @db.Text
   estado           E_Proyecto_Estado
   fecha_creacion   DateTime           @db.Date()
-  // Unnamed: 5 parece ser un campo que no tiene relevancia o es temporal, así que no se incluye en el modelo
+  empresa_id       Int
+  Empresa          Empresa            @relation(fields: [empresa_id], references: [id])
   UnidadProduccion UnidadProduccion[]
+  Tren             Tren[]
+  Partida          Partida[]
 }
 
 model UnidadProduccion {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
+  codigo      String    @unique
+  nombre      String
+  nota        String?   @default("") @db.Text()
   proyecto_id Int
-  codigo      Int
-  titulo      String
-  nota        String? @db.Text()
-
-  Proyecto Proyecto @relation(fields: [proyecto_id], references: [id])
-  Trabajo  Trabajo?
+  Proyecto    Proyecto  @relation(fields: [proyecto_id], references: [id])
+  Trabajo     Trabajo[]
 }
 
 model Tren {
-  id            Int             @id @default(autoincrement())
-  codigo        Int
-  titulo        String          @db.Text()
-  cuadrilla     String?         @db.Text()
-  nota          String?         @db.Text()
-  operario      Int
-  oficial       Int
-  peon          Int
-  ReporteTrenes ReporteTrenes[]
-  Trabajo       Trabajo?
+  id          Int           @id @default(autoincrement())
+  codigo      String        @unique
+  nombre      String
+  cuadrilla   String?
+  nota        String?       @default("") @db.Text()
+  operario    Int
+  oficial     Int
+  peon        Int
+  proyecto_id Int
+  ReporteTren ReporteTren[]
+  Trabajo     Trabajo[]
+  Proyecto    Proyecto      @relation(fields: [proyecto_id], references: [id])
 }
 
 model Partida {
-  id              Int               @id @default(autoincrement())
-  id_interno      Int
-  item            String            @db.Text()
-  partida         String            @db.Text()
-  unidad          String            @db.Text()
-  metrado         Float
-  precio          Float
-  parcial         Float?
-  total           Float?
-  ReportePartidas ReportePartidas[]
+  id                    Int                     @id @default(autoincrement())
+  id_interno            String                  @unique
+  item                  String
+  partida               String
+  unidad                String
+  metrado               Float
+  precio                Float
+  parcial               Float?                  @default(0)
+  total                 Float?                  @default(0)
+  proyecto_id           Int
+  ReportePartida        ReportePartida[]
+  Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
+  DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
 
 model Trabajo {
-  id                 Int              @id @default(autoincrement())
-  tren_id            Int              @unique
-  up_id              Int              @unique
-  codigo             String
-  nombre             String
-  duracion           Int
-  fecha_inicio       DateTime
-  fecha_finalizacion DateTime
-  estado             Boolean
-  costo_partida      Int
-  costo_mano_obra    Int
-  costo_material     Int
-  costo_equipo       Int
-  costo_varios       Int
-  Tren               Tren             @relation(fields: [tren_id], references: [id])
-  UnidadProduccion   UnidadProduccion @relation(fields: [up_id], references: [id])
-  ParteDiario        ParteDiario?
+  id                    Int                     @id @default(autoincrement())
+  codigo                String
+  nombre                String
+  duracion              Int
+  fecha_inicio          DateTime                @db.Date //año más dia
+  fecha_finalizacion    DateTime                @db.Date //año más dia
+  estado                E_Estado_BD             @default(y)
+  costo_partida         Int
+  costo_mano_obra       Int
+  costo_material        Int
+  costo_equipo          Int
+  costo_varios          Int
+  tren_id               Int                     @unique
+  up_id                 Int                     @unique
+  Tren                  Tren                    @relation(fields: [tren_id], references: [id])
+  UnidadProduccion      UnidadProduccion        @relation(fields: [up_id], references: [id])
+  ParteDiario           ParteDiario[]
+  DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
 
-model ListaPrecio {
-  id           Int      @id @default(autoincrement())
-  fecha_inicio DateTime
-  fecha_fin    DateTime
-  titulo       String   @db.Text()
-}
-
-model DetallePrecioHoraMO {
-  id             Int    @id @default(autoincrement())
-  codigo         Int
-  categoria      String
-  hora_normal    Float
-  hora_extra_60  Float
-  hora_extra_100 Float
-}
-
-model ReporteTrenes {
-  id             Int      @id @default(autoincrement())
-  trenId         Int // Relación con Tren
-  costo_total    Float
-  costo_anterior Float
-  costo_actual   Float
-  costo_parcial  Float
-  saldo          Float?
-  lunes          Float?
-  martes         Float?
-  miercoles      Float?
-  jueves         Float?
-  viernes        Float?
-  sabado         Float?
-  domingo        Float?
-  fecha_inicio   DateTime
-  fecha_fin      DateTime
-  Tren           Tren     @relation(fields: [trenId], references: [id])
-}
-
-model ReportePartidas {
-  id             Int     @id @default(autoincrement())
-  partida_id     Int // Relación con Partida
-  costo_total    Float
-  costo_anterior Float
-  costo_actual   Float
-  costo_parcial  Float
-  Partida        Partida @relation(fields: [partida_id], references: [id])
+model DetalleTrabajoPartida {
+  id         Int     @id @default(autoincrement())
+  trabajo_id Int
+  partida_id Int
+  Trabajo    Trabajo @relation(fields: [trabajo_id], references: [id])
+  Partida    Partida @relation(fields: [partida_id], references: [id])
 }
 
 model ManoDeObra {
   id                     Int                @id @default(autoincrement())
-  dni                    Int                @unique
-  nombres_completos      String
-  categoria_obrero       Int                @unique
+  unidad                 Int
+  fecha_inicio           DateTime           @db.Date //año más dia
+  fecha_cese             DateTime           @db.Date //año más dia
+  banco                  String
+  cuenta                 String             @db.Text()
+  fecha_nacimiento       DateTime           @db.Date //año más dia
+  escolaridad            String
+  usuario_id             Int
   tipo_obrero_id         Int                @unique
   origen_obrero_id       Int                @unique
   especialidad_obrero_id Int                @unique
-  unidad                 Int
-  fecha_inicio           DateTime
-  fecha_cese             DateTime
-  estado                 Boolean
-  cuenta                 String             @db.Text()
-  fecha_nacimiento       DateTime
-  escolaridad            String
-  celular                Int
-  correo                 String
-  CategoriaObrero        CategoriaObrero    @relation(fields: [categoria_obrero], references: [id])
+  categoria_obrero_id    Int                @unique
+  Asistencia             Asistencia[]
+  CategoriaObrero        CategoriaObrero    @relation(fields: [categoria_obrero_id], references: [id])
   EspecialidadObra       EspecialidadObrero @relation(fields: [especialidad_obrero_id], references: [id])
   TipoObrero             TipoObrero         @relation(fields: [tipo_obrero_id], references: [id])
   OrigenObrero           OrigenObrero       @relation(fields: [origen_obrero_id], references: [id])
-  Asistencia             Asistencia?
+  ParteDiarioMo          ParteDiarioMO[]
+  Usuario                Usuario            @relation(fields: [usuario_id], references: [id])
 }
 
 model CategoriaObrero {
-  id         Int         @id @default(autoincrement())
-  nombre     String
-  ManoDeObra ManoDeObra?
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  ManoDeObra          ManoDeObra[]
+  DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
 
 model TipoObrero {
-  id         Int         @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   nombre     String
-  ManoDeObra ManoDeObra?
+  ManoDeObra ManoDeObra[]
 }
 
 model OrigenObrero {
-  id         Int         @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   nombre     String
-  ManoDeObra ManoDeObra?
+  ManoDeObra ManoDeObra[]
 }
 
 model EspecialidadObrero {
-  id         Int         @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   nombre     String
-  ManoDeObra ManoDeObra?
+  ManoDeObra ManoDeObra[]
 }
 
-model Recursos {
-  id                Int              @id @default(autoincrement())
-  id_indice         Int
-  id_unificado      Int
-  codigo            Int
-  recurso           String
-  categoria_recurso Int              @unique
-  CategoriaRecurso  CategoriaRecurso @relation(fields: [categoria_recurso], references: [id])
-  unidad            Int
-  precio            Int
+model Recurso {
+  id                 Int                  @id @default(autoincrement())
+  id_indice          String               @unique
+  id_unificado       String               @unique
+  codigo             String               @unique
+  recurso            String
+  unidad             String
+  precio             Float
+  categoria_recurso  Int                  @unique
+  CategoriaRecurso   CategoriaRecurso     @relation(fields: [categoria_recurso], references: [id])
+  ParteDiarioRecurso ParteDiarioRecurso[]
 }
 
 model CategoriaRecurso {
-  id       Int       @id @default(autoincrement())
-  nombre   String
-  Recursos Recursos?
+  id      Int       @id @default(autoincrement())
+  nombre  String
+  Recurso Recurso[]
+}
+
+enum E_Asistencia_BD {
+  F
+  A
 }
 
 model Asistencia {
-  id                  Int        @id @default(autoincrement())
-  mano_de_obra_id     Int        @unique
+  id                  Int             @id @default(autoincrement())
   fecha               DateTime
-  fecha_inicio        DateTime
-  fecha_fin           DateTime
-  horas               Int
-  asistencia          String
-  horas_extras_estado Boolean
-  horas_extras        Int
-  ManoDeObra          ManoDeObra @relation(fields: [mano_de_obra_id], references: [id])
+  hora_inicio         String
+  hora_fin            String
+  horas               Float
+  asistencia          E_Asistencia_BD @default(F)
+  horas_extras_estado E_Estado_BD     @default(n)
+  horas_extras        Float
+  mano_obra_id        Int             @unique
+  ManoDeObra          ManoDeObra      @relation(fields: [mano_obra_id], references: [id])
 }
 
 model ParteDiario {
-  id                    Int      @id @default(autoincrement())
-  trabajo_id            Int      @unique
-  titulo                String
-  fecha                 DateTime
+  id                    Int                  @id @default(autoincrement())
+  nombre                String
+  fecha                 DateTime             @db.Date()
   etapa                 String
   jornada               String
-  hora_inicio           Float
-  hora_fin              Float
-  descripcion_actividad String
-  nota                  String
-  distanciamiento       Boolean
-  protocolo_ingreso     Boolean
-  protocolo_salida      Boolean
-  Trabajo               Trabajo  @relation(fields: [trabajo_id], references: [id])
+  hora_inicio           String
+  hora_fin              String
+  descripcion_actividad String?              @default("") @db.Text()
+  nota                  String?              @default("") @db.Text()
+  distanciamiento       E_Estado_BD?
+  protocolo_ingreso     E_Estado_BD?
+  protocolo_salida      E_Estado_BD?
+  trabajo_id            Int                  @unique
+  Trabajo               Trabajo              @relation(fields: [trabajo_id], references: [id])
+  ParteDiarioMo         ParteDiarioMO[]
+  ParteDiarioRecurso    ParteDiarioRecurso[]
+}
+
+model ParteDiarioMO {
+  id              Int         @id @default(autoincrement())
+  parte_diario_id Int
+  mano_obra_id    Int
+  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
+  ManoDeObra      ManoDeObra  @relation(fields: [mano_obra_id], references: [id])
+}
+
+model ParteDiarioRecurso {
+  id              Int         @id @default(autoincrement())
+  parte_diario_id Int
+  recurso_id      Int
+  cantidad        Int
+  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
+  Recurso         Recurso     @relation(fields: [recurso_id], references: [id])
+}
+
+model PrecioHoraMO {
+  id           Int      @id @default(autoincrement())
+  fecha_inicio DateTime @db.Date()
+  fecha_fin    DateTime @db.Date()
+  nombre       String
+}
+
+model DetallePrecioHoraMO {
+  id                  Int             @id @default(autoincrement())
+  codigo              String          @unique
+  hora_normal         Float
+  hora_extra_60       Float
+  hora_extra_100      Float
+  categoria_obrero_id Int
+  CategoriaObrero     CategoriaObrero @relation(fields: [categoria_obrero_id], references: [id])
+}
+
+model ReporteTren {
+  id             Int      @id @default(autoincrement())
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
+  saldo          Float?   @default(0)
+  lunes          Float?   @default(0)
+  martes         Float?   @default(0)
+  miercoles      Float?   @default(0)
+  jueves         Float?   @default(0)
+  viernes        Float?   @default(0)
+  sabado         Float?   @default(0)
+  domingo        Float?   @default(0)
+  fecha_inicio   DateTime @db.Date()
+  fecha_fin      DateTime @db.Date()
+  tren_id        Int
+  Tren           Tren     @relation(fields: [tren_id], references: [id])
+}
+
+model ReportePartida {
+  id             Int     @id @default(autoincrement())
+  costo_total    Float
+  costo_anterior Float
+  costo_actual   Float
+  costo_parcial  Float
+  partida_id     Int
+  Partida        Partida @relation(fields: [partida_id], references: [id])
 }
