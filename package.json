@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
+  "_moduleAliases": {
+    "@": "src"
+  },
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
@@ -22,6 +25,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "prisma": "^5.18.0",
     "validator": "^13.12.0",
     "zod": "^3.23.8"
