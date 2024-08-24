@@ -10,12 +10,12 @@ const prefix = "/auth";
 
 authRouter.post(
   `${prefix}`,
-  loginMiddleware.validateBody,
-  authRoleMiddleware.authAdmin
+  loginMiddleware.validateBody
+  //authRoleMiddleware.authAdmin
 );
 
 authRouter.post(
   `${prefix}`,
-  loginMiddleware.validateBody,
-  authRoleMiddleware.authUser
+  loginMiddleware.validateBody
+  // authRoleMiddleware.authUser
 );
