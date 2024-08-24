@@ -6,15 +6,14 @@ import { jwtService } from "../jwt.service";
 import { httpResponse } from "@/common/http.response";
 
 class AuthRoleMiddleware {
-  private unauthorizedError = httpResponse.UnauthorizedException(
-    "Error al autenticar usuario"
-  );
-
   authAdmin(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
+    const customError = httpResponse.UnauthorizedException(
+      "Error en la autenticación"
+    );
     try {
       const authorization = request.get("Authorization") as string;
 
@@ -22,16 +21,13 @@ class AuthRoleMiddleware {
 
       const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
 
-      if (tokenDecrypted.role !== "ADMIN")
-        response
-          .status(this.unauthorizedError.statusCode)
-          .send(this.unauthorizedError);
-
-      nextFunction();
+      if (tokenDecrypted.role !== "ADMIN") {
+        response.status(customError.statusCode).send(customError);
+      } else {
+        nextFunction();
+      }
     } catch (error) {
-      response
-        .status(this.unauthorizedError.statusCode)
-        .send(this.unauthorizedError);
+      response.status(customError.statusCode).send(customError);
     }
   }
 

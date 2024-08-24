@@ -13,7 +13,7 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "Error al validar autenticacion"
+        "[m] Error al validar autenticacion"
       );
       response.status(result.statusCode).send(result);
     }
