@@ -1,12 +1,10 @@
-import express from 'express';
+import express from "express";
+import { envConfig } from "./config/env.config";
+import userRouter from "./user/user.init";
+const globalPrefix = "/api";
 const app = express();
-
-app.get('/', (req, res) => {
-  const name = process.env.NAME || 'World';
-  res.send(`Hello ${name}!`);
-});
-
-const port = parseInt(process.env.PORT || '3000');
-app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+app.use(express.json());
+app.use(globalPrefix, userRouter);
+app.listen(envConfig.port, () => {
+  console.log(`listening on port ${envConfig.port}`);
 });
