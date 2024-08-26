@@ -2,7 +2,7 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { jwtService } from "./jwt.service";
 import { bcryptService } from "@/auth/bcrypt.service";
 import prisma from "@/config/prisma.config";
-import LoginResponseMapper from "./dtos/loginResponse.dto";
+import LoginResponseMapper from "./mappers/login.mapper";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {

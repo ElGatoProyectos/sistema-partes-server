@@ -16,10 +16,4 @@ authRouter.post(
   //authRoleMiddleware.authAdmin
 );
 
-// authRouter.post(
-//   `${prefix}`,
-//   loginMiddleware.validateBody
-//   // authRoleMiddleware.authUser
-// );
-
 export default authRouter;

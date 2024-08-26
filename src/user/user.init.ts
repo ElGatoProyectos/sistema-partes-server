@@ -10,8 +10,15 @@ const prefix = "/users";
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdmin,
+  // authRoleMiddleware.authAdmin,
   userController.create
+);
+
+userRouter.put(
+  `${prefix}/:id`,
+  userMiddleware.verifyFieldsUpdate,
+  //authRoleMiddleware.authAdmin,
+  userController.update
 );
 
 export default userRouter;

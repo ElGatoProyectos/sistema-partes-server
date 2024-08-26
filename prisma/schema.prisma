@@ -18,11 +18,48 @@ enum E_Rol_BD {
   USER
 }
 
+enum E_Estado_Riesgo_BD {
+  PENDIENTE
+  SOLUCIONADO
+}
+
+enum E_Categoria_Salarial_Obrero_BD {
+  BASICO
+  INTERMEDIO
+  AVANZADO
+}
+
+enum E_Riesgo_BD {
+  BAJO
+  MEDIO
+  ALTO
+}
+
+//si esta activo o no 
 enum E_Estado_BD {
   y
   n
 }
 
+enum E_TIPO_PARENTESCO_BD {
+  PADRE
+  MADRE
+  HIJO
+  HIJA
+  ABUELO
+  ABUELA
+  SOBRINA
+  SOBRINO
+}
+
+enum E_Proyecto_Estado {
+  ACTIVO
+  INACTIVO
+  PENDIENTE
+  FINALIZADO
+}
+
+//[success] actual
 model Usuario {
   id                    Int                     @id @default(autoincrement())
   email                 String                  @unique
@@ -30,13 +67,202 @@ model Usuario {
   nombre_completo       String
   telefono              String
   rol                   E_Rol_BD
-  estatus               E_Estado_BD             @default(y)
+  estado                E_Estado_BD             @default(y)
   contrasena            String
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  ManoDeObra            ManoDeObra[]
 }
 
+//[success] actual
+model ManoObra {
+  id                          Int                           @id @default(autoincrement())
+  //datos básicos
+  email_personal              String                        @unique
+  nombres                     String
+  apellido_materno            String
+  apellido_paterno            String
+  turno                       String?
+  sede_local                  String?
+  fecha_inicio                DateTime                      @db.Date //año más dia
+  fecha_cese                  DateTime                      @db.Date //año más dia
+  estado                      E_Estado_BD                   @default(y)
+  telefono                    String
+  usuario_marcacion           String?                       @default("")
+  domicilio                   String?
+  lugar_nacimiento            String?
+  genero                      String?
+  tipo_documento              String?
+  documento_identidad         String?
+  profesion                   String?
+  estado_civil                String?
+  n_libreta_militar           String?
+  n_pasaporte                 String?
+  email_corporativo           String?
+  brebete                     String?
+  grado_instruccion           String?
+  ruc                         String?
+  tipo_cese                   String?
+  carnet_extranjeria          String?
+  condicion                   String? //por ejemplo inválido 
+  pais_origen                 String?
+  observacion                 String?                       @db.Text()
+  hora_ingreso                String?
+  hora_salida                 String?
+  tolerancia_ingreso          String?
+  tiempo_refrigerio           String?
+  //termina básico
+  unidad                      Int
+  banco                       String
+  cuenta                      String                        @db.Text()
+  fecha_nacimiento            DateTime                      @db.Date //año más dia
+  escolaridad                 String
+  usuario_id                  Int
+  tipo_obrero_id              Int                           @unique
+  origen_obrero_id            Int                           @unique
+  especialidad_obrero_id      Int                           @unique
+  categoria_obrero_id         Int                           @unique
+  Asistencia                  Asistencia[]
+  CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id])
+  EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id])
+  TipoObrero                  TipoObrero                    @relation(fields: [tipo_obrero_id], references: [id])
+  OrigenObrero                OrigenObrero                  @relation(fields: [origen_obrero_id], references: [id])
+  ParteDiarioMo               ParteDiarioMO[]
+  ManoObraDatoLaboral         ManoObraDatoLaboral[]
+  ManoObraSemana              ManoObraSemana[]
+  ManoObraComposicionFamiliar ManoObraComposicionFamiliar[]
+  ManoObraExperienciaLaboral  ManoObraExperienciaLaboral[]
+  ManoObraEstudios            ManoObraEstudios[]
+}
+
+//[note] modulo futuro
+//si trabajas hoy o no para el trabajador
+model ManoObraSemana {
+  id           Int         @id @default(autoincrement())
+  lunes        E_Estado_BD @default(y)
+  martes       E_Estado_BD @default(y)
+  miercoles    E_Estado_BD @default(y)
+  jueves       E_Estado_BD @default(y)
+  viernes      E_Estado_BD @default(y)
+  sabado       E_Estado_BD @default(y)
+  domingo      E_Estado_BD @default(y)
+  mano_obra_id Int
+  ManoObra     ManoObra    @relation(fields: [mano_obra_id], references: [id])
+}
+
+//[note] modulo futuro
+model ManoObraDatoLaboral {
+  id                       Int                            @id @default(autoincrement())
+  seccion_id               Int
+  area_mo_id               Int
+  mano_obra_id             Int
+  puesto_id                Int
+  // OJO PUEDE CAMBIARSE POR LA BBDD PARA EL RENDIMIENTO
+  categoria_salarial_id    E_Categoria_Salarial_Obrero_BD
+  departamento_mo_id       Int
+  fecha_ingreso_planilla   DateTime                       @db.Date
+  //revisar lo de truncas
+  fecha_vacaciones_truncas DateTime                       @db.Date
+  //afp o onp
+  tipo_afiliacion          String
+  PuestoObrero             PuestoObrero                   @relation(fields: [puesto_id], references: [id])
+  DepartamentoObrero       DepartamentoObrero             @relation(fields: [departamento_mo_id], references: [id])
+  AreaObrero               AreaObrero                     @relation(fields: [area_mo_id], references: [id])
+  ManoObra                 ManoObra                       @relation(fields: [mano_obra_id], references: [id])
+  SeccionObrero            SeccionObrero                  @relation(fields: [seccion_id], references: [id])
+}
+
+//[note] modulo futuro
+model ManoObraComposicionFamiliar {
+  id                    Int                  @id @default(autoincrement())
+  apellido_materno      String
+  apellido_paterno      String
+  nombres               String
+  tipo_parentesco       E_TIPO_PARENTESCO_BD
+  acta_matrimonial      String
+  fecha_nacimiento      DateTime             @db.Date()
+  estado_civil          String
+  genero                String
+  vive                  E_Estado_BD
+  partida_difuncion     String
+  tipo_documento        String
+  documento_identidad   String
+  grado_instruccion     String
+  //si vive en otro lugar 
+  vive_otro_domicilio   E_Estado_BD
+  direccion             String
+  asegurado             E_Estado_BD
+  no_independiente      E_Estado_BD
+  ocupacion             String
+  ingreso_mensual       Float
+  centro_trabajo        String
+  incapacitado          E_Estado_BD
+  documento_incapacidad String
+  mano_obra_id          Int
+  ManoObra              ManoObra             @relation(fields: [mano_obra_id], references: [id])
+}
+
+//[note] modulo futuro
+model ManoObraExperienciaLaboral {
+  id            Int      @id @default(autoincrement())
+  desde         DateTime @db.Date
+  hasta         DateTime @db.Date
+  tipo_contrato String
+  tipo_cese     String
+  remuneracion  Float
+  logros        String?
+  mano_obra_id  Int
+  ManoObra      ManoObra @relation(fields: [mano_obra_id], references: [id])
+}
+
+//[note] modulo futuro
+model ManoObraEstudios {
+  id             Int      @id @default(autoincrement())
+  tipo_estudio   String
+  desde          DateTime @db.Date
+  hasta          DateTime @db.Date
+  nivel_obtenido String
+  centro_estudio String
+  lugar_estudio  String
+  institucion    String
+  especialidad   String?
+  mano_obra_id   Int
+  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id])
+}
+
+//[note] modulo futuro
+model PuestoObrero {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  ManoObraDatoLaboral ManoObraDatoLaboral[]
+}
+
+//[success] actual
+model SeccionObrero {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  proyecto_id         Int
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  ManoObraDatoLaboral ManoObraDatoLaboral[]
+}
+
+//[success] actual
+model DepartamentoObrero {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  proyecto_id         Int
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  ManoObraDatoLaboral ManoObraDatoLaboral[]
+}
+
+//[success] actual
+model AreaObrero {
+  id                  Int                   @id @default(autoincrement())
+  proyecto_id         Int
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  ManoObraDatoLaboral ManoObraDatoLaboral[]
+}
+
+//[success] actual
 model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
@@ -48,6 +274,7 @@ model Empresa {
   Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
 }
 
+//[success] actual
 model DetalleUsuarioEmpresa {
   id         Int     @id @default(autoincrement())
   usuario_id Int
@@ -56,33 +283,31 @@ model DetalleUsuarioEmpresa {
   Empresa    Empresa @relation(fields: [empresa_id], references: [id])
 }
 
-enum E_Proyecto_Estado {
-  ACTIVO
-  INACTIVO
-  PENDIENTE
-  FINALIZADO
-}
-
+//[success] actual
 model Proyecto {
-  id               Int                @id @default(autoincrement())
-  nombre_completo  String
-  descripcion      String?            @default("") @db.Text
-  direccion        String
-  nombre_consorcio String
-  nombre_corto     String
-  costo_proyecto   Float
-  estado           E_Proyecto_Estado
-  fecha_creacion   DateTime           @db.Date()
-  fecha_fin        DateTime           @db.Date()
-  plazo_proyecto   String
-  codigo_proyecto  String
-  empresa_id       Int
-  Empresa          Empresa            @relation(fields: [empresa_id], references: [id])
-  UnidadProduccion UnidadProduccion[]
-  Tren             Tren[]
-  Partida          Partida[]
+  id                 Int                  @id @default(autoincrement())
+  nombre_completo    String
+  descripcion        String?              @default("") @db.Text
+  direccion          String
+  nombre_consorcio   String
+  nombre_corto       String
+  costo_proyecto     Float
+  estado             E_Proyecto_Estado
+  fecha_creacion     DateTime             @db.Date()
+  fecha_fin          DateTime             @db.Date()
+  plazo_proyecto     String
+  codigo_proyecto    String
+  empresa_id         Int
+  Empresa            Empresa              @relation(fields: [empresa_id], references: [id])
+  UnidadProduccion   UnidadProduccion[]
+  Tren               Tren[]
+  Partida            Partida[]
+  SeccionObrero      SeccionObrero[]
+  DepartamentoObrero DepartamentoObrero[]
+  AreaObrero         AreaObrero[]
 }
 
+//[success] actual
 model UnidadProduccion {
   id          Int       @id @default(autoincrement())
   codigo      String    @unique
@@ -93,6 +318,7 @@ model UnidadProduccion {
   Trabajo     Trabajo[]
 }
 
+//[success] actual
 model Tren {
   id          Int           @id @default(autoincrement())
   codigo      String        @unique
@@ -108,6 +334,7 @@ model Tren {
   Proyecto    Proyecto      @relation(fields: [proyecto_id], references: [id])
 }
 
+//[success] actual
 model Partida {
   id                    Int                     @id @default(autoincrement())
   id_interno            String                  @unique
@@ -124,6 +351,7 @@ model Partida {
   DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
 
+//[success] actual
 model Trabajo {
   id                    Int                     @id @default(autoincrement())
   codigo                String
@@ -145,6 +373,7 @@ model Trabajo {
   DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
 
+//[success] actual
 model DetalleTrabajoPartida {
   id         Int     @id @default(autoincrement())
   trabajo_id Int
@@ -153,54 +382,36 @@ model DetalleTrabajoPartida {
   Partida    Partida @relation(fields: [partida_id], references: [id])
 }
 
-model ManoDeObra {
-  id                     Int                @id @default(autoincrement())
-  unidad                 Int
-  fecha_inicio           DateTime           @db.Date //año más dia
-  fecha_cese             DateTime           @db.Date //año más dia
-  banco                  String
-  cuenta                 String             @db.Text()
-  fecha_nacimiento       DateTime           @db.Date //año más dia
-  escolaridad            String
-  usuario_id             Int
-  tipo_obrero_id         Int                @unique
-  origen_obrero_id       Int                @unique
-  especialidad_obrero_id Int                @unique
-  categoria_obrero_id    Int                @unique
-  Asistencia             Asistencia[]
-  CategoriaObrero        CategoriaObrero    @relation(fields: [categoria_obrero_id], references: [id])
-  EspecialidadObra       EspecialidadObrero @relation(fields: [especialidad_obrero_id], references: [id])
-  TipoObrero             TipoObrero         @relation(fields: [tipo_obrero_id], references: [id])
-  OrigenObrero           OrigenObrero       @relation(fields: [origen_obrero_id], references: [id])
-  ParteDiarioMo          ParteDiarioMO[]
-  Usuario                Usuario            @relation(fields: [usuario_id], references: [id])
-}
-
+//[success] actual
 model CategoriaObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
-  ManoDeObra          ManoDeObra[]
+  ManoObra            ManoObra[]
   DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
 
+//[success] actual
 model TipoObrero {
-  id         Int          @id @default(autoincrement())
-  nombre     String
-  ManoDeObra ManoDeObra[]
+  id       Int        @id @default(autoincrement())
+  nombre   String
+  ManoObra ManoObra[]
 }
 
+//[success] actual
 model OrigenObrero {
-  id         Int          @id @default(autoincrement())
-  nombre     String
-  ManoDeObra ManoDeObra[]
+  id       Int        @id @default(autoincrement())
+  nombre   String
+  ManoObra ManoObra[]
 }
 
+//[success] actual
 model EspecialidadObrero {
-  id         Int          @id @default(autoincrement())
-  nombre     String
-  ManoDeObra ManoDeObra[]
+  id       Int        @id @default(autoincrement())
+  nombre   String
+  ManoObra ManoObra[]
 }
 
+//[success] actual
 model Recurso {
   id                 Int                  @id @default(autoincrement())
   id_indice          String               @unique
@@ -214,6 +425,7 @@ model Recurso {
   ParteDiarioRecurso ParteDiarioRecurso[]
 }
 
+//[success] actual
 model CategoriaRecurso {
   id      Int       @id @default(autoincrement())
   nombre  String
@@ -225,6 +437,7 @@ enum E_Asistencia_BD {
   A
 }
 
+//[success] actual
 model Asistencia {
   id                  Int             @id @default(autoincrement())
   fecha               DateTime
@@ -235,36 +448,50 @@ model Asistencia {
   horas_extras_estado E_Estado_BD     @default(n)
   horas_extras        Float
   mano_obra_id        Int             @unique
-  ManoDeObra          ManoDeObra      @relation(fields: [mano_obra_id], references: [id])
+  ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])
 }
 
+//[success] actual
 model ParteDiario {
-  id                    Int                  @id @default(autoincrement())
-  nombre                String
-  fecha                 DateTime             @db.Date()
-  etapa                 String
-  jornada               String
-  hora_inicio           String
-  hora_fin              String
-  descripcion_actividad String?              @default("") @db.Text()
-  nota                  String?              @default("") @db.Text()
-  distanciamiento       E_Estado_BD?
-  protocolo_ingreso     E_Estado_BD?
-  protocolo_salida      E_Estado_BD?
-  trabajo_id            Int                  @unique
-  Trabajo               Trabajo              @relation(fields: [trabajo_id], references: [id])
-  ParteDiarioMo         ParteDiarioMO[]
-  ParteDiarioRecurso    ParteDiarioRecurso[]
+  id                     Int                  @id @default(autoincrement())
+  nombre                 String
+  fecha                  DateTime             @db.Date()
+  etapa                  String
+  jornada                String
+  hora_inicio            String
+  hora_fin               String
+  descripcion_actividad  String?              @default("") @db.Text()
+  nota                   String?              @default("") @db.Text()
+  distanciamiento        E_Estado_BD?
+  protocolo_ingreso      E_Estado_BD?
+  protocolo_salida       E_Estado_BD?
+  riesto_parte_diario_id Int
+  trabajo_id             Int                  @unique
+  RiesgoParteDiario      RiesgoParteDiario    @relation(fields: [riesto_parte_diario_id], references: [id])
+  Trabajo                Trabajo              @relation(fields: [trabajo_id], references: [id])
+  ParteDiarioMo          ParteDiarioMO[]
+  ParteDiarioRecurso     ParteDiarioRecurso[]
 }
 
+//[success] actual
+model RiesgoParteDiario {
+  id          Int                @id @default(autoincrement())
+  descripcion String
+  estado      E_Estado_Riesgo_BD
+  riesgo      E_Riesgo_BD
+  ParteDiario ParteDiario[]
+}
+
+//[success] actual
 model ParteDiarioMO {
   id              Int         @id @default(autoincrement())
   parte_diario_id Int
   mano_obra_id    Int
   ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
-  ManoDeObra      ManoDeObra  @relation(fields: [mano_obra_id], references: [id])
+  ManoObra        ManoObra    @relation(fields: [mano_obra_id], references: [id])
 }
 
+//[success] actual
 model ParteDiarioRecurso {
   id              Int         @id @default(autoincrement())
   parte_diario_id Int
@@ -274,6 +501,7 @@ model ParteDiarioRecurso {
   Recurso         Recurso     @relation(fields: [recurso_id], references: [id])
 }
 
+//[success] actual
 model PrecioHoraMO {
   id           Int      @id @default(autoincrement())
   fecha_inicio DateTime @db.Date()
@@ -281,6 +509,7 @@ model PrecioHoraMO {
   nombre       String
 }
 
+//[success] actual
 model DetallePrecioHoraMO {
   id                  Int             @id @default(autoincrement())
   codigo              String          @unique
@@ -291,6 +520,7 @@ model DetallePrecioHoraMO {
   CategoriaObrero     CategoriaObrero @relation(fields: [categoria_obrero_id], references: [id])
 }
 
+//[success] actual
 model ReporteTren {
   id             Int      @id @default(autoincrement())
   costo_total    Float
@@ -311,6 +541,7 @@ model ReporteTren {
   Tren           Tren     @relation(fields: [tren_id], references: [id])
 }
 
+//[success] actual
 model ReportePartida {
   id             Int     @id @default(autoincrement())
   costo_total    Float

@@ -1,9 +1,17 @@
 import prisma from "@/config/prisma.config";
-import { I_CreateUserBD } from "./models/user.interface";
+import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
 import { Usuario } from "@prisma/client";
 
 class PrimsaUserRepository implements UserRepository {
+  async updateUser(data: I_UpdateUserBody, idUser: number): Promise<Usuario> {
+    const user = await prisma.usuario.update({
+      where: { id: idUser },
+      data: data,
+    });
+    return user;
+  }
+
   async createUser(data: I_CreateUserBD): Promise<Usuario> {
     const user = await prisma.usuario.create({
       data,
@@ -14,8 +22,13 @@ class PrimsaUserRepository implements UserRepository {
     // llama a prisma
     return "";
   }
-  findOne(): string {
-    return "";
+  async findById(idUser: number): Promise<Usuario | null> {
+    const user = await prisma.usuario.findFirst({
+      where: {
+        id: idUser,
+      },
+    });
+    return user;
   }
 }
 
