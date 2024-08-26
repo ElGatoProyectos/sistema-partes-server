@@ -2,6 +2,7 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { jwtService } from "./jwt.service";
 import { bcryptService } from "@/auth/bcrypt.service";
 import prisma from "@/config/prisma.config";
+import LoginResponseMapper from "./dtos/loginResponse.dto";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -28,9 +29,17 @@ class AuthService {
         );
       }
 
+      const userResponse = new LoginResponseMapper(user);
+
+      //const { estatus, contrasena, ...userWithoutSensitiveData } = user;
       // retornarjwt
-      const token = jwtService.sign({ id: user.id, role: user.rol });
+      const token = jwtService.sign({
+        id: user.id,
+        username: user.email,
+        role: user.rol,
+      });
       return httpResponse.SuccessResponse("Usuario logueado con éxito", {
+        user: userResponse,
         token,
       });
     } catch (error) {
