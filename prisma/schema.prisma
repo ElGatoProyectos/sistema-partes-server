@@ -66,11 +66,13 @@ model Usuario {
   dni                   String                  @unique
   nombre_completo       String
   telefono              String
+  limite_proyecto       Int                     @default(1)
   rol                   E_Rol_BD
   estado                E_Estado_BD             @default(y)
   contrasena            String
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
+  Proyecto              Proyecto[]
 }
 
 //[success] actual
@@ -267,10 +269,8 @@ model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
   descripcion_empresa   String?                 @default("") @db.Text()
-  limite_proyecto       Int                     @default(1)
   usuarioId             Int
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Proyecto              Proyecto[]
   Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
 }
 
@@ -298,7 +298,8 @@ model Proyecto {
   plazo_proyecto     String
   codigo_proyecto    String
   empresa_id         Int
-  Empresa            Empresa              @relation(fields: [empresa_id], references: [id])
+  usuario_id         Int
+  Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
   UnidadProduccion   UnidadProduccion[]
   Tren               Tren[]
   Partida            Partida[]

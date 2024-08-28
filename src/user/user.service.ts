@@ -5,10 +5,24 @@ import prisma from "@/config/prisma.config";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { bcryptService } from "@/auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
+import { T_FindAll } from "./models/user.service.types";
 
 class UserService {
-  findAll() {
-    return primsaUserRepository.findAll();
+  async findAll(page: T_FindAll): Promise<T_HttpResponse> {
+    try {
+      const users = await primsaUserRepository.findAll();
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los usuarios",
+        users
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "[s] Error al traer los usuarios",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {

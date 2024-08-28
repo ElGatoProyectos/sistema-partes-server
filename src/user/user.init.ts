@@ -7,6 +7,12 @@ const userRouter = express.Router();
 
 const prefix = "/users";
 
+userRouter.get(
+  `${prefix}`,
+  // authRoleMiddleware.authAdmin,
+  userController.allUsers
+);
+
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,

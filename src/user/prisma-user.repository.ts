@@ -18,9 +18,9 @@ class PrimsaUserRepository implements UserRepository {
     });
     return user;
   }
-  findAll(): string {
+  async findAll(): Promise<Usuario[] | null> {
     // llama a prisma
-    return "";
+    return await prisma.usuario.findMany();
   }
   async findById(idUser: number): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
