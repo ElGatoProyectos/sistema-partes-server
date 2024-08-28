@@ -12,14 +12,14 @@ const prefix = "/users";
 userRouter.get(
   `${prefix}`,
   requestMiddleware.validatePagination,
-  // authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdmin,
   userController.allUsers
 );
 
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  // authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdmin,
   userController.create
 );
 
@@ -27,14 +27,14 @@ userRouter.put(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFields,
   userMiddleware.verifyFieldsUpdate,
-  //authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdmin,
   userController.update
 );
 
 userRouter.delete(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFields,
-  //authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdmin,
   userController.updateStatus
 );
 

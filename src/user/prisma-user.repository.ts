@@ -13,13 +13,21 @@ class PrimsaUserRepository implements UserRepository {
     return user;
   }
   async updateStatusUser(idUser: number): Promise<Usuario> {
-    const user = await prisma.usuario.update({
-      where: { id: idUser },
-      data: {
-        estado: E_Estado_BD.n,
+    const user = await prisma.usuario.findFirst({
+      where: {
+        id: idUser,
       },
     });
-    return user;
+
+    const newEstadoUser =
+      user?.estado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
+    const userUpdate = await prisma.usuario.update({
+      where: { id: idUser },
+      data: {
+        estado: newEstadoUser,
+      },
+    });
+    return userUpdate;
   }
   async updateUser(data: I_UpdateUserBody, idUser: number): Promise<Usuario> {
     const user = await prisma.usuario.update({

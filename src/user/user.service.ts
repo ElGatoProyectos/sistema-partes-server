@@ -150,6 +150,8 @@ class UserService {
 
   async updateStatusUser(idUser: number): Promise<T_HttpResponse> {
     try {
+      const userResponse = await this.findById(idUser);
+      if (!userResponse.success) return userResponse;
       const result = await primsaUserRepository.updateStatusUser(idUser);
       return httpResponse.SuccessResponse(
         "Usuario eliminado correctamente",
