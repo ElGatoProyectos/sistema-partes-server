@@ -18,10 +18,20 @@ class PrimsaUserRepository implements UserRepository {
     });
     return user;
   }
-  async findAll(): Promise<Usuario[] | null> {
-    // llama a prisma
-    return await prisma.usuario.findMany();
+  async findAll(
+    skip: number,
+    limit: number
+  ): Promise<{ users: Usuario[]; total: number } | null> {
+    const [users, total]: [Usuario[], number] = await prisma.$transaction([
+      prisma.usuario.findMany({
+        skip,
+        take: limit,
+      }),
+      prisma.usuario.count(),
+    ]);
+    return { users, total };
   }
+
   async findById(idUser: number): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {

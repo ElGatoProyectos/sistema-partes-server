@@ -8,12 +8,31 @@ import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll } from "./models/user.service.types";
 
 class UserService {
-  async findAll(page: T_FindAll): Promise<T_HttpResponse> {
+  async findAll(data: T_FindAll): Promise<T_HttpResponse> {
     try {
-      const users = await primsaUserRepository.findAll();
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const result = await primsaUserRepository.findAll(
+        skip,
+        data.queryParams.limit
+      );
+      if (!result)
+        return httpResponse.SuccessResponse("No se encontraron usuarios.", 0);
+
+      const { users, total } = result;
+      //numero de pagina donde estas
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: users,
+      };
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los usuarios",
-        users
+        formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
