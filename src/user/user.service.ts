@@ -120,5 +120,22 @@ class UserService {
       await prisma.$disconnect();
     }
   }
+
+  async updateStatusUser(idUser: number): Promise<T_HttpResponse> {
+    try {
+      const result = await primsaUserRepository.updateStatusUser(idUser);
+      return httpResponse.SuccessResponse(
+        "Usuario eliminado correctamente",
+        result
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "[s] Error al eliminar el usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
 export const userService = new UserService();

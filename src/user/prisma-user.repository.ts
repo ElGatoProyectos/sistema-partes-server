@@ -1,9 +1,18 @@
 import prisma from "@/config/prisma.config";
 import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
-import { Usuario } from "@prisma/client";
+import { E_Estado_BD, Usuario } from "@prisma/client";
 
 class PrimsaUserRepository implements UserRepository {
+  async updateStatusUser(idUser: number): Promise<Usuario> {
+    const user = await prisma.usuario.update({
+      where: { id: idUser },
+      data: {
+        estado: E_Estado_BD.n,
+      },
+    });
+    return user;
+  }
   async updateUser(data: I_UpdateUserBody, idUser: number): Promise<Usuario> {
     const user = await prisma.usuario.update({
       where: { id: idUser },

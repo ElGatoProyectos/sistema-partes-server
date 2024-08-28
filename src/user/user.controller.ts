@@ -17,6 +17,13 @@ class UserController {
     response.status(result.statusCode).json(result);
   }
 
+  async updateStatus(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateUserBody;
+    const idUser = Number(request.params.id);
+    const result = await userService.updateStatusUser(idUser);
+    response.status(result.statusCode).json(result);
+  }
+
   async allUsers(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
