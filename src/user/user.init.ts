@@ -18,12 +18,14 @@ userRouter.get(
 
 userRouter.post(
   `${prefix}`,
+  userMiddleware.verifyFieldsRegistry,
   // authRoleMiddleware.authAdmin,
   userController.create
 );
 
 userRouter.put(
   `${prefix}/:id`,
+  userMiddleware.verifyHeadersFields,
   userMiddleware.verifyFieldsUpdate,
   //authRoleMiddleware.authAdmin,
   userController.update
@@ -31,7 +33,7 @@ userRouter.put(
 
 userRouter.delete(
   `${prefix}/:id`,
-  userMiddleware.verifyFieldsUpdate,
+  userMiddleware.verifyHeadersFields,
   //authRoleMiddleware.authAdmin,
   userController.updateStatus
 );

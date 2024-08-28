@@ -4,6 +4,14 @@ import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
 
 class PrimsaUserRepository implements UserRepository {
+  async findByDni(dni: string): Promise<Usuario | null> {
+    const user = await prisma.usuario.findFirst({
+      where: {
+        dni,
+      },
+    });
+    return user;
+  }
   async updateStatusUser(idUser: number): Promise<Usuario> {
     const user = await prisma.usuario.update({
       where: { id: idUser },
