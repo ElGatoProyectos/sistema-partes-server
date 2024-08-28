@@ -268,7 +268,7 @@ model AreaObrero {
 model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
-  descripcion_empresa   String?                 @default("") @db.Text()
+  descripcion_empresa   String?                 @db.Text()
   usuarioId             Int
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
@@ -287,7 +287,7 @@ model DetalleUsuarioEmpresa {
 model Proyecto {
   id                 Int                  @id @default(autoincrement())
   nombre_completo    String
-  descripcion        String?              @default("") @db.Text
+  descripcion        String?              @db.Text()
   direccion          String
   nombre_consorcio   String
   nombre_corto       String
@@ -313,7 +313,7 @@ model UnidadProduccion {
   id          Int       @id @default(autoincrement())
   codigo      String    @unique
   nombre      String
-  nota        String?   @default("") @db.Text()
+  nota        String?   @db.Text()
   proyecto_id Int
   Proyecto    Proyecto  @relation(fields: [proyecto_id], references: [id])
   Trabajo     Trabajo[]
@@ -325,7 +325,7 @@ model Tren {
   codigo      String        @unique
   nombre      String
   cuadrilla   String?
-  nota        String?       @default("") @db.Text()
+  nota        String?       @db.Text()
   operario    Int
   oficial     Int
   peon        Int
@@ -461,8 +461,8 @@ model ParteDiario {
   jornada                String
   hora_inicio            String
   hora_fin               String
-  descripcion_actividad  String?              @default("") @db.Text()
-  nota                   String?              @default("") @db.Text()
+  descripcion_actividad  String?              @db.Text()
+  nota                   String?              @db.Text()
   distanciamiento        E_Estado_BD?
   protocolo_ingreso      E_Estado_BD?
   protocolo_salida       E_Estado_BD?

@@ -9,17 +9,17 @@ class RequestMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      const page = request.get("page");
-      const limit = request.get("limit");
+      const page = request.query.page as string;
+      const limit = request.query.limit as string;
       console.log("page " + page);
       console.log("limit " + limit);
-      if (page) {
+      if (page || limit) {
         if (!validator.isNumeric(page)) {
           throw new Error("Error al validar peticion");
-        }
-      } else if (limit) {
-        if (!validator.isNumeric(limit)) {
+        } else if (!validator.isNumeric(limit)) {
           throw new Error("Error al validar peticion");
+        } else {
+          nextFunction();
         }
       } else {
         console.log("llegando aa next");
