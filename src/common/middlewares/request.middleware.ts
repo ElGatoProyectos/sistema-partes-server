@@ -11,8 +11,6 @@ class RequestMiddleware {
     try {
       const page = request.query.page as string;
       const limit = request.query.limit as string;
-      console.log("page " + page);
-      console.log("limit " + limit);
       if (page || limit) {
         if (!validator.isNumeric(page)) {
           throw new Error("Error al validar peticion");

@@ -62,7 +62,7 @@ enum E_Proyecto_Estado {
 //[success] actual
 model Usuario {
   id                    Int                     @id @default(autoincrement())
-  email                 String                  @unique
+  email                 String
   dni                   String                  @unique
   nombre_completo       String
   telefono              String

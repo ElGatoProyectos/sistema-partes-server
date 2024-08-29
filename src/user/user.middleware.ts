@@ -3,6 +3,7 @@ import { userDto } from "./dto/user.dto";
 import { httpResponse } from "@/common/http.response";
 import { userUpdateDto } from "./dto/update.dto";
 import { headerDto } from "./dto/header.params.dto";
+import validator from "validator";
 
 class UserMiddleware {
   verifyFieldsRegistry(
@@ -12,8 +13,11 @@ class UserMiddleware {
   ) {
     try {
       userDto.parse(request.body);
+      if (!validator.isEmail(request.body.email)) {
+        throw new Error("El formato del email ingresado no es válido");
+      }
       nextFunction();
-    } catch {
+    } catch (error) {
       const result = httpResponse.BadRequestException(
         "[m] Error al validar autenticacion"
       );
@@ -43,8 +47,10 @@ class UserMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      request.query;
-      headerDto.parse(request.headers);
+      const id = request.params.id;
+      if (!validator.isNumeric) {
+        throw new Error("El id debe ser numérico");
+      }
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(

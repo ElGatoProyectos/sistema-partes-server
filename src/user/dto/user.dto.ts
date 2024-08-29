@@ -5,5 +5,5 @@ export const userDto = z.object({
   dni: z.string(),
   nombre_completo: z.string(),
   telefono: z.string(),
-  contrasena: z.string(),
+  contrasena: z.string().min(3),
 });

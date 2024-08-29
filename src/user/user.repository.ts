@@ -11,4 +11,6 @@ export abstract class UserRepository {
   updateUser(data: I_UpdateUserBody, idUser: number): void {}
 
   updateStatusUser(idUser: number): void {}
+
+  findByDni(dni: string): void {}
 }

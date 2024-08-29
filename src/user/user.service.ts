@@ -46,6 +46,11 @@ class UserService {
 
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
+      const responseByDni = await this.findByDni(data.dni);
+      if (responseByDni.success)
+        return httpResponse.BadRequestException(
+          `El usuario con el dni ${data.dni} ya existe`
+        );
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
       const userFormat = {
         ...data,
@@ -63,6 +68,24 @@ class UserService {
       console.log(error);
       return httpResponse.InternalServerErrorException(
         "[s] Error al crear usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findByDni(dni: string): Promise<T_HttpResponse> {
+    try {
+      const user = await primsaUserRepository.findByDni(dni);
+      // este error me valida que no esta el usuario
+      if (!user) {
+        return httpResponse.NotFoundException("Usuario no encontrado");
+      }
+      return httpResponse.SuccessResponse("Usuario encontrado", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "[s] Error al buscar usuario",
         error
       );
     } finally {
@@ -97,6 +120,10 @@ class UserService {
       const userResponse = await this.findById(idUser);
       if (!userResponse.success) return userResponse;
 
+      const responseByDni = await this.findByDni(data.dni);
+      if (responseByDni.success)
+        return httpResponse.BadRequestException(`El dni ${data.dni} ya existe`);
+
       let hashContrasena;
       let userFormat = data;
 
@@ -123,6 +150,8 @@ class UserService {
 
   async updateStatusUser(idUser: number): Promise<T_HttpResponse> {
     try {
+      const userResponse = await this.findById(idUser);
+      if (!userResponse.success) return userResponse;
       const result = await primsaUserRepository.updateStatusUser(idUser);
       return httpResponse.SuccessResponse(
         "Usuario eliminado correctamente",
