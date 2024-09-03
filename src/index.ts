@@ -4,7 +4,7 @@ import express from "express";
 import { envConfig } from "./config/env.config";
 import userRouter from "./user/user.init";
 import authRouter from "./auth/auth.init";
-import projectRouter from "./proyecto/proyecto.init";
+import projectRouter from "./project/project.init";
 
 const globalPrefix = "/api";
 

@@ -24,6 +24,12 @@ class UserController {
     response.status(result.statusCode).json(result);
   }
 
+  async findByIdUser(request: express.Request, response: express.Response) {
+    const idUser = Number(request.params.id);
+    const result = await userService.findById(idUser);
+    response.status(result.statusCode).json(result);
+  }
+
   async allUsers(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;

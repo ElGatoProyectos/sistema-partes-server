@@ -309,7 +309,6 @@ model Proyecto {
   fecha_fin          DateTime             @db.Date()
   plazo_proyecto     String
   codigo_proyecto    String
-  empresa_id         Int
   usuario_id         Int
   Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
   UnidadProduccion   UnidadProduccion[]
