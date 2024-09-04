@@ -15,7 +15,20 @@ datasource db {
 
 enum E_Rol_BD {
   ADMIN // Alejandro
-  USER
+  USER //  Capaz superior a la de abajo
+  GERENTE_PROYECTO
+  RESIDENCIA
+  CONTROL_COSTOS
+  ASISTENTE_CONTROL_COSTOS
+  INGENIERO_PRODUCCION
+  ASISTENTE_PRODUCCION
+  MAESTRO_OBRA
+  CAPATAZ
+  ADMINISTRACION_OBRA
+  INGENIERO_SSOMMA
+  ASISTENTE_SSOMMA
+  LOGISTICA
+  ASISTENTE_ALMACEN
 }
 
 enum E_Estado_Riesgo_BD {
@@ -68,7 +81,7 @@ model Usuario {
   telefono              String
   limite_proyecto       Int                     @default(1)
   rol                   E_Rol_BD
-  estado                E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(y)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
   Empresa               Empresa[]
@@ -88,7 +101,9 @@ model ManoObra {
   sede_local                  String?
   fecha_inicio                DateTime                      @db.Date //año más dia
   fecha_cese                  DateTime                      @db.Date //año más dia
-  estado                      E_Estado_BD                   @default(y)
+  //hay un estado para esto 
+  estado                      E_Estado_BD?                  @default(y)
+  eliminado                   E_Estado_BD                   @default(n)
   telefono                    String
   usuario_marcacion           String?                       @default("")
   domicilio                   String?
@@ -136,6 +151,7 @@ model ManoObra {
   ManoObraComposicionFamiliar ManoObraComposicionFamiliar[]
   ManoObraExperienciaLaboral  ManoObraExperienciaLaboral[]
   ManoObraEstudios            ManoObraEstudios[]
+  detalle_combo_mo            detalle_combo_mo[]
 }
 
 //[note] modulo futuro
@@ -298,18 +314,20 @@ model DetalleUsuarioEmpresa {
 //[success] actual
 model Proyecto {
   id                 Int                  @id @default(autoincrement())
-  nombre_completo    String
+  nombre_completo    String               @db.Text()
   descripcion        String?              @db.Text()
   direccion          String
   nombre_consorcio   String
   nombre_corto       String
   costo_proyecto     Float
   estado             E_Proyecto_Estado
+  eliminado          E_Estado_BD          @default(n)
   fecha_creacion     DateTime             @db.Date()
   fecha_fin          DateTime             @db.Date()
   plazo_proyecto     String
   codigo_proyecto    String
   usuario_id         Int
+  color_proyecto     String
   Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
   UnidadProduccion   UnidadProduccion[]
   Tren               Tren[]
@@ -317,6 +335,24 @@ model Proyecto {
   SeccionObrero      SeccionObrero[]
   DepartamentoObrero DepartamentoObrero[]
   AreaObrero         AreaObrero[]
+  Combo              Combo[]
+}
+
+model Combo {
+  id               Int                @id @default(autoincrement())
+  nombre           String
+  fecha_creacion   DateTime           @default(now())
+  proyecto_id      Int
+  Proyecto         Proyecto           @relation(fields: [proyecto_id], references: [id])
+  detalle_combo_mo detalle_combo_mo[]
+}
+
+model detalle_combo_mo {
+  id       Int      @id @default(autoincrement())
+  combo_id Int
+  mo_id    Int
+  ManoObra ManoObra @relation(fields: [mo_id], references: [id])
+  Combo    Combo    @relation(fields: [combo_id], references: [id])
 }
 
 //[success] actual
@@ -374,7 +410,7 @@ model Trabajo {
   duracion              Int
   fecha_inicio          DateTime                @db.Date //año más dia
   fecha_finalizacion    DateTime                @db.Date //año más dia
-  estado                E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(y)
   fecha_creacion        DateTime                @default(now())
   costo_partida         Int
   costo_mano_obra       Int
