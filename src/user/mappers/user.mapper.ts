@@ -9,6 +9,7 @@ export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
   telefono: string;
   estado: E_Estado_BD;
   limite_proyecto: number;
+  fecha_creacion: Date;
 
   constructor(user: Usuario) {
     this.id = user.id;
@@ -19,5 +20,6 @@ export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
     this.telefono = user.telefono;
     this.estado = user.estado;
     this.limite_proyecto = user.limite_proyecto;
+    this.fecha_creacion = new Date();
   }
 }

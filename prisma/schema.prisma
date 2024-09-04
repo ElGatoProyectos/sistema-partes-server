@@ -15,7 +15,20 @@ datasource db {
 
 enum E_Rol_BD {
   ADMIN // Alejandro
-  USER
+  USER //  Capaz superior a la de abajo
+  GERENTE_PROYECTO
+  RESIDENCIA
+  CONTROL_COSTOS
+  ASISTENTE_CONTROL_COSTOS
+  INGENIERO_PRODUCCION
+  ASISTENTE_PRODUCCION
+  MAESTRO_OBRA
+  CAPATAZ
+  ADMINISTRACION_OBRA
+  INGENIERO_SSOMMA
+  ASISTENTE_SSOMMA
+  LOGISTICA
+  ASISTENTE_ALMACEN
 }
 
 enum E_Estado_Riesgo_BD {
@@ -68,8 +81,9 @@ model Usuario {
   telefono              String
   limite_proyecto       Int                     @default(1)
   rol                   E_Rol_BD
-  estado                E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(y)
   contrasena            String
+  fecha_creacion        DateTime                @default(now())
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Proyecto              Proyecto[]
@@ -87,7 +101,9 @@ model ManoObra {
   sede_local                  String?
   fecha_inicio                DateTime                      @db.Date //año más dia
   fecha_cese                  DateTime                      @db.Date //año más dia
-  estado                      E_Estado_BD                   @default(y)
+  //hay un estado para esto 
+  estado                      E_Estado_BD?                  @default(y)
+  eliminado                   E_Estado_BD                   @default(n)
   telefono                    String
   usuario_marcacion           String?                       @default("")
   domicilio                   String?
@@ -112,6 +128,7 @@ model ManoObra {
   hora_salida                 String?
   tolerancia_ingreso          String?
   tiempo_refrigerio           String?
+  fecha_creacion              DateTime                      @default(now())
   //termina básico
   unidad                      Int
   banco                       String
@@ -134,21 +151,23 @@ model ManoObra {
   ManoObraComposicionFamiliar ManoObraComposicionFamiliar[]
   ManoObraExperienciaLaboral  ManoObraExperienciaLaboral[]
   ManoObraEstudios            ManoObraEstudios[]
+  detalle_combo_mo            detalle_combo_mo[]
 }
 
 //[note] modulo futuro
 //si trabajas hoy o no para el trabajador
 model ManoObraSemana {
-  id           Int         @id @default(autoincrement())
-  lunes        E_Estado_BD @default(y)
-  martes       E_Estado_BD @default(y)
-  miercoles    E_Estado_BD @default(y)
-  jueves       E_Estado_BD @default(y)
-  viernes      E_Estado_BD @default(y)
-  sabado       E_Estado_BD @default(y)
-  domingo      E_Estado_BD @default(y)
-  mano_obra_id Int
-  ManoObra     ManoObra    @relation(fields: [mano_obra_id], references: [id])
+  id             Int         @id @default(autoincrement())
+  lunes          E_Estado_BD @default(y)
+  martes         E_Estado_BD @default(y)
+  miercoles      E_Estado_BD @default(y)
+  jueves         E_Estado_BD @default(y)
+  viernes        E_Estado_BD @default(y)
+  sabado         E_Estado_BD @default(y)
+  domingo        E_Estado_BD @default(y)
+  fecha_creacion DateTime    @default(now())
+  mano_obra_id   Int
+  ManoObra       ManoObra    @relation(fields: [mano_obra_id], references: [id])
 }
 
 //[note] modulo futuro
@@ -158,6 +177,7 @@ model ManoObraDatoLaboral {
   area_mo_id               Int
   mano_obra_id             Int
   puesto_id                Int
+  fecha_creacion           DateTime                       @default(now())
   // OJO PUEDE CAMBIARSE POR LA BBDD PARA EL RENDIMIENTO
   categoria_salarial_id    E_Categoria_Salarial_Obrero_BD
   departamento_mo_id       Int
@@ -189,6 +209,7 @@ model ManoObraComposicionFamiliar {
   tipo_documento        String
   documento_identidad   String
   grado_instruccion     String
+  fecha_creacion        DateTime             @default(now())
   //si vive en otro lugar 
   vive_otro_domicilio   E_Estado_BD
   direccion             String
@@ -205,15 +226,16 @@ model ManoObraComposicionFamiliar {
 
 //[note] modulo futuro
 model ManoObraExperienciaLaboral {
-  id            Int      @id @default(autoincrement())
-  desde         DateTime @db.Date
-  hasta         DateTime @db.Date
-  tipo_contrato String
-  tipo_cese     String
-  remuneracion  Float
-  logros        String?
-  mano_obra_id  Int
-  ManoObra      ManoObra @relation(fields: [mano_obra_id], references: [id])
+  id             Int      @id @default(autoincrement())
+  desde          DateTime @db.Date
+  hasta          DateTime @db.Date
+  tipo_contrato  String
+  tipo_cese      String
+  remuneracion   Float
+  logros         String?
+  fecha_creacion DateTime @default(now())
+  mano_obra_id   Int
+  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id])
 }
 
 //[note] modulo futuro
@@ -227,6 +249,7 @@ model ManoObraEstudios {
   lugar_estudio  String
   institucion    String
   especialidad   String?
+  fecha_creacion DateTime @default(now())
   mano_obra_id   Int
   ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id])
 }
@@ -235,6 +258,7 @@ model ManoObraEstudios {
 model PuestoObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
+  fecha_creacion      DateTime              @default(now())
   ManoObraDatoLaboral ManoObraDatoLaboral[]
 }
 
@@ -242,6 +266,7 @@ model PuestoObrero {
 model SeccionObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
+  fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
   Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
   ManoObraDatoLaboral ManoObraDatoLaboral[]
@@ -251,6 +276,7 @@ model SeccionObrero {
 model DepartamentoObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
+  fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
   Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
   ManoObraDatoLaboral ManoObraDatoLaboral[]
@@ -259,6 +285,7 @@ model DepartamentoObrero {
 //[success] actual
 model AreaObrero {
   id                  Int                   @id @default(autoincrement())
+  fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
   Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
   ManoObraDatoLaboral ManoObraDatoLaboral[]
@@ -270,6 +297,7 @@ model Empresa {
   nombre_empresa        String
   descripcion_empresa   String?                 @db.Text()
   usuarioId             Int
+  fecha_creacion        DateTime                @default(now())
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
 }
@@ -286,19 +314,20 @@ model DetalleUsuarioEmpresa {
 //[success] actual
 model Proyecto {
   id                 Int                  @id @default(autoincrement())
-  nombre_completo    String
+  nombre_completo    String               @db.Text()
   descripcion        String?              @db.Text()
   direccion          String
   nombre_consorcio   String
   nombre_corto       String
   costo_proyecto     Float
   estado             E_Proyecto_Estado
+  eliminado          E_Estado_BD          @default(n)
   fecha_creacion     DateTime             @db.Date()
   fecha_fin          DateTime             @db.Date()
   plazo_proyecto     String
   codigo_proyecto    String
-  empresa_id         Int
   usuario_id         Int
+  color_proyecto     String
   Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
   UnidadProduccion   UnidadProduccion[]
   Tren               Tren[]
@@ -306,33 +335,53 @@ model Proyecto {
   SeccionObrero      SeccionObrero[]
   DepartamentoObrero DepartamentoObrero[]
   AreaObrero         AreaObrero[]
+  Combo              Combo[]
+}
+
+model Combo {
+  id               Int                @id @default(autoincrement())
+  nombre           String
+  fecha_creacion   DateTime           @default(now())
+  proyecto_id      Int
+  Proyecto         Proyecto           @relation(fields: [proyecto_id], references: [id])
+  detalle_combo_mo detalle_combo_mo[]
+}
+
+model detalle_combo_mo {
+  id       Int      @id @default(autoincrement())
+  combo_id Int
+  mo_id    Int
+  ManoObra ManoObra @relation(fields: [mo_id], references: [id])
+  Combo    Combo    @relation(fields: [combo_id], references: [id])
 }
 
 //[success] actual
 model UnidadProduccion {
-  id          Int       @id @default(autoincrement())
-  codigo      String    @unique
-  nombre      String
-  nota        String?   @db.Text()
-  proyecto_id Int
-  Proyecto    Proyecto  @relation(fields: [proyecto_id], references: [id])
-  Trabajo     Trabajo[]
+  id             Int       @id @default(autoincrement())
+  codigo         String    @unique
+  nombre         String
+  nota           String?   @db.Text()
+  proyecto_id    Int
+  fecha_creacion DateTime  @default(now())
+  Proyecto       Proyecto  @relation(fields: [proyecto_id], references: [id])
+  Trabajo        Trabajo[]
 }
 
 //[success] actual
 model Tren {
-  id          Int           @id @default(autoincrement())
-  codigo      String        @unique
-  nombre      String
-  cuadrilla   String?
-  nota        String?       @db.Text()
-  operario    Int
-  oficial     Int
-  peon        Int
-  proyecto_id Int
-  ReporteTren ReporteTren[]
-  Trabajo     Trabajo[]
-  Proyecto    Proyecto      @relation(fields: [proyecto_id], references: [id])
+  id             Int           @id @default(autoincrement())
+  codigo         String        @unique
+  nombre         String
+  cuadrilla      String?
+  nota           String?       @db.Text()
+  operario       Int
+  oficial        Int
+  peon           Int
+  fecha_creacion DateTime      @default(now())
+  proyecto_id    Int
+  ReporteTren    ReporteTren[]
+  Trabajo        Trabajo[]
+  Proyecto       Proyecto      @relation(fields: [proyecto_id], references: [id])
 }
 
 //[success] actual
@@ -346,6 +395,7 @@ model Partida {
   precio                Float
   parcial               Float?                  @default(0)
   total                 Float?                  @default(0)
+  fecha_creacion        DateTime                @default(now())
   proyecto_id           Int
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
@@ -360,7 +410,8 @@ model Trabajo {
   duracion              Int
   fecha_inicio          DateTime                @db.Date //año más dia
   fecha_finalizacion    DateTime                @db.Date //año más dia
-  estado                E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(y)
+  fecha_creacion        DateTime                @default(now())
   costo_partida         Int
   costo_mano_obra       Int
   costo_material        Int
@@ -387,29 +438,33 @@ model DetalleTrabajoPartida {
 model CategoriaObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
+  fecha_creacion      DateTime              @default(now())
   ManoObra            ManoObra[]
   DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
 
 //[success] actual
 model TipoObrero {
-  id       Int        @id @default(autoincrement())
-  nombre   String
-  ManoObra ManoObra[]
+  id             Int        @id @default(autoincrement())
+  nombre         String
+  fecha_creacion DateTime   @default(now())
+  ManoObra       ManoObra[]
 }
 
 //[success] actual
 model OrigenObrero {
-  id       Int        @id @default(autoincrement())
-  nombre   String
-  ManoObra ManoObra[]
+  id             Int        @id @default(autoincrement())
+  nombre         String
+  fecha_creacion DateTime   @default(now())
+  ManoObra       ManoObra[]
 }
 
 //[success] actual
 model EspecialidadObrero {
-  id       Int        @id @default(autoincrement())
-  nombre   String
-  ManoObra ManoObra[]
+  id             Int        @id @default(autoincrement())
+  nombre         String
+  fecha_creacion DateTime   @default(now())
+  ManoObra       ManoObra[]
 }
 
 //[success] actual
@@ -421,6 +476,7 @@ model Recurso {
   recurso            String
   unidad             String
   precio             Float
+  fecha_creacion     DateTime             @default(now())
   categoria_recurso  Int                  @unique
   CategoriaRecurso   CategoriaRecurso     @relation(fields: [categoria_recurso], references: [id])
   ParteDiarioRecurso ParteDiarioRecurso[]
@@ -428,9 +484,10 @@ model Recurso {
 
 //[success] actual
 model CategoriaRecurso {
-  id      Int       @id @default(autoincrement())
-  nombre  String
-  Recurso Recurso[]
+  id             Int       @id @default(autoincrement())
+  nombre         String
+  fecha_creacion DateTime  @default(now())
+  Recurso        Recurso[]
 }
 
 enum E_Asistencia_BD {
@@ -447,6 +504,7 @@ model Asistencia {
   horas               Float
   asistencia          E_Asistencia_BD @default(F)
   horas_extras_estado E_Estado_BD     @default(n)
+  fecha_creacion      DateTime        @default(now())
   horas_extras        Float
   mano_obra_id        Int             @unique
   ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])
@@ -459,6 +517,7 @@ model ParteDiario {
   fecha                  DateTime             @db.Date()
   etapa                  String
   jornada                String
+  fecha_creacion         DateTime             @default(now())
   hora_inicio            String
   hora_fin               String
   descripcion_actividad  String?              @db.Text()
@@ -476,11 +535,12 @@ model ParteDiario {
 
 //[success] actual
 model RiesgoParteDiario {
-  id          Int                @id @default(autoincrement())
-  descripcion String
-  estado      E_Estado_Riesgo_BD
-  riesgo      E_Riesgo_BD
-  ParteDiario ParteDiario[]
+  id             Int                @id @default(autoincrement())
+  descripcion    String
+  estado         E_Estado_Riesgo_BD
+  riesgo         E_Riesgo_BD
+  fecha_creacion DateTime           @default(now())
+  ParteDiario    ParteDiario[]
 }
 
 //[success] actual
@@ -488,6 +548,7 @@ model ParteDiarioMO {
   id              Int         @id @default(autoincrement())
   parte_diario_id Int
   mano_obra_id    Int
+  fecha_creacion  DateTime    @default(now())
   ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
   ManoObra        ManoObra    @relation(fields: [mano_obra_id], references: [id])
 }
@@ -498,16 +559,18 @@ model ParteDiarioRecurso {
   parte_diario_id Int
   recurso_id      Int
   cantidad        Int
+  fecha_creacion  DateTime    @default(now())
   ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
   Recurso         Recurso     @relation(fields: [recurso_id], references: [id])
 }
 
 //[success] actual
 model PrecioHoraMO {
-  id           Int      @id @default(autoincrement())
-  fecha_inicio DateTime @db.Date()
-  fecha_fin    DateTime @db.Date()
-  nombre       String
+  id             Int      @id @default(autoincrement())
+  fecha_inicio   DateTime @db.Date()
+  fecha_fin      DateTime @db.Date()
+  fecha_creacion DateTime @default(now())
+  nombre         String
 }
 
 //[success] actual
@@ -538,17 +601,19 @@ model ReporteTren {
   domingo        Float?   @default(0)
   fecha_inicio   DateTime @db.Date()
   fecha_fin      DateTime @db.Date()
+  fecha_creacion DateTime @default(now())
   tren_id        Int
   Tren           Tren     @relation(fields: [tren_id], references: [id])
 }
 
 //[success] actual
 model ReportePartida {
-  id             Int     @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   costo_total    Float
   costo_anterior Float
   costo_actual   Float
   costo_parcial  Float
+  fecha_creacion DateTime @default(now())
   partida_id     Int
-  Partida        Partida @relation(fields: [partida_id], references: [id])
+  Partida        Partida  @relation(fields: [partida_id], references: [id])
 }

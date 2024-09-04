@@ -16,6 +16,13 @@ userRouter.get(
   userController.allUsers
 );
 
+userRouter.get(
+  `${prefix}/:id`,
+  userMiddleware.verifyHeadersFields,
+  authRoleMiddleware.authAdmin,
+  userController.findByIdUser
+);
+
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
