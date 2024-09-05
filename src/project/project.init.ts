@@ -12,7 +12,7 @@ projectRouter.get(
   `${prefix}/user/:id`,
   authRoleMiddleware.authViewProject,
   userMiddleware.verifyHeadersFields,
-  projectController.findAllProjectsXUser
+  projectController.findAllProjectsXCompany
 );
 projectRouter.get(
   `${prefix}/search`,

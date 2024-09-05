@@ -18,7 +18,7 @@ userRouter.get(
 
 userRouter.get(
   `${prefix}/search`,
-  //requestMiddleware.validatePagination,
+  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   userController.findByName
 );

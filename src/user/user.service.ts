@@ -1,18 +1,19 @@
 import { E_Estado_BD, E_Rol_BD, Usuario } from "@prisma/client";
 import { I_CreateUserBody, I_UpdateUserBody } from "./models/user.interface";
-import { primsaUserRepository } from "./prisma-user.repository";
+import { prismaUserRepository } from "./prisma-user.repository";
 import prisma from "@/config/prisma.config";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { bcryptService } from "@/auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll } from "../common/models/pagination.types";
 import validator from "validator";
+import { wordIsNumeric } from "@/common/utils/number";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await primsaUserRepository.findAll(
+      const result = await prismaUserRepository.findAll(
         skip,
         data.queryParams.limit
       );
@@ -48,13 +49,6 @@ class UserService {
     }
   }
 
-  isNumeric(phone: string) {
-    if (!validator.isNumeric(phone)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
   verifyLargeDni(dni: string) {
     if (dni.length < 8) {
       return true;
@@ -74,7 +68,7 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
-      const resultPhone = this.isNumeric(data.telefono);
+      const resultPhone = wordIsNumeric(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El teléfono ingresado solo debe contener números "
@@ -93,14 +87,13 @@ class UserService {
         contrasena: hashContrasena,
         rol: E_Rol_BD.USER,
       };
-      const result = await primsaUserRepository.createUser(userFormat);
+      const result = await prismaUserRepository.createUser(userFormat);
       const resultMapper = new UserResponseMapper(result);
       return httpResponse.CreatedResponse(
         "Usuario creado correctamente",
         resultMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al crear usuario",
         error
@@ -112,7 +105,7 @@ class UserService {
 
   async findByDni(dni: string): Promise<T_HttpResponse> {
     try {
-      const user = await primsaUserRepository.findByDni(dni);
+      const user = await prismaUserRepository.findByDni(dni);
       // este error me valida que no esta el usuario
       if (!user) {
         return httpResponse.NotFoundException("Usuario no encontrado");
@@ -130,7 +123,7 @@ class UserService {
 
   async findByEmail(email: string): Promise<T_HttpResponse> {
     try {
-      const emailExists = await primsaUserRepository.existsEmail(email);
+      const emailExists = await prismaUserRepository.existsEmail(email);
       if (emailExists) {
         return httpResponse.NotFoundException(
           "El email ingresado ya existe en la base de datos"
@@ -151,7 +144,7 @@ class UserService {
 
   async findById(id: number): Promise<T_HttpResponse> {
     try {
-      const user = await primsaUserRepository.findById(id);
+      const user = await prismaUserRepository.findById(id);
       if (!user)
         return httpResponse.NotFoundException(
           "No se encontró el usuario solicitado"
@@ -190,7 +183,7 @@ class UserService {
           `El usuario con el dni ${data.dni} ya existe`
         );
 
-      const resultPhone = this.isNumeric(data.telefono);
+      const resultPhone = wordIsNumeric(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El teléfono ingresado solo debe contener números "
@@ -212,14 +205,13 @@ class UserService {
         userFormat.contrasena = hashContrasena;
       }
 
-      const result = await primsaUserRepository.updateUser(userFormat, idUser);
+      const result = await prismaUserRepository.updateUser(userFormat, idUser);
       const resultMapper = new UserResponseMapper(result);
       return httpResponse.CreatedResponse(
         "Usuario modificado correctamente",
         resultMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al actualizar el usuario",
         error
@@ -233,7 +225,7 @@ class UserService {
     try {
       const userResponse = await this.findById(idUser);
       if (!userResponse.success) return userResponse;
-      const result = await primsaUserRepository.updateStatusUser(idUser);
+      const result = await prismaUserRepository.updateStatusUser(idUser);
       const resultMapper = new UserResponseMapper(result);
       return httpResponse.SuccessResponse(
         "Usuario eliminado correctamente",
@@ -252,7 +244,7 @@ class UserService {
   async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await primsaUserRepository.searchNameUser(
+      const result = await prismaUserRepository.searchNameUser(
         name,
         skip,
         data.queryParams.limit
@@ -279,7 +271,6 @@ class UserService {
       };
       return httpResponse.SuccessResponse("Éxito al buscar usuarios", formData);
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al buscar proyecto",
         error

@@ -1,25 +1,20 @@
 import express from "@/config/express.config";
-import { userDto } from "./dto/user.dto";
-import { httpResponse } from "@/common/http.response";
-import { userUpdateDto } from "./dto/update.dto";
-import { headerDto } from "./dto/header.params.dto";
 import validator from "validator";
+import { prouductionUnitDto } from "./dto/production-unit.dto";
+import { httpResponse } from "@/common/http.response";
 
-class UserMiddleware {
-  verifyFieldsRegistry(
+class ProductionUnitMiddleware {
+  verifyFields(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
     try {
-      userDto.parse(request.body);
-      if (!validator.isEmail(request.body.email)) {
-        throw new Error("El formato del email ingresado no es válido");
-      }
+      prouductionUnitDto.parse(request.body);
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(
-        " Error al validar campos"
+        " Error al validar campos "
       );
       response.status(result.statusCode).send(result);
     }
@@ -31,11 +26,11 @@ class UserMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      userUpdateDto.parse(request.body);
+      prouductionUnitDto.parse(request.body);
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar los campos para actualizar el usuario"
+        " Error al validar campos para actualizar la unidad de produccion"
       );
       response.status(result.statusCode).send(result);
     }
@@ -54,11 +49,11 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar los campos para traer los usuarios"
+        " Error al validar el parámetro"
       );
       response.status(result.statusCode).send(result);
     }
   }
 }
 
-export const userMiddleware = new UserMiddleware();
+export const productionUnitMiddleware = new ProductionUnitMiddleware();

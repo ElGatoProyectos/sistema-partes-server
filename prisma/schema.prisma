@@ -31,6 +31,15 @@ enum E_Rol_BD {
   ASISTENTE_ALMACEN
 }
 
+model Rol {
+  id                Int    @id @default(autoincrement())
+  nombre_secundario String
+  descripcion       String
+  rol               String
+
+  Usuario Usuario[]
+}
+
 enum E_Estado_Riesgo_BD {
   PENDIENTE
   SOLUCIONADO
@@ -84,9 +93,12 @@ model Usuario {
   eliminado             E_Estado_BD             @default(y)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
+  rol_id                Int
+  Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Proyecto              Proyecto[]
+
+  EmpresaUsuario EmpresaUsuario[]
 }
 
 //[success] actual
@@ -296,10 +308,13 @@ model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
   descripcion_empresa   String?                 @db.Text()
-  usuarioId             Int
+  usuario_id            Int
   fecha_creacion        DateTime                @default(now())
+  eliminado             E_Estado_BD             @default(y)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
+  Proyecto              Proyecto[]
+  EmpresaUsuario        EmpresaUsuario[]
 }
 
 //[success] actual
@@ -326,9 +341,9 @@ model Proyecto {
   fecha_fin          DateTime             @db.Date()
   plazo_proyecto     String
   codigo_proyecto    String
-  usuario_id         Int
+  empresa_id         Int
   color_proyecto     String
-  Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
+  Empresa            Empresa              @relation(fields: [empresa_id], references: [id])
   UnidadProduccion   UnidadProduccion[]
   Tren               Tren[]
   Partida            Partida[]
@@ -336,6 +351,14 @@ model Proyecto {
   DepartamentoObrero DepartamentoObrero[]
   AreaObrero         AreaObrero[]
   Combo              Combo[]
+}
+
+model EmpresaUsuario {
+  id         Int     @id @default(autoincrement())
+  usuario_id Int
+  empresa_id Int
+  Empresa    Empresa @relation(fields: [empresa_id], references: [id])
+  Usuario    Usuario @relation(fields: [usuario_id], references: [id])
 }
 
 model Combo {
@@ -357,13 +380,14 @@ model detalle_combo_mo {
 
 //[success] actual
 model UnidadProduccion {
-  id             Int       @id @default(autoincrement())
-  codigo         String    @unique
+  id             Int         @id @default(autoincrement())
+  codigo         String      @unique
   nombre         String
-  nota           String?   @db.Text()
+  nota           String?     @db.Text()
+  eliminado      E_Estado_BD @default(n)
   proyecto_id    Int
-  fecha_creacion DateTime  @default(now())
-  Proyecto       Proyecto  @relation(fields: [proyecto_id], references: [id])
+  fecha_creacion DateTime    @default(now())
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
   Trabajo        Trabajo[]
 }
 

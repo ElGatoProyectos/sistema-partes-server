@@ -7,7 +7,6 @@ import sharp from "sharp";
 import { projectService } from "./project.service";
 import { ProjectMulterProperties } from "@/project/models/project.constant";
 import { Proyecto } from "@prisma/client";
-import { T_ProyectoResponse } from "./models/project.type";
 import { proyectoDto } from "./dto/project.dto";
 import fs from "fs/promises";
 import { I_UpdateProyectBody } from "./models/project.interface";
@@ -227,7 +226,7 @@ class ProjectController {
     }
   };
 
-  findAllProjectsXUser = async (
+  findAllProjectsXCompany = async (
     request: express.Request,
     response: express.Response
   ) => {
@@ -240,7 +239,7 @@ class ProjectController {
       },
     };
     const idUser = request.params.id;
-    const result = await projectService.findAllProjectsXUser(
+    const result = await projectService.findAllProjectsXCompany(
       +idUser,
       paginationOptions
     );

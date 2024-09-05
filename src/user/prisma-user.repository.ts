@@ -3,7 +3,7 @@ import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
 
-class PrimsaUserRepository implements UserRepository {
+class PrismaUserRepository implements UserRepository {
   async existsEmail(email: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {
@@ -54,12 +54,12 @@ class PrimsaUserRepository implements UserRepository {
       },
     });
 
-    const newEstadoUser =
+    const newStateUser =
       user?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
     const userUpdate = await prisma.usuario.update({
       where: { id: idUser },
       data: {
-        eliminado: newEstadoUser,
+        eliminado: newStateUser,
       },
     });
     return userUpdate;
@@ -90,7 +90,11 @@ class PrimsaUserRepository implements UserRepository {
         skip,
         take: limit,
       }),
-      prisma.usuario.count(),
+      prisma.usuario.count({
+        where: {
+          eliminado: E_Estado_BD.n,
+        },
+      }),
     ]);
     return { users, total };
   }
@@ -105,4 +109,4 @@ class PrimsaUserRepository implements UserRepository {
   }
 }
 
-export const primsaUserRepository = new PrimsaUserRepository();
+export const prismaUserRepository = new PrismaUserRepository();

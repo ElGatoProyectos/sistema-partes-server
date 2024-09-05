@@ -10,9 +10,9 @@ import { ProjectMulterProperties } from "./models/project.constant";
 import fs from "fs/promises";
 import { converToDate } from "@/common/utils/date";
 import { T_FindAll } from "@/common/models/pagination.types";
-import { primsaUserRepository } from "@/user/prisma-user.repository";
 import { userService } from "@/user/user.service";
 import validator from "validator";
+import { companyService } from "@/company/company.service";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -25,6 +25,13 @@ class ProjectService {
 
   async createProject(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
+      data.empresa_id = Number(data.empresa_id);
+      const resultCompany = await companyService.findById(data.empresa_id);
+      if (!resultCompany.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el proyecto con el id de la empresa proporcionado"
+        );
+      }
       const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
       if (resultCostoProyecto) {
         return httpResponse.BadRequestException(
@@ -41,13 +48,6 @@ class ProjectService {
       if (resultCodigoProyecto) {
         return httpResponse.BadRequestException(
           "El campo codigo proyecto debe contener solo números"
-        );
-      }
-      data.usuario_id = Number(data.usuario_id);
-      const result = await userService.findById(data.usuario_id);
-      if (!result.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
         );
       }
       const fecha_creacion = converToDate(data.fecha_creacion);
@@ -83,6 +83,13 @@ class ProjectService {
     idProject: number
   ): Promise<T_HttpResponse> {
     try {
+      data.empresa_id = Number(data.empresa_id);
+      const companyResponse = await companyService.findById(data.empresa_id);
+      if (!companyResponse.success) {
+        return httpResponse.BadRequestException(
+          "No se pudo crear el proyecto con el id de la empresa proporcionado"
+        );
+      }
       const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
       if (resultCostoProyecto) {
         return httpResponse.BadRequestException(
@@ -106,26 +113,13 @@ class ProjectService {
       let fecha_creacion = new Date(data.fecha_creacion);
       let fecha_fin = new Date(data.fecha_fin);
 
-      // data.costo_proyecto = Number(data.costo_proyecto);
-      data.usuario_id = Number(data.usuario_id);
-      const userResponse = await userService.findById(data.usuario_id);
-      if (!userResponse.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
-        );
-      }
       const proyectFormat = {
         ...data,
         costo_proyecto: data.costo_proyecto,
         fecha_creacion: fecha_creacion,
         fecha_fin: fecha_fin,
       };
-      const result = await primsaUserRepository.findById(data.usuario_id);
-      if (!result) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
-        );
-      }
+
       const project = await prismaProyectoRepository.updateProject(
         proyectFormat,
         idProject

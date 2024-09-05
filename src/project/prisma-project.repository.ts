@@ -50,7 +50,12 @@ class PrismaProjectRepository implements ProjectRepository {
         skip,
         take: limit,
       }),
-      prisma.proyecto.count(),
+      prisma.proyecto.count({
+        where: {
+          usuario_id: idUser,
+          eliminado: E_Estado_BD.n,
+        },
+      }),
     ]);
     return { projects, total };
   }

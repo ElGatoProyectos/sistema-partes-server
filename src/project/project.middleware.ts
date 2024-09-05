@@ -16,7 +16,7 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar campo del id "
+        " Error al validar campo "
       );
       response.status(result.statusCode).send(result);
     }
