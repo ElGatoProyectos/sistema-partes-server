@@ -1,11 +1,12 @@
-import { E_Estado_BD, E_Rol_BD } from "@prisma/client";
+import { E_Estado_BD, E_Rol_BD, Usuario } from "@prisma/client";
 import { I_CreateUserBody, I_UpdateUserBody } from "./models/user.interface";
 import { primsaUserRepository } from "./prisma-user.repository";
 import prisma from "@/config/prisma.config";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { bcryptService } from "@/auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
-import { T_FindAll } from "./models/user.service.types";
+import { T_FindAll } from "../common/models/pagination.types";
+import validator from "validator";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -19,6 +20,9 @@ class UserService {
         return httpResponse.SuccessResponse("No se encontraron usuarios.", 0);
 
       const { users, total } = result;
+      const usersMapped = users.map(
+        (user: Usuario) => new UserResponseMapper(user)
+      );
       //numero de pagina donde estas
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -28,7 +32,7 @@ class UserService {
         limit: data.queryParams.limit,
         //cantidad de paginas que hay
         pageCount,
-        data: users,
+        data: usersMapped,
       };
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los usuarios",
@@ -36,7 +40,7 @@ class UserService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "[s] Error al traer los usuarios",
+        " Error al traer los usuarios",
         error
       );
     } finally {
@@ -44,17 +48,48 @@ class UserService {
     }
   }
 
+  isNumeric(phone: string) {
+    if (!validator.isNumeric(phone)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  verifyLargeDni(dni: string) {
+    if (dni.length < 8) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
+      const responseEmail = await this.findByEmail(data.email);
+      if (!responseEmail.success)
+        return httpResponse.BadRequestException(`El email ingresado ya existe`);
+
       const responseByDni = await this.findByDni(data.dni);
       if (responseByDni.success)
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+      const resultPhone = this.isNumeric(data.telefono);
+      if (resultPhone) {
+        return httpResponse.BadRequestException(
+          "El teléfono ingresado solo debe contener números "
+        );
+      }
+      const largedni = this.verifyLargeDni(data.dni);
+      if (resultPhone) {
+        return httpResponse.BadRequestException(
+          "El dni debe contener por lo menos 8 digitos"
+        );
+      }
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
       const userFormat = {
         ...data,
-        estado: E_Estado_BD.y,
+        eliminado: E_Estado_BD.n,
         contrasena: hashContrasena,
         rol: E_Rol_BD.USER,
       };
@@ -67,7 +102,7 @@ class UserService {
     } catch (error) {
       console.log(error);
       return httpResponse.InternalServerErrorException(
-        "[s] Error al crear usuario",
+        " Error al crear usuario",
         error
       );
     } finally {
@@ -82,10 +117,31 @@ class UserService {
       if (!user) {
         return httpResponse.NotFoundException("Usuario no encontrado");
       }
-      return httpResponse.SuccessResponse("Usuario encontrado", user);
+      return httpResponse.SuccessResponse("Usuario encontrado");
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "[s] Error al buscar usuario",
+        " Error al buscar usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findByEmail(email: string): Promise<T_HttpResponse> {
+    try {
+      const emailExists = await primsaUserRepository.existsEmail(email);
+      if (emailExists) {
+        return httpResponse.NotFoundException(
+          "El email ingresado ya existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El email no existe, puede proceguir"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar email",
         error
       );
     } finally {
@@ -100,10 +156,14 @@ class UserService {
         return httpResponse.NotFoundException(
           "No se encontró el usuario solicitado"
         );
-      return httpResponse.SuccessResponse("Usuario encontrado con éxito", user);
+      const userMapper = new UserResponseMapper(user);
+      return httpResponse.SuccessResponse(
+        "Usuario encontrado con éxito",
+        userMapper
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "[s] Error al buscar usuario",
+        " Error al buscar usuario",
         error
       );
     } finally {
@@ -120,9 +180,29 @@ class UserService {
       const userResponse = await this.findById(idUser);
       if (!userResponse.success) return userResponse;
 
+      const responseEmail = await this.findByEmail(data.email);
+      if (!responseEmail.success)
+        return httpResponse.BadRequestException(`El email ingresado ya existe`);
+
       const responseByDni = await this.findByDni(data.dni);
       if (responseByDni.success)
-        return httpResponse.BadRequestException(`El dni ${data.dni} ya existe`);
+        return httpResponse.BadRequestException(
+          `El usuario con el dni ${data.dni} ya existe`
+        );
+
+      const resultPhone = this.isNumeric(data.telefono);
+      if (resultPhone) {
+        return httpResponse.BadRequestException(
+          "El teléfono ingresado solo debe contener números "
+        );
+      }
+
+      const largedni = this.verifyLargeDni(data.dni);
+      if (largedni) {
+        return httpResponse.BadRequestException(
+          "El dni debe contener por lo menos 8 digitos"
+        );
+      }
 
       let hashContrasena;
       let userFormat = data;
@@ -133,14 +213,15 @@ class UserService {
       }
 
       const result = await primsaUserRepository.updateUser(userFormat, idUser);
+      const resultMapper = new UserResponseMapper(result);
       return httpResponse.CreatedResponse(
         "Usuario modificado correctamente",
-        result
+        resultMapper
       );
     } catch (error) {
       console.log(error);
       return httpResponse.InternalServerErrorException(
-        "[s] Error al actualizar el usuario",
+        " Error al actualizar el usuario",
         error
       );
     } finally {
@@ -153,13 +234,54 @@ class UserService {
       const userResponse = await this.findById(idUser);
       if (!userResponse.success) return userResponse;
       const result = await primsaUserRepository.updateStatusUser(idUser);
+      const resultMapper = new UserResponseMapper(result);
       return httpResponse.SuccessResponse(
         "Usuario eliminado correctamente",
-        result
+        resultMapper
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "[s] Error al eliminar el usuario",
+        " Error al eliminar el usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const result = await primsaUserRepository.searchNameUser(
+        name,
+        skip,
+        data.queryParams.limit
+      );
+      if (!result) {
+        return httpResponse.NotFoundException(
+          "No se encontraron resultados",
+          0
+        );
+      }
+      const { users, total } = result;
+      const usersMapped = users.map(
+        (user: Usuario) => new UserResponseMapper(user)
+      );
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: usersMapped,
+      };
+      return httpResponse.SuccessResponse("Éxito al buscar usuarios", formData);
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar proyecto",
         error
       );
     } finally {

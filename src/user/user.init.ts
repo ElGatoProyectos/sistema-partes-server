@@ -17,6 +17,13 @@ userRouter.get(
 );
 
 userRouter.get(
+  `${prefix}/search`,
+  //requestMiddleware.validatePagination,
+  authRoleMiddleware.authAdmin,
+  userController.findByName
+);
+
+userRouter.get(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFields,
   authRoleMiddleware.authAdmin,

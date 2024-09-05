@@ -19,7 +19,7 @@ class UserMiddleware {
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(
-        "[m] Error al validar autenticacion"
+        " Error al validar autenticacion"
       );
       response.status(result.statusCode).send(result);
     }
@@ -35,7 +35,7 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "[m] Error al validar campos para actualizar el usuario"
+        " Error al validar campos para actualizar el usuario"
       );
       response.status(result.statusCode).send(result);
     }
@@ -54,7 +54,7 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "[m] Error al validar campos para traer los usuarios"
+        " Error al validar campos para traer los usuarios"
       );
       response.status(result.statusCode).send(result);
     }

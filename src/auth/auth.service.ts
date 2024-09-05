@@ -3,6 +3,7 @@ import { jwtService } from "./jwt.service";
 import { bcryptService } from "@/auth/bcrypt.service";
 import prisma from "@/config/prisma.config";
 import LoginResponseMapper from "./mappers/login.mapper";
+import { T_ResponseToken } from "./models/auth.type";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -45,6 +46,23 @@ class AuthService {
     } catch (error) {
       return httpResponse.InternalServerErrorException("Error", error);
     } finally {
+    }
+  }
+  verifyRolProject(authorization: string) {
+    try {
+      const [bearer, token] = authorization.split(" ");
+
+      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
+      if (
+        tokenDecrypted.role === "ADMIN" ||
+        tokenDecrypted.role === "GERENTE_PROYECTO"
+      ) {
+        return httpResponse.SuccessResponse("Éxito en la autenticación");
+      }
+    } catch (error) {
+      return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }
 }

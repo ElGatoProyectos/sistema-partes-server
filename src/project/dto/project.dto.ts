@@ -7,6 +7,7 @@ export const proyectoDto = z.object({
   nombre_consorcio: z.string(),
   nombre_corto: z.string().min(3),
   costo_proyecto: z.string(),
+  color_proyecto: z.string(),
   estado: z.enum(["ACTIVO", "INACTIVO", "PENDIENTE", "FINALIZADO"]),
   fecha_creacion: z.string(),
   fecha_fin: z.string(),

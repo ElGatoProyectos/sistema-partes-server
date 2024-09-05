@@ -20,7 +20,7 @@ class RequestMiddleware {
           nextFunction();
         }
       } else {
-        console.log("llegando aa next");
+        // console.log("llegando aa next");
         nextFunction();
       }
 
