@@ -1,24 +1,60 @@
 import prisma from "@/config/prisma.config";
-import fs from "fs/promises";
 import {
   I_CreateProjectBD,
-  I_UpdateProyectBody,
+  I_UpdateProjectBD,
 } from "./models/project.interface";
 import { ProjectRepository } from "./project.repository";
-import { Proyecto } from "@prisma/client";
-import appRootPath from "app-root-path";
-import { httpResponse } from "@/common/http.response";
-import { ProjectMulterProperties } from "./models/project.constant";
+import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
+import { contains } from "validator";
 
 class PrismaProjectRepository implements ProjectRepository {
-  async allProjectsuser(idUser: number): Promise<Proyecto[]> {
-    const projects = await prisma.proyecto.findMany({
-      where: {
-        usuario_id: idUser,
-      },
-    });
-    return projects;
+  async searchNameProject(
+    name: string,
+    skip: number,
+    limit: number
+  ): Promise<{ projects: Proyecto[]; total: number } | null> {
+    const [projects, total]: [Proyecto[], number] = await prisma.$transaction([
+      prisma.proyecto.findMany({
+        where: {
+          nombre_completo: {
+            contains: name,
+          },
+          eliminado: E_Estado_BD.n,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.proyecto.count({
+        where: {
+          nombre_completo: {
+            contains: name,
+          },
+          eliminado: E_Estado_BD.n,
+        },
+      }),
+    ]);
+    return { projects, total };
   }
+
+  async allProjectsuser(
+    idUser: number,
+    skip: number,
+    limit: number
+  ): Promise<{ projects: Proyecto[]; total: number } | null> {
+    const [projects, total]: [Proyecto[], number] = await prisma.$transaction([
+      prisma.proyecto.findMany({
+        where: {
+          usuario_id: idUser,
+          eliminado: E_Estado_BD.n,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.proyecto.count(),
+    ]);
+    return { projects, total };
+  }
+
   findById = async (idProject: number) => {
     const project = await prisma.proyecto.findFirst({
       where: {
@@ -28,17 +64,37 @@ class PrismaProjectRepository implements ProjectRepository {
     return project;
   };
 
-  updateStatusProject(idProject: number): void {
-    throw new Error("Method not implemented.");
+  async updateStatusProject(idProject: number): Promise<Proyecto> {
+    const project = await prisma.proyecto.findFirst({
+      where: {
+        id: idProject,
+      },
+    });
+    const newStateProject =
+      project?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
+    const projectUpdate = await prisma.proyecto.update({
+      where: { id: idProject },
+      data: {
+        eliminado: newStateProject,
+      },
+    });
+    return projectUpdate;
   }
   async updateProject(
-    data: I_UpdateProyectBody,
+    dataa: I_UpdateProjectBD, // Cambié a I_UpdateProyectBody
     idProject: number
   ): Promise<Proyecto> {
+    // Convertir la propiedad "costo_proyecto" de string a number
+    const updatedData: I_CreateProjectBD = {
+      ...dataa,
+      costo_proyecto: Number(dataa.costo_proyecto), // Conversión de tipo
+    };
+
     const project = await prisma.proyecto.update({
       where: { id: idProject },
-      data: data,
+      data: updatedData, // Usar los datos convertidos
     });
+
     return project;
   }
 

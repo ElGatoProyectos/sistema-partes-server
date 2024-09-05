@@ -11,6 +11,10 @@ import { T_ProyectoResponse } from "./models/project.type";
 import { proyectoDto } from "./dto/project.dto";
 import fs from "fs/promises";
 import { I_UpdateProyectBody } from "./models/project.interface";
+import { proyectoDtoUpdate } from "./dto/proyectUpdate.dto";
+import { T_FindAll } from "@/common/models/pagination.types";
+import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authService } from "@/auth/auth.service";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.
 // esto es útil por si lo querés analizar o guardar en algun lugar
@@ -19,7 +23,11 @@ const upload: any = multer({ storage: storage });
 
 class ProjectController {
   //[note] DEBE SER ASI SINO TE TOMA UPLOAD COMO UNDEFINED
-  create = async (request: express.Request, response: express.Response) => {
+  create = async (
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) => {
     //se utiliza para manejar la subida de un solo archivo con el nombre de campo especificado
     //este método devuelve una función middleware
     //es una funcion q devuelve nuna funcion eso es por eso que puedes invocarla inmediatamente después de su creación.
@@ -27,6 +35,7 @@ class ProjectController {
     upload.single(ProjectMulterProperties.field)(
       request,
       response,
+      //nextFunction,
       async (error: any) => {
         if (error) {
           const customError = httpResponse.BadRequestException(
@@ -36,46 +45,59 @@ class ProjectController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            proyectoDto.parse(request.body);
-            const data = request.body;
-            const result = await projectService.createProject(data);
-            if (!result.success) {
-              return result;
-            }
-            const project = result.payload as Proyecto;
-            if (request.file) {
-              const id = project.id;
-              const direction = path.join(
-                appRootPath.path,
-                "static",
-                ProjectMulterProperties.folder
-              );
-              const ext = ".png";
-              const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
-              //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
-              //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
-              //de carpeta donde van a guardar
-              const filePath = path.join(direction, fileName);
-              sharp(request.file.buffer)
-                .resize({ width: 800 })
-                .toFormat("png")
-                .toFile(filePath, (err) => {
-                  if (err) {
-                    const customError = httpResponse.BadRequestException(
-                      "Error al guardar la imagen",
-                      err
-                    );
-                    response.status(customError.statusCode).json(customError);
-                  } else {
-                    response.status(result.statusCode).json(result);
-                  }
-                });
+            // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
+            //despues los valores
+            const responseValidate = authService.verifyRolProject(
+              request.get("Authorization") as string
+            );
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
             } else {
-              response.status(result.statusCode).json(result);
+              proyectoDto.parse(request.body);
+              const data = request.body;
+              const result = await projectService.createProject(data);
+              //en controlador si hay if tiene q tener su else
+              if (!result.success) {
+                response.status(result.statusCode).json(result);
+              } else {
+                const project = result.payload as Proyecto;
+                if (request.file) {
+                  const id = project.id;
+                  const direction = path.join(
+                    appRootPath.path,
+                    "static",
+                    ProjectMulterProperties.folder
+                  );
+                  const ext = ".png";
+                  const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
+                  //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
+                  //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
+                  //de carpeta donde van a guardar
+                  const filePath = path.join(direction, fileName);
+                  sharp(request.file.buffer)
+                    .resize({ width: 800 })
+                    .toFormat("png")
+                    .toFile(filePath, (err) => {
+                      if (err) {
+                        const customError = httpResponse.BadRequestException(
+                          "Error al guardar la imagen",
+                          err
+                        );
+                        response
+                          .status(customError.statusCode)
+                          .json(customError);
+                      } else {
+                        response.status(result.statusCode).json(result);
+                      }
+                    });
+                } else {
+                  response.status(result.statusCode).json(result);
+                }
+              }
             }
           } catch (error) {
             const customError = httpResponse.BadRequestException(
-              "[c] Error al validar los campos ",
+              " Error al validar los campos ",
               error
             );
             response.status(customError.statusCode).json(customError);
@@ -100,47 +122,63 @@ class ProjectController {
           );
           response.status(customError.statusCode).json(customError);
         } else {
-          const data = request.body as I_UpdateProyectBody;
           try {
-            const idProject = Number(request.params.id);
-            const result = await projectService.updateProject(data, idProject);
-            if (!result.success) {
-              return result;
-            }
-            const project = result.payload as Proyecto;
-            if (request.file) {
-              const id = project.id;
-              const direction = path.join(
-                appRootPath.path,
-                "static",
-                ProjectMulterProperties.folder
-              );
-              const ext = ".png";
-              const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
-              //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
-              //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
-              //de carpeta donde van a guardar
-              const filePath = path.join(direction, fileName);
-              sharp(request.file.buffer)
-                .resize({ width: 800 })
-                .toFormat("png")
-                .toFile(filePath, (err) => {
-                  if (err) {
-                    const customError = httpResponse.BadRequestException(
-                      "Error al guardar la imagen",
-                      err
-                    );
-                    response.status(customError.statusCode).json(customError);
-                  } else {
-                    response.status(result.statusCode).json(result);
-                  }
-                });
+            // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
+            //despues los valores
+            const responseValidate = authService.verifyRolProject(
+              request.get("Authorization") as string
+            );
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
             } else {
-              response.status(result.statusCode).json(result);
+              proyectoDtoUpdate.parse(request.body);
+              const data = request.body as I_UpdateProyectBody;
+              const idProject = Number(request.params.id);
+              const result = await projectService.updateProject(
+                data,
+                idProject
+              );
+              if (!result.success) {
+                response.status(result.statusCode).json(result);
+              } else {
+                const project = result.payload as Proyecto;
+                if (request.file) {
+                  const id = project.id;
+                  const direction = path.join(
+                    appRootPath.path,
+                    "static",
+                    ProjectMulterProperties.folder
+                  );
+                  const ext = ".png";
+                  const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
+                  //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
+                  //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
+                  //de carpeta donde van a guardar
+                  const filePath = path.join(direction, fileName);
+                  sharp(request.file.buffer)
+                    .resize({ width: 800 })
+                    .toFormat("png")
+                    .toFile(filePath, (err) => {
+                      if (err) {
+                        const customError = httpResponse.BadRequestException(
+                          "Error al guardar la imagen",
+                          err
+                        );
+                        response
+                          .status(customError.statusCode)
+                          .json(customError);
+                      } else {
+                        response.status(result.statusCode).json(result);
+                      }
+                    });
+                } else {
+                  response.status(result.statusCode).json(result);
+                }
+              }
             }
           } catch (error) {
             const customError = httpResponse.BadRequestException(
-              "[c] Error al validar los campos ",
+              " Error al validar los campos ",
               error
             );
             response.status(customError.statusCode).json(customError);
@@ -161,11 +199,6 @@ class ProjectController {
     }
   };
 
-  // updateIdProject = async (
-  //   request: express.Request,
-  //   response: express.Response
-  // ) => {};
-
   findByIdProject = async (
     request: express.Request,
     response: express.Response
@@ -175,14 +208,53 @@ class ProjectController {
     response.status(result.statusCode).json(result);
   };
 
+  findByName = async (request: express.Request, response: express.Response) => {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    let paginationOptions: T_FindAll = {
+      queryParams: {
+        page: page,
+        limit: limit,
+      },
+    };
+    //si buscaba como request.body no me llegaba bien para luego buscar
+    const name = request.query.name as string;
+    const result = await projectService.findByName(name, paginationOptions);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  };
+
   findAllProjectsXUser = async (
     request: express.Request,
     response: express.Response
   ) => {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    let paginationOptions: T_FindAll = {
+      queryParams: {
+        page: page,
+        limit: limit,
+      },
+    };
     const idUser = request.params.id;
-    const result = await projectService.findAllProjectsXUser(+idUser);
-    response.status(result.statusCode).json(result);
+    const result = await projectService.findAllProjectsXUser(
+      +idUser,
+      paginationOptions
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
   };
+  async updateStatus(request: express.Request, response: express.Response) {
+    const idProject = Number(request.params.id);
+    const result = await projectService.updateStatusProject(idProject);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const projectController = new ProjectController();

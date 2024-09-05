@@ -4,6 +4,41 @@ import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
 
 class PrimsaUserRepository implements UserRepository {
+  async existsEmail(email: string): Promise<Usuario | null> {
+    const user = await prisma.usuario.findFirst({
+      where: {
+        email,
+      },
+    });
+    return user;
+  }
+  async searchNameUser(
+    name: string,
+    skip: number,
+    limit: number
+  ): Promise<{ users: Usuario[]; total: number } | null> {
+    const [users, total]: [Usuario[], number] = await prisma.$transaction([
+      prisma.usuario.findMany({
+        where: {
+          nombre_completo: {
+            contains: name,
+          },
+          eliminado: E_Estado_BD.n,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.usuario.count({
+        where: {
+          nombre_completo: {
+            contains: name,
+          },
+          eliminado: E_Estado_BD.n,
+        },
+      }),
+    ]);
+    return { users, total };
+  }
   async findByDni(dni: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {
@@ -20,11 +55,11 @@ class PrimsaUserRepository implements UserRepository {
     });
 
     const newEstadoUser =
-      user?.estado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
+      user?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
     const userUpdate = await prisma.usuario.update({
       where: { id: idUser },
       data: {
-        estado: newEstadoUser,
+        eliminado: newEstadoUser,
       },
     });
     return userUpdate;
@@ -49,6 +84,9 @@ class PrimsaUserRepository implements UserRepository {
   ): Promise<{ users: Usuario[]; total: number } | null> {
     const [users, total]: [Usuario[], number] = await prisma.$transaction([
       prisma.usuario.findMany({
+        where: {
+          eliminado: E_Estado_BD.n,
+        },
         skip,
         take: limit,
       }),

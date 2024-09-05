@@ -13,4 +13,8 @@ export abstract class UserRepository {
   updateStatusUser(idUser: number): void {}
 
   findByDni(dni: string): void {}
+
+  existsEmail(dni: string): void {}
+
+  searchNameUser(name: string, skip: number, limit: number): void {}
 }
