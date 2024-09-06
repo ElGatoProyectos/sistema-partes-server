@@ -37,14 +37,14 @@ class PrismaProjectRepository implements ProjectRepository {
   }
 
   async allProjectsuser(
-    idUser: number,
+    idCompany: number,
     skip: number,
     limit: number
   ): Promise<{ projects: Proyecto[]; total: number } | null> {
     const [projects, total]: [Proyecto[], number] = await prisma.$transaction([
       prisma.proyecto.findMany({
         where: {
-          usuario_id: idUser,
+          empresa_id: idCompany,
           eliminado: E_Estado_BD.n,
         },
         skip,
@@ -52,7 +52,7 @@ class PrismaProjectRepository implements ProjectRepository {
       }),
       prisma.proyecto.count({
         where: {
-          usuario_id: idUser,
+          empresa_id: idCompany,
           eliminado: E_Estado_BD.n,
         },
       }),

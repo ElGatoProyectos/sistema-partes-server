@@ -2,6 +2,7 @@ import prisma from "@/config/prisma.config";
 import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
+import { UsuarioSinContrasena } from "./dto/user.type";
 
 class PrismaUserRepository implements UserRepository {
   async existsEmail(email: string): Promise<Usuario | null> {
@@ -99,11 +100,15 @@ class PrismaUserRepository implements UserRepository {
     return { users, total };
   }
 
-  async findById(idUser: number): Promise<Usuario | null> {
+  async findById(idUser: number): Promise<UsuarioSinContrasena | null> {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
       },
+      include: {
+        Rol: true,
+      },
+      omit: { contrasena: true },
     });
     return user;
   }

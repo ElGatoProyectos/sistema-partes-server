@@ -1,4 +1,4 @@
-import { E_Estado_BD, E_Rol_BD, Usuario } from "@prisma/client";
+import { E_Estado_BD, Usuario } from "@prisma/client";
 import { I_CreateUserBody, I_UpdateUserBody } from "./models/user.interface";
 import { prismaUserRepository } from "./prisma-user.repository";
 import prisma from "@/config/prisma.config";
@@ -8,6 +8,7 @@ import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll } from "../common/models/pagination.types";
 import validator from "validator";
 import { wordIsNumeric } from "@/common/utils/number";
+import { rolService } from "@/rol/rol.service";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -59,6 +60,12 @@ class UserService {
 
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
+      const roleResponse = await rolService.findById(data.rol_id);
+      if (!roleResponse.success)
+        return httpResponse.BadRequestException(
+          `No se encontro el rol ingresado`
+        );
+
       const responseEmail = await this.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -85,7 +92,9 @@ class UserService {
         ...data,
         eliminado: E_Estado_BD.n,
         contrasena: hashContrasena,
-        rol: E_Rol_BD.USER,
+        rol_id: data.rol_id,
+        // esto era antes asi ahora va rol_id y un numero y faltaria una validacion
+        //rol: E_Rol_BD.USER,
       };
       const result = await prismaUserRepository.createUser(userFormat);
       const resultMapper = new UserResponseMapper(result);
@@ -94,6 +103,7 @@ class UserService {
         resultMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al crear usuario",
         error
@@ -149,11 +159,8 @@ class UserService {
         return httpResponse.NotFoundException(
           "No se encontró el usuario solicitado"
         );
-      const userMapper = new UserResponseMapper(user);
-      return httpResponse.SuccessResponse(
-        "Usuario encontrado con éxito",
-        userMapper
-      );
+      // const userMapper = new UserResponseMapper(user);
+      return httpResponse.SuccessResponse("Usuario encontrado con éxito", user);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         " Error al buscar usuario",

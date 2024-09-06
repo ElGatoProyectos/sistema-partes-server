@@ -8,6 +8,6 @@ export abstract class ProjectRepository {
   updateProject(data: I_UpdateProyectBody, idProject: number): void {}
   findById(idProject: number): void {}
   updateStatusProject(idProject: number): void {}
-  allProjectsuser(idUser: number, skip: number, limit: number): void {}
+  allProjectsuser(idProject: number, skip: number, limit: number): void {}
   searchNameProject(name: string, skip: number, limit: number): void {}
 }

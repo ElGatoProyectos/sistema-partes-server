@@ -232,7 +232,7 @@ class ProjectService {
     }
   }
 
-  async findAllProjectsXUser(idUser: number, data: T_FindAll) {
+  async findAllProjectsXCompany(idUser: number, data: T_FindAll) {
     try {
       const userResponse = await userService.findById(idUser);
       if (!userResponse.success) {

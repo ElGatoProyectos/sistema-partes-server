@@ -238,9 +238,9 @@ class ProjectController {
         limit: limit,
       },
     };
-    const idUser = request.params.id;
+    const idCompany = request.params.id;
     const result = await projectService.findAllProjectsXCompany(
-      +idUser,
+      +idCompany,
       paginationOptions
     );
     if (!result.success) {

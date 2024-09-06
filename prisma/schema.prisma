@@ -5,7 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  //para omitir campos
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -29,15 +31,6 @@ enum E_Rol_BD {
   ASISTENTE_SSOMMA
   LOGISTICA
   ASISTENTE_ALMACEN
-}
-
-model Rol {
-  id                Int    @id @default(autoincrement())
-  nombre_secundario String
-  descripcion       String
-  rol               String
-
-  Usuario Usuario[]
 }
 
 enum E_Estado_Riesgo_BD {
@@ -81,6 +74,14 @@ enum E_Proyecto_Estado {
   FINALIZADO
 }
 
+model Rol {
+  id                Int       @id @default(autoincrement())
+  nombre_secundario String
+  descripcion       String
+  rol               String
+  Usuario           Usuario[]
+}
+
 //[success] actual
 model Usuario {
   id                    Int                     @id @default(autoincrement())
@@ -89,7 +90,6 @@ model Usuario {
   nombre_completo       String
   telefono              String
   limite_proyecto       Int                     @default(1)
-  rol                   E_Rol_BD
   eliminado             E_Estado_BD             @default(y)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
@@ -97,8 +97,7 @@ model Usuario {
   Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-
-  EmpresaUsuario EmpresaUsuario[]
+  EmpresaUsuario        EmpresaUsuario[]
 }
 
 //[success] actual

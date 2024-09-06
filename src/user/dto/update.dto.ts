@@ -7,4 +7,5 @@ export const userUpdateDto = z.object({
   telefono: z.string().optional(),
   contrasena: z.string().optional(),
   eliminado: z.enum(["y", "n"]).optional(),
+  rol_id: z.string().optional(),
 });
