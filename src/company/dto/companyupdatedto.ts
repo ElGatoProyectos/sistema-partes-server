@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const empresaDto = z.object({
-  nombre_empresa: z.string(),
+  nombre_empresa: z.string().optional(),
   descripcion_empresa: z.string().optional(),
-  fecha_creacion: z.string(),
 });

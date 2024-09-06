@@ -90,7 +90,7 @@ model Usuario {
   nombre_completo       String
   telefono              String
   limite_proyecto       Int                     @default(1)
-  eliminado             E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(n)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
   rol_id                Int
@@ -309,7 +309,7 @@ model Empresa {
   descripcion_empresa   String?                 @db.Text()
   usuario_id            Int
   fecha_creacion        DateTime                @default(now())
-  eliminado             E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(n)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   Proyecto              Proyecto[]
@@ -433,7 +433,7 @@ model Trabajo {
   duracion              Int
   fecha_inicio          DateTime                @db.Date //año más dia
   fecha_finalizacion    DateTime                @db.Date //año más dia
-  eliminado             E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(n)
   fecha_creacion        DateTime                @default(now())
   costo_partida         Int
   costo_mano_obra       Int

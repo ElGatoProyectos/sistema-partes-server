@@ -47,11 +47,13 @@ class CompanyService {
 
   async createCompany(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
+      const userResponse = await userService.findById(data.usuario_id);
+      if (!userResponse.success) {
+        return userResponse;
+      }
+
       const responseEmail = await this.findByName(data.nombre_empresa);
-      if (!responseEmail.success)
-        return httpResponse.BadRequestException(
-          `El nombre ingresado ya existe`
-        );
+      if (!responseEmail.success) return responseEmail;
 
       const result = await prismaCompanyRepository.createCompany(data);
       return httpResponse.CreatedResponse(
@@ -149,8 +151,8 @@ class CompanyService {
 
   async updateStatusCompany(idCompany: number): Promise<T_HttpResponse> {
     try {
-      const userResponse = await this.findById(idCompany);
-      if (!userResponse.success) return userResponse;
+      const companyResponse = await this.findById(idCompany);
+      if (!companyResponse.success) return companyResponse;
       const empresaResponse = await prismaCompanyRepository.updateStatusCompany(
         idCompany
       );

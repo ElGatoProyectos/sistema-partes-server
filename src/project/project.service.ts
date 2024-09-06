@@ -236,9 +236,7 @@ class ProjectService {
     try {
       const userResponse = await userService.findById(idUser);
       if (!userResponse.success) {
-        return httpResponse.BadRequestException(
-          "El id del usuario proporcionado no existe "
-        );
+        return userResponse;
       }
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaProyectoRepository.allProjectsuser(
