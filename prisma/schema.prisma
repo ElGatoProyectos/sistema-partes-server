@@ -90,6 +90,7 @@ model Usuario {
   nombre_completo       String
   telefono              String
   limite_proyecto       Int                     @default(1)
+  limite_usuarios       Int
   eliminado             E_Estado_BD             @default(n)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
@@ -97,7 +98,6 @@ model Usuario {
   Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  EmpresaUsuario        EmpresaUsuario[]
 }
 
 //[success] actual
@@ -121,7 +121,8 @@ model ManoObra {
   lugar_nacimiento            String?
   genero                      String?
   tipo_documento              String?
-  documento_identidad         String?
+  documento_identidad         String
+  contrasena                  String
   profesion                   String?
   estado_civil                String?
   n_libreta_militar           String?
@@ -307,13 +308,16 @@ model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
   descripcion_empresa   String?                 @db.Text()
+  ruc                   String?
+  direccion             String?
+  nombre_corto          String?
+  telefono              String
   usuario_id            Int
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   Proyecto              Proyecto[]
-  EmpresaUsuario        EmpresaUsuario[]
 }
 
 //[success] actual
@@ -327,37 +331,35 @@ model DetalleUsuarioEmpresa {
 
 //[success] actual
 model Proyecto {
-  id                 Int                  @id @default(autoincrement())
-  nombre_completo    String               @db.Text()
-  descripcion        String?              @db.Text()
-  direccion          String
-  nombre_consorcio   String
-  nombre_corto       String
-  costo_proyecto     Float
-  estado             E_Proyecto_Estado
-  eliminado          E_Estado_BD          @default(n)
-  fecha_creacion     DateTime             @db.Date()
-  fecha_fin          DateTime             @db.Date()
-  plazo_proyecto     String
-  codigo_proyecto    String
-  empresa_id         Int
-  color_proyecto     String
-  Empresa            Empresa              @relation(fields: [empresa_id], references: [id])
-  UnidadProduccion   UnidadProduccion[]
-  Tren               Tren[]
-  Partida            Partida[]
-  SeccionObrero      SeccionObrero[]
-  DepartamentoObrero DepartamentoObrero[]
-  AreaObrero         AreaObrero[]
-  Combo              Combo[]
-}
-
-model EmpresaUsuario {
-  id         Int     @id @default(autoincrement())
-  usuario_id Int
-  empresa_id Int
-  Empresa    Empresa @relation(fields: [empresa_id], references: [id])
-  Usuario    Usuario @relation(fields: [usuario_id], references: [id])
+  id                  Int                  @id @default(autoincrement())
+  nombre_completo     String               @db.Text()
+  descripcion         String?              @db.Text()
+  direccion           String
+  nombre_consorcio    String
+  nombre_corto        String
+  costo_proyecto      Float
+  estado              E_Proyecto_Estado
+  eliminado           E_Estado_BD          @default(n)
+  fecha_creacion      DateTime             @db.Date()
+  fecha_fin           DateTime             @db.Date()
+  plazo_proyecto      String
+  color_primario      String?
+  color_personalizado String?
+  color_linea         String?
+  color_detalle       String?
+  color_menu          String?
+  color_submenu       String?
+  codigo_proyecto     String
+  empresa_id          Int
+  color_proyecto      String
+  Empresa             Empresa              @relation(fields: [empresa_id], references: [id])
+  UnidadProduccion    UnidadProduccion[]
+  Tren                Tren[]
+  Partida             Partida[]
+  SeccionObrero       SeccionObrero[]
+  DepartamentoObrero  DepartamentoObrero[]
+  AreaObrero          AreaObrero[]
+  Combo               Combo[]
 }
 
 model Combo {
