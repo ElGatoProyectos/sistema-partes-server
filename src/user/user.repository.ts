@@ -1,5 +1,4 @@
-import { Usuario } from "@prisma/client";
-import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
+import { I_CreateUserBD, I_UpdateUserBD } from "./models/user.interface";
 
 export abstract class UserRepository {
   findAll(skip: number, limit: number): void {}
@@ -8,7 +7,7 @@ export abstract class UserRepository {
 
   createUser(data: I_CreateUserBD): void {}
 
-  updateUser(data: I_UpdateUserBody, idUser: number): void {}
+  updateUser(data: I_UpdateUserBD, idUser: number): void {}
 
   updateStatusUser(idUser: number): void {}
 

@@ -17,4 +17,6 @@ export abstract class CompanyRepository {
   updateStatusCompany(idCompany: number): void {}
 
   searchNameCompany(name: string, skip: number, limit: number): void {}
+
+  findCompanyByUser(idUser: number): void {}
 }

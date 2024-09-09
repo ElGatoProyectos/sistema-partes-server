@@ -76,7 +76,7 @@ class CompanyService {
       const nameExists = await prismaCompanyRepository.existsName(name);
       if (nameExists) {
         return httpResponse.NotFoundException(
-          "El nombre ingresado ya existe en la base de datos"
+          "El nombre ingresado de la empresa ya existe en la base de datos"
         );
       }
       return httpResponse.SuccessResponse(
@@ -106,6 +106,29 @@ class CompanyService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         " Error al buscar empresa",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  //hacer find user id
+
+  async findCompanyByUser(idUser: number) {
+    try {
+      const company = await prismaCompanyRepository.findCompanyByUser(idUser);
+      if (!company)
+        return httpResponse.NotFoundException(
+          "No se encontró la empresa del usuario"
+        );
+      return httpResponse.SuccessResponse(
+        "Empresa encontrada del usuario con éxito",
+        company
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar empresa del usuario",
         error
       );
     } finally {

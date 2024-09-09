@@ -7,6 +7,14 @@ import {
 import prisma from "@/config/prisma.config";
 
 class PrismaCompanyRepository implements CompanyRepository {
+  async findCompanyByUser(idUser: number): Promise<Empresa | null> {
+    const companyByUser = await prisma.empresa.findFirst({
+      where: {
+        usuario_id: idUser,
+      },
+    });
+    return companyByUser;
+  }
   async existsName(name: string): Promise<Empresa | null> {
     const company = await prisma.empresa.findFirst({
       where: {

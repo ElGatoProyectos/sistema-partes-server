@@ -20,6 +20,22 @@ class CompanyMiddleware {
     }
   }
 
+  verifyFieldsFromUser(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      empresaDto.parse(request.body.company);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        " Error al validar campos"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+
   verifyFieldsUpdate(
     request: express.Request,
     response: express.Response,

@@ -2,7 +2,6 @@ import express from "@/config/express.config";
 import { userMiddleware } from "./user.middleware";
 import { userController } from "./user.controller";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import { headerDto } from "./dto/header.params.dto";
 import { requestMiddleware } from "@/common/middlewares/request.middleware";
 
 const userRouter = express.Router();
@@ -34,7 +33,21 @@ userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdmin,
-  userController.create
+  userController.createUser
+);
+
+userRouter.post(
+  `${prefix}/company`,
+  userMiddleware.verifyFieldsRegistry,
+  authRoleMiddleware.authAdmin,
+  userController.createUserandCompany
+);
+
+userRouter.post(
+  `${prefix}/user`,
+  userMiddleware.verifyFieldsRegistry,
+  authRoleMiddleware.authAdmin,
+  userController.createUserAndSearchToken
 );
 
 userRouter.put(
