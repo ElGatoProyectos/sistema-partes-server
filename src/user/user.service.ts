@@ -1,4 +1,4 @@
-import { E_Estado_BD, Empresa, Usuario } from "@prisma/client";
+import { Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserBD,
@@ -14,13 +14,14 @@ import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll } from "../common/models/pagination.types";
 import validator from "validator";
 import { wordIsNumeric } from "@/common/utils/number";
-import { rolService } from "@/rol/rol.service";
 import { prismaCompanyRepository } from "@/company/prisma-company.repository";
 import { jwtService } from "@/auth/jwt.service";
 import { detailUserCompanyService } from "@/detailsUserCompany/detailuserservice.service";
 import { I_CreateCompanyBD } from "@/company/models/company.interface";
-import { companyService } from "@/company/company.service";
 import { largeMinEleven } from "@/common/utils/largeMinEleven";
+import { userValidation } from "./user.validation";
+import { rolValidation } from "@/rol/rol.validation";
+import { companyValidation } from "@/company/company.validation";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -72,17 +73,17 @@ class UserService {
 
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolService.findById(Number(data.rol_id));
+      const roleResponse = await rolValidation.findById(Number(data.rol_id));
       if (!roleResponse.success)
         return httpResponse.BadRequestException(
           `No se encontro el rol ingresado`
         );
 
-      const responseEmail = await this.findByEmail(data.email);
+      const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await this.findByDni(data.dni);
+      const responseByDni = await userValidation.findByDni(data.dni);
       if (responseByDni.success)
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
@@ -115,9 +116,8 @@ class UserService {
         resultUser
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear usuario",
+        "Error al crear usuario",
         error
       );
     } finally {
@@ -129,17 +129,17 @@ class UserService {
     data: I_CreateUserAndCompany
   ): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolService.findById(Number(data.rol_id));
+      const roleResponse = await rolValidation.findById(Number(data.rol_id));
       if (!roleResponse.success)
         return httpResponse.BadRequestException(
           `No se encontro el rol ingresado`
         );
 
-      const responseEmail = await this.findByEmail(data.email);
+      const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await this.findByDni(data.dni);
+      const responseByDni = await userValidation.findByDni(data.dni);
       if (responseByDni.success)
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
@@ -198,7 +198,7 @@ class UserService {
         );
       }
 
-      const existNameCompany = await companyService.findByName(
+      const existNameCompany = await companyValidation.findByName(
         data.nombre_empresa
       );
       if (!existNameCompany.success) return existNameCompany;
@@ -237,9 +237,8 @@ class UserService {
         resultUserAndCompany
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear usuario y la empresa ",
+        "Error al crear usuario y la empresa ",
         error
       );
     } finally {
@@ -252,17 +251,17 @@ class UserService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolService.findById(Number(data.rol_id));
+      const roleResponse = await rolValidation.findById(Number(data.rol_id));
       if (!roleResponse.success)
         return httpResponse.BadRequestException(
           `No se encontro el rol ingresado`
         );
 
-      const responseEmail = await this.findByEmail(data.email);
+      const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await this.findByDni(data.dni);
+      const responseByDni = await userValidation.findByDni(data.dni);
       if (responseByDni.success)
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
@@ -312,9 +311,8 @@ class UserService {
         );
       }
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear el usuario",
+        "Error al crear el usuario",
         error
       );
     } finally {
@@ -332,28 +330,7 @@ class UserService {
       return httpResponse.SuccessResponse("Usuario encontrado", user);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar usuario",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
-  async findByEmail(email: string): Promise<T_HttpResponse> {
-    try {
-      const emailExists = await prismaUserRepository.existsEmail(email);
-      if (emailExists) {
-        return httpResponse.NotFoundException(
-          "El email ingresado ya existe en la base de datos"
-        );
-      }
-      return httpResponse.SuccessResponse(
-        "El email no existe, puede proceguir"
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        " Error al buscar email",
+        "Error al buscar usuario",
         error
       );
     } finally {
@@ -386,16 +363,16 @@ class UserService {
   ): Promise<T_HttpResponse> {
     try {
       //arquitectura Hans
-      const userResponse = await this.findById(idUser);
+      const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) return userResponse;
       const userFind = userResponse.payload as Usuario;
 
-      const responseEmail = await this.findByEmail(data.email);
+      const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success) {
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
       }
 
-      const responseByDni = await this.findByDni(data.dni);
+      const responseByDni = await userValidation.findByDni(data.dni);
       if (responseByDni.success) {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
@@ -416,7 +393,7 @@ class UserService {
         );
       }
 
-      const roleResponse = await rolService.findById(data.rol_id);
+      const roleResponse = await rolValidation.findById(data.rol_id);
       if (!roleResponse.success)
         return httpResponse.BadRequestException(
           `No se encontro el rol ingresado`
@@ -456,7 +433,7 @@ class UserService {
 
   async updateStatusUser(idUser: number): Promise<T_HttpResponse> {
     try {
-      const userResponse = await this.findById(idUser);
+      const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) return userResponse;
       const result = await prismaUserRepository.updateStatusUser(idUser);
       const resultMapper = new UserResponseMapper(result);
@@ -466,7 +443,7 @@ class UserService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al eliminar el usuario",
+        "Error al eliminar el usuario",
         error
       );
     } finally {
@@ -476,9 +453,9 @@ class UserService {
 
   async updateRolUser(idUser: number, idRol: number): Promise<T_HttpResponse> {
     try {
-      const userResponse = await this.findById(idUser);
+      const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) return userResponse;
-      const rolResponse = await rolService.findById(idRol);
+      const rolResponse = await rolValidation.findById(idRol);
       if (!rolResponse.success) return rolResponse;
       const result = await prismaUserRepository.updaterRolUser(idUser, idRol);
       const resultMapper = new UserResponseMapper(result);

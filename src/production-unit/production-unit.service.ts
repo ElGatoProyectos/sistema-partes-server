@@ -5,32 +5,53 @@ import {
 } from "./models/production-unit.interface";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 import prisma from "@/config/prisma.config";
-import path from "path";
 import fs from "fs/promises";
 import appRootPath from "app-root-path";
 import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
 import { UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
-import { projectService } from "@/project/project.service";
+import { productionUnitValidation } from "./productionUnit.validation";
+import { projectValidation } from "@/project/project.validation";
 
 class ProductionUnitService {
   async createProductionUnit(
     data: I_CreateProductionUnitBody
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProject = await projectService.findById(data.proyecto_id);
+      const resultIdProject = await projectValidation.findById(
+        Number(data.proyecto_id)
+      );
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear la unidad de producción con el id del proyecto proporcionado"
         );
       }
+      const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
+      const lastProductionUnitResponse =
+        lastProductionUnit.payload as UnidadProduccion;
+
+      // Incrementar el código en 1
+      const nextCodigo =
+        (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+
+      const productionUnit = {
+        ...data,
+        codigo: formattedCodigo,
+        proyecto_id: Number(data.proyecto_id),
+      };
+
       const responseProductionUnit =
-        await prismaProductionUnitRepository.createProductionUnit(data);
+        await prismaProductionUnitRepository.createProductionUnit(
+          productionUnit
+        );
       return httpResponse.CreatedResponse(
         "Unidad de produccion creada correctamente",
         responseProductionUnit
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear Unidad de producción",
         error
@@ -45,15 +66,29 @@ class ProductionUnitService {
     idProductionUnit: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProductionUnit = await this.findById(idProductionUnit);
+      const resultIdProductionUnit = await productionUnitValidation.findById(
+        idProductionUnit
+      );
       if (!resultIdProductionUnit.success) {
         return httpResponse.BadRequestException(
           "No se pudo encontrar el id de la Unidad de Producción que se quiere editar"
         );
       }
+      const resultIdProject = await projectValidation.findById(
+        Number(data.proyecto_id)
+      );
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear la unidad de producción con el id del proyecto proporcionado"
+        );
+      }
+      const productionUnit = {
+        ...data,
+        proyecto_id: Number(data.proyecto_id),
+      };
       const responseProductionUnit =
         await prismaProductionUnitRepository.updateProductionUnit(
-          data,
+          productionUnit,
           idProductionUnit
         );
       return httpResponse.SuccessResponse(
@@ -163,9 +198,8 @@ class ProductionUnitService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la Unidad de Producción",
+        "Error al buscar la Unidad de Producción",
         error
       );
     } finally {
@@ -199,7 +233,7 @@ class ProductionUnitService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al traer todas las Unidades de Producción",
+        "Error al traer todas las Unidades de Producción",
         error
       );
     } finally {
@@ -209,7 +243,9 @@ class ProductionUnitService {
 
   async updateStatusProject(idProductionUnit: number): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await this.findById(idProductionUnit);
+      const projectResponse = await productionUnitValidation.findById(
+        idProductionUnit
+      );
       if (!projectResponse.success) {
         return projectResponse;
       } else {

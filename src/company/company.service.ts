@@ -6,13 +6,14 @@ import {
   I_CreateCompanyBody,
   I_UpdateCompanyBody,
 } from "./models/company.interface";
-import { userService } from "@/user/user.service";
 import { CompanyResponseMapper } from "./mapper/company.mapper";
 import { CompanyMulterProperties } from "./models/company.constant";
 import appRootPath from "app-root-path";
 import fs from "fs/promises";
 import { wordIsNumeric } from "@/common/utils/number";
 import { largeMinEleven } from "@/common/utils/largeMinEleven";
+import { userValidation } from "@/user/user.validation";
+import { companyValidation } from "./company.validation";
 
 class CompanyService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -83,7 +84,7 @@ class CompanyService {
       return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la imagen",
+        "Error al buscar la imagen",
         error
       );
     } finally {
@@ -93,12 +94,16 @@ class CompanyService {
 
   async createCompany(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
-      const userResponse = await userService.findById(Number(data.usuario_id));
+      const userResponse = await userValidation.findById(
+        Number(data.usuario_id)
+      );
       if (!userResponse.success) {
         return userResponse;
       }
 
-      const responseEmail = await this.findByName(data.nombre_empresa);
+      const responseEmail = await companyValidation.findByName(
+        data.nombre_empresa
+      );
       if (!responseEmail.success) return responseEmail;
 
       if (data.ruc) {
@@ -143,27 +148,6 @@ class CompanyService {
     }
   }
 
-  async findByName(name: string): Promise<T_HttpResponse> {
-    try {
-      const nameExists = await prismaCompanyRepository.existsName(name);
-      if (nameExists) {
-        return httpResponse.NotFoundException(
-          "El nombre ingresado de la empresa ya existe en la base de datos"
-        );
-      }
-      return httpResponse.SuccessResponse(
-        "El nombre no existe, puede proceguir"
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        " Error al buscar el nombre en la base de datos",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
   async findById(id: number): Promise<T_HttpResponse> {
     try {
       const company = await prismaCompanyRepository.findById(id);
@@ -177,7 +161,7 @@ class CompanyService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar empresa",
+        "Error al buscar empresa",
         error
       );
     } finally {
@@ -200,7 +184,7 @@ class CompanyService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar empresa del usuario",
+        "Error al buscar empresa del usuario",
         error
       );
     } finally {
@@ -213,13 +197,17 @@ class CompanyService {
     idCompany: number
   ): Promise<T_HttpResponse> {
     try {
-      const companyResponseId = await this.findById(idCompany);
+      const companyResponseId = await companyValidation.findById(idCompany);
       if (!companyResponseId.success) return companyResponseId;
 
-      const userResponse = await userService.findById(Number(data.usuario_id));
+      const userResponse = await userValidation.findById(
+        Number(data.usuario_id)
+      );
       if (!userResponse.success) return userResponse;
 
-      const responseEmail = await this.findByName(data.nombre_empresa);
+      const responseEmail = await companyValidation.findByName(
+        data.nombre_empresa
+      );
       if (!responseEmail.success)
         return httpResponse.BadRequestException(
           `El nombre ingresado ya existe`
@@ -238,7 +226,6 @@ class CompanyService {
         companyMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al actualizar la empresa",
         error
@@ -250,7 +237,7 @@ class CompanyService {
 
   async updateStatusCompany(idCompany: number): Promise<T_HttpResponse> {
     try {
-      const companyResponse = await this.findById(idCompany);
+      const companyResponse = await companyValidation.findById(idCompany);
       if (!companyResponse.success) return companyResponse;
       const empresaResponse = await prismaCompanyRepository.updateStatusCompany(
         idCompany
@@ -296,7 +283,6 @@ class CompanyService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al buscar empresas",
         error

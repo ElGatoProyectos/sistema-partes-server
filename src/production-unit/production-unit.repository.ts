@@ -18,4 +18,6 @@ export abstract class ProudctionUnitRepository {
   updateStatusProductionUnit(idUser: number): void {}
 
   searchNameProductionUnit(name: string, skip: number, limit: number): void {}
+
+  codeMoreHigh(): void {}
 }

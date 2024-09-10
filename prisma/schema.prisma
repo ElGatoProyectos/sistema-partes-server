@@ -417,7 +417,8 @@ model Partida {
   item                  String
   partida               String
   unidad                String
-  metrado               Float
+  metrado_inicial       Float
+  metrado_total         Float
   precio                Float
   parcial               Float?                  @default(0)
   total                 Float?                  @default(0)
