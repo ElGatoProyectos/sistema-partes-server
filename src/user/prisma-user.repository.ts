@@ -8,6 +8,17 @@ import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
 
 class PrismaUserRepository implements UserRepository {
+  async updaterRolUser(idUser: number, idRol: number): Promise<Usuario> {
+    const user = await prisma.usuario.update({
+      where: {
+        id: idUser,
+      },
+      data: {
+        rol_id: idRol,
+      },
+    });
+    return user;
+  }
   async existsEmail(email: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {
@@ -86,14 +97,18 @@ class PrismaUserRepository implements UserRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ users: Usuario[]; total: number } | null> {
-    const [users, total]: [Usuario[], number] = await prisma.$transaction([
+  ): Promise<{ users: I_User[]; total: number } | null> {
+    const [users, total]: [I_User[], number] = await prisma.$transaction([
       prisma.usuario.findMany({
         where: {
           eliminado: E_Estado_BD.n,
         },
         skip,
         take: limit,
+        omit: {
+          contrasena: true,
+          eliminado: true,
+        },
       }),
       prisma.usuario.count({
         where: {
@@ -112,7 +127,10 @@ class PrismaUserRepository implements UserRepository {
       include: {
         Rol: true,
       },
-      omit: { contrasena: true },
+      omit: {
+        contrasena: true,
+        eliminado: true,
+      },
     });
     return user;
   }

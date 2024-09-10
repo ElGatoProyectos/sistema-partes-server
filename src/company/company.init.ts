@@ -10,7 +10,6 @@ const prefix = "/companies";
 
 companyRouter.post(
   `${prefix}`,
-  companyMiddleware.verifyFields,
   authRoleMiddleware.authAdmin,
   companyController.create
 );
@@ -28,6 +27,12 @@ companyRouter.get(
   authRoleMiddleware.authAdmin,
   companyController.findByName
 );
+companyRouter.get(
+  `${prefix}/file/:id`,
+  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdmin,
+  companyController.findImage
+);
 
 companyRouter.get(
   `${prefix}/:id`,
@@ -36,12 +41,7 @@ companyRouter.get(
   companyController.findByIdCompany
 );
 
-companyRouter.put(
-  `${prefix}/:id`,
-  companyMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdmin,
-  companyController.update
-);
+companyRouter.put(`${prefix}/:id`, companyController.update);
 
 companyRouter.delete(
   `${prefix}/:id`,

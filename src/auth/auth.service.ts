@@ -67,6 +67,7 @@ class AuthService {
         return httpResponse.SuccessResponse("Éxito en la autenticación");
       }
     } catch (error) {
+      // console.log(error);
       return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }

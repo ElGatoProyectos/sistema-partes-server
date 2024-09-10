@@ -1,12 +1,13 @@
 import { E_Estado_BD, UnidadProduccion } from "@prisma/client";
 import {
   I_CreateProductionUnitBD,
+  I_ProductionUnit,
   I_UpdateProductionUnitBody,
 } from "./models/production-unit.interface";
 import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 
-class PrimsaUserRepository implements ProudctionUnitRepository {
+class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
   async createProductionUnit(
     data: I_CreateProductionUnitBD
   ): Promise<UnidadProduccion> {
@@ -17,21 +18,21 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
   }
   async updateProductionUnit(
     data: I_UpdateProductionUnitBody,
-    idProductionUser: number
+    idProductionUnit: number
   ): Promise<UnidadProduccion> {
     const productionUnit = await prisma.unidadProduccion.update({
-      where: { id: idProductionUser },
+      where: { id: idProductionUnit },
       data: data,
     });
     return productionUnit;
   }
 
-  async searchNameUser(
+  async searchNameProductionUnit(
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ productionUnits: UnidadProduccion[]; total: number } | null> {
-    const [productionUnits, total]: [UnidadProduccion[], number] =
+  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number } | null> {
+    const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
           where: {
@@ -42,6 +43,9 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
           },
           skip,
           take: limit,
+          omit: {
+            eliminado: true,
+          },
         }),
         prisma.unidadProduccion.count({
           where: {
@@ -58,8 +62,8 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ productionUnits: UnidadProduccion[]; total: number } | null> {
-    const [productionUnits, total]: [UnidadProduccion[], number] =
+  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number } | null> {
+    const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
           where: {
@@ -67,6 +71,9 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
           },
           skip,
           take: limit,
+          omit: {
+            eliminado: true,
+          },
         }),
         prisma.unidadProduccion.count({
           where: {
@@ -77,16 +84,19 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
     return { productionUnits, total };
   }
 
-  async findById(idProductionUnit: number): Promise<UnidadProduccion | null> {
+  async findById(idProductionUnit: number): Promise<I_ProductionUnit | null> {
     const productionUnit = await prisma.unidadProduccion.findFirst({
       where: {
         id: idProductionUnit,
+      },
+      omit: {
+        eliminado: true,
       },
     });
     return productionUnit;
   }
 
-  async updateStatusProduction(
+  async updateStatusProductionUnit(
     idProductionUnit: number
   ): Promise<UnidadProduccion | null> {
     const productionUnit = await prisma.unidadProduccion.findFirst({
@@ -108,3 +118,6 @@ class PrimsaUserRepository implements ProudctionUnitRepository {
     return productionUnitUpdate;
   }
 }
+
+export const prismaProductionUnitRepository =
+  new PrimsaProductionUnitRepository();

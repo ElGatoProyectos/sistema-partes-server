@@ -6,7 +6,17 @@ export interface I_UpdateUserBD
   extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
 
 export interface I_CreateUserBody
-  extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
+  extends Omit<
+    Usuario,
+    | "id"
+    | "eliminado"
+    | "fecha_creacion"
+    | "limite_proyecto"
+    | "limite_usuarios"
+  > {
+  limite_proyecto: string;
+  limite_usuarios: string;
+}
 
 export interface I_UpdateUserBody
   extends Omit<Usuario, "id" | "limite_proyecto" | "limite_usuarios"> {
@@ -14,7 +24,7 @@ export interface I_UpdateUserBody
   limite_usuarios: string;
 }
 
-export interface I_User extends Omit<Usuario, "contrasena"> {}
+export interface I_User extends Omit<Usuario, "contrasena" | "eliminado"> {}
 
 export interface I_CreateUserAndCompany {
   email: string;
@@ -28,15 +38,21 @@ export interface I_CreateUserAndCompany {
   nombre_empresa: string;
   descripcion_empresa: string;
   ruc: string;
-  direccion: string;
-  nombre_corto: string;
+  direccion_empresa: string;
+  nombre_corto_empresa: string;
   telefono_empresa: string;
 }
 
 export interface I_CreateUserAndCompanyBody {
-  usuario: I_User; // Usar el tipo que omite "id" para crear un usuario
-  empresa: Empresa; // Asumimos que quieres omitir "id" para la creación
+  usuario: I_User;
+  empresa: Empresa;
 }
+
+export interface I_UpdateRolUserBody {
+  idUser: number;
+  idRol: number;
+}
+
 /// esto es xq los atributos van a ser parciales es decir todos van a ser opcionales
 //export interface I_UpdateStatus extends Partial<I_CreateUserBody> {
 // ahora creas el estado xq lo quite por la interfaz I_CreateUserBody

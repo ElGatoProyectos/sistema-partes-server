@@ -11,6 +11,8 @@ export abstract class UserRepository {
 
   updateStatusUser(idUser: number): void {}
 
+  updaterRolUser(idUser: number, idRol: number): void {}
+
   findByDni(dni: string): void {}
 
   existsEmail(dni: string): void {}

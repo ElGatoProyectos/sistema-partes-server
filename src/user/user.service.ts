@@ -20,6 +20,7 @@ import { jwtService } from "@/auth/jwt.service";
 import { detailUserCompanyService } from "@/detailsUserCompany/detailuserservice.service";
 import { I_CreateCompanyBD } from "@/company/models/company.interface";
 import { companyService } from "@/company/company.service";
+import { largeMinEleven } from "@/common/utils/largeMinEleven";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -33,9 +34,9 @@ class UserService {
         return httpResponse.SuccessResponse("No se encontraron usuarios.", 0);
 
       const { users, total } = result;
-      const usersMapped = users.map(
-        (user: Usuario) => new UserResponseMapper(user)
-      );
+      // const usersMapped = users.map(
+      //   (user: Usuario) => new UserResponseMapper(user)
+      // );
       //numero de pagina donde estas
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -45,7 +46,7 @@ class UserService {
         limit: data.queryParams.limit,
         //cantidad de paginas que hay
         pageCount,
-        data: usersMapped,
+        data: users,
       };
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los usuarios",
@@ -86,20 +87,21 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+      const resultDni = wordIsNumeric(data.dni);
+      if (resultDni) {
+        return httpResponse.BadRequestException(
+          "El campo dni debe contener solo números"
+        );
+      }
+
       const resultPhone = wordIsNumeric(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
-          "El teléfono ingresado solo debe contener números "
-        );
-      }
-      const largedni = this.verifyLargeDni(data.dni);
-      if (largedni) {
-        return httpResponse.BadRequestException(
-          "El dni debe contener por lo menos 8 digitos"
+          "El campo telefono debe contener solo números"
         );
       }
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
-      const userFormat: I_CreateUserBody = {
+      const userFormat: I_CreateUserBD = {
         ...data,
         contrasena: hashContrasena,
         limite_proyecto: Number(data.limite_proyecto),
@@ -142,35 +144,65 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+
+      if (!validator.isEmail(data.email)) {
+        return httpResponse.BadRequestException(
+          "El formato del email ingresado no es válido"
+        );
+      }
+      const resultDni = wordIsNumeric(data.dni);
+      if (resultDni) {
+        return httpResponse.BadRequestException(
+          "El campo dni debe contener solo números"
+        );
+      }
+
       const resultPhone = wordIsNumeric(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
-          "El teléfono ingresado solo debe contener números "
+          "El campo telefono debe contener solo números"
         );
       }
-      const largedni = this.verifyLargeDni(data.dni);
-      if (largedni) {
+
+      const resultLimitProject = wordIsNumeric(data.limite_proyecto);
+      if (resultLimitProject) {
         return httpResponse.BadRequestException(
-          "El dni debe contener por lo menos 8 digitos"
+          "El campo limite proyecto debe contener solo números"
         );
       }
-      const existNameCompany = await companyService.findByName(
-        data.nombre_empresa
-      );
-      if (!existNameCompany.success) return existNameCompany;
+
+      const resultLimitUsers = wordIsNumeric(data.limite_usuarios);
+      if (resultLimitUsers) {
+        return httpResponse.BadRequestException(
+          "El campo limite usuarios debe contener solo números"
+        );
+      }
+
       const resultRuc = wordIsNumeric(data.ruc);
       if (resultRuc) {
         return httpResponse.BadRequestException(
-          "El Ruc ingresado solo debe contener números "
+          "El campo Ruc debe contener solo números"
+        );
+      }
+      const resultRucLength = largeMinEleven(data.ruc);
+      if (resultRucLength) {
+        return httpResponse.BadRequestException(
+          "El campo Ruc debe contener por lo menos 11 caracteres"
         );
       }
 
       const resultPhoneCompany = wordIsNumeric(data.telefono_empresa);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
-          "El telefono de la empresa ingresado solo debe contener números "
+          "El campo telefono de la empresa debe contener solo números"
         );
       }
+
+      const existNameCompany = await companyService.findByName(
+        data.nombre_empresa
+      );
+      if (!existNameCompany.success) return existNameCompany;
+
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
       const userFormat: I_CreateUserBD = {
         email: data.email,
@@ -188,8 +220,8 @@ class UserService {
         nombre_empresa: data.nombre_empresa,
         descripcion_empresa: data.descripcion_empresa,
         ruc: data.ruc,
-        direccion: data.direccion,
-        nombre_corto: data.nombre_corto,
+        direccion: data.direccion_empresa,
+        nombre_corto: data.nombre_corto_empresa,
         telefono: data.telefono_empresa,
         usuario_id: resultUser.id,
       };
@@ -220,6 +252,12 @@ class UserService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      const roleResponse = await rolService.findById(Number(data.rol_id));
+      if (!roleResponse.success)
+        return httpResponse.BadRequestException(
+          `No se encontro el rol ingresado`
+        );
+
       const responseEmail = await this.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -229,32 +267,19 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+      const resultDni = wordIsNumeric(data.dni);
+      if (resultDni) {
+        return httpResponse.BadRequestException(
+          "El campo dni debe contener solo números"
+        );
+      }
+
       const resultPhone = wordIsNumeric(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
-          "El teléfono ingresado solo debe contener números "
+          "El campo telefono debe contener solo números"
         );
       }
-      const largedni = this.verifyLargeDni(data.dni);
-      if (largedni) {
-        return httpResponse.BadRequestException(
-          "El dni debe contener por lo menos 8 digitos"
-        );
-      }
-      const resultLimitProject = wordIsNumeric(data.limite_proyecto);
-      if (resultLimitProject) {
-        return httpResponse.BadRequestException(
-          "El campo limite de proyectos ingresado solo debe contener números "
-        );
-      }
-
-      const resultLimitUsers = wordIsNumeric(data.limite_usuarios);
-      if (resultLimitUsers) {
-        return httpResponse.BadRequestException(
-          "El campo limite de usuarios ingresado solo debe contener números "
-        );
-      }
-
       const userTokenResponse = await jwtService.getUserFromToken(
         tokenWithBearer
       );
@@ -304,7 +329,7 @@ class UserService {
       if (!user) {
         return httpResponse.NotFoundException("Usuario no encontrado");
       }
-      return httpResponse.SuccessResponse("Usuario encontrado");
+      return httpResponse.SuccessResponse("Usuario encontrado", user);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         " Error al buscar usuario",
@@ -347,7 +372,7 @@ class UserService {
       return httpResponse.SuccessResponse("Usuario encontrado con éxito", user);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar usuario",
+        "Error al buscar usuario",
         error
       );
     } finally {
@@ -365,57 +390,37 @@ class UserService {
       if (!userResponse.success) return userResponse;
       const userFind = userResponse.payload as Usuario;
 
-      if (data.email) {
-        const responseEmail = await this.findByEmail(data.email);
-        if (!responseEmail.success) {
-          return httpResponse.BadRequestException(
-            `El email ingresado ya existe`
-          );
-        }
+      const responseEmail = await this.findByEmail(data.email);
+      if (!responseEmail.success) {
+        return httpResponse.BadRequestException(`El email ingresado ya existe`);
       }
 
-      if (data.dni) {
-        const responseByDni = await this.findByDni(data.dni);
-        if (responseByDni.success) {
-          return httpResponse.BadRequestException(
-            `El usuario con el dni ${data.dni} ya existe`
-          );
-        }
-
-        const largedni = this.verifyLargeDni(data.dni);
-        if (largedni) {
-          return httpResponse.BadRequestException(
-            "El dni debe contener por lo menos 8 dígitos"
-          );
-        }
+      const responseByDni = await this.findByDni(data.dni);
+      if (responseByDni.success) {
+        return httpResponse.BadRequestException(
+          `El usuario con el dni ${data.dni} ya existe`
+        );
       }
 
-      if (data.telefono) {
-        const resultPhone = wordIsNumeric(data.telefono);
-        if (resultPhone) {
-          return httpResponse.BadRequestException(
-            "El teléfono ingresado solo debe contener números"
-          );
-        }
+      const resultDni = wordIsNumeric(data.dni);
+      if (resultDni) {
+        return httpResponse.BadRequestException(
+          "El dni ingresado solo debe contener números"
+        );
       }
 
-      if (data.limite_proyecto) {
-        const resultlimitProject = wordIsNumeric(data.limite_proyecto);
-        if (resultlimitProject) {
-          return httpResponse.BadRequestException(
-            "La cantidad de proyectos ingresado solo debe contener números"
-          );
-        }
+      const resultPhone = wordIsNumeric(data.telefono);
+      if (resultPhone) {
+        return httpResponse.BadRequestException(
+          "El teléfono ingresado solo debe contener números"
+        );
       }
 
-      if (data.limite_usuarios) {
-        const resultPhone = wordIsNumeric(data.limite_usuarios);
-        if (resultPhone) {
-          return httpResponse.BadRequestException(
-            "La cantidad de usuario ingresado solo debe contener números"
-          );
-        }
-      }
+      const roleResponse = await rolService.findById(data.rol_id);
+      if (!roleResponse.success)
+        return httpResponse.BadRequestException(
+          `No se encontro el rol ingresado`
+        );
       let hashContrasena;
       let userFormat: I_UpdateUserBD = {
         ...data,
@@ -469,6 +474,28 @@ class UserService {
     }
   }
 
+  async updateRolUser(idUser: number, idRol: number): Promise<T_HttpResponse> {
+    try {
+      const userResponse = await this.findById(idUser);
+      if (!userResponse.success) return userResponse;
+      const rolResponse = await rolService.findById(idRol);
+      if (!rolResponse.success) return rolResponse;
+      const result = await prismaUserRepository.updaterRolUser(idUser, idRol);
+      const resultMapper = new UserResponseMapper(result);
+      return httpResponse.SuccessResponse(
+        "Se ha cambiado de rol correctamente",
+        resultMapper
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al cambiar de rol",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
@@ -509,93 +536,3 @@ class UserService {
   }
 }
 export const userService = new UserService();
-
-// async createUser(
-//   data: I_CreateUserAndCompany,
-//   tokenWithBearer: string
-// ): Promise<T_HttpResponse> {
-//   try {
-//     const userTokenResponse = await jwtService.getUserFromToken(
-//       tokenWithBearer
-//     );
-//     if (!userTokenResponse) return userTokenResponse;
-//     const userResponse = userTokenResponse.payload as Usuario;
-//     const roleResponse = await rolService.findById(data.user.rol_id);
-//     if (!roleResponse.success)
-//       return httpResponse.BadRequestException(
-//         `No se encontro el rol ingresado`
-//       );
-
-//     const responseEmail = await this.findByEmail(data.user.email);
-//     if (!responseEmail.success)
-//       return httpResponse.BadRequestException(`El email ingresado ya existe`);
-
-//     const responseByDni = await this.findByDni(data.user.dni);
-//     if (responseByDni.success)
-//       return httpResponse.BadRequestException(
-//         `El usuario con el dni ${data.user.dni} ya existe`
-//       );
-//     const resultPhone = wordIsNumeric(data.user.telefono);
-//     if (resultPhone) {
-//       return httpResponse.BadRequestException(
-//         "El teléfono ingresado solo debe contener números "
-//       );
-//     }
-//     const largedni = this.verifyLargeDni(data.user.dni);
-//     if (largedni) {
-//       return httpResponse.BadRequestException(
-//         "El dni debe contener por lo menos 8 digitos"
-//       );
-//     }
-//     const hashContrasena = bcryptService.hashPassword(data.user.contrasena);
-//     if (data.company) {
-//       const resultUser = await prismaUserRepository.createUser(data.user);
-//       const companyFormat = {
-//         ...data.company,
-//         usuario_id: resultUser.id,
-//       };
-//       const resultCompany = await prismaCompanyRepository.createCompany(
-//         companyFormat
-//       );
-//       const resultUserAndCompany = {
-//         usuario: {
-//           resultUser,
-//         },
-//         empresa: {
-//           resultCompany,
-//         },
-//       };
-//       return httpResponse.CreatedResponse(
-//         "Usuario y empresa creadas correctamente",
-//         resultUserAndCompany
-//       );
-//     } else {
-//       const resultUser = await prismaUserRepository.createUser(data.user);
-//       const resultCompanyFindByUser =
-//         await prismaCompanyRepository.findCompanyByUser(userResponse.id);
-//       if (resultCompanyFindByUser) {
-//         const detailUserCompany = await detailUserCompanyService.createDetail(
-//           resultUser.id,
-//           resultCompanyFindByUser?.id
-//         );
-//         return httpResponse.CreatedResponse(
-//           "El detalle usuario-empresa fue creado correctamente",
-//           detailUserCompany
-//         );
-//       } else {
-//         return httpResponse.BadRequestException(
-//           "No se encontró el id de la empresa del usuario logueado",
-//           null
-//         );
-//       }
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     return httpResponse.InternalServerErrorException(
-//       " Error al crear usuario",
-//       error
-//     );
-//   } finally {
-//     await prisma.$disconnect();
-//   }
-// }

@@ -2,7 +2,7 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
 import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
-  I_CreateUserBody,
+  I_CreateCompanyBody,
   I_UpdateProyectBody,
 } from "./models/project.interface";
 import appRootPath from "app-root-path";
@@ -13,6 +13,7 @@ import { T_FindAll } from "@/common/models/pagination.types";
 import { userService } from "@/user/user.service";
 import validator from "validator";
 import { companyService } from "@/company/company.service";
+import { ProjectResponseMapper } from "./mapper/project.mapper";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -23,7 +24,7 @@ class ProjectService {
     }
   }
 
-  async createProject(data: I_CreateUserBody): Promise<T_HttpResponse> {
+  async createProject(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
       data.empresa_id = Number(data.empresa_id);
       const resultCompany = await companyService.findById(data.empresa_id);
@@ -32,18 +33,7 @@ class ProjectService {
           "No se puede crear el proyecto con el id de la empresa proporcionado"
         );
       }
-      const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
-      if (resultCostoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo costo proyecto debe contener solo números"
-        );
-      }
-      const resultPlazoProyecto = this.isNumeric(data.plazo_proyecto);
-      if (resultPlazoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo plazo proyecto debe contener solo números"
-        );
-      }
+
       const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
       if (resultCodigoProyecto) {
         return httpResponse.BadRequestException(
@@ -55,17 +45,16 @@ class ProjectService {
       const proyectFormat = {
         ...data,
         costo_proyecto: Number(data.costo_proyecto),
-        plazo_proyecto: data.plazo_proyecto,
-        codigo_proyecto: data.codigo_proyecto,
         fecha_creacion,
         fecha_fin,
       };
       const project = await prismaProyectoRepository.createProject(
         proyectFormat
       );
+      const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",
-        project
+        projectMapper
       );
     } catch (error) {
       console.log(error);
@@ -90,18 +79,6 @@ class ProjectService {
           "No se pudo crear el proyecto con el id de la empresa proporcionado"
         );
       }
-      const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
-      if (resultCostoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo costo proyecto debe contener solo números"
-        );
-      }
-      const resultPlazoProyecto = this.isNumeric(data.plazo_proyecto);
-      if (resultPlazoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo plazo proyecto debe contener solo números"
-        );
-      }
       const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
       if (resultCodigoProyecto) {
         return httpResponse.BadRequestException(
@@ -124,9 +101,10 @@ class ProjectService {
         proyectFormat,
         idProject
       );
+      const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.SuccessResponse(
         "Proyecto modificado correctamente",
-        project
+        projectMapper
       );
     } catch (error) {
       console.log(error);
@@ -222,7 +200,6 @@ class ProjectService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al buscar proyecto",
         error

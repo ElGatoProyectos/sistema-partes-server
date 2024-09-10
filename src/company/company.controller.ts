@@ -5,28 +5,175 @@ import {
 } from "./models/company.interface";
 import { companyService } from "./company.service";
 import { T_FindAll } from "@/common/models/pagination.types";
+import { httpResponse } from "@/common/http.response";
+import { CompanyMulterProperties } from "./models/company.constant";
+import { authService } from "@/auth/auth.service";
+import { empresaDto } from "./dto/companydto";
+import multer from "multer";
+import { Empresa } from "@prisma/client";
+import path from "path";
+import appRootPath from "app-root-path";
+import sharp from "sharp";
+import { empresaUpdateDto } from "./dto/companyupdatedto";
+import { productionUnitService } from "@/production-unit/production-unit.service";
+import fs from "fs/promises";
+
+const storage = multer.memoryStorage();
+const upload: any = multer({ storage: storage });
 
 class CompanyController {
-  async create(request: express.Request, response: express.Response) {
-    const data = request.body as I_CreateCompanyBody;
-    const result = await companyService.createCompany(data);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
-    } else {
-      response.status(result.statusCode).json(result);
-    }
-  }
+  create = async (request: express.Request, response: express.Response) => {
+    upload.single(CompanyMulterProperties.field)(
+      request,
+      response,
+      async (error: any) => {
+        if (error) {
+          const customError = httpResponse.BadRequestException(
+            "Error al procesar la imagen ",
+            error
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          try {
+            const responseValidate = authService.verifyRolProject(
+              request.get("Authorization") as string
+            );
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
+            } else {
+              empresaDto.parse(request.body);
+              const data = request.body as I_CreateCompanyBody;
+              const result = await companyService.createCompany(data);
+              if (!result.success) {
+                response.status(result.statusCode).json(result);
+              } else {
+                const project = result.payload as Empresa;
+                if (request.file) {
+                  const id = project.id;
+                  const direction = path.join(
+                    appRootPath.path,
+                    "static",
+                    CompanyMulterProperties.folder
+                  );
+                  const ext = ".png";
+                  const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                  const filePath = path.join(direction, fileName);
+                  sharp(request.file.buffer)
+                    .resize({ width: 800 })
+                    .toFormat("png")
+                    .toFile(filePath, (err) => {
+                      if (err) {
+                        const customError = httpResponse.BadRequestException(
+                          "Error al guardar la foto de la empresa",
+                          err
+                        );
+                        response
+                          .status(customError.statusCode)
+                          .json(customError);
+                      } else {
+                        response.status(result.statusCode).json(result);
+                      }
+                    });
+                } else {
+                  response.status(result.statusCode).json(result);
+                }
+              }
+            }
+          } catch (error) {
+            const customError = httpResponse.BadRequestException(
+              "Error al validar los campos de la empresa ",
+              error
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    );
+  };
 
-  async update(request: express.Request, response: express.Response) {
-    const data = request.body as I_UpdateCompanyBody;
-    const idCompany = Number(request.params.id);
-    const result = await companyService.updateCompany(data, idCompany);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+  update = async (request: express.Request, response: express.Response) => {
+    upload.single(CompanyMulterProperties.field)(
+      request,
+      response,
+      async (error: any) => {
+        if (error) {
+          const customError = httpResponse.BadRequestException(
+            "Error al procesar la imagen ",
+            error
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          try {
+            const responseValidate = authService.verifyRolProject(
+              request.get("Authorization") as string
+            );
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
+            } else {
+              empresaUpdateDto.parse(request.body);
+              const data = request.body as I_UpdateCompanyBody;
+              const idCompany = Number(request.params.id);
+              const result = await companyService.updateCompany(
+                data,
+                idCompany
+              );
+              if (!result.success) {
+                response.status(result.statusCode).json(result);
+              } else {
+                const project = result.payload as Empresa;
+                if (request.file) {
+                  const id = project.id;
+                  const direction = path.join(
+                    appRootPath.path,
+                    "static",
+                    CompanyMulterProperties.folder
+                  );
+                  const ext = ".png";
+                  const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                  const filePath = path.join(direction, fileName);
+                  sharp(request.file.buffer)
+                    .resize({ width: 800 })
+                    .toFormat("png")
+                    .toFile(filePath, (err) => {
+                      if (err) {
+                        const customError = httpResponse.BadRequestException(
+                          "Error al actualizar la imagen de la empresa",
+                          err
+                        );
+                        response
+                          .status(customError.statusCode)
+                          .json(customError);
+                      } else {
+                        response.status(result.statusCode).json(result);
+                      }
+                    });
+                } else {
+                  response.status(result.statusCode).json(result);
+                }
+              }
+            }
+          } catch (error) {
+            const customError = httpResponse.BadRequestException(
+              "Error al validar los campos de la empresa ",
+              error
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    );
+  };
+
+  findImage = async (request: express.Request, response: express.Response) => {
+    const idProject = Number(request.params.id);
+    const result = await companyService.findIdImage(idProject);
+    if (typeof result.payload === "string") {
+      fs.readFile(result.payload);
+      response.sendFile(result.payload);
     } else {
       response.status(result.statusCode).json(result);
     }
-  }
+  };
 
   async updateStatus(request: express.Request, response: express.Response) {
     const idCompany = Number(request.params.id);

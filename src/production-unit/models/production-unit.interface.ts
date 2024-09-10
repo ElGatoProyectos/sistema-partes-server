@@ -8,3 +8,5 @@ export interface I_CreateProductionUnitBody
 
 export interface I_UpdateProductionUnitBody
   extends Omit<UnidadProduccion, "id"> {}
+
+export interface I_ProductionUnit extends Omit<UnidadProduccion, "eliminado"> {}

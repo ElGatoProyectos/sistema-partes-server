@@ -38,7 +38,6 @@ userRouter.post(
 
 userRouter.post(
   `${prefix}/company`,
-  userMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdmin,
   userController.createUserandCompany
 );
@@ -48,6 +47,13 @@ userRouter.post(
   userMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdmin,
   userController.createUserAndSearchToken
+);
+
+userRouter.put(
+  `${prefix}/rol`,
+  userMiddleware.verifyFieldsUpdateRol,
+  authRoleMiddleware.authAdmin,
+  userController.updateRol
 );
 
 userRouter.put(

@@ -47,13 +47,12 @@ class RolService {
 
   async findById(id: number): Promise<T_HttpResponse> {
     try {
-      const user = await prismaRolRepository.findById(id);
-      if (!user)
+      const rol = await prismaRolRepository.findById(id);
+      if (!rol)
         return httpResponse.NotFoundException(
           "No se encontró el rol solicitado"
         );
-      // const userMapper = new UserResponseMapper(user);
-      return httpResponse.SuccessResponse("Rol encontrado con éxito", user);
+      return httpResponse.SuccessResponse("Rol encontrado con éxito", rol);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         " Error al buscar rol",

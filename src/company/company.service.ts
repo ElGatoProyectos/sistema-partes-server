@@ -7,6 +7,12 @@ import {
   I_UpdateCompanyBody,
 } from "./models/company.interface";
 import { userService } from "@/user/user.service";
+import { CompanyResponseMapper } from "./mapper/company.mapper";
+import { CompanyMulterProperties } from "./models/company.constant";
+import appRootPath from "app-root-path";
+import fs from "fs/promises";
+import { wordIsNumeric } from "@/common/utils/number";
+import { largeMinEleven } from "@/common/utils/largeMinEleven";
 
 class CompanyService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -37,17 +43,54 @@ class CompanyService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al traer las empresas",
+        "Error al traer las empresas",
         error
       );
     } finally {
       await prisma.$disconnect();
     }
   }
+  async findIdImage(idProject: number) {
+    try {
+      const productionUnitResponse = await prismaCompanyRepository.findById(
+        idProject
+      );
+      if (!productionUnitResponse)
+        return httpResponse.NotFoundException(
+          "No se ha podido encontrar la imagen de la empresa"
+        );
+
+      const imagePath =
+        appRootPath +
+        "/static/" +
+        CompanyMulterProperties.folder +
+        "/" +
+        CompanyMulterProperties.folder +
+        "_" +
+        productionUnitResponse.id +
+        ".png";
+
+      try {
+        // se verifica primero si el archivo existe en el path que colocaste y luego si es accesible
+        await fs.access(imagePath, fs.constants.F_OK);
+      } catch (error) {
+        return httpResponse.BadRequestException(" La Imagen no fue encontrada");
+      }
+
+      return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar la imagen",
+        error
+      );
+    } finally {
+      await prisma.$disconnect;
+    }
+  }
 
   async createCompany(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
-      const userResponse = await userService.findById(data.usuario_id);
+      const userResponse = await userService.findById(Number(data.usuario_id));
       if (!userResponse.success) {
         return userResponse;
       }
@@ -55,15 +98,41 @@ class CompanyService {
       const responseEmail = await this.findByName(data.nombre_empresa);
       if (!responseEmail.success) return responseEmail;
 
-      const result = await prismaCompanyRepository.createCompany(data);
+      if (data.ruc) {
+        const resultRuc = wordIsNumeric(data.ruc);
+        if (resultRuc) {
+          return httpResponse.BadRequestException(
+            "El campo Ruc debe contener solo números"
+          );
+        }
+        const resultRucLength = largeMinEleven(data.ruc);
+        if (resultRucLength) {
+          return httpResponse.BadRequestException(
+            "El campo Ruc debe contener por lo menos 11 caracteres"
+          );
+        }
+      }
+
+      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      if (resultPhoneCompany) {
+        return httpResponse.BadRequestException(
+          "El campo telefono de la empresa debe contener solo números"
+        );
+      }
+
+      const companyFormat = {
+        ...data,
+        usuario_id: Number(data.usuario_id),
+      };
+      const result = await prismaCompanyRepository.createCompany(companyFormat);
+      const companyMapper = new CompanyResponseMapper(result);
       return httpResponse.CreatedResponse(
         "Empresa creada correctamente",
-        result
+        companyMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear empresa",
+        "Error al crear empresa",
         error
       );
     } finally {
@@ -144,7 +213,7 @@ class CompanyService {
       const companyResponseId = await this.findById(idCompany);
       if (!companyResponseId.success) return companyResponseId;
 
-      const userResponse = await userService.findById(data.usuario_id);
+      const userResponse = await userService.findById(Number(data.usuario_id));
       if (!userResponse.success) return userResponse;
 
       const responseEmail = await this.findByName(data.nombre_empresa);
@@ -152,19 +221,23 @@ class CompanyService {
         return httpResponse.BadRequestException(
           `El nombre ingresado ya existe`
         );
-
+      const companyFormat = {
+        ...data,
+        usuario_id: Number(data.usuario_id),
+      };
       const companyResponse = await prismaCompanyRepository.updateCompany(
-        data,
+        companyFormat,
         idCompany
       );
+      const companyMapper = new CompanyResponseMapper(companyResponse);
       return httpResponse.CreatedResponse(
         "Empresa modificada correctamente",
-        companyResponse
+        companyMapper
       );
     } catch (error) {
       console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al actualizar la empresa",
+        "Error al actualizar la empresa",
         error
       );
     } finally {
@@ -185,7 +258,7 @@ class CompanyService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al eliminar la empresa",
+        "Error al eliminar la empresa",
         error
       );
     } finally {
@@ -225,7 +298,7 @@ class CompanyService {
     } catch (error) {
       console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al buscar empresas",
+        "Error al buscar empresas",
         error
       );
     } finally {
