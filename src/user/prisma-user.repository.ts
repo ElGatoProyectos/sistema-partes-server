@@ -1,9 +1,24 @@
 import prisma from "@/config/prisma.config";
-import { I_CreateUserBD, I_UpdateUserBody } from "./models/user.interface";
+import {
+  I_CreateUserBD,
+  I_UpdateUserBD,
+  I_User,
+} from "./models/user.interface";
 import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Usuario } from "@prisma/client";
 
-class PrimsaUserRepository implements UserRepository {
+class PrismaUserRepository implements UserRepository {
+  async updaterRolUser(idUser: number, idRol: number): Promise<Usuario> {
+    const user = await prisma.usuario.update({
+      where: {
+        id: idUser,
+      },
+      data: {
+        rol_id: idRol,
+      },
+    });
+    return user;
+  }
   async existsEmail(email: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {
@@ -54,21 +69,22 @@ class PrimsaUserRepository implements UserRepository {
       },
     });
 
-    const newEstadoUser =
+    const newStateUser =
       user?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
     const userUpdate = await prisma.usuario.update({
       where: { id: idUser },
       data: {
-        eliminado: newEstadoUser,
+        eliminado: newStateUser,
       },
     });
     return userUpdate;
   }
-  async updateUser(data: I_UpdateUserBody, idUser: number): Promise<Usuario> {
+  async updateUser(data: I_UpdateUserBD, idUser: number): Promise<Usuario> {
     const user = await prisma.usuario.update({
       where: { id: idUser },
-      data: data,
+      data,
     });
+
     return user;
   }
 
@@ -81,28 +97,43 @@ class PrimsaUserRepository implements UserRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ users: Usuario[]; total: number } | null> {
-    const [users, total]: [Usuario[], number] = await prisma.$transaction([
+  ): Promise<{ users: I_User[]; total: number } | null> {
+    const [users, total]: [I_User[], number] = await prisma.$transaction([
       prisma.usuario.findMany({
         where: {
           eliminado: E_Estado_BD.n,
         },
         skip,
         take: limit,
+        omit: {
+          contrasena: true,
+          eliminado: true,
+        },
       }),
-      prisma.usuario.count(),
+      prisma.usuario.count({
+        where: {
+          eliminado: E_Estado_BD.n,
+        },
+      }),
     ]);
     return { users, total };
   }
 
-  async findById(idUser: number): Promise<Usuario | null> {
+  async findById(idUser: number): Promise<I_User | null> {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
+      },
+      include: {
+        Rol: true,
+      },
+      omit: {
+        contrasena: true,
+        eliminado: true,
       },
     });
     return user;
   }
 }
 
-export const primsaUserRepository = new PrimsaUserRepository();
+export const prismaUserRepository = new PrismaUserRepository();

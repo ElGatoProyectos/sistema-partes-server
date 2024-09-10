@@ -5,7 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  //para omitir campos
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -72,6 +74,14 @@ enum E_Proyecto_Estado {
   FINALIZADO
 }
 
+model Rol {
+  id                Int       @id @default(autoincrement())
+  nombre_secundario String
+  descripcion       String
+  rol               String
+  Usuario           Usuario[]
+}
+
 //[success] actual
 model Usuario {
   id                    Int                     @id @default(autoincrement())
@@ -80,13 +90,14 @@ model Usuario {
   nombre_completo       String
   telefono              String
   limite_proyecto       Int                     @default(1)
-  rol                   E_Rol_BD
-  eliminado             E_Estado_BD             @default(y)
+  limite_usuarios       Int
+  eliminado             E_Estado_BD             @default(n)
   contrasena            String
   fecha_creacion        DateTime                @default(now())
+  rol_id                Int
+  Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Proyecto              Proyecto[]
 }
 
 //[success] actual
@@ -110,7 +121,8 @@ model ManoObra {
   lugar_nacimiento            String?
   genero                      String?
   tipo_documento              String?
-  documento_identidad         String?
+  documento_identidad         String
+  contrasena                  String
   profesion                   String?
   estado_civil                String?
   n_libreta_militar           String?
@@ -296,10 +308,16 @@ model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
   descripcion_empresa   String?                 @db.Text()
-  usuarioId             Int
+  ruc                   String?
+  direccion             String?
+  nombre_corto          String?
+  telefono              String
+  usuario_id            Int
   fecha_creacion        DateTime                @default(now())
+  eliminado             E_Estado_BD             @default(n)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Usuario               Usuario                 @relation(fields: [usuarioId], references: [id])
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
+  Proyecto              Proyecto[]
 }
 
 //[success] actual
@@ -313,29 +331,35 @@ model DetalleUsuarioEmpresa {
 
 //[success] actual
 model Proyecto {
-  id                 Int                  @id @default(autoincrement())
-  nombre_completo    String               @db.Text()
-  descripcion        String?              @db.Text()
-  direccion          String
-  nombre_consorcio   String
-  nombre_corto       String
-  costo_proyecto     Float
-  estado             E_Proyecto_Estado
-  eliminado          E_Estado_BD          @default(n)
-  fecha_creacion     DateTime             @db.Date()
-  fecha_fin          DateTime             @db.Date()
-  plazo_proyecto     String
-  codigo_proyecto    String
-  usuario_id         Int
-  color_proyecto     String
-  Usuario            Usuario              @relation(fields: [usuario_id], references: [id])
-  UnidadProduccion   UnidadProduccion[]
-  Tren               Tren[]
-  Partida            Partida[]
-  SeccionObrero      SeccionObrero[]
-  DepartamentoObrero DepartamentoObrero[]
-  AreaObrero         AreaObrero[]
-  Combo              Combo[]
+  id                  Int                  @id @default(autoincrement())
+  nombre_completo     String               @db.Text()
+  descripcion         String?              @db.Text()
+  direccion           String
+  nombre_consorcio    String
+  nombre_corto        String
+  costo_proyecto      Float
+  estado              E_Proyecto_Estado
+  eliminado           E_Estado_BD          @default(n)
+  fecha_creacion      DateTime             @db.Date()
+  fecha_fin           DateTime             @db.Date()
+  plazo_proyecto      String
+  color_primario      String?
+  color_personalizado String?
+  color_linea         String?
+  color_detalle       String?
+  color_menu          String?
+  color_submenu       String?
+  codigo_proyecto     String
+  empresa_id          Int
+  color_proyecto      String
+  Empresa             Empresa              @relation(fields: [empresa_id], references: [id])
+  UnidadProduccion    UnidadProduccion[]
+  Tren                Tren[]
+  Partida             Partida[]
+  SeccionObrero       SeccionObrero[]
+  DepartamentoObrero  DepartamentoObrero[]
+  AreaObrero          AreaObrero[]
+  Combo               Combo[]
 }
 
 model Combo {
@@ -357,13 +381,14 @@ model detalle_combo_mo {
 
 //[success] actual
 model UnidadProduccion {
-  id             Int       @id @default(autoincrement())
-  codigo         String    @unique
+  id             Int         @id @default(autoincrement())
+  codigo         String      @unique
   nombre         String
-  nota           String?   @db.Text()
+  nota           String?     @db.Text()
+  eliminado      E_Estado_BD @default(n)
   proyecto_id    Int
-  fecha_creacion DateTime  @default(now())
-  Proyecto       Proyecto  @relation(fields: [proyecto_id], references: [id])
+  fecha_creacion DateTime    @default(now())
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
   Trabajo        Trabajo[]
 }
 
@@ -410,7 +435,7 @@ model Trabajo {
   duracion              Int
   fecha_inicio          DateTime                @db.Date //año más dia
   fecha_finalizacion    DateTime                @db.Date //año más dia
-  eliminado             E_Estado_BD             @default(y)
+  eliminado             E_Estado_BD             @default(n)
   fecha_creacion        DateTime                @default(now())
   costo_partida         Int
   costo_mano_obra       Int

@@ -3,6 +3,7 @@ import { projectController } from "./project.controller";
 import { userMiddleware } from "./project.middleware";
 import { authAuthmiddleware } from "@/auth/middlewares/auth.middleware";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { requestMiddleware } from "@/common/middlewares/request.middleware";
 
 const projectRouter = express.Router();
 const prefix = "/projects";
@@ -10,12 +11,14 @@ const prefix = "/projects";
 projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}/user/:id`,
+  requestMiddleware.validatePagination,
   authRoleMiddleware.authViewProject,
   userMiddleware.verifyHeadersFields,
-  projectController.findAllProjectsXUser
+  projectController.findAllProjectsXCompany
 );
 projectRouter.get(
   `${prefix}/search`,
+  requestMiddleware.validatePagination,
   authRoleMiddleware.authViewProject,
   projectController.findByName
 );

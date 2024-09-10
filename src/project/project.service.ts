@@ -2,7 +2,7 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
 import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
-  I_CreateUserBody,
+  I_CreateCompanyBody,
   I_UpdateProyectBody,
 } from "./models/project.interface";
 import appRootPath from "app-root-path";
@@ -10,9 +10,10 @@ import { ProjectMulterProperties } from "./models/project.constant";
 import fs from "fs/promises";
 import { converToDate } from "@/common/utils/date";
 import { T_FindAll } from "@/common/models/pagination.types";
-import { primsaUserRepository } from "@/user/prisma-user.repository";
 import { userService } from "@/user/user.service";
 import validator from "validator";
+import { companyService } from "@/company/company.service";
+import { ProjectResponseMapper } from "./mapper/project.mapper";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -23,31 +24,20 @@ class ProjectService {
     }
   }
 
-  async createProject(data: I_CreateUserBody): Promise<T_HttpResponse> {
+  async createProject(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
-      const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
-      if (resultCostoProyecto) {
+      data.empresa_id = Number(data.empresa_id);
+      const resultCompany = await companyService.findById(data.empresa_id);
+      if (!resultCompany.success) {
         return httpResponse.BadRequestException(
-          "El campo costo proyecto debe contener solo números"
+          "No se puede crear el proyecto con el id de la empresa proporcionado"
         );
       }
-      const resultPlazoProyecto = this.isNumeric(data.plazo_proyecto);
-      if (resultPlazoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo plazo proyecto debe contener solo números"
-        );
-      }
+
       const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
       if (resultCodigoProyecto) {
         return httpResponse.BadRequestException(
           "El campo codigo proyecto debe contener solo números"
-        );
-      }
-      data.usuario_id = Number(data.usuario_id);
-      const result = await userService.findById(data.usuario_id);
-      if (!result.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
         );
       }
       const fecha_creacion = converToDate(data.fecha_creacion);
@@ -55,17 +45,16 @@ class ProjectService {
       const proyectFormat = {
         ...data,
         costo_proyecto: Number(data.costo_proyecto),
-        plazo_proyecto: data.plazo_proyecto,
-        codigo_proyecto: data.codigo_proyecto,
         fecha_creacion,
         fecha_fin,
       };
       const project = await prismaProyectoRepository.createProject(
         proyectFormat
       );
+      const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",
-        project
+        projectMapper
       );
     } catch (error) {
       console.log(error);
@@ -83,16 +72,11 @@ class ProjectService {
     idProject: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultCostoProyecto = this.isNumeric(data.costo_proyecto);
-      if (resultCostoProyecto) {
+      data.empresa_id = Number(data.empresa_id);
+      const companyResponse = await companyService.findById(data.empresa_id);
+      if (!companyResponse.success) {
         return httpResponse.BadRequestException(
-          "El campo costo proyecto debe contener solo números"
-        );
-      }
-      const resultPlazoProyecto = this.isNumeric(data.plazo_proyecto);
-      if (resultPlazoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo plazo proyecto debe contener solo números"
+          "No se pudo crear el proyecto con el id de la empresa proporcionado"
         );
       }
       const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
@@ -106,33 +90,21 @@ class ProjectService {
       let fecha_creacion = new Date(data.fecha_creacion);
       let fecha_fin = new Date(data.fecha_fin);
 
-      // data.costo_proyecto = Number(data.costo_proyecto);
-      data.usuario_id = Number(data.usuario_id);
-      const userResponse = await userService.findById(data.usuario_id);
-      if (!userResponse.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
-        );
-      }
       const proyectFormat = {
         ...data,
         costo_proyecto: data.costo_proyecto,
         fecha_creacion: fecha_creacion,
         fecha_fin: fecha_fin,
       };
-      const result = await primsaUserRepository.findById(data.usuario_id);
-      if (!result) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id del usuario proporcionado"
-        );
-      }
+
       const project = await prismaProyectoRepository.updateProject(
         proyectFormat,
         idProject
       );
+      const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.SuccessResponse(
         "Proyecto modificado correctamente",
-        project
+        projectMapper
       );
     } catch (error) {
       console.log(error);
@@ -228,7 +200,6 @@ class ProjectService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al buscar proyecto",
         error
@@ -238,13 +209,11 @@ class ProjectService {
     }
   }
 
-  async findAllProjectsXUser(idUser: number, data: T_FindAll) {
+  async findAllProjectsXCompany(idUser: number, data: T_FindAll) {
     try {
       const userResponse = await userService.findById(idUser);
       if (!userResponse.success) {
-        return httpResponse.BadRequestException(
-          "El id del usuario proporcionado no existe "
-        );
+        return userResponse;
       }
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaProyectoRepository.allProjectsuser(

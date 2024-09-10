@@ -6,8 +6,9 @@ export interface I_UpdateProjectBD
   extends Omit<Proyecto, "id" | "costo_proyecto"> {
   costo_proyecto: string;
 }
+export interface I_Project extends Omit<Proyecto, "eliminado"> {}
 
-export interface I_CreateUserBody
+export interface I_CreateCompanyBody
   extends Omit<
     Proyecto,
     | "id"

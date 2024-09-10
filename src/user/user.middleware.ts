@@ -2,8 +2,9 @@ import express from "@/config/express.config";
 import { userDto } from "./dto/user.dto";
 import { httpResponse } from "@/common/http.response";
 import { userUpdateDto } from "./dto/update.dto";
-import { headerDto } from "./dto/header.params.dto";
 import validator from "validator";
+import { userAndCompanyDto } from "./dto/userAndCompany.dto";
+import { userUpdateRolDto } from "./dto/updateUserRol.dto";
 
 class UserMiddleware {
   verifyFieldsRegistry(
@@ -19,7 +20,7 @@ class UserMiddleware {
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(
-        " Error al validar autenticacion"
+        "Error al validar campos"
       );
       response.status(result.statusCode).send(result);
     }
@@ -33,9 +34,25 @@ class UserMiddleware {
     try {
       userUpdateDto.parse(request.body);
       nextFunction();
-    } catch {
+    } catch (error) {
       const result = httpResponse.BadRequestException(
-        " Error al validar campos para actualizar el usuario"
+        "Error al validar los campos para actualizar el usuario"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+
+  verifyFieldsUpdateRol(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      userUpdateRolDto.parse(request.body);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        "Error al validar los campos para actualizar el rol del usuario"
       );
       response.status(result.statusCode).send(result);
     }
@@ -54,7 +71,7 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar campos para traer los usuarios"
+        "Error al validar los campos para traer los usuarios"
       );
       response.status(result.statusCode).send(result);
     }
