@@ -222,7 +222,7 @@ class ProjectService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron projectos.", 0);
+        return httpResponse.SuccessResponse("No se encontraron projectos.", []);
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {

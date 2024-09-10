@@ -23,7 +23,10 @@ class CompanyService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron usuarios.", 0);
+        return httpResponse.SuccessResponse(
+          "No se encontraron resultados.",
+          []
+        );
 
       const { companies, total } = result;
       //numero de pagina donde estas
@@ -275,10 +278,7 @@ class CompanyService {
         data.queryParams.limit
       );
       if (!result) {
-        return httpResponse.NotFoundException(
-          "No se encontraron resultados",
-          0
-        );
+        return httpResponse.SuccessResponse("No se encontraron resultados", []);
       }
       const { companies, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

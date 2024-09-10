@@ -31,7 +31,7 @@ class UserService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron usuarios.", 0);
+        return httpResponse.SuccessResponse("No se encontraron usuarios.", []);
 
       const { users, total } = result;
       // const usersMapped = users.map(
@@ -507,7 +507,7 @@ class UserService {
       if (!result) {
         return httpResponse.NotFoundException(
           "No se encontraron resultados",
-          0
+          []
         );
       }
       const { users, total } = result;

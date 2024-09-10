@@ -98,6 +98,7 @@ model Usuario {
   Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
+  Partida               Partida[]
 }
 
 //[success] actual
@@ -421,7 +422,9 @@ model Partida {
   parcial               Float?                  @default(0)
   total                 Float?                  @default(0)
   fecha_creacion        DateTime                @default(now())
+  usuario_id            Int
   proyecto_id           Int
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
   DetalleTrabajoPartida DetalleTrabajoPartida[]
@@ -452,11 +455,12 @@ model Trabajo {
 
 //[success] actual
 model DetalleTrabajoPartida {
-  id         Int     @id @default(autoincrement())
-  trabajo_id Int
-  partida_id Int
-  Trabajo    Trabajo @relation(fields: [trabajo_id], references: [id])
-  Partida    Partida @relation(fields: [partida_id], references: [id])
+  id                Int     @id @default(autoincrement())
+  trabajo_id        Int
+  partida_id        Int
+  metrado_utilizado Float
+  Trabajo           Trabajo @relation(fields: [trabajo_id], references: [id])
+  Partida           Partida @relation(fields: [partida_id], references: [id])
 }
 
 //[success] actual
