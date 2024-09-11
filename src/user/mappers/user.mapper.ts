@@ -21,7 +21,7 @@ export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
     this.telefono = user.telefono;
     this.eliminado = user.eliminado;
     this.limite_proyecto = user.limite_proyecto;
-    this.fecha_creacion = new Date();
+    this.fecha_creacion = user.fecha_creacion;
     this.rol_id = user.rol_id;
     this.limite_usuarios = user.limite_usuarios;
   }

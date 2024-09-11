@@ -404,6 +404,7 @@ model Tren {
   oficial        Int
   peon           Int
   fecha_creacion DateTime      @default(now())
+  eliminado      E_Estado_BD   @default(n)
   proyecto_id    Int
   ReporteTren    ReporteTren[]
   Trabajo        Trabajo[]
@@ -529,13 +530,12 @@ enum E_Asistencia_BD {
 model Asistencia {
   id                  Int             @id @default(autoincrement())
   fecha               DateTime
-  hora_inicio         String
-  hora_fin            String
   horas               Float
+  horas_60            Float
+  horas_100           Float
   asistencia          E_Asistencia_BD @default(F)
   horas_extras_estado E_Estado_BD     @default(n)
   fecha_creacion      DateTime        @default(now())
-  horas_extras        Float
   mano_obra_id        Int             @unique
   ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])
 }
@@ -576,6 +576,12 @@ model RiesgoParteDiario {
 //[success] actual
 model ParteDiarioMO {
   id              Int         @id @default(autoincrement())
+  hora_inicio     Float
+  hora_fin        Float
+  hora_parcial    Float
+  hora_normal     Float
+  hora_60         Float
+  hora_100        Float
   parte_diario_id Int
   mano_obra_id    Int
   fecha_creacion  DateTime    @default(now())

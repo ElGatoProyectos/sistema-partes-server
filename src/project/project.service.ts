@@ -148,7 +148,7 @@ class ProjectService {
       return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la imagen",
+        "Error al buscar la imagen",
         error
       );
     } finally {
@@ -165,7 +165,7 @@ class ProjectService {
       return httpResponse.SuccessResponse("Proyecto encontrado", project);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     } finally {
@@ -265,7 +265,7 @@ class ProjectService {
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al eliminar el proyecto",
+        "Error al eliminar el proyecto",
         error
       );
     } finally {

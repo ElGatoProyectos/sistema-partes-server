@@ -1,16 +1,18 @@
 import express from "@/config/express.config";
-import validator from "validator";
-import { prouductionUnitDto } from "./dto/production-unit.dto";
+import { trainDto } from "./dto/train.dto";
 import { httpResponse } from "@/common/http.response";
+import { trainUpdateDto } from "./dto/update.dto";
+import validator from "validator";
+import { cuadrillaDto } from "./dto/cuadrilla.dto";
 
-class ProductionUnitMiddleware {
+class TrainMiddleware {
   verifyFields(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
     try {
-      prouductionUnitDto.parse(request.body);
+      trainDto.parse(request.body);
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(
@@ -26,11 +28,28 @@ class ProductionUnitMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      prouductionUnitDto.parse(request.body);
+      trainUpdateDto.parse(request.body);
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "Error al validar campos para actualizar la Unidad de Produccion"
+        "Error al validar campos para actualizar el Tren"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+
+  verifyFieldsUpdateCuadrilla(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      cuadrillaDto.parse(request.body);
+      nextFunction();
+    } catch {
+      console.log("llegoooo");
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos para actualizar el Tren"
       );
       response.status(result.statusCode).send(result);
     }
@@ -49,11 +68,11 @@ class ProductionUnitMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "Error al validar el parámetro"
+        " Error al validar el parámetro"
       );
       response.status(result.statusCode).send(result);
     }
   }
 }
 
-export const productionUnitMiddleware = new ProductionUnitMiddleware();
+export const trainMiddleware = new TrainMiddleware();

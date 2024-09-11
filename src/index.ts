@@ -8,6 +8,7 @@ import projectRouter from "./project/project.init";
 import companyRouter from "./company/company.init";
 import rolRouter from "./rol/rol.init";
 import prouductionUnitRouter from "./production-unit/production-unit.init";
+import trainRouter from "./train/train.init";
 
 const globalPrefix = "/api";
 
@@ -21,6 +22,7 @@ app.use(globalPrefix, projectRouter);
 app.use(globalPrefix, companyRouter);
 app.use(globalPrefix, rolRouter);
 app.use(globalPrefix, prouductionUnitRouter);
+app.use(globalPrefix, trainRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

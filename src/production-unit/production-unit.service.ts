@@ -12,6 +12,7 @@ import { UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
 import { projectValidation } from "@/project/project.validation";
+import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
 
 class ProductionUnitService {
   async createProductionUnit(
@@ -23,7 +24,7 @@ class ProductionUnitService {
       );
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear la unidad de producción con el id del proyecto proporcionado"
+          "No se puede crear la Unidad de Producción con el id del proyecto proporcionado"
         );
       }
       const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
@@ -46,14 +47,16 @@ class ProductionUnitService {
         await prismaProductionUnitRepository.createProductionUnit(
           productionUnit
         );
-      return httpResponse.CreatedResponse(
-        "Unidad de produccion creada correctamente",
+      const prouductionUnitMapper = new ProductionUnitResponseMapper(
         responseProductionUnit
       );
+      return httpResponse.CreatedResponse(
+        "Unidad de produccion creada correctamente",
+        prouductionUnitMapper
+      );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        "Error al crear Unidad de producción",
+        "Error al crear la Unidad de producción",
         error
       );
     } finally {
@@ -91,9 +94,12 @@ class ProductionUnitService {
           productionUnit,
           idProductionUnit
         );
+      const prouductionUnitMapper = new ProductionUnitResponseMapper(
+        responseProductionUnit
+      );
       return httpResponse.SuccessResponse(
         "Unidad de producción modificada correctamente",
-        responseProductionUnit
+        prouductionUnitMapper
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -137,7 +143,7 @@ class ProductionUnitService {
       return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la imagen de la Unidad de Producción",
+        "Error al buscar la imagen de la Unidad de Producción",
         error
       );
     } finally {
@@ -152,7 +158,7 @@ class ProductionUnitService {
       );
       if (!productionUnit) {
         return httpResponse.NotFoundException(
-          "El id de la unidad de producción no fue no encontrado"
+          "El id de la Unidad de Producción no fue no encontrado"
         );
       }
       return httpResponse.SuccessResponse(
@@ -161,7 +167,7 @@ class ProductionUnitService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la Unidad de producción",
+        "Error al buscar la Unidad de producción",
         error
       );
     } finally {
@@ -215,7 +221,10 @@ class ProductionUnitService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron projectos.", 0);
+        return httpResponse.SuccessResponse(
+          "No se encontraron Unidades de Producción.",
+          []
+        );
       const { productionUnits, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -254,13 +263,13 @@ class ProductionUnitService {
             idProductionUnit
           );
         return httpResponse.SuccessResponse(
-          "Unidad de Producción eliminado correctamente",
+          "Unidad de Producción eliminada correctamente",
           result
         );
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error la Unidad de Producción",
+        "Error al eliminar la Unidad de Producción",
         error
       );
     } finally {

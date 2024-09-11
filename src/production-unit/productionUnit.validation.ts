@@ -1,5 +1,4 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import { prismaProyectoRepository } from "@/project/prisma-project.repository";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 
 class ProductionUnitValidation {

@@ -18,18 +18,14 @@ const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class ProductionUnitController {
-  create = async (
-    request: express.Request,
-    response: express.Response,
-    nextFunction: express.NextFunction
-  ) => {
+  create = async (request: express.Request, response: express.Response) => {
     upload.single(ProductionUnitMulterProperties.field)(
       request,
       response,
       async (error: any) => {
         if (error) {
           const customError = httpResponse.BadRequestException(
-            "Error al procesar la imagen ",
+            "Error al procesar la imagen de la Unidad de Producción",
             error
           );
           response.status(customError.statusCode).json(customError);
@@ -139,7 +135,7 @@ class ProductionUnitController {
                     .toFile(filePath, (err) => {
                       if (err) {
                         const customError = httpResponse.BadRequestException(
-                          "Error al guardar la imagen de la unidad de producción",
+                          "Error al guardar la imagen de la Unidad de Producción",
                           err
                         );
                         response

@@ -8,11 +8,7 @@ const companyRouter = express.Router();
 
 const prefix = "/companies";
 
-companyRouter.post(
-  `${prefix}`,
-  authRoleMiddleware.authAdmin,
-  companyController.create
-);
+companyRouter.post(`${prefix}`, companyController.create);
 
 companyRouter.get(
   `${prefix}`,
