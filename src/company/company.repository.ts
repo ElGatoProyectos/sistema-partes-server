@@ -10,6 +10,10 @@ export abstract class CompanyRepository {
 
   existsName(name: string): void {}
 
+  existsNameShort(name: string): void {}
+
+  existsRuc(name: string): void {}
+
   createCompany(data: I_CreateCompanyBD): void {}
 
   updateCompany(data: I_UpdateCompanyBody, idUser: number): void {}

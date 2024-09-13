@@ -10,3 +10,8 @@ export interface I_UpdateProductionUnitBody
   extends Omit<UnidadProduccion, "id"> {}
 
 export interface I_ProductionUnit extends Omit<UnidadProduccion, "eliminado"> {}
+
+export interface I_ProductionUnitExcel {
+  nombre: string;
+  nota: string;
+}

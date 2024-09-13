@@ -31,8 +31,6 @@ class UserService {
         skip,
         data.queryParams.limit
       );
-      if (!result)
-        return httpResponse.SuccessResponse("No se encontraron usuarios.", []);
 
       const { users, total } = result;
       // const usersMapped = users.map(
@@ -362,21 +360,26 @@ class UserService {
     idUser: number
   ): Promise<T_HttpResponse> {
     try {
-      //arquitectura Hans
       const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) return userResponse;
       const userFind = userResponse.payload as Usuario;
 
-      const responseEmail = await userValidation.findByEmail(data.email);
-      if (!responseEmail.success) {
-        return httpResponse.BadRequestException(`El email ingresado ya existe`);
+      if (userFind.email != data.email) {
+        const responseEmail = await userValidation.findByEmail(data.email);
+        if (!responseEmail.success) {
+          return httpResponse.BadRequestException(
+            `El email ingresado ya existe`
+          );
+        }
       }
 
-      const responseByDni = await userValidation.findByDni(data.dni);
-      if (responseByDni.success) {
-        return httpResponse.BadRequestException(
-          `El usuario con el dni ${data.dni} ya existe`
-        );
+      if (userFind.dni != data.dni) {
+        const responseByDni = await userValidation.findByDni(data.dni);
+        if (responseByDni.success) {
+          return httpResponse.BadRequestException(
+            `El usuario con el dni ${data.dni} ya existe`
+          );
+        }
       }
 
       const resultDni = wordIsNumeric(data.dni);
@@ -481,12 +484,6 @@ class UserService {
         skip,
         data.queryParams.limit
       );
-      if (!result) {
-        return httpResponse.NotFoundException(
-          "No se encontraron resultados",
-          []
-        );
-      }
       const { users, total } = result;
       const usersMapped = users.map(
         (user: Usuario) => new UserResponseMapper(user)

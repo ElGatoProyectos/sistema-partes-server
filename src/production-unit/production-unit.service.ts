@@ -1,11 +1,13 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import {
   I_CreateProductionUnitBody,
+  I_ProductionUnitExcel,
   I_UpdateProductionUnitBody,
 } from "./models/production-unit.interface";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 import prisma from "@/config/prisma.config";
 import fs from "fs/promises";
+import * as xlsx from "xlsx";
 import appRootPath from "app-root-path";
 import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
 import { UnidadProduccion } from "@prisma/client";
@@ -19,6 +21,12 @@ class ProductionUnitService {
     data: I_CreateProductionUnitBody
   ): Promise<T_HttpResponse> {
     try {
+      const resultNameProjectUnit = await productionUnitValidation.findByName(
+        data.nombre
+      );
+      if (!resultNameProjectUnit.success) {
+        return resultNameProjectUnit;
+      }
       const resultIdProject = await projectValidation.findById(
         Number(data.proyecto_id)
       );
@@ -77,6 +85,19 @@ class ProductionUnitService {
           "No se pudo encontrar el id de la Unidad de Producción que se quiere editar"
         );
       }
+
+      const resultProductionUnit =
+        resultIdProductionUnit.payload as UnidadProduccion;
+
+      if (resultProductionUnit.nombre != data.nombre) {
+        const resultNameProjectUnit = await productionUnitValidation.findByName(
+          data.nombre
+        );
+        if (!resultNameProjectUnit.success) {
+          return resultNameProjectUnit;
+        }
+      }
+
       const resultIdProject = await projectValidation.findById(
         Number(data.proyecto_id)
       );
@@ -158,7 +179,7 @@ class ProductionUnitService {
       );
       if (!productionUnit) {
         return httpResponse.NotFoundException(
-          "El id de la Unidad de Producción no fue no encontrado"
+          "El id de la Unidad de Producción no fue encontrado"
         );
       }
       return httpResponse.SuccessResponse(
@@ -184,10 +205,6 @@ class ProductionUnitService {
           skip,
           data.queryParams.limit
         );
-
-      if (!result) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
-      }
       const { productionUnits, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -220,11 +237,6 @@ class ProductionUnitService {
         skip,
         data.queryParams.limit
       );
-      if (!result)
-        return httpResponse.SuccessResponse(
-          "No se encontraron Unidades de Producción.",
-          []
-        );
       const { productionUnits, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -276,6 +288,54 @@ class ProductionUnitService {
       await prisma.$disconnect();
     }
   }
+
+  // async registerLincensesMasive(file: any, proyectId: number) {
+  //   try {
+  //     const buffer = file.buffer;
+
+  //     const workbook = xlsx.read(buffer, { type: "buffer" });
+  //     const sheetName = workbook.SheetNames[0];
+  //     const sheet = workbook.Sheets[sheetName];
+  //     const sheetToJson = xlsx.utils.sheet_to_json(
+  //       sheet
+  //     ) as I_ProductionUnitExcel[];
+
+  //     await Promise.all(
+  //       //como hago para tomar campos
+  //       sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+  //         if (
+  //           item.nombre === "" ||
+  //           item.nota === ""
+  //           // item.proyecto_id === ""  Esto lo tengo q buscar pero viene con nombre
+  //         )
+  //           throw new Error(
+  //             "Error en crear la Unidad de Produccion de forma masiva"
+  //           );
+  //         // const productionUnit = await productionUnitValidation.findByName(
+  //         //   item.nombre
+  //         // );
+  //         await prisma.unidadProduccion.create({
+  //           data: {
+  //             nombre: item.nombre,
+  //             nota: item.nota,
+  //             proyecto_id: 1,
+  //             codigo: "120",
+  //           },
+  //         });
+  //       })
+  //     );
+  //     await prisma.$disconnect();
+  //     return httpResponse.SuccessResponse(
+  //       "Unidad de producción creada correctamente!"
+  //     );
+  //   } catch (error) {
+  //     await prisma.$disconnect();
+  //     return httpResponse.InternalServerErrorException(
+  //       "Error al crear la Unidad de Producción",
+  //       error
+  //     );
+  //   }
+  // }
 }
 
 export const productionUnitService = new ProductionUnitService();

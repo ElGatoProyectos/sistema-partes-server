@@ -10,49 +10,49 @@ const prefix = "/train";
 trainRouter.post(
   `${prefix}`,
   trainMiddleware.verifyFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.create
 );
 
 trainRouter.put(
   `${prefix}/cuadrilla`,
   trainMiddleware.verifyFieldsUpdateCuadrilla,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.updateCuadrilla
 );
 
 trainRouter.get(
   `${prefix}`,
-  trainMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  requestMiddleware.validatePagination,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.allTrains
 );
 
 trainRouter.get(
   `${prefix}/search`,
   requestMiddleware.validatePagination,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.findByName
 );
 
 trainRouter.get(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.findByIdTrain
 );
 
 trainRouter.put(
   `${prefix}/:id`,
   trainMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.update
 );
 
 trainRouter.delete(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   trainController.updateStatus
 );
 

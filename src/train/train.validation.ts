@@ -16,6 +16,22 @@ class TrainValidation {
       );
     }
   }
+  async findByName(name: string): Promise<T_HttpResponse> {
+    try {
+      const train = await prismaTrainRepository.existsName(name);
+      if (train) {
+        return httpResponse.NotFoundException(
+          "El nombre del Tren ya existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse("Tren encontrado", train);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Tren",
+        error
+      );
+    }
+  }
 
   async codeMoreHigh(): Promise<T_HttpResponse> {
     try {

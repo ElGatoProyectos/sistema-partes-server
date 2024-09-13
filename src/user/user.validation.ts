@@ -6,7 +6,7 @@ class UserValidation {
     try {
       const emailExists = await prismaUserRepository.existsEmail(email);
 
-      if (emailExists && emailExists.email != email) {
+      if (emailExists) {
         return httpResponse.NotFoundException(
           "El email ingresado ya existe en la base de datos"
         );

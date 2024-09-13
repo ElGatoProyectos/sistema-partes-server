@@ -223,6 +223,32 @@ class ProductionUnitController {
     const result = await productionUnitService.updateStatusProject(idProject);
     response.status(result.statusCode).json(result);
   }
+
+  // async productionUnitLicenceFilePost(
+  //   request: express.Request,
+  //   response: express.Response
+  // ) {
+  //   // Usando multer para manejar la subida de archivos en memoria
+  //   upload.single("file")(request, response, async (err: Error | null) => {
+  //     if (err) {
+  //       return response.status(500).json({ error: "Error uploading file" });
+  //     }
+
+  //     const file = request.file;
+  //     if (!file) {
+  //       return response.status(400).json({ error: "No file uploaded" });
+  //     }
+
+  //     try {
+  //       const serviceResponse =
+  //         await productionUnitService.registerLincensesMasive(file);
+
+  //       response.status(serviceResponse.statusCode).json(serviceResponse);
+  //     } catch (error) {
+  //       response.status(500).json(error);
+  //     }
+  //   });
+  // }
 }
 
 export const productionUnitController = new ProductionUnitController();
