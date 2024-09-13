@@ -98,6 +98,7 @@ model Usuario {
   Rol                   Rol                     @relation(fields: [rol_id], references: [id])
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
+  Partida               Partida[]
 }
 
 //[success] actual
@@ -403,6 +404,7 @@ model Tren {
   oficial        Int
   peon           Int
   fecha_creacion DateTime      @default(now())
+  eliminado      E_Estado_BD   @default(n)
   proyecto_id    Int
   ReporteTren    ReporteTren[]
   Trabajo        Trabajo[]
@@ -416,12 +418,15 @@ model Partida {
   item                  String
   partida               String
   unidad                String
-  metrado               Float
+  metrado_inicial       Float
+  metrado_total         Float
   precio                Float
   parcial               Float?                  @default(0)
   total                 Float?                  @default(0)
   fecha_creacion        DateTime                @default(now())
+  usuario_id            Int
   proyecto_id           Int
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
   DetalleTrabajoPartida DetalleTrabajoPartida[]
@@ -452,11 +457,12 @@ model Trabajo {
 
 //[success] actual
 model DetalleTrabajoPartida {
-  id         Int     @id @default(autoincrement())
-  trabajo_id Int
-  partida_id Int
-  Trabajo    Trabajo @relation(fields: [trabajo_id], references: [id])
-  Partida    Partida @relation(fields: [partida_id], references: [id])
+  id                Int     @id @default(autoincrement())
+  trabajo_id        Int
+  partida_id        Int
+  metrado_utilizado Float
+  Trabajo           Trabajo @relation(fields: [trabajo_id], references: [id])
+  Partida           Partida @relation(fields: [partida_id], references: [id])
 }
 
 //[success] actual
@@ -524,13 +530,12 @@ enum E_Asistencia_BD {
 model Asistencia {
   id                  Int             @id @default(autoincrement())
   fecha               DateTime
-  hora_inicio         String
-  hora_fin            String
   horas               Float
+  horas_60            Float
+  horas_100           Float
   asistencia          E_Asistencia_BD @default(F)
   horas_extras_estado E_Estado_BD     @default(n)
   fecha_creacion      DateTime        @default(now())
-  horas_extras        Float
   mano_obra_id        Int             @unique
   ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])
 }
@@ -571,6 +576,12 @@ model RiesgoParteDiario {
 //[success] actual
 model ParteDiarioMO {
   id              Int         @id @default(autoincrement())
+  hora_inicio     Float
+  hora_fin        Float
+  hora_parcial    Float
+  hora_normal     Float
+  hora_60         Float
+  hora_100        Float
   parte_diario_id Int
   mano_obra_id    Int
   fecha_creacion  DateTime    @default(now())

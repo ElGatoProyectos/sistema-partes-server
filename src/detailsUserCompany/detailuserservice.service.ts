@@ -18,13 +18,10 @@ class DetailUserCompanyService {
         responseDetails
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear detalle usuario-empresa",
+        "Error al crear detalle usuario-empresa",
         error
       );
-    } finally {
-      await prisma.$disconnect();
     }
   }
 }

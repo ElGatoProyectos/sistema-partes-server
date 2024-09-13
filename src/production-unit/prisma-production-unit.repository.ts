@@ -8,6 +8,12 @@ import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
+  async codeMoreHigh(): Promise<UnidadProduccion | null> {
+    const lastProductionUnit = await prisma.unidadProduccion.findFirst({
+      orderBy: { codigo: "desc" },
+    });
+    return lastProductionUnit;
+  }
   async createProductionUnit(
     data: I_CreateProductionUnitBD
   ): Promise<UnidadProduccion> {

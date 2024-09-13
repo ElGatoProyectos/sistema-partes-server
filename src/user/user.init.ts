@@ -32,7 +32,7 @@ userRouter.get(
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdmin,
+  // authRoleMiddleware.authAdmin,
   userController.createUser
 );
 

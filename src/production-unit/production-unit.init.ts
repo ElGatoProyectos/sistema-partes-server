@@ -2,6 +2,7 @@ import { productionUnitController } from "./production-unit.controller";
 import express from "@/config/express.config";
 import { productionUnitMiddleware } from "./production-unit.middleware";
 import { requestMiddleware } from "@/common/middlewares/request.middleware";
+import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 
 const prouductionUnitRouter = express.Router();
 const prefix = "/unidad-de-produccion";
@@ -9,33 +10,33 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.get(
   `${prefix}`,
-  // authRoleMiddleware.authViewProject,
   productionUnitMiddleware.verifyHeadersFields,
+  authRoleMiddleware.authViewProject,
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  //falta metodo rol
   requestMiddleware.validatePagination,
+  authRoleMiddleware.authViewProject,
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
-  // authRoleMiddleware.authViewProject,
   productionUnitMiddleware.verifyHeadersFields,
+  authRoleMiddleware.authViewProject,
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
-  // authRoleMiddleware.authViewProject,
   productionUnitMiddleware.verifyHeadersFields,
+  authRoleMiddleware.authViewProject,
   productionUnitController.findImage
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
-  // authRoleMiddleware.authViewProject,
   productionUnitMiddleware.verifyHeadersFields,
+  authRoleMiddleware.authViewProject,
   productionUnitController.updateStatus
 );
 

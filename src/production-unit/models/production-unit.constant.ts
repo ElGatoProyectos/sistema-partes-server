@@ -1,4 +1,4 @@
 export const ProductionUnitMulterProperties = {
-  folder: "production-unit",
+  folder: "productionUnit",
   field: "production-unit-profile",
 };

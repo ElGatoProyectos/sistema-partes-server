@@ -5,34 +5,58 @@ import {
 } from "./models/production-unit.interface";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 import prisma from "@/config/prisma.config";
-import path from "path";
 import fs from "fs/promises";
 import appRootPath from "app-root-path";
 import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
 import { UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
-import { projectService } from "@/project/project.service";
+import { productionUnitValidation } from "./productionUnit.validation";
+import { projectValidation } from "@/project/project.validation";
+import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
 
 class ProductionUnitService {
   async createProductionUnit(
     data: I_CreateProductionUnitBody
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProject = await projectService.findById(data.proyecto_id);
+      const resultIdProject = await projectValidation.findById(
+        Number(data.proyecto_id)
+      );
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear la unidad de producción con el id del proyecto proporcionado"
+          "No se puede crear la Unidad de Producción con el id del proyecto proporcionado"
         );
       }
+      const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
+      const lastProductionUnitResponse =
+        lastProductionUnit.payload as UnidadProduccion;
+
+      // Incrementar el código en 1
+      const nextCodigo =
+        (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+
+      const productionUnit = {
+        ...data,
+        codigo: formattedCodigo,
+        proyecto_id: Number(data.proyecto_id),
+      };
+
       const responseProductionUnit =
-        await prismaProductionUnitRepository.createProductionUnit(data);
+        await prismaProductionUnitRepository.createProductionUnit(
+          productionUnit
+        );
+      const prouductionUnitMapper = new ProductionUnitResponseMapper(
+        responseProductionUnit
+      );
       return httpResponse.CreatedResponse(
         "Unidad de produccion creada correctamente",
-        responseProductionUnit
+        prouductionUnitMapper
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear Unidad de producción",
+        "Error al crear la Unidad de producción",
         error
       );
     } finally {
@@ -45,20 +69,37 @@ class ProductionUnitService {
     idProductionUnit: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProductionUnit = await this.findById(idProductionUnit);
+      const resultIdProductionUnit = await productionUnitValidation.findById(
+        idProductionUnit
+      );
       if (!resultIdProductionUnit.success) {
         return httpResponse.BadRequestException(
           "No se pudo encontrar el id de la Unidad de Producción que se quiere editar"
         );
       }
+      const resultIdProject = await projectValidation.findById(
+        Number(data.proyecto_id)
+      );
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear la unidad de producción con el id del proyecto proporcionado"
+        );
+      }
+      const productionUnit = {
+        ...data,
+        proyecto_id: Number(data.proyecto_id),
+      };
       const responseProductionUnit =
         await prismaProductionUnitRepository.updateProductionUnit(
-          data,
+          productionUnit,
           idProductionUnit
         );
+      const prouductionUnitMapper = new ProductionUnitResponseMapper(
+        responseProductionUnit
+      );
       return httpResponse.SuccessResponse(
         "Unidad de producción modificada correctamente",
-        responseProductionUnit
+        prouductionUnitMapper
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -102,7 +143,7 @@ class ProductionUnitService {
       return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la imagen de la Unidad de Producción",
+        "Error al buscar la imagen de la Unidad de Producción",
         error
       );
     } finally {
@@ -117,7 +158,7 @@ class ProductionUnitService {
       );
       if (!productionUnit) {
         return httpResponse.NotFoundException(
-          "El id de la unidad de producción no fue no encontrado"
+          "El id de la Unidad de Producción no fue no encontrado"
         );
       }
       return httpResponse.SuccessResponse(
@@ -126,7 +167,7 @@ class ProductionUnitService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la Unidad de producción",
+        "Error al buscar la Unidad de producción",
         error
       );
     } finally {
@@ -163,9 +204,8 @@ class ProductionUnitService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la Unidad de Producción",
+        "Error al buscar la Unidad de Producción",
         error
       );
     } finally {
@@ -181,7 +221,10 @@ class ProductionUnitService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron projectos.", 0);
+        return httpResponse.SuccessResponse(
+          "No se encontraron Unidades de Producción.",
+          []
+        );
       const { productionUnits, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -199,7 +242,7 @@ class ProductionUnitService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al traer todas las Unidades de Producción",
+        "Error al traer todas las Unidades de Producción",
         error
       );
     } finally {
@@ -209,7 +252,9 @@ class ProductionUnitService {
 
   async updateStatusProject(idProductionUnit: number): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await this.findById(idProductionUnit);
+      const projectResponse = await productionUnitValidation.findById(
+        idProductionUnit
+      );
       if (!projectResponse.success) {
         return projectResponse;
       } else {
@@ -218,13 +263,13 @@ class ProductionUnitService {
             idProductionUnit
           );
         return httpResponse.SuccessResponse(
-          "Unidad de Producción eliminado correctamente",
+          "Unidad de Producción eliminada correctamente",
           result
         );
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error la Unidad de Producción",
+        "Error al eliminar la Unidad de Producción",
         error
       );
     } finally {

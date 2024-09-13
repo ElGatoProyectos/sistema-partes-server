@@ -14,6 +14,9 @@ import { userService } from "@/user/user.service";
 import validator from "validator";
 import { companyService } from "@/company/company.service";
 import { ProjectResponseMapper } from "./mapper/project.mapper";
+import { companyValidation } from "@/company/company.validation";
+import { userValidation } from "@/user/user.validation";
+import { projectValidation } from "./project.validation";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -27,7 +30,7 @@ class ProjectService {
   async createProject(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
       data.empresa_id = Number(data.empresa_id);
-      const resultCompany = await companyService.findById(data.empresa_id);
+      const resultCompany = await companyValidation.findById(data.empresa_id);
       if (!resultCompany.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el proyecto con el id de la empresa proporcionado"
@@ -57,9 +60,8 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al crear proyecto",
+        "Error al crear proyecto",
         error
       );
     } finally {
@@ -73,7 +75,7 @@ class ProjectService {
   ): Promise<T_HttpResponse> {
     try {
       data.empresa_id = Number(data.empresa_id);
-      const companyResponse = await companyService.findById(data.empresa_id);
+      const companyResponse = await companyValidation.findById(data.empresa_id);
       if (!companyResponse.success) {
         return httpResponse.BadRequestException(
           "No se pudo crear el proyecto con el id de la empresa proporcionado"
@@ -85,7 +87,7 @@ class ProjectService {
           "El campo codigo proyecto debe contener solo números"
         );
       }
-      const projectResponse = await this.findById(idProject);
+      const projectResponse = await projectValidation.findById(idProject);
       if (!projectResponse.success) return projectResponse;
       let fecha_creacion = new Date(data.fecha_creacion);
       let fecha_fin = new Date(data.fecha_fin);
@@ -107,9 +109,8 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
-        " Error al modificar el proyecto",
+        "Error al modificar el proyecto",
         error
       );
     } finally {
@@ -147,7 +148,7 @@ class ProjectService {
       return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la imagen",
+        "Error al buscar la imagen",
         error
       );
     } finally {
@@ -164,7 +165,7 @@ class ProjectService {
       return httpResponse.SuccessResponse("Proyecto encontrado", project);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     } finally {
@@ -201,7 +202,7 @@ class ProjectService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     } finally {
@@ -211,7 +212,7 @@ class ProjectService {
 
   async findAllProjectsXCompany(idUser: number, data: T_FindAll) {
     try {
-      const userResponse = await userService.findById(idUser);
+      const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) {
         return userResponse;
       }
@@ -222,7 +223,7 @@ class ProjectService {
         data.queryParams.limit
       );
       if (!result)
-        return httpResponse.SuccessResponse("No se encontraron projectos.", 0);
+        return httpResponse.SuccessResponse("No se encontraron projectos.", []);
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -240,7 +241,7 @@ class ProjectService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al traer todos los proyectos",
+        "Error al traer todos los proyectos",
         error
       );
     } finally {
@@ -250,7 +251,7 @@ class ProjectService {
 
   async updateStatusProject(idProject: number): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await this.findById(idProject);
+      const projectResponse = await projectValidation.findById(idProject);
       if (!projectResponse.success) {
         return projectResponse;
       } else {
@@ -264,7 +265,7 @@ class ProjectService {
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al eliminar el proyecto",
+        "Error al eliminar el proyecto",
         error
       );
     } finally {
