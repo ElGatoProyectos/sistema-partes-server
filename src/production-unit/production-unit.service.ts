@@ -304,7 +304,7 @@ class ProductionUnitService {
       const sheetToJson = xlsx.utils.sheet_to_json(
         sheet
       ) as I_ProductionUnitExcel[];
-      let index = 2;
+      let index = 1;
       const project = await projectValidation.findById(projectId);
       const responseProject = project.payload as Proyecto;
       const productionUnits = await prismaProductionUnitRepository.findAll();
@@ -321,8 +321,8 @@ class ProductionUnitService {
       let errors: any = [];
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-          index++;
           try {
+            index++;
             let formattedCodigo = nextCodigo.toString().padStart(3, "0");
             nextCodigo++;
             await prisma.unidadProduccion.create({
@@ -334,8 +334,8 @@ class ProductionUnitService {
               },
             });
           } catch (error) {
-            // console.log(error);
-            errors.push("fila index " + index);
+            index++;
+            errors.push({ ...item, index });
           }
         })
       );

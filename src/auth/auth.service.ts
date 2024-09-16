@@ -10,11 +10,9 @@ import { Rol } from "@prisma/client";
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
     try {
-      // buscar usuario
-      // const data = body as I_CreateUserBody;
       const user = await prisma.usuario.findFirst({
         where: {
-          OR: [{ email: body.username }, { dni: body.dni }],
+          OR: [{ email: body.username }, { dni: body.username }],
           //contrasena: data.contrasena,
         },
       });
@@ -31,10 +29,11 @@ class AuthService {
           null
         );
       }
-
-      const userResponse = new LoginResponseMapper(user);
-
       const role = await rolService.findById(user.rol_id);
+      const responseRole = role.payload as Rol;
+
+      const userResponse = new LoginResponseMapper(user, responseRole.rol);
+
       const rolePayload = role.payload as Rol;
 
       //const { estatus, contrasena, ...userWithoutSensitiveData } = user;

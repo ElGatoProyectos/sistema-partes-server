@@ -7,7 +7,7 @@ import { authController } from "./auth.controller";
 
 const authRouter = express.Router();
 
-const prefix = "/auth";
+const prefix = "/auth/login";
 
 authRouter.post(
   `${prefix}`,
