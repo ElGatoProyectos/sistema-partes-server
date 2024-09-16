@@ -7,6 +7,7 @@ class UnifiedIndexValidation {
       const unifiedIndex = await prismaUnifiedIndexRepository.findById(
         idUnifiedIndex
       );
+      console.log(unifiedIndex);
       if (!unifiedIndex) {
         return httpResponse.NotFoundException(
           "Id del Indice Unificado no fue encontrado"
@@ -44,7 +45,9 @@ class UnifiedIndexValidation {
   }
   async findBySymbol(symbol: string): Promise<T_HttpResponse> {
     try {
-      const symbolExists = await prismaUnifiedIndexRepository.existSymbol(symbol);
+      const symbolExists = await prismaUnifiedIndexRepository.existSymbol(
+        symbol
+      );
       if (symbolExists) {
         return httpResponse.NotFoundException(
           "El nombre ingresado del Indice Unificado ya existe en la base de datos"

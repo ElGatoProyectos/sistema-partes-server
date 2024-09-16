@@ -6,7 +6,7 @@ import { unifiedIndexMiddleware } from "./unifiedIndex.middleware";
 
 const unifiedIndexRouter = express.Router();
 
-const prefix = "/unifiedIndex";
+const prefix = "/unified-index";
 
 unifiedIndexRouter.post(
   `${prefix}`,
