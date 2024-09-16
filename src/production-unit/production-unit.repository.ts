@@ -4,7 +4,9 @@ import {
 } from "./models/production-unit.interface";
 
 export abstract class ProudctionUnitRepository {
-  findAll(skip: number, limit: number): void {}
+  findAll(): void {}
+
+  findAllPagination(skip: number, limit: number): void {}
 
   findById(idUser: number): void {}
 

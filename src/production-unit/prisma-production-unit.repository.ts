@@ -8,6 +8,10 @@ import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
+  async findAll(): Promise<UnidadProduccion[]> {
+    const productionUnits = await prisma.unidadProduccion.findMany();
+    return productionUnits;
+  }
   async existsName(name: string): Promise<UnidadProduccion | null> {
     const productionUnit = await prisma.unidadProduccion.findFirst({
       where: {
@@ -77,7 +81,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     return { productionUnits, total };
   }
 
-  async findAll(
+  async findAllPagination(
     skip: number,
     limit: number
   ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {

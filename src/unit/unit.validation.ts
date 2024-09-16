@@ -8,9 +8,7 @@ class UnitValidation {
         idResourseCategory
       );
       if (!unitResponse) {
-        return httpResponse.NotFoundException(
-          "Id de la Unidad no fue encontrada"
-        );
+        return httpResponse.NotFoundException("Unidad no fue encontrada");
       }
       return httpResponse.SuccessResponse(
         "La Unidad fue encontrada",

@@ -242,18 +242,18 @@ class ProductionUnitController {
         return response.status(400).json({ error: "No file uploaded" });
       }
 
-      try {
-        const serviceResponse =
-          await productionUnitService.registerProductionUnitMasive(
-            file,
-            +responseBody.idProject
-          );
+      // try {
+      //   const serviceResponse =
+      //     await productionUnitService.registerProductionUnitMasive(
+      //       file,
+      //       +responseBody.idProject
+      //     );
 
-        response.status(serviceResponse.statusCode).json(serviceResponse);
-      } catch (error) {
-        console.log("entro en error general");
-        response.status(500).json(error);
-      }
+      //   response.status(serviceResponse.statusCode).json(serviceResponse);
+      // } catch (error) {
+      //   console.log("entro en error general");
+      //   response.status(500).json(error);
+      // }
     });
   };
 }
