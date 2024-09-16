@@ -238,7 +238,7 @@ class ProductionUnitService {
   async findAll(data: T_FindAll) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaProductionUnitRepository.findAll(
+      const result = await prismaProductionUnitRepository.findAllPagination(
         skip,
         data.queryParams.limit
       );
@@ -294,82 +294,62 @@ class ProductionUnitService {
     }
   }
 
-  async registerProductionUnitMasive(file: any, projectId: number) {
-    try {
-      const buffer = file.buffer;
+  // async registerProductionUnitMasive(file: any, projectId: number) {
+  //   try {
+  //     const buffer = file.buffer;
 
-      const workbook = xlsx.read(buffer, { type: "buffer" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const sheetToJson = xlsx.utils.sheet_to_json(
-        sheet
-      ) as I_ProductionUnitExcel[];
-      const project = await projectValidation.findById(projectId);
-      const responseProject = project.payload as Proyecto;
-      const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
-      const lastProductionUnitResponse =
-        lastProductionUnit.payload as UnidadProduccion;
-      let nextCodigo = (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
+  //     const workbook = xlsx.read(buffer, { type: "buffer" });
+  //     const sheetName = workbook.SheetNames[0];
+  //     const sheet = workbook.Sheets[sheetName];
+  //     const sheetToJson = xlsx.utils.sheet_to_json(
+  //       sheet
+  //     ) as I_ProductionUnitExcel[];
+  //     const project = await projectValidation.findById(projectId);
+  //     const responseProject = project.payload as Proyecto;
+  //     const productionUnits = await prismaProductionUnitRepository.findAll();
+  //     const productionUnitsNumber = productionUnits
+  //       .map((productionUnit) => productionUnit.codigo)
+  //       .map(Number);
+  //     const maxCodigo = Math.max(...productionUnitsNumber);
+  //     let nextCodigo = maxCodigo + 1;
+  //     let errors: { nombre: number; fila: any }[] = [];
+  //     await Promise.all(
+  //       sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+  //         try {
+  //           let formattedCodigo = nextCodigo.toString().padStart(3, "0");
+  //           nextCodigo++;
+  //           await prisma.unidadProduccion.create({
+  //             data: {
+  //               codigo: formattedCodigo,
+  //               nombre: item.Nombre, // Asegúrate de que el campo sea correcto
+  //               nota: item.Nota,
+  //               proyecto_id: responseProject.id,
+  //             },
+  //           });
+  //         } catch {
+  //           {
+  //             errors.push({});
+  //           }
+  //         }
+  //       })
 
-      //SINO
-      //const formattedCodigo = await this.getNextProductionUnitCode();
+  //       //contirnue
+  //     );
 
-      await Promise.all(
-        sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-          if (item.Nombre === "" || item.Nota === "")
-            throw new Error(
-              "Error al leer el excel ya que no hay dato disponible para leer"
-            );
-          let formattedCodigo = nextCodigo.toString().padStart(3, "0");
-          nextCodigo++; //PARA LA PROXIMA TIENE UNO MÁS
-          await prisma.unidadProduccion.create({
-            data: {
-              codigo: formattedCodigo,
-              nombre: item.Nombre, // Asegúrate de que el campo sea correcto
-              nota: item.Nota,
-              proyecto_id: responseProject.id,
-            },
-          });
-        })
-      );
+  //     // Desconectar prisma después de la operación masiva
+  //     await prisma.$disconnect();
 
-      // Desconectar prisma después de la operación masiva
-      await prisma.$disconnect();
-
-      return httpResponse.SuccessResponse(
-        "Unidad de producción creada correctamente!"
-      );
-    } catch (error) {
-      await prisma.$disconnect();
-      return httpResponse.InternalServerErrorException(
-        "Error al leer la Unidad de Producción",
-        error
-      );
-    }
-  }
+  //     return httpResponse.SuccessResponse(
+  //       "Unidad de producción creada correctamente!"
+  //     );
+  //   } catch (error) {
+  //     await prisma.$disconnect();
+  //     return httpResponse.InternalServerErrorException(
+  //       "Error al leer la Unidad de Producción",
+  //       error
+  //     );
+  //   }
+  // }
 }
-
-//   //como hago para tomar campos
-// sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-//   //     if (
-//   //       item.nombre === "" ||
-//   //       item.nota === ""
-//   //       // item.proyecto_id === ""  Esto lo tengo q buscar pero viene con nombre
-//   //     )
-//   //       throw new Error(
-//   //         "Error en crear la Unidad de Produccion de forma masiva"
-//   //       );
-//   //     // const productionUnit = await productionUnitValidation.findByName(
-//   //     //   item.nombre
-//   //     // );
-//   //     await prisma.unidadProduccion.create({
-//   //       data: {
-//   //         nombre: item.nombre,
-//   //         nota: item.nota,
-//   //         proyecto_id: 1,
-//   //         codigo: "120",
-//   //       },
-//   //     });
-// })();
 
 export const productionUnitService = new ProductionUnitService();

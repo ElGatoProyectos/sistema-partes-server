@@ -2,6 +2,18 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 
 class ProductionUnitValidation {
+  async findAll(): Promise<T_HttpResponse> {
+    try {
+      const projects = await prismaProductionUnitRepository.findAll();
+
+      return httpResponse.SuccessResponse("Proyectos encontrados", projects);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar proyecto",
+        error
+      );
+    }
+  }
   async findById(idProductionUnit: number): Promise<T_HttpResponse> {
     try {
       const project = await prismaProductionUnitRepository.findById(

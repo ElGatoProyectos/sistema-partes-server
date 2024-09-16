@@ -11,7 +11,7 @@ class CompanyValidation {
         );
       }
       return httpResponse.SuccessResponse(
-        "El nombre no existe, puede proceguir"
+        "El nombre no existe, puede proseguir"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

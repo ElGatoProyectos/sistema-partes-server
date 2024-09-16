@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { I_CreateRolBD, I_Rol } from "./models/rol.interfaces";
 import { RolRepository } from "./rol.repository";
 import { E_Estado_BD, Rol } from "@prisma/client";
