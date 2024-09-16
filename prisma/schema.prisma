@@ -317,11 +317,15 @@ model AreaObrero {
 model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
-  descripcion_empresa   String?                 @db.Text()
+  descripcion_empresa   String?
   ruc                   String?
-  direccion             String?
+  razon_social          String?
+  direccion_fiscal      String
+  direccion_oficina     String
   nombre_corto          String?
   telefono              String
+  correo                String
+  contacto_responsable  String
   usuario_id            Int
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)

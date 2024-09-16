@@ -10,7 +10,7 @@ import fs from "fs/promises";
 import * as xlsx from "xlsx";
 import appRootPath from "app-root-path";
 import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
-import { UnidadProduccion } from "@prisma/client";
+import { Proyecto, UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
 import { projectValidation } from "@/project/project.validation";
@@ -35,15 +35,8 @@ class ProductionUnitService {
           "No se puede crear la Unidad de Producción con el id del proyecto proporcionado"
         );
       }
-      const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
-      const lastProductionUnitResponse =
-        lastProductionUnit.payload as UnidadProduccion;
 
-      // Incrementar el código en 1
-      const nextCodigo =
-        (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
-
-      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+      const formattedCodigo = await this.getNextProductionUnitCode();
 
       const productionUnit = {
         ...data,
@@ -70,6 +63,18 @@ class ProductionUnitService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  async getNextProductionUnitCode(): Promise<string> {
+    const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
+    const lastProductionUnitResponse =
+      lastProductionUnit.payload as UnidadProduccion;
+
+    // Incrementar el código en 1
+    const nextCodigo = (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
+
+    // Formatear el código con ceros a la izquierda
+    return nextCodigo.toString().padStart(3, "0");
   }
 
   async updateProductionUnit(
@@ -289,53 +294,82 @@ class ProductionUnitService {
     }
   }
 
-  // async registerLincensesMasive(file: any, proyectId: number) {
-  //   try {
-  //     const buffer = file.buffer;
+  async registerProductionUnitMasive(file: any, projectId: number) {
+    try {
+      const buffer = file.buffer;
 
-  //     const workbook = xlsx.read(buffer, { type: "buffer" });
-  //     const sheetName = workbook.SheetNames[0];
-  //     const sheet = workbook.Sheets[sheetName];
-  //     const sheetToJson = xlsx.utils.sheet_to_json(
-  //       sheet
-  //     ) as I_ProductionUnitExcel[];
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(
+        sheet
+      ) as I_ProductionUnitExcel[];
+      const project = await projectValidation.findById(projectId);
+      const responseProject = project.payload as Proyecto;
+      const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
+      const lastProductionUnitResponse =
+        lastProductionUnit.payload as UnidadProduccion;
+      let nextCodigo = (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
 
-  //     await Promise.all(
-  //       //como hago para tomar campos
-  //       sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-  //         if (
-  //           item.nombre === "" ||
-  //           item.nota === ""
-  //           // item.proyecto_id === ""  Esto lo tengo q buscar pero viene con nombre
-  //         )
-  //           throw new Error(
-  //             "Error en crear la Unidad de Produccion de forma masiva"
-  //           );
-  //         // const productionUnit = await productionUnitValidation.findByName(
-  //         //   item.nombre
-  //         // );
-  //         await prisma.unidadProduccion.create({
-  //           data: {
-  //             nombre: item.nombre,
-  //             nota: item.nota,
-  //             proyecto_id: 1,
-  //             codigo: "120",
-  //           },
-  //         });
-  //       })
-  //     );
-  //     await prisma.$disconnect();
-  //     return httpResponse.SuccessResponse(
-  //       "Unidad de producción creada correctamente!"
-  //     );
-  //   } catch (error) {
-  //     await prisma.$disconnect();
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al crear la Unidad de Producción",
-  //       error
-  //     );
-  //   }
-  // }
+      //SINO
+      //const formattedCodigo = await this.getNextProductionUnitCode();
+
+      await Promise.all(
+        sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+          if (item.Nombre === "" || item.Nota === "")
+            throw new Error(
+              "Error al leer el excel ya que no hay dato disponible para leer"
+            );
+          let formattedCodigo = nextCodigo.toString().padStart(3, "0");
+          nextCodigo++; //PARA LA PROXIMA TIENE UNO MÁS
+          await prisma.unidadProduccion.create({
+            data: {
+              codigo: formattedCodigo,
+              nombre: item.Nombre, // Asegúrate de que el campo sea correcto
+              nota: item.Nota,
+              proyecto_id: responseProject.id,
+            },
+          });
+        })
+      );
+
+      // Desconectar prisma después de la operación masiva
+      await prisma.$disconnect();
+
+      return httpResponse.SuccessResponse(
+        "Unidad de producción creada correctamente!"
+      );
+    } catch (error) {
+      await prisma.$disconnect();
+      return httpResponse.InternalServerErrorException(
+        "Error al leer la Unidad de Producción",
+        error
+      );
+    }
+  }
 }
+
+//   //como hago para tomar campos
+// sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+//   //     if (
+//   //       item.nombre === "" ||
+//   //       item.nota === ""
+//   //       // item.proyecto_id === ""  Esto lo tengo q buscar pero viene con nombre
+//   //     )
+//   //       throw new Error(
+//   //         "Error en crear la Unidad de Produccion de forma masiva"
+//   //       );
+//   //     // const productionUnit = await productionUnitValidation.findByName(
+//   //     //   item.nombre
+//   //     // );
+//   //     await prisma.unidadProduccion.create({
+//   //       data: {
+//   //         nombre: item.nombre,
+//   //         nota: item.nota,
+//   //         proyecto_id: 1,
+//   //         codigo: "120",
+//   //       },
+//   //     });
+// })();
 
 export const productionUnitService = new ProductionUnitService();

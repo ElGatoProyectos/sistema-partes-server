@@ -37,10 +37,14 @@ export interface I_CreateUserAndCompany {
   rol_id: string;
   nombre_empresa: string;
   descripcion_empresa: string;
+  direccion_empresa_fiscal: string;
+  direccion_empresa_oficina: string;
   ruc: string;
-  direccion_empresa: string;
   nombre_corto_empresa: string;
   telefono_empresa: string;
+  razon_social: string;
+  email_empresa: string;
+  contacto_responsable: string;
 }
 
 export interface I_CreateUserAndCompanyBody {

@@ -8,6 +8,10 @@ const prouductionUnitRouter = express.Router();
 const prefix = "/unidad-de-produccion";
 
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
+prouductionUnitRouter.post(
+  `${prefix}/upload-excel`,
+  productionUnitController.productionUnitReadExcel
+);
 prouductionUnitRouter.get(
   `${prefix}`,
   productionUnitMiddleware.verifyHeadersFields,

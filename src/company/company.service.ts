@@ -15,6 +15,7 @@ import { largeMinEleven } from "@/common/utils/largeMinEleven";
 import { userValidation } from "@/user/user.validation";
 import { companyValidation } from "./company.validation";
 import { Empresa } from "@prisma/client";
+import { emailValid } from "@/common/utils/email";
 
 class CompanyService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -134,6 +135,16 @@ class CompanyService {
         );
       }
 
+      const resultEmail = emailValid(data.correo);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      const responseEmail = await companyValidation.findByEmail(data.correo);
+      if (!responseEmail.success) return responseEmail;
+
       const companyFormat = {
         ...data,
         usuario_id: Number(data.usuario_id),
@@ -145,6 +156,7 @@ class CompanyService {
         companyMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear empresa",
         error
@@ -174,8 +186,6 @@ class CompanyService {
       await prisma.$disconnect();
     }
   }
-
-  //hacer find user id
 
   async findCompanyByUser(idUser: number) {
     try {
@@ -232,6 +242,25 @@ class CompanyService {
           data.nombre_empresa
         );
         if (!responseRuc.success) return responseRuc;
+      }
+
+      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      if (resultPhoneCompany) {
+        return httpResponse.BadRequestException(
+          "El campo telefono de la empresa debe contener solo números"
+        );
+      }
+
+      const resultEmail = emailValid(data.correo);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      if (company.correo != data.correo) {
+        const responseEmail = await companyValidation.findByEmail(data.correo);
+        if (!responseEmail.success) return responseEmail;
       }
 
       const companyFormat = {

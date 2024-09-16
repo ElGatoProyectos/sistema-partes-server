@@ -22,6 +22,7 @@ import { largeMinEleven } from "@/common/utils/largeMinEleven";
 import { userValidation } from "./user.validation";
 import { rolValidation } from "@/rol/rol.validation";
 import { companyValidation } from "@/company/company.validation";
+import { emailValid } from "@/common/utils/email";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -133,8 +134,8 @@ class UserService {
           `No se encontro el rol ingresado`
         );
 
-      const responseEmail = await userValidation.findByEmail(data.email);
-      if (!responseEmail.success)
+      const responseEmailUser = await userValidation.findByEmail(data.email);
+      if (!responseEmailUser.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
       const responseByDni = await userValidation.findByDni(data.dni);
@@ -201,6 +202,18 @@ class UserService {
       );
       if (!existNameCompany.success) return existNameCompany;
 
+      const resultEmail = emailValid(data.email_empresa);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      const responseEmailCompany = await companyValidation.findByEmail(
+        data.email_empresa
+      );
+      if (!responseEmailCompany.success) return responseEmailCompany;
+
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
       const userFormat: I_CreateUserBD = {
         email: data.email,
@@ -218,9 +231,13 @@ class UserService {
         nombre_empresa: data.nombre_empresa,
         descripcion_empresa: data.descripcion_empresa,
         ruc: data.ruc,
-        direccion: data.direccion_empresa,
+        razon_social: data.razon_social,
+        direccion_fiscal: data.direccion_empresa_fiscal,
+        direccion_oficina: data.direccion_empresa_oficina,
         nombre_corto: data.nombre_corto_empresa,
         telefono: data.telefono_empresa,
+        correo: data.email_empresa,
+        contacto_responsable: data.contacto_responsable,
         usuario_id: resultUser.id,
       };
       const resultCompany = await prismaCompanyRepository.createCompany(
