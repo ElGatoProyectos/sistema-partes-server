@@ -1,7 +1,7 @@
 import prisma from "@/config/prisma.config";
-import { I_CreateRolBD } from "./models/rol.interfaces";
+import { I_CreateRolBD, I_Rol } from "./models/rol.interfaces";
 import { RolRepository } from "./rol.repository";
-import { Rol } from "@prisma/client";
+import { E_Estado_BD, Rol } from "@prisma/client";
 
 class PrismaRolRepository implements RolRepository {
   async existsName(name: string): Promise<Rol | null> {
@@ -23,10 +23,11 @@ class PrismaRolRepository implements RolRepository {
     const roles = await prisma.rol.findMany();
     return roles;
   }
-  async findById(idRol: number): Promise<Rol | null> {
+  async findById(idRol: number): Promise<I_Rol | null> {
     const rol = await prisma.rol.findFirst({
       where: {
         id: idRol,
+        eliminado: E_Estado_BD.n,
       },
     });
     return rol;

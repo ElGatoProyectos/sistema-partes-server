@@ -11,7 +11,7 @@ class ProjectValidation {
       return httpResponse.SuccessResponse("Proyecto encontrado", project);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     }

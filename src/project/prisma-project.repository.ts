@@ -12,7 +12,7 @@ class PrismaProjectRepository implements ProjectRepository {
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ projects: I_Project[]; total: number } | null> {
+  ): Promise<{ projects: I_Project[]; total: number }> {
     const [projects, total]: [I_Project[], number] = await prisma.$transaction([
       prisma.proyecto.findMany({
         where: {
@@ -43,7 +43,7 @@ class PrismaProjectRepository implements ProjectRepository {
     idCompany: number,
     skip: number,
     limit: number
-  ): Promise<{ projects: I_Project[]; total: number } | null> {
+  ): Promise<{ projects: I_Project[]; total: number }> {
     const [projects, total]: [I_Project[], number] = await prisma.$transaction([
       prisma.proyecto.findMany({
         where: {
@@ -70,6 +70,9 @@ class PrismaProjectRepository implements ProjectRepository {
     const project = await prisma.proyecto.findFirst({
       where: {
         id: idProject,
+      },
+      omit: {
+        eliminado: true,
       },
     });
     return project;

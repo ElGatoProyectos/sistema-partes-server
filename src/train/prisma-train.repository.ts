@@ -4,12 +4,19 @@ import prisma from "@/config/prisma.config";
 import { TrainRepository } from "./train.repository";
 import {
   I_CreateTrainBD,
-  I_Cuadrilla_Train,
   I_Train,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
 
 class PrismaTrainRepository implements TrainRepository {
+  async existsName(name: string): Promise<Tren | null> {
+    const train = await prisma.tren.findFirst({
+      where: {
+        nombre: name,
+      },
+    });
+    return train;
+  }
   async updateCuadrillaByIdTrain(
     idTrain: number,
     workers: number,
@@ -28,8 +35,12 @@ class PrismaTrainRepository implements TrainRepository {
     });
     return updateTrain;
   }
+
   async codeMoreHigh(): Promise<Tren | null> {
     const lastTrain = await prisma.tren.findFirst({
+      where: {
+        eliminado: E_Estado_BD.n,
+      },
       orderBy: { codigo: "desc" },
     });
     return lastTrain;
@@ -52,7 +63,7 @@ class PrismaTrainRepository implements TrainRepository {
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ trains: I_Train[]; total: number } | null> {
+  ): Promise<{ trains: I_Train[]; total: number }> {
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
         where: {
@@ -82,7 +93,7 @@ class PrismaTrainRepository implements TrainRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ trains: I_Train[]; total: number } | null> {
+  ): Promise<{ trains: I_Train[]; total: number }> {
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
         where: {
@@ -107,6 +118,7 @@ class PrismaTrainRepository implements TrainRepository {
     const train = await prisma.tren.findFirst({
       where: {
         id: idTrain,
+        eliminado: E_Estado_BD.n,
       },
       omit: {
         eliminado: true,
@@ -119,6 +131,7 @@ class PrismaTrainRepository implements TrainRepository {
     const train = await prisma.tren.findFirst({
       where: {
         id: idTrain,
+        eliminado: E_Estado_BD.n,
       },
     });
 

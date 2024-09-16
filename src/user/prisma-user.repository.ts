@@ -12,6 +12,7 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.update({
       where: {
         id: idUser,
+        eliminado: E_Estado_BD.n,
       },
       data: {
         rol_id: idRol,
@@ -23,6 +24,7 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         email,
+        eliminado: E_Estado_BD.n,
       },
     });
     return user;
@@ -31,7 +33,7 @@ class PrismaUserRepository implements UserRepository {
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ users: Usuario[]; total: number } | null> {
+  ): Promise<{ users: Usuario[]; total: number }> {
     const [users, total]: [Usuario[], number] = await prisma.$transaction([
       prisma.usuario.findMany({
         where: {
@@ -58,6 +60,7 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         dni,
+        eliminado: E_Estado_BD.n,
       },
     });
     return user;
@@ -66,6 +69,7 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
+        eliminado: E_Estado_BD.n,
       },
     });
 
@@ -97,7 +101,7 @@ class PrismaUserRepository implements UserRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ users: I_User[]; total: number } | null> {
+  ): Promise<{ users: I_User[]; total: number }> {
     const [users, total]: [I_User[], number] = await prisma.$transaction([
       prisma.usuario.findMany({
         where: {
@@ -123,6 +127,7 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
+        eliminado: E_Estado_BD.n,
       },
       include: {
         Rol: true,

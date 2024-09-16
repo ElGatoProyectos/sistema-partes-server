@@ -15,6 +15,10 @@ import { T_FindAll } from "@/common/models/pagination.types";
 class TrainService {
   async createTrain(data: I_CreateTrainUnitBody): Promise<T_HttpResponse> {
     try {
+      const resultTrain = await trainValidation.findByName(data.nombre);
+      if (!resultTrain.success) {
+        return resultTrain;
+      }
       const resultIdProject = await projectValidation.findById(
         Number(data.proyecto_id)
       );
@@ -23,6 +27,7 @@ class TrainService {
           "No se puede crear el Tren con el id del Proyecto proporcionado"
         );
       }
+
       const lastTrain = await trainValidation.codeMoreHigh();
       const lastTrainResponse = lastTrain.payload as Tren;
 
@@ -70,6 +75,13 @@ class TrainService {
         return httpResponse.BadRequestException(
           "No se pudo encontrar el id del Tren que se quiere editar"
         );
+      }
+      const resultTrainFind = resultIdTrain.payload as Tren;
+      if (resultTrainFind.nombre != data.nombre) {
+        const resultTrain = await trainValidation.findByName(data.nombre);
+        if (!resultTrain.success) {
+          return resultTrain;
+        }
       }
       const resultIdProject = await projectValidation.findById(
         Number(data.proyecto_id)
@@ -164,9 +176,6 @@ class TrainService {
         data.queryParams.limit
       );
 
-      if (!result) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
-      }
       const { trains, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -196,8 +205,7 @@ class TrainService {
         skip,
         data.queryParams.limit
       );
-      if (!result)
-        return httpResponse.SuccessResponse("No se encontraron trenes.", []);
+
       const { trains, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {

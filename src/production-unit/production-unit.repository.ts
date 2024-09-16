@@ -15,6 +15,8 @@ export abstract class ProudctionUnitRepository {
     idUser: number
   ): void {}
 
+  existsName(name: string): void {}
+
   updateStatusProductionUnit(idUser: number): void {}
 
   searchNameProductionUnit(name: string, skip: number, limit: number): void {}

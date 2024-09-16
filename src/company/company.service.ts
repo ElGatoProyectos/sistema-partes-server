@@ -14,6 +14,8 @@ import { wordIsNumeric } from "@/common/utils/number";
 import { largeMinEleven } from "@/common/utils/largeMinEleven";
 import { userValidation } from "@/user/user.validation";
 import { companyValidation } from "./company.validation";
+import { Empresa } from "@prisma/client";
+import { emailValid } from "@/common/utils/email";
 
 class CompanyService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -23,11 +25,6 @@ class CompanyService {
         skip,
         data.queryParams.limit
       );
-      if (!result)
-        return httpResponse.SuccessResponse(
-          "No se encontraron resultados.",
-          []
-        );
 
       const { companies, total } = result;
       //numero de pagina donde estas
@@ -101,10 +98,20 @@ class CompanyService {
         return userResponse;
       }
 
-      const responseEmail = await companyValidation.findByName(
+      const responseName = await companyValidation.findByName(
         data.nombre_empresa
       );
-      if (!responseEmail.success) return responseEmail;
+      if (!responseName.success) return responseName;
+
+      const responseNameShort = await companyValidation.findByNameShort(
+        data.nombre_empresa
+      );
+      if (!responseNameShort.success) return responseNameShort;
+
+      const responseRuc = await companyValidation.findByRuc(
+        data.nombre_empresa
+      );
+      if (!responseRuc.success) return responseRuc;
 
       if (data.ruc) {
         const resultRuc = wordIsNumeric(data.ruc);
@@ -128,6 +135,16 @@ class CompanyService {
         );
       }
 
+      const resultEmail = emailValid(data.correo);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      const responseEmail = await companyValidation.findByEmail(data.correo);
+      if (!responseEmail.success) return responseEmail;
+
       const companyFormat = {
         ...data,
         usuario_id: Number(data.usuario_id),
@@ -139,6 +156,7 @@ class CompanyService {
         companyMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear empresa",
         error
@@ -168,8 +186,6 @@ class CompanyService {
       await prisma.$disconnect();
     }
   }
-
-  //hacer find user id
 
   async findCompanyByUser(idUser: number) {
     try {
@@ -205,13 +221,48 @@ class CompanyService {
       );
       if (!userResponse.success) return userResponse;
 
-      const responseEmail = await companyValidation.findByName(
-        data.nombre_empresa
-      );
-      if (!responseEmail.success)
-        return httpResponse.BadRequestException(
-          `El nombre ingresado ya existe`
+      const company = companyResponseId.payload as Empresa;
+
+      if (company.nombre_empresa != data.nombre_empresa) {
+        const responseName = await companyValidation.findByName(
+          data.nombre_empresa
         );
+        if (!responseName.success) return responseName;
+      }
+
+      if (company.nombre_corto != data.nombre_corto) {
+        const responseNameShort = await companyValidation.findByNameShort(
+          data.nombre_empresa
+        );
+        if (!responseNameShort.success) return responseNameShort;
+      }
+
+      if (company.ruc != data.ruc) {
+        const responseRuc = await companyValidation.findByRuc(
+          data.nombre_empresa
+        );
+        if (!responseRuc.success) return responseRuc;
+      }
+
+      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      if (resultPhoneCompany) {
+        return httpResponse.BadRequestException(
+          "El campo telefono de la empresa debe contener solo números"
+        );
+      }
+
+      const resultEmail = emailValid(data.correo);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      if (company.correo != data.correo) {
+        const responseEmail = await companyValidation.findByEmail(data.correo);
+        if (!responseEmail.success) return responseEmail;
+      }
+
       const companyFormat = {
         ...data,
         usuario_id: Number(data.usuario_id),
@@ -264,9 +315,6 @@ class CompanyService {
         skip,
         data.queryParams.limit
       );
-      if (!result) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
-      }
       const { companies, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {

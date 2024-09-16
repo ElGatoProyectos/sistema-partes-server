@@ -30,7 +30,7 @@ class AuthRoleMiddleware {
       response.status(customError.statusCode).send(customError);
     }
   }
-  authViewProject(
+  authAdminAndProjectManager(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction

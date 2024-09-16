@@ -8,10 +8,38 @@ import {
 import prisma from "@/config/prisma.config";
 
 class PrismaCompanyRepository implements CompanyRepository {
+  async existsEmail(email: string): Promise<Empresa | null> {
+    const company = await prisma.empresa.findFirst({
+      where: {
+        correo: email,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return company;
+  }
+  async existsNameShort(nameShort: string): Promise<Empresa | null> {
+    const company = await prisma.empresa.findFirst({
+      where: {
+        nombre_corto: nameShort,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return company;
+  }
+  async existsRuc(ruc: string): Promise<Empresa | null> {
+    const company = await prisma.empresa.findFirst({
+      where: {
+        ruc: ruc,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return company;
+  }
   async findCompanyByUser(idUser: number): Promise<Empresa | null> {
     const companyByUser = await prisma.empresa.findFirst({
       where: {
         usuario_id: idUser,
+        eliminado: E_Estado_BD.n,
       },
     });
     return companyByUser;
@@ -28,7 +56,7 @@ class PrismaCompanyRepository implements CompanyRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ companies: I_Company[]; total: number } | null> {
+  ): Promise<{ companies: I_Company[]; total: number }> {
     const [companies, total]: [I_Company[], number] = await prisma.$transaction(
       [
         prisma.empresa.findMany({
@@ -50,10 +78,14 @@ class PrismaCompanyRepository implements CompanyRepository {
     );
     return { companies, total };
   }
-  async findById(idCompany: number): Promise<Empresa | null> {
+  async findById(idCompany: number): Promise<I_Company | null> {
     const company = await prisma.empresa.findFirst({
       where: {
         id: idCompany,
+        eliminado: E_Estado_BD.n,
+      },
+      omit: {
+        eliminado: true,
       },
     });
     return company;
@@ -81,6 +113,7 @@ class PrismaCompanyRepository implements CompanyRepository {
     const company = await prisma.empresa.findFirst({
       where: {
         id: idCompany,
+        eliminado: E_Estado_BD.n,
       },
     });
 
@@ -100,7 +133,7 @@ class PrismaCompanyRepository implements CompanyRepository {
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ companies: I_Company[]; total: number } | null> {
+  ): Promise<{ companies: I_Company[]; total: number }> {
     const [companies, total]: [I_Company[], number] = await prisma.$transaction(
       [
         prisma.empresa.findMany({

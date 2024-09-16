@@ -12,7 +12,10 @@ import { prouductionUnitDto } from "./dto/production-unit.dto";
 import { productionUnitService } from "./production-unit.service";
 import { UnidadProduccion } from "@prisma/client";
 import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
-import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
+import {
+  I_ImportExcelRequest,
+  I_UpdateProductionUnitBody,
+} from "./models/production-unit.interface";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -223,6 +226,36 @@ class ProductionUnitController {
     const result = await productionUnitService.updateStatusProject(idProject);
     response.status(result.statusCode).json(result);
   }
+
+  productionUnitReadExcel = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    // Usando multer para manejar la subida de archivos en memoria
+    upload.single("production-unit")(request, response, async (err: any) => {
+      if (err) {
+        return response.status(500).json({ error: "Error uploading file" });
+      }
+      const responseBody = request.body as I_ImportExcelRequest;
+      const file = request.file;
+      if (!file) {
+        return response.status(400).json({ error: "No file uploaded" });
+      }
+
+      try {
+        const serviceResponse =
+          await productionUnitService.registerProductionUnitMasive(
+            file,
+            +responseBody.idProject
+          );
+
+        response.status(serviceResponse.statusCode).json(serviceResponse);
+      } catch (error) {
+        console.log("entro en error general");
+        response.status(500).json(error);
+      }
+    });
+  };
 }
 
 export const productionUnitController = new ProductionUnitController();

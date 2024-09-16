@@ -7,8 +7,6 @@ class RolService {
   async findAll(): Promise<T_HttpResponse> {
     try {
       const result = await prismaRolRepository.findAll();
-      if (!result)
-        return httpResponse.SuccessResponse("No se encontraron roles.", 0);
 
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los roles",
@@ -35,7 +33,6 @@ class RolService {
       const result = await prismaRolRepository.createRol(data);
       return httpResponse.CreatedResponse("Rol creado correctamente", result);
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         " Error al crear el rol",
         error

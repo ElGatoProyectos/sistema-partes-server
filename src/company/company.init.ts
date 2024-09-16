@@ -25,7 +25,7 @@ companyRouter.get(
 );
 companyRouter.get(
   `${prefix}/file/:id`,
-  authRoleMiddleware.authViewProject,
+  companyMiddleware.verifyHeadersFields,
   authRoleMiddleware.authAdmin,
   companyController.findImage
 );

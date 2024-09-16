@@ -17,6 +17,8 @@ export abstract class TrainRepository {
     pawns: number
   ): void {}
 
+  existsName(name: string): void {}
+
   updateTrain(data: I_UpdateTrainBody, idUser: number): void {}
 
   updateStatusTrain(idUser: number): void {}

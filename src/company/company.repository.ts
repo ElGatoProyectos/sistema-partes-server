@@ -8,7 +8,13 @@ export abstract class CompanyRepository {
 
   findById(idCompany: number): void {}
 
+  existsEmail(email: string): void {}
+
   existsName(name: string): void {}
+
+  existsNameShort(name: string): void {}
+
+  existsRuc(name: string): void {}
 
   createCompany(data: I_CreateCompanyBD): void {}
 

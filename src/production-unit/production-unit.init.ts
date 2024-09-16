@@ -8,35 +8,39 @@ const prouductionUnitRouter = express.Router();
 const prefix = "/unidad-de-produccion";
 
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
+prouductionUnitRouter.post(
+  `${prefix}/upload-excel`,
+  productionUnitController.productionUnitReadExcel
+);
 prouductionUnitRouter.get(
   `${prefix}`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
   requestMiddleware.validatePagination,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.findImage
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authViewProject,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.updateStatus
 );
 

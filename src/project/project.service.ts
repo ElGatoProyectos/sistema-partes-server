@@ -30,15 +30,15 @@ class ProjectService {
   async createProject(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
     try {
       data.empresa_id = Number(data.empresa_id);
-      const resultCompany = await companyValidation.findById(data.empresa_id);
-      if (!resultCompany.success) {
+      const resultProject = await companyValidation.findById(data.empresa_id);
+      if (!resultProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el proyecto con el id de la empresa proporcionado"
         );
       }
 
-      const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
-      if (resultCodigoProyecto) {
+      const resultCodeProject = this.isNumeric(data.codigo_proyecto);
+      if (resultCodeProject) {
         return httpResponse.BadRequestException(
           "El campo codigo proyecto debe contener solo números"
         );
@@ -181,10 +181,6 @@ class ProjectService {
         skip,
         data.queryParams.limit
       );
-
-      if (!result) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
-      }
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -222,8 +218,6 @@ class ProjectService {
         skip,
         data.queryParams.limit
       );
-      if (!result)
-        return httpResponse.SuccessResponse("No se encontraron projectos.", []);
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {

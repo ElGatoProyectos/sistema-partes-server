@@ -7,21 +7,29 @@ export class CompanyResponseMapper implements Omit<Empresa, "eliminado"> {
   ruc: string;
   nombre_corto: string;
   telefono: string;
-  direccion: string;
   usuario_id: number;
   fecha_creacion: Date;
+  razon_social: string;
+  direccion_fiscal: string;
+  direccion_oficina: string;
+  correo: string;
+  contacto_responsable: string;
 
-  constructor(user: Empresa) {
-    this.id = user.id;
-    this.nombre_empresa = user.nombre_empresa;
-    this.descripcion_empresa = user.descripcion_empresa
-      ? user.descripcion_empresa
+  constructor(company: Empresa) {
+    this.id = company.id;
+    this.nombre_empresa = company.nombre_empresa;
+    this.descripcion_empresa = company.descripcion_empresa
+      ? company.descripcion_empresa
       : "";
-    this.ruc = user.ruc ? user.ruc : "";
-    this.nombre_corto = user.nombre_corto ? user.nombre_corto : "";
-    this.telefono = user.telefono ? user.telefono : "";
-    this.direccion = user.direccion ? user.direccion : "";
-    this.usuario_id = user.usuario_id;
-    this.fecha_creacion = user.fecha_creacion;
+    this.ruc = company.ruc ? company.ruc : "";
+    this.nombre_corto = company.nombre_corto ? company.nombre_corto : "";
+    this.telefono = company.telefono ? company.telefono : "";
+    this.direccion_fiscal = company.direccion_fiscal;
+    this.direccion_oficina = company.direccion_oficina;
+    this.usuario_id = company.usuario_id;
+    this.fecha_creacion = company.fecha_creacion;
+    this.razon_social = company.razon_social ? company.razon_social : "";
+    this.correo = company.correo;
+    this.contacto_responsable = company.contacto_responsable;
   }
 }

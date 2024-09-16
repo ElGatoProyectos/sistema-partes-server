@@ -75,11 +75,12 @@ enum E_Proyecto_Estado {
 }
 
 model Rol {
-  id                Int       @id @default(autoincrement())
+  id                Int         @id @default(autoincrement())
   nombre_secundario String
   descripcion       String
   rol               String
   Usuario           Usuario[]
+  eliminado         E_Estado_BD @default(n)
 }
 
 //[success] actual
@@ -129,7 +130,7 @@ model ManoObra {
   n_libreta_militar           String?
   n_pasaporte                 String?
   email_corporativo           String?
-  brebete                     String?
+  brevete                     String?
   grado_instruccion           String?
   ruc                         String?
   tipo_cese                   String?
@@ -143,16 +144,18 @@ model ManoObra {
   tiempo_refrigerio           String?
   fecha_creacion              DateTime                      @default(now())
   //termina básico
-  unidad                      Int
-  banco                       String
   cuenta                      String                        @db.Text()
   fecha_nacimiento            DateTime                      @db.Date //año más dia
   escolaridad                 String
   usuario_id                  Int
-  tipo_obrero_id              Int                           @unique
-  origen_obrero_id            Int                           @unique
-  especialidad_obrero_id      Int                           @unique
-  categoria_obrero_id         Int                           @unique
+  tipo_obrero_id              Int
+  origen_obrero_id            Int
+  especialidad_obrero_id      Int
+  categoria_obrero_id         Int
+  unidad_id                   Int
+  banco_id                    Int
+  Banco                       Banco                         @relation(fields: [banco_id], references: [id])
+  Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id])
   Asistencia                  Asistencia[]
   CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id])
   EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id])
@@ -165,6 +168,12 @@ model ManoObra {
   ManoObraExperienciaLaboral  ManoObraExperienciaLaboral[]
   ManoObraEstudios            ManoObraEstudios[]
   detalle_combo_mo            detalle_combo_mo[]
+}
+
+model Banco {
+  id       Int        @id @default(autoincrement())
+  nombre   String
+  ManoObra ManoObra[]
 }
 
 //[note] modulo futuro
@@ -308,17 +317,23 @@ model AreaObrero {
 model Empresa {
   id                    Int                     @id @default(autoincrement())
   nombre_empresa        String
-  descripcion_empresa   String?                 @db.Text()
+  descripcion_empresa   String?
   ruc                   String?
-  direccion             String?
+  razon_social          String?
+  direccion_fiscal      String
+  direccion_oficina     String
   nombre_corto          String?
   telefono              String
+  correo                String
+  contacto_responsable  String
   usuario_id            Int
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   Proyecto              Proyecto[]
+  Unidad                Unidad[]
+  IndiceUnificado       IndiceUnificado[]
 }
 
 //[success] actual
@@ -417,15 +432,19 @@ model Partida {
   id_interno            String                  @unique
   item                  String
   partida               String
-  unidad                String
   metrado_inicial       Float
   metrado_total         Float
   precio                Float
   parcial               Float?                  @default(0)
-  total                 Float?                  @default(0)
+  mano_de_obra_unitaria String
+  material_unitario     String
+  equipo_unitario       String
+  subcontrata_varios    String
   fecha_creacion        DateTime                @default(now())
+  unidad_id             Int
   usuario_id            Int
   proyecto_id           Int
+  Unidad                Unidad                  @relation(fields: [unidad_id], references: [id])
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
@@ -470,54 +489,87 @@ model CategoriaObrero {
   id                  Int                   @id @default(autoincrement())
   nombre              String
   fecha_creacion      DateTime              @default(now())
+  eliminado           E_Estado_BD           @default(n)
   ManoObra            ManoObra[]
   DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
 
-//[success] actual
+//[success] actual 
 model TipoObrero {
-  id             Int        @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   nombre         String
-  fecha_creacion DateTime   @default(now())
+  fecha_creacion DateTime    @default(now())
+  eliminado      E_Estado_BD @default(n)
   ManoObra       ManoObra[]
 }
 
 //[success] actual
 model OrigenObrero {
-  id             Int        @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   nombre         String
-  fecha_creacion DateTime   @default(now())
+  fecha_creacion DateTime    @default(now())
+  eliminado      E_Estado_BD @default(n)
   ManoObra       ManoObra[]
 }
 
 //[success] actual
 model EspecialidadObrero {
-  id             Int        @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   nombre         String
-  fecha_creacion DateTime   @default(now())
+  fecha_creacion DateTime    @default(now())
+  eliminado      E_Estado_BD @default(n)
   ManoObra       ManoObra[]
 }
 
 //[success] actual
 model Recurso {
   id                 Int                  @id @default(autoincrement())
-  id_indice          String               @unique
-  id_unificado       String               @unique
   codigo             String               @unique
-  recurso            String
-  unidad             String
+  nombre             String
+  eliminado          E_Estado_BD          @default(n)
   precio             Float
   fecha_creacion     DateTime             @default(now())
+  unidad_id          Int
+  id_unificado       Int
+  Unidad             Unidad               @relation(fields: [unidad_id], references: [id])
+  IndiceUnificado    IndiceUnificado      @relation(fields: [id_unificado], references: [id])
   categoria_recurso  Int                  @unique
   CategoriaRecurso   CategoriaRecurso     @relation(fields: [categoria_recurso], references: [id])
   ParteDiarioRecurso ParteDiarioRecurso[]
 }
 
+model Unidad {
+  id             Int         @id @default(autoincrement())
+  nombre         String
+  simbolo        String
+  descripcion    String
+  empresa_id     Int
+  Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
+  fecha_creacion DateTime    @default(now())
+  eliminado      E_Estado_BD @default(n)
+  Partida        Partida[]
+  Recurso        Recurso[]
+  ManoObra       ManoObra[]
+}
+
+model IndiceUnificado {
+  id             Int         @id @default(autoincrement())
+  nombre         String
+  simbolo        String
+  comentario     String
+  empresa_id     Int
+  fecha_creacion DateTime    @default(now())
+  Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
+  Recurso        Recurso[]
+  eliminado      E_Estado_BD @default(n)
+}
+
 //[success] actual
 model CategoriaRecurso {
-  id             Int       @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   nombre         String
-  fecha_creacion DateTime  @default(now())
+  fecha_creacion DateTime    @default(now())
+  eliminado      E_Estado_BD @default(n)
   Recurso        Recurso[]
 }
 
@@ -555,6 +607,7 @@ model ParteDiario {
   distanciamiento        E_Estado_BD?
   protocolo_ingreso      E_Estado_BD?
   protocolo_salida       E_Estado_BD?
+  eliminado              E_Estado_BD          @default(n)
   riesto_parte_diario_id Int
   trabajo_id             Int                  @unique
   RiesgoParteDiario      RiesgoParteDiario    @relation(fields: [riesto_parte_diario_id], references: [id])

@@ -19,6 +19,28 @@ class ProductionUnitValidation {
     }
   }
 
+  async findByName(name: string): Promise<T_HttpResponse> {
+    try {
+      const productionUnit = await prismaProductionUnitRepository.existsName(
+        name
+      );
+      if (productionUnit) {
+        return httpResponse.NotFoundException(
+          "El Nombre de la Unidad de Producción ya existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Nombre de la Unidad de Producción no encontrado",
+        productionUnit
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar Unidad de Producción",
+        error
+      );
+    }
+  }
+
   async codeMoreHigh(): Promise<T_HttpResponse> {
     try {
       const productionUnit =

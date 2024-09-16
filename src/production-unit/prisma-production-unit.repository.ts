@@ -8,8 +8,20 @@ import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
+  async existsName(name: string): Promise<UnidadProduccion | null> {
+    const productionUnit = await prisma.unidadProduccion.findFirst({
+      where: {
+        nombre: name,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return productionUnit;
+  }
   async codeMoreHigh(): Promise<UnidadProduccion | null> {
     const lastProductionUnit = await prisma.unidadProduccion.findFirst({
+      where: {
+        eliminado: E_Estado_BD.n,
+      },
       orderBy: { codigo: "desc" },
     });
     return lastProductionUnit;
@@ -37,7 +49,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     name: string,
     skip: number,
     limit: number
-  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number } | null> {
+  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
@@ -68,7 +80,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
   async findAll(
     skip: number,
     limit: number
-  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number } | null> {
+  ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
