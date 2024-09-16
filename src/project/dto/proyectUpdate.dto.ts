@@ -12,4 +12,12 @@ export const proyectoDtoUpdate = z.object({
   fecha_fin: z.string().optional(),
   plazo_proyecto: z.string().optional(),
   codigo_proyecto: z.string().optional(),
+  color_proyecto: z.string().optional(),
+  color_primario: z.string(),
+  color_personalizado: z.string(),
+  color_linea: z.string(),
+  color_detalle: z.string(),
+  color_menu: z.string(),
+  color_submenu: z.string(),
+  empresa_id: z.string(),
 });
