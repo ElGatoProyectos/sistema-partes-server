@@ -319,6 +319,7 @@ class ProductionUnitService {
       }
       let nextCodigo = maxCodigo == null ? 1 : maxCodigo + 1;
       let errors: any = [];
+      console.log("el codigo va a ser " + nextCodigo);
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
           try {
