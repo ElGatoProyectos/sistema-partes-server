@@ -1,3 +1,4 @@
+import { bcryptService } from "../src/auth/bcrypt.service";
 import prisma from "../src/config/prisma.config";
 import { I_CreateRolBody, I_Rol } from "../src/rol/models/rol.interfaces";
 import { rolValidation } from "../src/rol/rol.validation";
@@ -15,7 +16,7 @@ async function main() {
     dni: "12345678",
     nombre_completo: "Don Alejandro",
     telefono: "26112345677",
-    contrasena: "123456",
+    contrasena: bcryptService.hashPassword("1234567"),
     limite_proyecto: 0,
     limite_usuarios: 0,
     rol_id: 1,

@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
 
 class BcryptService {
   comparePassword(passwordBody: string, passwordUser: string): Boolean {
