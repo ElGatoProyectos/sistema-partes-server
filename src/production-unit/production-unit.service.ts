@@ -294,62 +294,68 @@ class ProductionUnitService {
     }
   }
 
-  // async registerProductionUnitMasive(file: any, projectId: number) {
-  //   try {
-  //     const buffer = file.buffer;
+  async registerProductionUnitMasive(file: any, projectId: number) {
+    try {
+      const buffer = file.buffer;
 
-  //     const workbook = xlsx.read(buffer, { type: "buffer" });
-  //     const sheetName = workbook.SheetNames[0];
-  //     const sheet = workbook.Sheets[sheetName];
-  //     const sheetToJson = xlsx.utils.sheet_to_json(
-  //       sheet
-  //     ) as I_ProductionUnitExcel[];
-  //     const project = await projectValidation.findById(projectId);
-  //     const responseProject = project.payload as Proyecto;
-  //     const productionUnits = await prismaProductionUnitRepository.findAll();
-  //     const productionUnitsNumber = productionUnits
-  //       .map((productionUnit) => productionUnit.codigo)
-  //       .map(Number);
-  //     const maxCodigo = Math.max(...productionUnitsNumber);
-  //     let nextCodigo = maxCodigo + 1;
-  //     let errors: { nombre: number; fila: any }[] = [];
-  //     await Promise.all(
-  //       sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-  //         try {
-  //           let formattedCodigo = nextCodigo.toString().padStart(3, "0");
-  //           nextCodigo++;
-  //           await prisma.unidadProduccion.create({
-  //             data: {
-  //               codigo: formattedCodigo,
-  //               nombre: item.Nombre, // Asegúrate de que el campo sea correcto
-  //               nota: item.Nota,
-  //               proyecto_id: responseProject.id,
-  //             },
-  //           });
-  //         } catch {
-  //           {
-  //             errors.push({});
-  //           }
-  //         }
-  //       })
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(
+        sheet
+      ) as I_ProductionUnitExcel[];
+      let index = 2;
+      const project = await projectValidation.findById(projectId);
+      const responseProject = project.payload as Proyecto;
+      const productionUnits = await prismaProductionUnitRepository.findAll();
+      let maxCodigo;
+      if (productionUnits.length == 0) {
+        maxCodigo = 1;
+      } else {
+        const productionUnitsNumber = productionUnits
+          .map((productionUnit) => productionUnit.codigo)
+          .map(Number);
+        maxCodigo = Math.max(...productionUnitsNumber);
+      }
+      let nextCodigo = maxCodigo == null ? 1 : maxCodigo + 1;
+      let errors: any = [];
+      await Promise.all(
+        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+          index++;
+          try {
+            let formattedCodigo = nextCodigo.toString().padStart(3, "0");
+            nextCodigo++;
+            await prisma.unidadProduccion.create({
+              data: {
+                codigo: formattedCodigo,
+                nombre: item.Nombre, // Asegúrate de que el campo sea correcto
+                nota: item.Nota,
+                proyecto_id: responseProject.id,
+              },
+            });
+          } catch (error) {
+            // console.log(error);
+            errors.push("fila index " + index);
+          }
+        })
+      );
 
-  //       //contirnue
-  //     );
+      // Desconectar prisma después de la operación masiva
+      await prisma.$disconnect();
 
-  //     // Desconectar prisma después de la operación masiva
-  //     await prisma.$disconnect();
-
-  //     return httpResponse.SuccessResponse(
-  //       "Unidad de producción creada correctamente!"
-  //     );
-  //   } catch (error) {
-  //     await prisma.$disconnect();
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al leer la Unidad de Producción",
-  //       error
-  //     );
-  //   }
-  // }
+      return httpResponse.SuccessResponse(
+        "Unidad de producción creada correctamente!",
+        errors
+      );
+    } catch (error) {
+      console.log(error);
+      await prisma.$disconnect();
+      return httpResponse.InternalServerErrorException(
+        "Error al leer la Unidad de Producción",
+        error
+      );
+    }
+  }
 }
 
 export const productionUnitService = new ProductionUnitService();
