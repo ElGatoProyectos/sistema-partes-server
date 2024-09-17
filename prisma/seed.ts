@@ -6,10 +6,15 @@ import { I_CreateUserBD } from "../src/user/models/user.interface";
 import { userValidation } from "../src/user/user.validation";
 
 async function main() {
-  const rol = {
+  const rolAdmin = {
     nombre_secundario: "SUPER ADMIN2",
     descripcion: "TIENE EL PODER DE TODO2",
     rol: "ADMIN",
+  };
+  const rolUser = {
+    nombre_secundario: "USUARIO",
+    descripcion: "TIENE EL PODER DE USUARIO",
+    rol: "USER",
   };
   const user = {
     email: "ale@gmail.com",
@@ -19,10 +24,10 @@ async function main() {
     contrasena: bcryptService.hashPassword("1234567"),
     limite_proyecto: 0,
     limite_usuarios: 0,
-    rol_id: 1,
   };
 
-  await rolValidation.createRol(rol as I_CreateRolBody);
+  await rolValidation.createRol(rolAdmin as I_CreateRolBody);
+  await rolValidation.createRol(rolUser as I_CreateRolBody);
   await userValidation.createUser(user as I_CreateUserBD);
 }
 

@@ -12,12 +12,16 @@ import trainRouter from "./train/train.init";
 import resourseCategoryRouter from "./resourseCategory/resourseCategory.init";
 import unitRouter from "./unit/unit.init";
 import unifiedIndexRouter from "./unifiedIndex/unifiedIndex.init";
-
+import cors from "cors";
 const globalPrefix = "/api";
 
 const app = express();
 
 app.use(express.json());
+var corsOptions = {
+  origin: "*",
+};
+app.use(cors(corsOptions));
 
 app.use(globalPrefix, userRouter);
 app.use(globalPrefix, authRouter);

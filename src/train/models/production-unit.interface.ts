@@ -14,3 +14,10 @@ export interface I_Cuadrilla_Train {
   official: number;
   pawns: number;
 }
+export interface I_ProductionUnitExcel {
+  Nombre: string;
+  Cuadrilla: string;
+}
+export interface I_ImportExcelRequest {
+  idProject: string;
+}

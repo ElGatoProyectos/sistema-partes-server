@@ -1,4 +1,4 @@
-import { Usuario } from "@prisma/client";
+import { Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserBD,
@@ -23,6 +23,7 @@ import { userValidation } from "./user.validation";
 import { rolValidation } from "@/rol/rol.validation";
 import { companyValidation } from "@/company/company.validation";
 import { emailValid } from "@/common/utils/email";
+import { prismaRolRepository } from "@/rol/prisma-rol.repository";
 
 class UserService {
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
@@ -72,12 +73,6 @@ class UserService {
 
   async createUser(data: I_CreateUserBody): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolValidation.findById(Number(data.rol_id));
-      if (!roleResponse.success)
-        return httpResponse.BadRequestException(
-          `No se encontro el rol ingresado`
-        );
-
       const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -101,12 +96,18 @@ class UserService {
         );
       }
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
+      const role = await prismaRolRepository.existsName("USER");
+      if (!role) {
+        return httpResponse.BadRequestException(
+          "El Rol que deseas buscar no existe"
+        );
+      }
       const userFormat: I_CreateUserBD = {
         ...data,
         contrasena: hashContrasena,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
-        rol_id: Number(data.rol_id),
+        rol_id: role.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);
 
@@ -128,12 +129,6 @@ class UserService {
     data: I_CreateUserAndCompany
   ): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolValidation.findById(Number(data.rol_id));
-      if (!roleResponse.success)
-        return httpResponse.BadRequestException(
-          `No se encontro el rol ingresado`
-        );
-
       const responseEmailUser = await userValidation.findByEmail(data.email);
       if (!responseEmailUser.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -215,7 +210,14 @@ class UserService {
       if (!responseEmailCompany.success) return responseEmailCompany;
 
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
-      const userFormat: I_CreateUserBD = {
+      const role = await prismaRolRepository.existsName("USER");
+      if (!role) {
+        return httpResponse.BadRequestException(
+          "El Rol que deseas buscar no existe"
+        );
+      }
+      let userFormat: I_CreateUserBD;
+      userFormat = {
         email: data.email,
         dni: data.dni,
         nombre_completo: data.nombre_completo,
@@ -223,10 +225,9 @@ class UserService {
         contrasena: hashContrasena,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
-        rol_id: Number(data.rol_id),
+        rol_id: role.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);
-
       const companyFormat: I_CreateCompanyBD = {
         nombre_empresa: data.nombre_empresa,
         descripcion_empresa: data.descripcion_empresa,
@@ -247,6 +248,7 @@ class UserService {
         usuario: resultUser,
         empresa: resultCompany,
       };
+
       return httpResponse.CreatedResponse(
         "Usuario y empresa creadas correctamente",
         resultUserAndCompany
@@ -266,12 +268,6 @@ class UserService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
-      const roleResponse = await rolValidation.findById(Number(data.rol_id));
-      if (!roleResponse.success)
-        return httpResponse.BadRequestException(
-          `No se encontro el rol ingresado`
-        );
-
       const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -300,12 +296,18 @@ class UserService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
+      const role = await prismaRolRepository.existsName("USER");
+      if (!role) {
+        return httpResponse.BadRequestException(
+          "El Rol que deseas buscar no existe"
+        );
+      }
       const userFormat: I_UpdateUserBD = {
         ...data,
         contrasena: hashContrasena,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
-        rol_id: Number(data.rol_id),
+        rol_id: role.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);
       const resultCompanyFindByUser =
@@ -414,10 +416,8 @@ class UserService {
       }
 
       const roleResponse = await rolValidation.findById(data.rol_id);
-      if (!roleResponse.success)
-        return httpResponse.BadRequestException(
-          `No se encontro el rol ingresado`
-        );
+      if (!roleResponse.success) return roleResponse;
+      const resultRole = roleResponse.payload as Rol;
       let hashContrasena;
       let userFormat: I_UpdateUserBD = {
         ...data,
@@ -427,7 +427,7 @@ class UserService {
         limite_usuarios: data.limite_usuarios
           ? Number(data.limite_usuarios)
           : userFind.limite_usuarios,
-        rol_id: data.rol_id ? Number(data.rol_id) : userFind.rol_id,
+        rol_id: resultRole.id,
       };
 
       if (data.contrasena && data.contrasena !== "") {
