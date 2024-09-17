@@ -337,7 +337,7 @@ class ProductionUnitService {
         );
       }
 
-      //[note] Aca verificamos si que el codigo no tenga letras ni
+      //[note] Aca verificamos si que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
           //verificamos si tenemos el codigo
@@ -376,32 +376,32 @@ class ProductionUnitService {
       }
 
       //guardado o actualizacion del excel
-      let code;
-      let productionUnit;
-      await Promise.all(
-        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-          code = await productionUnitValidation.findByCode(String(item.Codigo));
-          if (!code.success) {
-            productionUnit = code.payload as UnidadProduccion;
-            await productionUnitValidation.updateProductionUnit(
-              item,
-              +productionUnit.id,
-              responseProject.id
-            );
-          } else {
-            await prisma.unidadProduccion.create({
-              data: {
-                codigo: String(item.Codigo),
-                nombre: item.Nombre,
-                nota: item.Nota,
-                proyecto_id: responseProject.id,
-              },
-            });
-          }
-        })
-      );
+      // let code;
+      // let productionUnit;
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+      //     code = await productionUnitValidation.findByCode(String(item.Codigo));
+      //     if (!code.success) {
+      //       productionUnit = code.payload as UnidadProduccion;
+      //       await productionUnitValidation.updateProductionUnit(
+      //         item,
+      //         +productionUnit.id,
+      //         responseProject.id
+      //       );
+      //     } else {
+      //       await prisma.unidadProduccion.create({
+      //         data: {
+      //           codigo: String(item.Codigo),
+      //           nombre: item.Nombre,
+      //           nota: item.Nota,
+      //           proyecto_id: responseProject.id,
+      //         },
+      //       });
+      //     }
+      //   })
+      // );
 
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(
         "Unidad de producción creada correctamente!"

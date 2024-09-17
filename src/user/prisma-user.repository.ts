@@ -135,7 +135,13 @@ class PrismaUserRepository implements UserRepository {
       }),
       prisma.usuario.count({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
+          Rol: {
+            rol: {
+              not: "ADMIN",
+            },
+          },
         },
       }),
     ]);
