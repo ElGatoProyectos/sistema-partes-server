@@ -140,7 +140,7 @@ class PrismaUserRepository implements UserRepository {
       const { Rol, Empresa, ...user } = item;
       return {
         rol: Rol,
-        empresa: Empresa,
+        empresa: Empresa[0],
         user,
       };
     });

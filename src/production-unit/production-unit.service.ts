@@ -15,6 +15,7 @@ import { T_FindAll } from "@/common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
 import { projectValidation } from "@/project/project.validation";
 import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
+import validator from "validator";
 
 class ProductionUnitService {
   async createProductionUnit(
@@ -307,59 +308,69 @@ class ProductionUnitService {
       let index = 1;
       const project = await projectValidation.findById(projectId);
       const responseProject = project.payload as Proyecto;
-      // const productionUnits = await prismaProductionUnitRepository.findAll();
-      let nextCodigo = 0;
-      let maxCodigo;
-      //verificar codigo consecutivo
       let errorNumber = 0;
-      const seenCodes = new Set<number>();
+      const seenCodes = new Set<string>();
       let previousCodigo: number | null = null;
+      //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+      //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
+      //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
+      //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+
+      //[note] Aca verificamos si que el codigo no tenga letras ni
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
           //verificamos si tenemos el codigo
           const codigo = parseInt(item.Codigo, 10); // Intenta convertir el string a número
 
-          if (isNaN(codigo)) {
+          if (!validator.isNumeric(item.Codigo)) {
             errorNumber++; // Aumenta si el código no es un número válido
           } else {
             // Verifica si el código ya ha sido procesado
-            if (!seenCodes.has(codigo)) {
+            if (!seenCodes.has(item.Codigo)) {
               // errorNumber++; // Aumenta si hay duplicado
-              seenCodes.add(codigo);
+              seenCodes.add(item.Codigo);
             }
 
             // Verifica si el código actual no es mayor que el anterior
             if (previousCodigo !== null && codigo <= previousCodigo) {
-              errorNumber++; // Aumenta si no es mayor que el anterior
+              errorNumber++;
             }
 
-            previousCodigo = codigo; // Actualiza el código anterior
+            previousCodigo = codigo;
           }
         })
       );
+      const sortedCodesArray = Array.from(seenCodes)
+        .map((item) => item.padStart(3, "0"))
+        .sort((a, b) => parseInt(a) - parseInt(b));
+
+      if (sortedCodesArray[0] != "001") {
+        errorNumber++;
+      }
+
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Los código no son consecutivos"
+          "Error al leer el archivo. Verificar los campos"
         );
       }
 
       let error = 0;
 
-      //si no hay espacio en blanco
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-      //     index++;
-      //     if (item.Nombre == undefined) {
-      //       error++;
-      //     }
-      //   })
-      // );
+      //[note] aca si hay espacio en blanco
+      await Promise.all(
+        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+          index++;
+          if (item.Nombre == undefined) {
+            error++;
+          }
+        })
+      );
 
-      // if (error > 0) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       //guardado o actualizacion del excel
       // let code;
