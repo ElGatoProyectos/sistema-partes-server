@@ -117,6 +117,11 @@ class PrismaUserRepository implements UserRepository {
         where: {
           ...filters,
           eliminado: E_Estado_BD.n,
+          Rol: {
+            rol: {
+              not: "ADMIN",
+            },
+          },
         },
         include: {
           Rol: true,
@@ -126,7 +131,6 @@ class PrismaUserRepository implements UserRepository {
         take: limit,
         omit: {
           contrasena: true,
-          eliminado: true,
         },
       }),
       prisma.usuario.count({
