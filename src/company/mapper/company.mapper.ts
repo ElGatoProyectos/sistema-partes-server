@@ -9,7 +9,6 @@ export class CompanyResponseMapper implements Omit<Empresa, "eliminado"> {
   telefono: string;
   usuario_id: number;
   fecha_creacion: Date;
-  razon_social: string;
   direccion_fiscal: string;
   direccion_oficina: string;
   correo: string;
@@ -28,7 +27,6 @@ export class CompanyResponseMapper implements Omit<Empresa, "eliminado"> {
     this.direccion_oficina = company.direccion_oficina;
     this.usuario_id = company.usuario_id;
     this.fecha_creacion = company.fecha_creacion;
-    this.razon_social = company.razon_social ? company.razon_social : "";
     this.correo = company.correo;
     this.contacto_responsable = company.contacto_responsable;
   }

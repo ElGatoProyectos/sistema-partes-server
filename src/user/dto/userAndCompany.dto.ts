@@ -11,7 +11,6 @@ export const userAndCompanyDto = z.object({
   nombre_empresa: z.string(),
   descripcion_empresa: z.string(),
   ruc: z.string(),
-  razon_social: z.string(),
   telefono_empresa: z.string(),
   nombre_corto_empresa: z.string(),
   direccion_empresa_fiscal: z.string(),

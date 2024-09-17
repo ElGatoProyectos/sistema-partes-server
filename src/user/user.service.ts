@@ -235,7 +235,6 @@ class UserService {
         nombre_empresa: data.nombre_empresa,
         descripcion_empresa: data.descripcion_empresa,
         ruc: data.ruc,
-        razon_social: data.razon_social,
         direccion_fiscal: data.direccion_empresa_fiscal,
         direccion_oficina: data.direccion_empresa_oficina,
         nombre_corto: data.nombre_corto_empresa,
