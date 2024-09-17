@@ -11,7 +11,7 @@ import prisma from "@/config/prisma.config";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { bcryptService } from "@/auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
-import { T_FindAll } from "../common/models/pagination.types";
+import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
 import validator from "validator";
 import { wordIsNumeric } from "@/common/utils/number";
 import { prismaCompanyRepository } from "@/company/prisma-company.repository";
@@ -26,19 +26,22 @@ import { emailValid } from "@/common/utils/email";
 import { prismaRolRepository } from "@/rol/prisma-rol.repository";
 
 class UserService {
-  async findAll(data: T_FindAll): Promise<T_HttpResponse> {
+  async findAll(data: T_FindAllUser): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaUserRepository.findAll(
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        data.queryParams.name
       );
 
-      const { users, total } = result;
+      const { userAll, total } = result;
+
       // const usersMapped = users.map(
       //   (user: Usuario) => new UserResponseMapper(user)
       // );
       //numero de pagina donde estas
+
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
         total,
@@ -47,7 +50,7 @@ class UserService {
         limit: data.queryParams.limit,
         //cantidad de paginas que hay
         pageCount,
-        data: users,
+        data: userAll,
       };
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los usuarios",

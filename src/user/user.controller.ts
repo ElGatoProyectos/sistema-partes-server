@@ -1,4 +1,4 @@
-import { T_FindAll } from "../common/models/pagination.types";
+import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
 import express from "@/config/express.config";
 import {
   I_CreateUserAndCompany,
@@ -180,10 +180,12 @@ class UserController {
   async allUsers(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
+    const name = request.query.name as string;
+    let paginationOptions: T_FindAllUser = {
       queryParams: {
         page: page,
         limit: limit,
+        name,
       },
     };
     const result = await userService.findAll(paginationOptions);

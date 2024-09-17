@@ -25,6 +25,11 @@ export interface I_UpdateUserBody
 }
 
 export interface I_User extends Omit<Usuario, "contrasena" | "eliminado"> {}
+export interface I_AllUsers {
+  user: Usuario;
+  rol: Rol;
+  empresa: Empresa;
+}
 
 export interface I_CreateUserAndCompany {
   email: string;

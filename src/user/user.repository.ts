@@ -1,7 +1,7 @@
 import { I_CreateUserBD, I_UpdateUserBD } from "./models/user.interface";
 
 export abstract class UserRepository {
-  findAll(skip: number, limit: number): void {}
+  findAll(skip: number, limit: number, filters: string): void {}
 
   findById(idUser: number): void {}
 

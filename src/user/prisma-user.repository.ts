@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.config";
 import {
+  I_AllUsers,
   I_CreateUserBD,
   I_UpdateUserBD,
   I_User,
@@ -100,12 +101,26 @@ class PrismaUserRepository implements UserRepository {
   }
   async findAll(
     skip: number,
-    limit: number
-  ): Promise<{ users: I_User[]; total: number }> {
-    const [users, total]: [I_User[], number] = await prisma.$transaction([
+    limit: number,
+    name: string
+  ): Promise<{ userAll: any[]; total: number }> {
+    let filters: any = {};
+
+    if (name) {
+      filters.nombre_completo = {
+        contains: name,
+      };
+    }
+
+    const [users, total] = await prisma.$transaction([
       prisma.usuario.findMany({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
+        },
+        include: {
+          Rol: true,
+          Empresa: true,
         },
         skip,
         take: limit,
@@ -120,7 +135,17 @@ class PrismaUserRepository implements UserRepository {
         },
       }),
     ]);
-    return { users, total };
+
+    const userAll = users.map((item) => {
+      const { Rol, Empresa, ...user } = item;
+      return {
+        rol: Rol,
+        empresa: Empresa,
+        user,
+      };
+    });
+
+    return { userAll, total };
   }
 
   async findById(idUser: number): Promise<I_User | null> {
