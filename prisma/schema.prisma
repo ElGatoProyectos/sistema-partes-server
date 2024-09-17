@@ -100,6 +100,7 @@ model Usuario {
   Empresa               Empresa[]
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
   Partida               Partida[]
+  ManoObra              ManoObra[]
 }
 
 //[success] actual
@@ -154,6 +155,7 @@ model ManoObra {
   categoria_obrero_id         Int
   unidad_id                   Int
   banco_id                    Int
+  Usuario                     Usuario                       @relation(fields: [usuario_id], references: [id])
   Banco                       Banco                         @relation(fields: [banco_id], references: [id])
   Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id])
   Asistencia                  Asistencia[]

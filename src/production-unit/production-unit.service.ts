@@ -308,40 +308,64 @@ class ProductionUnitService {
       const project = await projectValidation.findById(projectId);
       const responseProject = project.payload as Proyecto;
       const productionUnits = await prismaProductionUnitRepository.findAll();
+      let nextCodigo = 0;
       let maxCodigo;
       if (productionUnits.length == 0) {
-        maxCodigo = 1;
+        nextCodigo = 1;
       } else {
         const productionUnitsNumber = productionUnits
           .map((productionUnit) => productionUnit.codigo)
           .map(Number);
         maxCodigo = Math.max(...productionUnitsNumber);
+        nextCodigo = maxCodigo + 1;
       }
-      let nextCodigo = maxCodigo == null ? 1 : maxCodigo + 1;
       let errors: any = [];
-      console.log("el codigo va a ser " + nextCodigo);
+      //verificar codigo consecutivo
+      //si no hay espacio en blanco
+      let errorsNumber = 0;
+      let error = 0;
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-          try {
-            index++;
-            let formattedCodigo = nextCodigo.toString().padStart(3, "0");
-            nextCodigo++;
-            await prisma.unidadProduccion.create({
-              data: {
-                codigo: formattedCodigo,
-                nombre: item.Nombre, // Asegúrate de que el campo sea correcto
-                nota: item.Nota,
-                proyecto_id: responseProject.id,
-              },
-            });
-          } catch (error) {
-            index++;
-            errors.push({ ...item, index });
+          index++;
+          if (item.Nombre == undefined) {
+            console.log("ENTRO DENTRO DEL IF");
+            error++;
           }
         })
       );
 
-      // Desconectar prisma después de la operación masiva
+      console.log("cantidad de errores " + error);
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Se encontraron espacios en blanco al leer el excel!",
+          error
+        );
+      }
+      // let code;
+      // let productionUnit;
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+      //     code = await productionUnitValidation.findByCode(String(item.Codigo));
+      //     if (!code.success) {
+      //       productionUnit = code.payload as UnidadProduccion;
+      //       await productionUnitValidation.updateProductionUnit(
+      //         item,
+      //         +productionUnit.id,
+      //         responseProject.id
+      //       );
+      //     } else {
+      //       await prisma.unidadProduccion.create({
+      //         data: {
+      //           codigo: String(item.Codigo),
+      //           nombre: item.Nombre,
+      //           nota: item.Nota,
+      //           proyecto_id: responseProject.id,
+      //         },
+      //       });
+      //     }
+      //   })
+      // );
+
       await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(
@@ -349,7 +373,6 @@ class ProductionUnitService {
         errors
       );
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer la Unidad de Producción",

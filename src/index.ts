@@ -18,7 +18,10 @@ const globalPrefix = "/api";
 const app = express();
 
 app.use(express.json());
-app.use(cors);
+var corsOptions = {
+  origin: "*",
+};
+app.use(cors(corsOptions));
 
 app.use(globalPrefix, userRouter);
 app.use(globalPrefix, authRouter);

@@ -8,6 +8,8 @@ export abstract class ProudctionUnitRepository {
 
   findAllPagination(skip: number, limit: number): void {}
 
+  findByCode(code: string): void {}
+
   findById(idUser: number): void {}
 
   createProductionUnit(data: I_CreateProductionUnitBD): void {}

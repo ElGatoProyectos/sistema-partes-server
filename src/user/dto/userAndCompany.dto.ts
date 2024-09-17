@@ -18,5 +18,4 @@ export const userAndCompanyDto = z.object({
   direccion_empresa_oficina: z.string(),
   email_empresa: z.string(),
   contacto_responsable: z.string(),
-  rol_id: z.string(),
 });

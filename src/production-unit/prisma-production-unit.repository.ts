@@ -3,11 +3,21 @@ import {
   I_CreateProductionUnitBD,
   I_ProductionUnit,
   I_UpdateProductionUnitBody,
+  I_UpdateProductionUnitBodyValidation,
 } from "./models/production-unit.interface";
 import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
+  async findByCode(code: string): Promise<UnidadProduccion | null> {
+    const productionUnit = await prisma.unidadProduccion.findFirst({
+      where: {
+        codigo: code,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return productionUnit;
+  }
   async findAll(): Promise<UnidadProduccion[]> {
     const productionUnits = await prisma.unidadProduccion.findMany();
     return productionUnits;
@@ -39,7 +49,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     return productionUnit;
   }
   async updateProductionUnit(
-    data: I_UpdateProductionUnitBody,
+    data: I_UpdateProductionUnitBodyValidation,
     idProductionUnit: number
   ): Promise<UnidadProduccion> {
     const productionUnit = await prisma.unidadProduccion.update({
