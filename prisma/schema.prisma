@@ -321,7 +321,6 @@ model Empresa {
   nombre_empresa        String
   descripcion_empresa   String?
   ruc                   String?
-  razon_social          String?
   direccion_fiscal      String
   direccion_oficina     String
   nombre_corto          String?

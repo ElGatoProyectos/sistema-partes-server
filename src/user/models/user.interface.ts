@@ -47,7 +47,6 @@ export interface I_CreateUserAndCompany {
   ruc: string;
   nombre_corto_empresa: string;
   telefono_empresa: string;
-  razon_social: string;
   email_empresa: string;
   contacto_responsable: string;
 }

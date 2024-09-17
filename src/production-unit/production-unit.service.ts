@@ -315,6 +315,27 @@ class ProductionUnitService {
       //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
       //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
       //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+      let error = 0;
+
+      //[note] aca si hay espacio en blanco.
+      await Promise.all(
+        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+          index++;
+          if (
+            item.Codigo == undefined ||
+            item.Nombre == undefined ||
+            item.Nota == undefined
+          ) {
+            error++;
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       //[note] Aca verificamos si que el codigo no tenga letras ni
       await Promise.all(
@@ -354,49 +375,31 @@ class ProductionUnitService {
         );
       }
 
-      let error = 0;
-
-      //[note] aca si hay espacio en blanco
+      //guardado o actualizacion del excel
+      let code;
+      let productionUnit;
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-          index++;
-          if (item.Nombre == undefined) {
-            error++;
+          code = await productionUnitValidation.findByCode(String(item.Codigo));
+          if (!code.success) {
+            productionUnit = code.payload as UnidadProduccion;
+            await productionUnitValidation.updateProductionUnit(
+              item,
+              +productionUnit.id,
+              responseProject.id
+            );
+          } else {
+            await prisma.unidadProduccion.create({
+              data: {
+                codigo: String(item.Codigo),
+                nombre: item.Nombre,
+                nota: item.Nota,
+                proyecto_id: responseProject.id,
+              },
+            });
           }
         })
       );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
-        );
-      }
-
-      //guardado o actualizacion del excel
-      // let code;
-      // let productionUnit;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-      //     code = await productionUnitValidation.findByCode(String(item.Codigo));
-      //     if (!code.success) {
-      //       productionUnit = code.payload as UnidadProduccion;
-      //       await productionUnitValidation.updateProductionUnit(
-      //         item,
-      //         +productionUnit.id,
-      //         responseProject.id
-      //       );
-      //     } else {
-      //       await prisma.unidadProduccion.create({
-      //         data: {
-      //           codigo: String(item.Codigo),
-      //           nombre: item.Nombre,
-      //           nota: item.Nota,
-      //           proyecto_id: responseProject.id,
-      //         },
-      //       });
-      //     }
-      //   })
-      // );
 
       await prisma.$disconnect();
 
