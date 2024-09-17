@@ -307,40 +307,61 @@ class ProductionUnitService {
       let index = 1;
       const project = await projectValidation.findById(projectId);
       const responseProject = project.payload as Proyecto;
-      const productionUnits = await prismaProductionUnitRepository.findAll();
+      // const productionUnits = await prismaProductionUnitRepository.findAll();
       let nextCodigo = 0;
       let maxCodigo;
-      if (productionUnits.length == 0) {
-        nextCodigo = 1;
-      } else {
-        const productionUnitsNumber = productionUnits
-          .map((productionUnit) => productionUnit.codigo)
-          .map(Number);
-        maxCodigo = Math.max(...productionUnitsNumber);
-        nextCodigo = maxCodigo + 1;
-      }
-      let errors: any = [];
       //verificar codigo consecutivo
-      //si no hay espacio en blanco
-      let errorsNumber = 0;
-      let error = 0;
+      let errorNumber = 0;
+      const seenCodes = new Set<number>();
+      let previousCodigo: number | null = null;
       await Promise.all(
-        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-          index++;
-          if (item.Nombre == undefined) {
-            console.log("ENTRO DENTRO DEL IF");
-            error++;
+        sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+          //verificamos si tenemos el codigo
+          const codigo = parseInt(item.Codigo, 10); // Intenta convertir el string a número
+
+          if (isNaN(codigo)) {
+            errorNumber++; // Aumenta si el código no es un número válido
+          } else {
+            // Verifica si el código ya ha sido procesado
+            if (!seenCodes.has(codigo)) {
+              // errorNumber++; // Aumenta si hay duplicado
+              seenCodes.add(codigo);
+            }
+
+            // Verifica si el código actual no es mayor que el anterior
+            if (previousCodigo !== null && codigo <= previousCodigo) {
+              errorNumber++; // Aumenta si no es mayor que el anterior
+            }
+
+            previousCodigo = codigo; // Actualiza el código anterior
           }
         })
       );
-
-      console.log("cantidad de errores " + error);
-      if (error > 0) {
+      if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Se encontraron espacios en blanco al leer el excel!",
-          error
+          "Los código no son consecutivos"
         );
       }
+
+      let error = 0;
+
+      //si no hay espacio en blanco
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+      //     index++;
+      //     if (item.Nombre == undefined) {
+      //       error++;
+      //     }
+      //   })
+      // );
+
+      // if (error > 0) {
+      //   return httpResponse.BadRequestException(
+      //     "Error al leer el archivo. Verificar los campos"
+      //   );
+      // }
+
+      //guardado o actualizacion del excel
       // let code;
       // let productionUnit;
       // await Promise.all(
@@ -369,8 +390,7 @@ class ProductionUnitService {
       await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(
-        "Unidad de producción creada correctamente!",
-        errors
+        "Unidad de producción creada correctamente!"
       );
     } catch (error) {
       await prisma.$disconnect();
