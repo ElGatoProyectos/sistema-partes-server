@@ -5,6 +5,8 @@ export abstract class UnitRepository {
 
   findById(idUnit: number): void {}
 
+  codeMoreHigh(): void {}
+
   existsName(name: string): void {}
 
   existsSymbol(symbol: string): void {}

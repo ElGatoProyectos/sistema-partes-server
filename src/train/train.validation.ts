@@ -1,7 +1,53 @@
+import { I_Train, I_TrainExcel } from "./models/production-unit.interface";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaTrainRepository } from "./prisma-train.repository";
 
 class TrainValidation {
+  async updateTrain(
+    data: I_TrainExcel,
+    idProductionUnit: number,
+    idProjectID: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const train = {
+        codigo: String(data["ID-TREN"]),
+        nombre: data.TREN,
+        nota: data.NOTA,
+        cuadrilla: data.TREN + "-" + data["ID-TREN"],
+        proyecto_id: Number(idProjectID),
+      };
+      const responseProductionUnit = await prismaTrainRepository.updateTrain(
+        train,
+        idProductionUnit
+      );
+      return httpResponse.SuccessResponse(
+        "Tren modificado correctamente",
+        responseProductionUnit
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Unidad de Producción",
+        error
+      );
+    }
+  }
+  async findByCode(code: string): Promise<T_HttpResponse> {
+    try {
+      const train = await prismaTrainRepository.findByCode(code);
+      if (train) {
+        return httpResponse.NotFoundException(
+          "Codigo del Tren encontrado",
+          train
+        );
+      }
+      return httpResponse.SuccessResponse("Tren encontrado", train);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código del Tren",
+        error
+      );
+    }
+  }
   async findById(idTrain: number): Promise<T_HttpResponse> {
     try {
       const train = await prismaTrainRepository.findById(idTrain);
@@ -42,7 +88,7 @@ class TrainValidation {
       return httpResponse.SuccessResponse("Tren encontrado", train);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar Tren",
+        "Error al buscar Tren",
         error
       );
     }

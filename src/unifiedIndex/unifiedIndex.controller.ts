@@ -2,9 +2,15 @@ import { T_FindAll } from "@/common/models/pagination.types";
 import express from "@/config/express.config";
 import {
   I_CreateUnifiedIndexBody,
+  I_ImportExcelRequestUnifiedIndex,
   I_UpdateUnifiedIndexBody,
 } from "./models/unifiedIndex.interface";
 import { unifiedIndexService } from "./unifiedIndex.service";
+import multer from "multer";
+import { unifiedIndexExcelDto } from "./dto/unifiedIndexExcel.dto";
+
+const storage = multer.memoryStorage();
+const upload: any = multer({ storage: storage });
 
 class UnifiedIndexController {
   async create(request: express.Request, response: express.Response) {
@@ -77,6 +83,36 @@ class UnifiedIndexController {
     const result = await unifiedIndexService.findAll(paginationOptions);
     response.status(result.statusCode).json(result);
   }
+
+  // unifiedIndexReadExcel = async (
+  //   request: express.Request,
+  //   response: express.Response
+  // ) => {
+  //   // Usando multer para manejar la subida de archivos en memoria
+  //   upload.single("train-file")(request, response, async (err: any) => {
+  //     if (err) {
+  //       return response.status(500).json({ error: "Error uploading file" });
+  //     }
+  //     const responseBody = request.body as I_ImportExcelRequestUnifiedIndex;
+  //     const file = request.file;
+  //     if (!file) {
+  //       return response.status(400).json({ error: "No se subió archivo" });
+  //     }
+
+  //     try {
+  //       unifiedIndexExcelDto.parse(request.body);
+  //       const serviceResponse =
+  //         await unifiedIndexService.registerUnifiedIndexMasive(
+  //           file,
+  //           +responseBody.idCompany
+  //         );
+
+  //       response.status(serviceResponse.statusCode).json(serviceResponse);
+  //     } catch (error) {
+  //       response.status(500).json(error);
+  //     }
+  //   });
+  // };
 }
 
 export const unifiedIndexController = new UnifiedIndexController();

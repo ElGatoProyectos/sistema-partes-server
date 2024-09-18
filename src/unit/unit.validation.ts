@@ -2,6 +2,20 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaUnitRepository } from "./prisma-unit.repository";
 
 class UnitValidation {
+  async codeMoreHigh(): Promise<T_HttpResponse> {
+    try {
+      const responseUnit = await prismaUnitRepository.codeMoreHigh();
+      if (!responseUnit) {
+        return httpResponse.SuccessResponse("No se encontraron resultados", []);
+      }
+      return httpResponse.SuccessResponse("Unidad encontrada", responseUnit);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Unidad",
+        error
+      );
+    }
+  }
   async findById(idResourseCategory: number): Promise<T_HttpResponse> {
     try {
       const unitResponse = await prismaUnitRepository.findById(

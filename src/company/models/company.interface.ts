@@ -7,6 +7,7 @@ export interface I_UpdateCompanyBD extends Omit<Empresa, "id"> {}
 
 export interface I_CreateCompanyBody extends Omit<Empresa, "id"> {}
 
-export interface I_UpdateCompanyBody extends Omit<Empresa, "id"> {}
+export interface I_UpdateCompanyBody
+  extends Omit<Empresa, "id" | "eliminado" | "fecha_creacion"> {}
 
 export interface I_Company extends Omit<Empresa, "eliminado"> {}

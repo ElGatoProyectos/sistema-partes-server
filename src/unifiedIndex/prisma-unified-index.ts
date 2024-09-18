@@ -8,6 +8,24 @@ import {
 import { UnifiedIndexRepository } from "./unifiedIndex.repository";
 
 class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
+  async codeMoreHigh(): Promise<IndiceUnificado | null> {
+    const lastUnifiedIndex = await prisma.indiceUnificado.findFirst({
+      where: {
+        eliminado: E_Estado_BD.n,
+      },
+      orderBy: { codigo: "desc" },
+    });
+    return lastUnifiedIndex;
+  }
+  async findByCode(code: string): Promise<IndiceUnificado | null> {
+    const unifiedIndex = await prisma.indiceUnificado.findFirst({
+      where: {
+        codigo: code,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return unifiedIndex;
+  }
   async existSymbol(symbol: string): Promise<IndiceUnificado | null> {
     const unifiedIndex = await prisma.indiceUnificado.findFirst({
       where: {

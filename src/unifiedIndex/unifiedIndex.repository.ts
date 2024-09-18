@@ -6,6 +6,10 @@ import {
 export abstract class UnifiedIndexRepository {
   findAll(skip: number, limit: number): void {}
 
+  findByCode(code: string): void {}
+
+  codeMoreHigh(): void {}
+
   findById(idUnifiedIndex: number): void {}
 
   existsName(name: string): void {}

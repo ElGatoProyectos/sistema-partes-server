@@ -13,6 +13,11 @@ trainRouter.post(
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.create
 );
+trainRouter.post(
+  `${prefix}/upload-excel`,
+  authRoleMiddleware.authAdminAndProjectManager,
+  trainController.trainReadExcel
+);
 
 trainRouter.put(
   `${prefix}/cuadrilla`,

@@ -14,7 +14,7 @@ class ProductionUnitValidation {
       return httpResponse.SuccessResponse("Proyectos encontrados", projects);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     }
@@ -36,7 +36,7 @@ class ProductionUnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     }
@@ -57,7 +57,7 @@ class ProductionUnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     }
@@ -79,7 +79,7 @@ class ProductionUnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar Unidad de Producción",
+        "Error al buscar Unidad de Producción",
         error
       );
     }
@@ -98,7 +98,7 @@ class ProductionUnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
+        "Error al buscar proyecto",
         error
       );
     }

@@ -24,12 +24,22 @@ class UnitService {
       if (!resultIdCompany.success) {
         return resultIdCompany;
       }
+
+      const lastUnit = await unitValidation.codeMoreHigh();
+      const lastUnitResponse = lastUnit.payload as Unidad;
+
+      // Incrementar el código en 1
+      const nextCodigo = (parseInt(lastUnitResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+
       const unitFormat = {
         ...data,
+        codigo: formattedCodigo,
         simbolo: data.simbolo.toUpperCase(),
       };
 
-      const responseUnit = await prismaUnitRepository.createUnit(data);
+      const responseUnit = await prismaUnitRepository.createUnit(unitFormat);
       const unitMapper = new ResponseUnitMapper(responseUnit);
       return httpResponse.CreatedResponse(
         "Unidad creada correctamente",

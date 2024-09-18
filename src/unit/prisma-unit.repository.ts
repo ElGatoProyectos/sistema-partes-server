@@ -8,6 +8,15 @@ import { E_Estado_BD, Unidad } from "@prisma/client";
 import { UnitRepository } from "./unit.repository";
 
 class PrismaUnitRepository implements UnitRepository {
+  async codeMoreHigh(): Promise<Unidad | null> {
+    const lastUnit = await prisma.unidad.findFirst({
+      where: {
+        eliminado: E_Estado_BD.n,
+      },
+      orderBy: { codigo: "desc" },
+    });
+    return lastUnit;
+  }
   async existsSymbol(symbol: string): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {

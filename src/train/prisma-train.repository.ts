@@ -1,4 +1,4 @@
-import { E_Estado_BD, Tren, UnidadProduccion } from "@prisma/client";
+import { E_Estado_BD, Tren } from "@prisma/client";
 
 import prisma from "@/config/prisma.config";
 import { TrainRepository } from "./train.repository";
@@ -6,9 +6,19 @@ import {
   I_CreateTrainBD,
   I_Train,
   I_UpdateTrainBody,
+  I_UpdateTrainBodyValidation,
 } from "./models/production-unit.interface";
 
 class PrismaTrainRepository implements TrainRepository {
+  async findByCode(code: string): Promise<Tren | null> {
+    const train = await prisma.tren.findFirst({
+      where: {
+        codigo: code,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return train;
+  }
   async existsName(name: string): Promise<Tren | null> {
     const train = await prisma.tren.findFirst({
       where: {
@@ -51,7 +61,10 @@ class PrismaTrainRepository implements TrainRepository {
     });
     return train;
   }
-  async updateTrain(data: I_UpdateTrainBody, idTrain: number): Promise<Tren> {
+  async updateTrain(
+    data: I_UpdateTrainBodyValidation,
+    idTrain: number
+  ): Promise<Tren> {
     const train = await prisma.tren.update({
       where: { id: idTrain },
       data: data,
