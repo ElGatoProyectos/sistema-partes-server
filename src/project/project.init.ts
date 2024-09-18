@@ -11,14 +11,12 @@ const prefix = "/projects";
 projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}/user/:id`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   userMiddleware.verifyHeadersFields,
   projectController.findAllProjectsXCompany
 );
 projectRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   projectController.findByName
 );

@@ -6,6 +6,9 @@ export interface I_CreateUnifiedIndexBody extends Omit<IndiceUnificado, "id"> {}
 
 export interface I_UpdateUnifiedIndexBody extends Omit<IndiceUnificado, "id"> {}
 
+export interface I_UpdateUnifiedIndexBodyValidation
+  extends Omit<IndiceUnificado, "id" | "eliminado" | "fecha_creacion"> {}
+
 export interface I_UnifiedIndex extends Omit<IndiceUnificado, "eliminado"> {}
 
 export interface I_UnifiedIndexExcel {

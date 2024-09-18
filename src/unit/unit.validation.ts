@@ -1,7 +1,37 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaUnitRepository } from "./prisma-unit.repository";
+import { I_UnitExcel } from "./models/unit.interface";
 
 class UnitValidation {
+  async updateUnifiedIndex(
+    data: I_UnitExcel,
+    idUnit: number,
+    idCompany: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const unifiedIndexFormat = {
+        codigo: String(data["ID-UNIT"]),
+        nombre: data.NOMBRE,
+        simbolo: data.SIMBOLO,
+        descripcion: data.DESCRIPCION,
+        empresa_id: idCompany,
+      };
+
+      const responseUnifiedIndex = await prismaUnitRepository.updateUnit(
+        unifiedIndexFormat,
+        idUnit
+      );
+      return httpResponse.SuccessResponse(
+        "Unidad modificada correctamente",
+        responseUnifiedIndex
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Unidad",
+        error
+      );
+    }
+  }
   async codeMoreHigh(): Promise<T_HttpResponse> {
     try {
       const responseUnit = await prismaUnitRepository.codeMoreHigh();
@@ -12,6 +42,20 @@ class UnitValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar Unidad",
+        error
+      );
+    }
+  }
+  async findByCode(code: string): Promise<T_HttpResponse> {
+    try {
+      const unit = await prismaUnitRepository.findByCode(code);
+      if (unit) {
+        return httpResponse.NotFoundException("Unidad fue encontrada");
+      }
+      return httpResponse.SuccessResponse("La Unidad fue encontrada", unit);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Unidad ",
         error
       );
     }

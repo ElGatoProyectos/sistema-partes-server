@@ -26,11 +26,13 @@ class UnifiedIndexService {
         return resultIdProject;
       }
 
-      const resultIdUnifiedIndex = await unifiedIndexValidation.findBySymbol(
-        data.simbolo
-      );
-      if (!resultIdUnifiedIndex.success) {
-        return resultIdUnifiedIndex;
+      if (data.simbolo) {
+        const resultIdUnifiedIndex = await unifiedIndexValidation.findBySymbol(
+          data.simbolo
+        );
+        if (!resultIdUnifiedIndex.success) {
+          return resultIdUnifiedIndex;
+        }
       }
 
       const resultIdCompany = await companyValidation.findById(data.empresa_id);
@@ -49,7 +51,7 @@ class UnifiedIndexService {
       const unifiedIndexFormat = {
         ...data,
         codigo: formattedCodigo,
-        simbolo: data.simbolo.toUpperCase(),
+        simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
       const responseUnifiedIndex =
         await prismaUnifiedIndexRepository.createUnifiedIndex(
@@ -97,7 +99,7 @@ class UnifiedIndexService {
         }
       }
 
-      if (unifiedIndexFind.simbolo != data.simbolo) {
+      if (data.simbolo && unifiedIndexFind.simbolo != data.simbolo) {
         const resultIdUnifiedIndex = await unifiedIndexValidation.findBySymbol(
           data.simbolo
         );
@@ -114,7 +116,7 @@ class UnifiedIndexService {
       }
       const unifiedIndexFormat = {
         ...data,
-        simbolo: data.simbolo.toUpperCase(),
+        simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
       const responseUnifiedIndex =
         await prismaUnifiedIndexRepository.updateUnifiedIndex(
@@ -257,153 +259,170 @@ class UnifiedIndexService {
       await prisma.$disconnect();
     }
   }
-  // async registerUnifiedIndexMasive(file: any, idCompany: number) {
-  //   try {
-  //     const buffer = file.buffer;
+  async registerUnifiedIndexMasive(file: any, idCompany: number) {
+    try {
+      const buffer = file.buffer;
 
-  //     const workbook = xlsx.read(buffer, { type: "buffer" });
-  //     const sheetName = workbook.SheetNames[0];
-  //     const sheet = workbook.Sheets[sheetName];
-  //     const sheetToJson = xlsx.utils.sheet_to_json(
-  //       sheet
-  //     ) as I_UnifiedIndexExcel[];
-  //     const company = await companyValidation.findById(idCompany);
-  //     if (!company.success) return company;
-  //     const responseCompany = company.payload as Empresa;
-  //     let errorNumber = 0;
-  //     const seenCodes = new Set<string>();
-  //     let previousCodigo: number | null = null;
-  //     //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
-  //     //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
-  //     //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
-  //     //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
-  //     //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
-  //     //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
-  //     let error = 0;
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(
+        sheet
+      ) as I_UnifiedIndexExcel[];
 
-  //     //[note] aca si hay espacio en blanco.
-  //     await Promise.all(
-  //       sheetToJson.map(async (item: I_UnifiedIndexExcel, index: number) => {
-  //         index++;
-  //         if (
-  //           item.ID == undefined ||
-  //           item.Nombre == undefined ||
-  //           item.Simbolo == undefined
-  //         ) {
-  //           error++;
-  //         }
-  //       })
-  //     );
+      let error = 0;
+      //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+      //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
+      //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
+      //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
+      //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
+      //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+      //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
 
-  //     if (error > 0) {
-  //       return httpResponse.BadRequestException(
-  //         "Error al leer el archivo. Verificar los campos"
-  //       );
-  //     }
+      //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
+      //Usamos rango 0 para verificar q estamos leyendo las primeras filas
+      const firstTwoRows: any = xlsx.utils
+        .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
+        .slice(0, 2); //nos limitamos a las primeras 2
+      //verificamos si están vacias las primeras filas
+      const isEmptyRow = (row: any[]) =>
+        row.every((cell) => cell === null || cell === undefined || cell === "");
+      //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
+      if (
+        firstTwoRows.length < 2 ||
+        (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
+      ) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+      const company = await companyValidation.findById(idCompany);
+      if (!company.success) return company;
+      const responseCompany = company.payload as Empresa;
+      let errorNumber = 0;
+      const seenCodes = new Set<string>();
+      let previousCodigo: number | null = null;
 
-  //     //[note] Aca verificamos si que el codigo no tenga letras ni que sea menor que el anterior
-  //     await Promise.all(
-  //       sheetToJson.map(async (item: I_UnifiedIndexExcel) => {
-  //         //verificamos si tenemos el codigo
-  //         const codigo = parseInt(item.ID, 10); // Intenta convertir el string a número
+      //[note] aca si hay espacio en blanco.
+      await Promise.all(
+        sheetToJson.map(async (item: I_UnifiedIndexExcel, index: number) => {
+          index++;
+          if (item.ID == undefined || item.Nombre == undefined) {
+            error++;
+          }
+        })
+      );
 
-  //         if (!validator.isNumeric(item.ID)) {
-  //           errorNumber++; // Aumenta si el código no es un número válido
-  //         } else {
-  //           // Verifica si el código ya ha sido procesado
-  //           if (!seenCodes.has(item.ID)) {
-  //             // errorNumber++; // Aumenta si hay duplicado
-  //             seenCodes.add(item.ID);
-  //           }
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
-  //           // Verifica si el código actual no es mayor que el anterior
-  //           if (previousCodigo !== null && codigo <= previousCodigo) {
-  //             errorNumber++;
-  //           }
+      //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
+      await Promise.all(
+        sheetToJson.map(async (item: I_UnifiedIndexExcel) => {
+          //verificamos si tenemos el codigo
+          const codigo = parseInt(item.ID, 10); // Intenta convertir el string a número
 
-  //           previousCodigo = codigo;
-  //         }
-  //       })
-  //     );
+          if (!validator.isNumeric(item.ID)) {
+            errorNumber++; // Aumenta si el código no es un número válido
+          } else {
+            // Verifica si el código ya ha sido procesado
+            if (!seenCodes.has(item.ID)) {
+              // errorNumber++; // Aumenta si hay duplicado
+              seenCodes.add(item.ID);
+            }
 
-  //     if (errorNumber > 0) {
-  //       return httpResponse.BadRequestException(
-  //         "Error al leer el archivo. Verificar los campos"
-  //       );
-  //     }
+            // Verifica si el código actual no es mayor que el anterior
+            if (previousCodigo !== null && codigo <= previousCodigo) {
+              errorNumber++;
+            }
 
-  //     //[NOTE] Acá verifico si el primer elemento es 001
-  //     const sortedCodesArray = Array.from(seenCodes)
-  //       .map((item) => item.padStart(3, "0"))
-  //       .sort((a, b) => parseInt(a) - parseInt(b));
+            previousCodigo = codigo;
+          }
+        })
+      );
 
-  //     if (sortedCodesArray[0] != "001") {
-  //       errorNumber++;
-  //     }
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
-  //     if (errorNumber > 0) {
-  //       return httpResponse.BadRequestException(
-  //         "Error al leer el archivo. Verificar los campos"
-  //       );
-  //     }
-  //     //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
-  //     for (let i = 1; i < sortedCodesArray.length; i++) {
-  //       const currentCode = parseInt(sortedCodesArray[i]);
-  //       const previousCode = parseInt(sortedCodesArray[i - 1]);
+      //[NOTE] Acá verifico si el primer elemento es 001, si empieza con por ejemplo 000 te da error
+      const sortedCodesArray = Array.from(seenCodes)
+        .map((item) => item.padStart(3, "0"))
+        .sort((a, b) => parseInt(a) - parseInt(b));
 
-  //       if (currentCode !== previousCode + 1) {
-  //         errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-  //         break; // Puedes detener el ciclo en el primer error
-  //       }
-  //     }
+      if (sortedCodesArray[0] != "001") {
+        errorNumber++;
+      }
 
-  //     if (errorNumber > 0) {
-  //       return httpResponse.BadRequestException(
-  //         "Error al leer el archivo. Verificar los campos"
-  //       );
-  //     }
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+      //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
+      for (let i = 1; i < sortedCodesArray.length; i++) {
+        const currentCode = parseInt(sortedCodesArray[i]);
+        const previousCode = parseInt(sortedCodesArray[i - 1]);
 
-  //     //[SUCCESS] Guardo o actualizo la Unidad de Producción
-  //     let code;
-  //     let productionUnit;
-  //     await Promise.all(
-  //       sheetToJson.map(async (item: I_UnifiedIndexExcel, index: number) => {
-  //         code = await unifiedIndexValidation.findByCode(item.ID);
-  //         if (!code.success) {
-  //           productionUnit = code.payload as Tren;
-  //           await trainValidation.updateTrain(
-  //             item,
-  //             +productionUnit.id,
-  //             responseProject.id
-  //           );
-  //         } else {
-  //           await prisma.tren.create({
-  //             data: {
-  //               codigo: String(item["ID-TREN"]),
-  //               nombre: item.TREN,
-  //               nota: item.NOTA,
-  //               cuadrilla: item.TREN + "-" + item["ID-TREN"],
-  //               operario: 1,
-  //               oficial: 1,
-  //               peon: 1,
-  //               proyecto_id: responseCompany.id,
-  //             },
-  //           });
-  //         }
-  //       })
-  //     );
+        if (currentCode !== previousCode + 1) {
+          errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
+          break; // Puedes detener el ciclo en el primer error
+        }
+      }
 
-  //     await prisma.$disconnect();
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
-  //     return httpResponse.SuccessResponse("Trenes creados correctamente!");
-  //   } catch (error) {
-  //     await prisma.$disconnect();
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al leer el Tren",
-  //       error
-  //     );
-  //   }
-  // }
+      //[SUCCESS] Guardo o actualizo la Unidad de Producción
+
+      let code;
+      let unifiedIndexIdResponse;
+      await Promise.all(
+        sheetToJson.map(async (item: I_UnifiedIndexExcel) => {
+          code = await unifiedIndexValidation.findByCode(String(item.ID));
+          if (!code.success) {
+            unifiedIndexIdResponse = code.payload as IndiceUnificado;
+            await unifiedIndexValidation.updateUnifiedIndex(
+              item,
+              unifiedIndexIdResponse.id,
+              responseCompany.id
+            );
+          } else {
+            await prisma.indiceUnificado.create({
+              data: {
+                codigo: String(item.ID),
+                nombre: item.Nombre,
+                simbolo: item.Simbolo,
+                comentario: item.Comentario,
+                empresa_id: idCompany,
+              },
+            });
+          }
+        })
+      );
+
+      await prisma.$disconnect();
+
+      return httpResponse.SuccessResponse(
+        "Indices Unificados creados correctamente!"
+      );
+    } catch (error) {
+      console.log(error);
+      await prisma.$disconnect();
+      return httpResponse.InternalServerErrorException(
+        "Error al leer el Indice Unificado",
+        error
+      );
+    }
+  }
 }
 
 export const unifiedIndexService = new UnifiedIndexService();

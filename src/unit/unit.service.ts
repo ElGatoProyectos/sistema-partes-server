@@ -15,9 +15,11 @@ class UnitService {
       if (!resultName.success) {
         return resultName;
       }
-      const resultSymbol = await unitValidation.findBySymbol(data.simbolo);
-      if (!resultSymbol.success) {
-        return resultSymbol;
+      if (data.simbolo) {
+        const resultSymbol = await unitValidation.findBySymbol(data.simbolo);
+        if (!resultSymbol.success) {
+          return resultSymbol;
+        }
       }
 
       const resultIdCompany = await companyValidation.findById(data.empresa_id);
@@ -36,7 +38,7 @@ class UnitService {
       const unitFormat = {
         ...data,
         codigo: formattedCodigo,
-        simbolo: data.simbolo.toUpperCase(),
+        simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
 
       const responseUnit = await prismaUnitRepository.createUnit(unitFormat);
@@ -73,7 +75,7 @@ class UnitService {
         }
       }
 
-      if (resultUnitFind.simbolo != data.simbolo) {
+      if (data.simbolo && resultUnitFind.simbolo != data.simbolo) {
         const resultSymbol = await unitValidation.findBySymbol(data.simbolo);
         if (!resultSymbol.success) {
           return resultSymbol;
@@ -85,7 +87,7 @@ class UnitService {
 
       const unitFormat = {
         ...data,
-        simbolo: data.simbolo.toUpperCase(),
+        simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
 
       const responseUnit = await prismaUnitRepository.updateUnit(

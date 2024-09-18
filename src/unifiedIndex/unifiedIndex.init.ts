@@ -15,16 +15,20 @@ unifiedIndexRouter.post(
   unifiedIndexController.create
 );
 
+unifiedIndexRouter.post(
+  `${prefix}/upload-excel`,
+  authRoleMiddleware.authAdminAndProjectManager,
+  unifiedIndexController.unifiedIndexReadExcel
+);
+
 unifiedIndexRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   unifiedIndexController.allUnifiedIndex
 );
 
 unifiedIndexRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   unifiedIndexController.findByName
 );

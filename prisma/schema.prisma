@@ -543,8 +543,8 @@ model Unidad {
   id             Int         @id @default(autoincrement())
   codigo         String      @unique
   nombre         String
-  simbolo        String
-  descripcion    String
+  simbolo        String?
+  descripcion    String?
   empresa_id     Int
   Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
   fecha_creacion DateTime    @default(now())
@@ -558,8 +558,8 @@ model IndiceUnificado {
   id             Int         @id @default(autoincrement())
   codigo         String      @unique
   nombre         String
-  simbolo        String
-  comentario     String
+  simbolo        String?
+  comentario     String?
   empresa_id     Int
   fecha_creacion DateTime    @default(now())
   Empresa        Empresa     @relation(fields: [empresa_id], references: [id])

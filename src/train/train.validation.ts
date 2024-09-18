@@ -16,17 +16,17 @@ class TrainValidation {
         cuadrilla: data.TREN + "-" + data["ID-TREN"],
         proyecto_id: Number(idProjectID),
       };
-      const responseProductionUnit = await prismaTrainRepository.updateTrain(
+      const responseTrain = await prismaTrainRepository.updateTrain(
         train,
         idProductionUnit
       );
       return httpResponse.SuccessResponse(
         "Tren modificado correctamente",
-        responseProductionUnit
+        responseTrain
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al modificar la Unidad de Producción",
+        "Error al modificar el Tren",
         error
       );
     }
