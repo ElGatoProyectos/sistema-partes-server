@@ -21,7 +21,6 @@ prouductionUnitRouter.get(
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.findByName
 );

@@ -15,8 +15,8 @@ export class UnifiedIndexResponseMapper
     this.id = unifiedIndex.id;
     this.codigo = unifiedIndex.codigo;
     this.nombre = unifiedIndex.nombre;
-    this.simbolo = unifiedIndex.simbolo;
-    this.comentario = unifiedIndex.comentario;
+    this.simbolo = unifiedIndex.simbolo ? unifiedIndex.simbolo : "";
+    this.comentario = unifiedIndex.comentario ? unifiedIndex.comentario : "";
     this.empresa_id = unifiedIndex.empresa_id;
     this.fecha_creacion = unifiedIndex.fecha_creacion;
   }

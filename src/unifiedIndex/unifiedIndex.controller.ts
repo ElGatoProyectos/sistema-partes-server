@@ -84,35 +84,35 @@ class UnifiedIndexController {
     response.status(result.statusCode).json(result);
   }
 
-  // unifiedIndexReadExcel = async (
-  //   request: express.Request,
-  //   response: express.Response
-  // ) => {
-  //   // Usando multer para manejar la subida de archivos en memoria
-  //   upload.single("train-file")(request, response, async (err: any) => {
-  //     if (err) {
-  //       return response.status(500).json({ error: "Error uploading file" });
-  //     }
-  //     const responseBody = request.body as I_ImportExcelRequestUnifiedIndex;
-  //     const file = request.file;
-  //     if (!file) {
-  //       return response.status(400).json({ error: "No se subió archivo" });
-  //     }
+  unifiedIndexReadExcel = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    // Usando multer para manejar la subida de archivos en memoria
+    upload.single("unified-index-file")(request, response, async (err: any) => {
+      if (err) {
+        return response.status(500).json({ error: "Error uploading file" });
+      }
+      const responseBody = request.body as I_ImportExcelRequestUnifiedIndex;
+      const file = request.file;
+      if (!file) {
+        return response.status(400).json({ error: "No se subió archivo" });
+      }
 
-  //     try {
-  //       unifiedIndexExcelDto.parse(request.body);
-  //       const serviceResponse =
-  //         await unifiedIndexService.registerUnifiedIndexMasive(
-  //           file,
-  //           +responseBody.idCompany
-  //         );
+      try {
+        unifiedIndexExcelDto.parse(request.body);
+        const serviceResponse =
+          await unifiedIndexService.registerUnifiedIndexMasive(
+            file,
+            +responseBody.idCompany
+          );
 
-  //       response.status(serviceResponse.statusCode).json(serviceResponse);
-  //     } catch (error) {
-  //       response.status(500).json(error);
-  //     }
-  //   });
-  // };
+        response.status(serviceResponse.statusCode).json(serviceResponse);
+      } catch (error) {
+        response.status(500).json(error);
+      }
+    });
+  };
 }
 
 export const unifiedIndexController = new UnifiedIndexController();

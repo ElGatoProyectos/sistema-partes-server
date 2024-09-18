@@ -10,14 +10,12 @@ const prefix = "/unit";
 
 unitRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.allResoursesCategories
 );
 
 unitRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.findByName
 );

@@ -10,14 +10,12 @@ const prefix = "/resourseCategory";
 
 resourseCategoryRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   resourseCategoryController.allResoursesCategories
 );
 
 resourseCategoryRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   resourseCategoryController.findByName
 );

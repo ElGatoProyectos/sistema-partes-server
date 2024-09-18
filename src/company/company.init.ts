@@ -12,14 +12,12 @@ companyRouter.post(`${prefix}`, companyController.create);
 
 companyRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   companyController.allCompanies
 );
 
 companyRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   companyController.findByName
 );

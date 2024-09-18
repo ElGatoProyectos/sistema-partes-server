@@ -3,6 +3,8 @@ import { I_CreateUnitBD, I_UpdateUnitBody } from "./models/unit.interface";
 export abstract class UnitRepository {
   findAll(skip: number, limit: number): void {}
 
+  findByCode(code: string): void {}
+
   findById(idUnit: number): void {}
 
   codeMoreHigh(): void {}

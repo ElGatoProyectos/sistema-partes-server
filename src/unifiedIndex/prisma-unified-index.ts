@@ -4,6 +4,7 @@ import {
   I_CreateUnifiedIndexBD,
   I_UnifiedIndex,
   I_UpdateUnifiedIndexBody,
+  I_UpdateUnifiedIndexBodyValidation,
 } from "./models/unifiedIndex.interface";
 import { UnifiedIndexRepository } from "./unifiedIndex.repository";
 
@@ -131,7 +132,7 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
   }
 
   async updateUnifiedIndex(
-    data: I_UpdateUnifiedIndexBody,
+    data: I_UpdateUnifiedIndexBodyValidation,
     idUnifiedIndex: number
   ): Promise<IndiceUnificado> {
     const unifiedIndex = await prisma.indiceUnificado.update({

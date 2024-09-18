@@ -3,11 +3,21 @@ import {
   I_CreateUnitBD,
   I_Unit,
   I_UpdateUnitBody,
+  I_UpdateUnitBodyValidation,
 } from "./models/unit.interface";
 import { E_Estado_BD, Unidad } from "@prisma/client";
 import { UnitRepository } from "./unit.repository";
 
 class PrismaUnitRepository implements UnitRepository {
+  async findByCode(code: string): Promise<Unidad | null> {
+    const unit = await prisma.unidad.findFirst({
+      where: {
+        codigo: code,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return unit;
+  }
   async codeMoreHigh(): Promise<Unidad | null> {
     const lastUnit = await prisma.unidad.findFirst({
       where: {
@@ -126,7 +136,10 @@ class PrismaUnitRepository implements UnitRepository {
     return unit;
   }
 
-  async updateUnit(data: I_UpdateUnitBody, idUnit: number): Promise<Unidad> {
+  async updateUnit(
+    data: I_UpdateUnitBodyValidation,
+    idUnit: number
+  ): Promise<Unidad> {
     const unidad = await prisma.unidad.update({
       where: { id: idUnit },
       data: data,

@@ -28,14 +28,12 @@ trainRouter.put(
 
 trainRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.allTrains
 );
 
 trainRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.findByName
 );

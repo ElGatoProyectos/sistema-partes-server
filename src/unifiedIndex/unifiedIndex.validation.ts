@@ -3,34 +3,36 @@ import { prismaUnifiedIndexRepository } from "./prisma-unified-index";
 import { I_UnifiedIndexExcel } from "./models/unifiedIndex.interface";
 
 class UnifiedIndexValidation {
-  // async updateUnifiedIndex(
-  //   data: I_UnifiedIndexExcel,
-  //   idUnit: number,
-  //   idCompany: number
-  // ): Promise<T_HttpResponse> {
-  //   try {
-  //     const train = {
-  //       codigo: String(data["ID-TREN"]),
-  //       nombre: data.TREN,
-  //       nota: data.NOTA,
-  //       cuadrilla: data.TREN + "-" + data["ID-TREN"],
-  //       proyecto_id: Number(idProjectID),
-  //     };
-  //     const responseProductionUnit = await prismaTrainRepository.updateTrain(
-  //       train,
-  //       idProductionUnit
-  //     );
-  //     return httpResponse.SuccessResponse(
-  //       "Tren modificado correctamente",
-  //       responseProductionUnit
-  //     );
-  //   } catch (error) {
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al modificar la Unidad de Producción",
-  //       error
-  //     );
-  //   }
-  // }
+  async updateUnifiedIndex(
+    data: I_UnifiedIndexExcel,
+    idUnit: number,
+    idCompany: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const unifiedIndexFormat = {
+        codigo: String(data.ID),
+        nombre: data.Nombre,
+        simbolo: data.Simbolo,
+        comentario: data.Comentario,
+        empresa_id: idCompany,
+      };
+
+      const responseUnifiedIndex =
+        await prismaUnifiedIndexRepository.updateUnifiedIndex(
+          unifiedIndexFormat,
+          idUnit
+        );
+      return httpResponse.SuccessResponse(
+        "Indice Unificado modificado correctamente",
+        responseUnifiedIndex
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar el Indice Unificado",
+        error
+      );
+    }
+  }
   async codeMoreHigh(): Promise<T_HttpResponse> {
     try {
       const unifiedIndex = await prismaUnifiedIndexRepository.codeMoreHigh();
@@ -51,9 +53,10 @@ class UnifiedIndexValidation {
   async findByCode(code: string): Promise<T_HttpResponse> {
     try {
       const unifiedIndex = await prismaUnifiedIndexRepository.findByCode(code);
-      if (!unifiedIndex) {
+      if (unifiedIndex) {
         return httpResponse.NotFoundException(
-          "El códgo del Indice Unificado no fue encontrado"
+          "El códgo del Indice Unificado encontrado",
+          unifiedIndex
         );
       }
       return httpResponse.SuccessResponse(

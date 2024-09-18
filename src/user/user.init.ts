@@ -10,14 +10,12 @@ const prefix = "/users";
 
 userRouter.get(
   `${prefix}`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   userController.allUsers
 );
 
 userRouter.get(
   `${prefix}/search`,
-  requestMiddleware.validatePagination,
   authRoleMiddleware.authAdmin,
   userController.findByName
 );
@@ -32,7 +30,7 @@ userRouter.get(
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  // authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdmin,
   userController.createUser
 );
 

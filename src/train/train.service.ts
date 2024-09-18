@@ -263,19 +263,38 @@ class TrainService {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_TrainExcel[];
-      const project = await projectValidation.findById(projectId);
-      if (!project.success) return project;
-      const responseProject = project.payload as Proyecto;
+      let error = 0;
       let errorNumber = 0;
-      const seenCodes = new Set<string>();
-      let previousCodigo: number | null = null;
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+      //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
       //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
       //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
       //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
       //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
-      let error = 0;
+
+      //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
+      //Usamos rango 0 para verificar q estamos leyendo las primeras filas
+      const firstTwoRows: any = xlsx.utils
+        .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
+        .slice(0, 2); //nos limitamos a las primeras 2
+      //verificamos si están vacias las primeras filas
+      const isEmptyRow = (row: any[]) =>
+        row.every((cell) => cell === null || cell === undefined || cell === "");
+      //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
+      if (
+        firstTwoRows.length < 2 ||
+        (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
+      ) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+      const project = await projectValidation.findById(projectId);
+      if (!project.success) return project;
+      const responseProject = project.payload as Proyecto;
+      const seenCodes = new Set<string>();
+      let previousCodigo: number | null = null;
 
       //[note] aca si hay espacio en blanco.
       await Promise.all(
@@ -293,7 +312,7 @@ class TrainService {
         );
       }
 
-      //[note] Aca verificamos si que el codigo no tenga letras ni que sea menor que el anterior
+      //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_TrainExcel) => {
           //verificamos si tenemos el codigo
@@ -359,7 +378,7 @@ class TrainService {
       let code;
       let productionUnit;
       await Promise.all(
-        sheetToJson.map(async (item: I_TrainExcel, index: number) => {
+        sheetToJson.map(async (item: I_TrainExcel) => {
           code = await trainValidation.findByCode(String(item["ID-TREN"]));
           if (!code.success) {
             productionUnit = code.payload as Tren;
