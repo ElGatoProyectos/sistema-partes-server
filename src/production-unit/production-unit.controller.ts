@@ -1,3 +1,4 @@
+import { prouductionUnitExcelDto } from "./dto/production-unit-excel";
 import { httpResponse } from "@/common/http.response";
 import express from "@/config/express.config";
 import multer from "multer";
@@ -232,29 +233,33 @@ class ProductionUnitController {
     response: express.Response
   ) => {
     // Usando multer para manejar la subida de archivos en memoria
-    upload.single("production-unit")(request, response, async (err: any) => {
-      if (err) {
-        return response.status(500).json({ error: "Error uploading file" });
-      }
-      const responseBody = request.body as I_ImportExcelRequest;
-      const file = request.file;
-      if (!file) {
-        return response.status(400).json({ error: "No file uploaded" });
-      }
+    upload.single("production-unit-file")(
+      request,
+      response,
+      async (err: any) => {
+        if (err) {
+          return response.status(500).json({ error: "Error uploading file" });
+        }
+        const responseBody = request.body as I_ImportExcelRequest;
+        const file = request.file;
+        if (!file) {
+          return response.status(400).json({ error: "No se subió archivo" });
+        }
 
-      try {
-        const serviceResponse =
-          await productionUnitService.registerProductionUnitMasive(
-            file,
-            +responseBody.idProject
-          );
+        try {
+          prouductionUnitExcelDto.parse(request.body);
+          const serviceResponse =
+            await productionUnitService.registerProductionUnitMasive(
+              file,
+              +responseBody.idProject
+            );
 
-        response.status(serviceResponse.statusCode).json(serviceResponse);
-      } catch (error) {
-        console.log("entro en error general");
-        response.status(500).json(error);
+          response.status(serviceResponse.statusCode).json(serviceResponse);
+        } catch (error) {
+          response.status(500).json(error);
+        }
       }
-    });
+    );
   };
 }
 

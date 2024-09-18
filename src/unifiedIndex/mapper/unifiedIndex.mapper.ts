@@ -5,6 +5,7 @@ export class UnifiedIndexResponseMapper
 {
   id: number;
   nombre: string;
+  codigo: string;
   simbolo: string;
   comentario: string;
   empresa_id: number;
@@ -12,6 +13,7 @@ export class UnifiedIndexResponseMapper
 
   constructor(unifiedIndex: IndiceUnificado) {
     this.id = unifiedIndex.id;
+    this.codigo = unifiedIndex.codigo;
     this.nombre = unifiedIndex.nombre;
     this.simbolo = unifiedIndex.simbolo;
     this.comentario = unifiedIndex.comentario;

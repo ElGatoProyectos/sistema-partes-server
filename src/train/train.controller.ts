@@ -1,11 +1,17 @@
+import { trainExcelDto } from "./dto/train-excel.dto";
 import express from "@/config/express.config";
 import { trainService } from "./train.service";
 import {
   I_CreateTrainUnitBody,
   I_Cuadrilla_Train,
+  I_ImportExcelRequestTrain,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
 import { T_FindAll } from "@/common/models/pagination.types";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload: any = multer({ storage: storage });
 
 class TrainController {
   async create(request: express.Request, response: express.Response) {
@@ -78,6 +84,35 @@ class TrainController {
     const result = await trainService.findAll(paginationOptions);
     response.status(result.statusCode).json(result);
   }
+
+  trainReadExcel = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    // Usando multer para manejar la subida de archivos en memoria
+    upload.single("train-file")(request, response, async (err: any) => {
+      if (err) {
+        return response.status(500).json({ error: "Error uploading file" });
+      }
+      const responseBody = request.body as I_ImportExcelRequestTrain;
+      const file = request.file;
+      if (!file) {
+        return response.status(400).json({ error: "No se subió archivo" });
+      }
+
+      try {
+        trainExcelDto.parse(request.body);
+        const serviceResponse = await trainService.registerTrainMasive(
+          file,
+          +responseBody.idProject
+        );
+
+        response.status(serviceResponse.statusCode).json(serviceResponse);
+      } catch (error) {
+        response.status(500).json(error);
+      }
+    });
+  };
 }
 
 export const trainController = new TrainController();

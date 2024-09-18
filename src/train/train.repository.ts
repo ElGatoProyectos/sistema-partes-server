@@ -6,6 +6,8 @@ import {
 export abstract class TrainRepository {
   findAll(skip: number, limit: number): void {}
 
+  findByCode(code: string): void {}
+
   findById(idUser: number): void {}
 
   createTrain(data: I_CreateTrainBD): void {}

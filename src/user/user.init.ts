@@ -41,6 +41,11 @@ userRouter.post(
   authRoleMiddleware.authAdmin,
   userController.createUserandCompany
 );
+userRouter.put(
+  `${prefix}/company`,
+  authRoleMiddleware.authAdmin,
+  userController.updateUserandCompany
+);
 
 userRouter.post(
   `${prefix}/user`,

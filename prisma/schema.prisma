@@ -541,6 +541,7 @@ model Recurso {
 
 model Unidad {
   id             Int         @id @default(autoincrement())
+  codigo         String      @unique
   nombre         String
   simbolo        String
   descripcion    String
@@ -555,6 +556,7 @@ model Unidad {
 
 model IndiceUnificado {
   id             Int         @id @default(autoincrement())
+  codigo         String      @unique
   nombre         String
   simbolo        String
   comentario     String

@@ -305,16 +305,18 @@ class ProductionUnitService {
       const sheetToJson = xlsx.utils.sheet_to_json(
         sheet
       ) as I_ProductionUnitExcel[];
-      let index = 1;
       const project = await projectValidation.findById(projectId);
+      if (!project.success) return project;
       const responseProject = project.payload as Proyecto;
       let errorNumber = 0;
       const seenCodes = new Set<string>();
       let previousCodigo: number | null = null;
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+      //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
       //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
       //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
       //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+      //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
       let error = 0;
 
       //[note] aca si hay espacio en blanco.
@@ -361,6 +363,14 @@ class ProductionUnitService {
           }
         })
       );
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+
+      //[NOTE] Acá verifico si el primer elemento es 001
       const sortedCodesArray = Array.from(seenCodes)
         .map((item) => item.padStart(3, "0"))
         .sort((a, b) => parseInt(a) - parseInt(b));
@@ -374,34 +384,50 @@ class ProductionUnitService {
           "Error al leer el archivo. Verificar los campos"
         );
       }
+      //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
+      for (let i = 1; i < sortedCodesArray.length; i++) {
+        const currentCode = parseInt(sortedCodesArray[i]);
+        const previousCode = parseInt(sortedCodesArray[i - 1]);
 
-      //guardado o actualizacion del excel
-      // let code;
-      // let productionUnit;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
-      //     code = await productionUnitValidation.findByCode(String(item.Codigo));
-      //     if (!code.success) {
-      //       productionUnit = code.payload as UnidadProduccion;
-      //       await productionUnitValidation.updateProductionUnit(
-      //         item,
-      //         +productionUnit.id,
-      //         responseProject.id
-      //       );
-      //     } else {
-      //       await prisma.unidadProduccion.create({
-      //         data: {
-      //           codigo: String(item.Codigo),
-      //           nombre: item.Nombre,
-      //           nota: item.Nota,
-      //           proyecto_id: responseProject.id,
-      //         },
-      //       });
-      //     }
-      //   })
-      // );
+        if (currentCode !== previousCode + 1) {
+          errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
+          break; // Puedes detener el ciclo en el primer error
+        }
+      }
 
-      // await prisma.$disconnect();
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+
+      //[SUCCESS] Guardo o actualizo la Unidad de Producción
+      let code;
+      let productionUnit;
+      await Promise.all(
+        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+          code = await productionUnitValidation.findByCode(String(item.Codigo));
+          if (!code.success) {
+            productionUnit = code.payload as UnidadProduccion;
+            await productionUnitValidation.updateProductionUnit(
+              item,
+              +productionUnit.id,
+              responseProject.id
+            );
+          } else {
+            await prisma.unidadProduccion.create({
+              data: {
+                codigo: String(item.Codigo),
+                nombre: item.Nombre,
+                nota: item.Nota,
+                proyecto_id: responseProject.id,
+              },
+            });
+          }
+        })
+      );
+
+      await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(
         "Unidad de producción creada correctamente!"

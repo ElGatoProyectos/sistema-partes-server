@@ -3,8 +3,10 @@ import express from "@/config/express.config";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyBody,
+  I_CreateUserAndCompanyUpdate,
   I_CreateUserBody,
   I_UpdateRolUserBody,
+  I_UpdateUserAndCompanyBody,
   I_UpdateUserBody,
 } from "./models/user.interface";
 import { userService } from "./user.service";
@@ -16,6 +18,7 @@ import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";
 import { userAndCompanyDto } from "./dto/userAndCompany.dto";
+import { userAndCompanyUpdateDto } from "./dto/userAndCompanyUpdate.dto";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.
 // esto es útil por si lo querés analizar o guardar en algun lugar
@@ -64,6 +67,80 @@ class UserController {
               } else {
                 const responseUserAndCompany =
                   result.payload as I_CreateUserAndCompanyBody;
+                if (request.file) {
+                  const id = responseUserAndCompany.empresa.id;
+                  const direction = path.join(
+                    appRootPath.path,
+                    "static",
+                    CompanyMulterProperties.folder
+                  );
+                  const ext = ".png";
+                  const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                  const filePath = path.join(direction, fileName);
+                  sharp(request.file.buffer)
+                    .resize({ width: 800 })
+                    .toFormat("png")
+                    .toFile(filePath, (err) => {
+                      if (err) {
+                        const customError = httpResponse.BadRequestException(
+                          "Error al guardar la imagen de la empresa",
+                          err
+                        );
+                        response
+                          .status(customError.statusCode)
+                          .json(customError);
+                      } else {
+                        response.status(result.statusCode).json(result);
+                      }
+                    });
+                } else {
+                  response.status(result.statusCode).json(result);
+                }
+              }
+            }
+          } catch (error) {
+            console.log(error);
+            const customError = httpResponse.BadRequestException(
+              "Error al validar los campos al crear el usuario y la empresa",
+              error
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    );
+  };
+  updateUserandCompany = async (
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) => {
+    upload.single(CompanyMulterProperties.field)(
+      request,
+      response,
+      async (error: any) => {
+        if (error) {
+          const customError = httpResponse.BadRequestException(
+            "Error al procesar la imagen ",
+            error
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          try {
+            const responseValidate = authService.verifyRolProject(
+              request.get("Authorization") as string
+            );
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
+            } else {
+              userAndCompanyUpdateDto.parse(request.body);
+              const data = request.body as I_CreateUserAndCompanyUpdate;
+              const result = await userService.updateUserAndCompany(data);
+              if (!result.success) {
+                response.status(result.statusCode).json(result);
+              } else {
+                const responseUserAndCompany =
+                  result.payload as I_UpdateUserAndCompanyBody;
                 if (request.file) {
                   const id = responseUserAndCompany.empresa.id;
                   const direction = path.join(

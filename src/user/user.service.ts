@@ -1,6 +1,7 @@
-import { Rol, Usuario } from "@prisma/client";
+import { Empresa, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
+  I_CreateUserAndCompanyUpdate,
   I_CreateUserBD,
   I_CreateUserBody,
   I_UpdateUserBD,
@@ -264,6 +265,169 @@ class UserService {
       await prisma.$disconnect();
     }
   }
+  async updateUserAndCompany(
+    data: I_CreateUserAndCompanyUpdate
+  ): Promise<T_HttpResponse> {
+    try {
+      const responseUser = await userValidation.findById(+data.id_user);
+      if (!responseUser.success) {
+        return responseUser;
+      }
+      const responseCompany = await companyValidation.findById(
+        +data.id_company
+      );
+      if (!responseCompany.success) {
+        return responseCompany;
+      }
+      const user = responseUser.payload as Usuario;
+      const company = responseCompany.payload as Empresa;
+      if (user.email != data.email) {
+        const responseEmailUser = await userValidation.findByEmail(data.email);
+        if (!responseEmailUser.success) return responseEmailUser;
+      }
+      if (user.dni != data.dni) {
+        const responseByDni = await userValidation.findByDni(data.dni);
+        if (responseByDni.success) return responseByDni;
+      }
+
+      if (!validator.isEmail(data.email)) {
+        return httpResponse.BadRequestException(
+          "El formato del email ingresado no es válido"
+        );
+      }
+      const resultDni = wordIsNumeric(data.dni);
+      if (resultDni) {
+        return httpResponse.BadRequestException(
+          "El campo dni debe contener solo números"
+        );
+      }
+
+      const resultPhone = wordIsNumeric(data.telefono);
+      if (resultPhone) {
+        return httpResponse.BadRequestException(
+          "El campo telefono debe contener solo números"
+        );
+      }
+
+      const resultLimitProject = wordIsNumeric(data.limite_proyecto);
+      if (resultLimitProject) {
+        return httpResponse.BadRequestException(
+          "El campo limite proyecto debe contener solo números"
+        );
+      }
+
+      const resultLimitUsers = wordIsNumeric(data.limite_usuarios);
+      if (resultLimitUsers) {
+        return httpResponse.BadRequestException(
+          "El campo limite usuarios debe contener solo números"
+        );
+      }
+
+      const resultRuc = wordIsNumeric(data.ruc);
+      if (resultRuc) {
+        return httpResponse.BadRequestException(
+          "El campo Ruc debe contener solo números"
+        );
+      }
+      const resultRucLength = largeMinEleven(data.ruc);
+      if (resultRucLength) {
+        return httpResponse.BadRequestException(
+          "El campo Ruc debe contener por lo menos 11 caracteres"
+        );
+      }
+
+      const resultPhoneCompany = wordIsNumeric(data.telefono_empresa);
+      if (resultPhoneCompany) {
+        return httpResponse.BadRequestException(
+          "El campo telefono de la empresa debe contener solo números"
+        );
+      }
+
+      if (company.nombre_empresa != data.nombre_empresa) {
+        const existNameCompany = await companyValidation.findByName(
+          data.nombre_empresa
+        );
+        if (!existNameCompany.success) return existNameCompany;
+      }
+
+      if (company.nombre_corto != data.nombre_corto_empresa) {
+        const responseNameShort = await companyValidation.findByNameShort(
+          data.nombre_corto_empresa
+        );
+        if (!responseNameShort.success) return responseNameShort;
+      }
+
+      const resultEmail = emailValid(data.email_empresa);
+      if (!resultEmail) {
+        return httpResponse.BadRequestException(
+          "El Correo de la empresa ingresado no es válido"
+        );
+      }
+
+      if (company.correo != data.email_empresa) {
+        const responseEmailCompany = await companyValidation.findByEmail(
+          data.email_empresa
+        );
+        if (!responseEmailCompany.success) return responseEmailCompany;
+      }
+
+      const hashContrasena = bcryptService.hashPassword(data.contrasena);
+      const role = await prismaRolRepository.existsName("USER");
+      if (!role) {
+        return httpResponse.BadRequestException(
+          "El Rol que deseas buscar no existe"
+        );
+      }
+      let userFormat: I_CreateUserBD;
+      userFormat = {
+        email: data.email,
+        dni: data.dni,
+        nombre_completo: data.nombre_completo,
+        telefono: data.telefono_empresa,
+        contrasena: hashContrasena,
+        limite_proyecto: Number(data.limite_proyecto),
+        limite_usuarios: Number(data.limite_usuarios),
+        rol_id: role.id,
+      };
+      const resultUser = await prismaUserRepository.updateUser(
+        userFormat,
+        +data.id_user
+      );
+      const companyFormat = {
+        nombre_empresa: data.nombre_empresa,
+        descripcion_empresa: data.descripcion_empresa,
+        ruc: data.ruc,
+        direccion_fiscal: data.direccion_empresa_fiscal,
+        direccion_oficina: data.direccion_empresa_oficina,
+        nombre_corto: data.nombre_corto_empresa,
+        telefono: data.telefono_empresa,
+        correo: data.email_empresa,
+        contacto_responsable: data.contacto_responsable,
+        usuario_id: resultUser.id,
+      };
+
+      const resultCompany = await prismaCompanyRepository.updateCompany(
+        companyFormat,
+        +data.id_company
+      );
+      const resultUserAndCompany = {
+        usuario: resultUser,
+        empresa: resultCompany,
+      };
+
+      return httpResponse.CreatedResponse(
+        "Usuario y empresa modificados correctamente",
+        resultUserAndCompany
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar usuario y la empresa ",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 
   async usersToCompany(
     data: I_UpdateUserBody,
@@ -445,7 +609,7 @@ class UserService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al actualizar el usuario",
+        "Error al actualizar el usuario",
         error
       );
     } finally {

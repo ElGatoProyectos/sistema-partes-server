@@ -50,8 +50,33 @@ export interface I_CreateUserAndCompany {
   email_empresa: string;
   contacto_responsable: string;
 }
+export interface I_CreateUserAndCompanyUpdate {
+  email: string;
+  dni: string;
+  nombre_completo: string;
+  telefono: string;
+  contrasena: string;
+  limite_proyecto: string;
+  limite_usuarios: string;
+  rol_id: string;
+  id_user: string;
+  nombre_empresa: string;
+  descripcion_empresa: string;
+  direccion_empresa_fiscal: string;
+  direccion_empresa_oficina: string;
+  ruc: string;
+  nombre_corto_empresa: string;
+  telefono_empresa: string;
+  email_empresa: string;
+  contacto_responsable: string;
+  id_company: string;
+}
 
 export interface I_CreateUserAndCompanyBody {
+  usuario: I_User;
+  empresa: Empresa;
+}
+export interface I_UpdateUserAndCompanyBody {
   usuario: I_User;
   empresa: Empresa;
 }

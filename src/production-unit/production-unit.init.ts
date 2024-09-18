@@ -10,6 +10,7 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel`,
+  authRoleMiddleware.authAdminAndProjectManager,
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.get(
