@@ -1,12 +1,8 @@
-import { envConfig } from "@/config/env.config";
-import express from "@/config/express.config";
-import jwt from "@/config/jwt.config";
+import { envConfig } from "../config/env.config";
+import jwt from "../config/jwt.config";
 import { T_ResponseToken } from "./models/auth.type";
-import { prismaUserRepository } from "@/user/prisma-user.repository";
-import { Usuario } from "@prisma/client";
-import { I_User } from "@/user/models/user.interface";
-import { userService } from "@/user/user.service";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { userService } from "../user/user.service";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 
 class JWTService {
   sign(payload: any) {
@@ -22,7 +18,10 @@ class JWTService {
     const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
     const userResponse = await userService.findById(tokenDecrypted.id);
     if (!userResponse.success) return userResponse;
-    return httpResponse.SuccessResponse("Usuario encontrado", userResponse);
+    return httpResponse.SuccessResponse(
+      "Usuario encontrado",
+      userResponse.payload
+    );
   }
 }
 

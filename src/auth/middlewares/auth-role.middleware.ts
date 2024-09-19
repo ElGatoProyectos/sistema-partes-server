@@ -1,6 +1,4 @@
-import { envConfig } from "@/config/env.config";
 import express from "@/config/express.config";
-import jwt from "@/config/jwt.config";
 import { T_ResponseToken } from "../models/auth.type";
 import { jwtService } from "../jwt.service";
 import { httpResponse } from "@/common/http.response";

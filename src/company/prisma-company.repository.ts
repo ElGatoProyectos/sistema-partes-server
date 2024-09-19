@@ -5,7 +5,7 @@ import {
   I_CreateCompanyBD,
   I_UpdateCompanyBody,
 } from "./models/company.interface";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 
 class PrismaCompanyRepository implements CompanyRepository {
   async findByIdUser(idUser: number): Promise<Empresa | null> {

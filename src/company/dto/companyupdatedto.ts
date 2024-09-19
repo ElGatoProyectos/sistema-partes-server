@@ -10,5 +10,4 @@ export const empresaUpdateDto = z.object({
   telefono: z.string(),
   correo: z.string(),
   contacto_responsable: z.string(),
-  usuario_id: z.string(),
 });

@@ -1,4 +1,4 @@
-import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
+import { Empresa, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyUpdate,
@@ -8,25 +8,49 @@ import {
   I_UpdateUserBody,
 } from "./models/user.interface";
 import { prismaUserRepository } from "./prisma-user.repository";
-import prisma from "@/config/prisma.config";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import { bcryptService } from "@/auth/bcrypt.service";
+import prisma from "../config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import { bcryptService } from "../auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
 import validator from "validator";
-import { wordIsNumeric } from "@/common/utils/number";
-import { prismaCompanyRepository } from "@/company/prisma-company.repository";
-import { jwtService } from "@/auth/jwt.service";
-import { detailUserCompanyService } from "@/detailsUserCompany/detailuserservice.service";
-import { I_CreateCompanyBD } from "@/company/models/company.interface";
-import { largeMinEleven } from "@/common/utils/largeMinEleven";
+import { wordIsNumeric } from "../common/utils/number";
+import { prismaCompanyRepository } from "../company/prisma-company.repository";
+import { jwtService } from "../auth/jwt.service";
+import { detailUserCompanyService } from "../detailsUserCompany/detailuserservice.service";
+import { I_CreateCompanyBD } from "../company/models/company.interface";
+import { largeMinEleven } from "../common/utils/largeMinEleven";
 import { userValidation } from "./user.validation";
-import { rolValidation } from "@/rol/rol.validation";
-import { companyValidation } from "@/company/company.validation";
-import { emailValid } from "@/common/utils/email";
-import { prismaRolRepository } from "@/rol/prisma-rol.repository";
+import { rolValidation } from "../rol/rol.validation";
+import { companyValidation } from "../company/company.validation";
+import { emailValid } from "../common/utils/email";
+import { prismaRolRepository } from "../rol/prisma-rol.repository";
 
 class UserService {
+  async createUserAsAdmin(data: I_CreateUserBD): Promise<T_HttpResponse> {
+    try {
+      const role = await prismaRolRepository.existsName("ADMIN");
+      if (!role) {
+        return httpResponse.BadRequestException(
+          "El Rol que deseas buscar no existe"
+        );
+      }
+      const userFormat = {
+        ...data,
+        rol_id: role?.id,
+      };
+      const user = await prismaUserRepository.createUser(userFormat);
+      if (!user)
+        return httpResponse.NotFoundException("No se pudo crear el usuario");
+      // const userMapper = new UserResponseMapper(user);
+      return httpResponse.SuccessResponse("Usuario creado con éxito", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar usuario",
+        error
+      );
+    }
+  }
   async findAll(data: T_FindAllUser): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
@@ -507,6 +531,23 @@ class UserService {
     }
   }
 
+  async findByEmail(email: string): Promise<T_HttpResponse> {
+    try {
+      const user = await prismaUserRepository.existsEmail(email);
+      // este error me valida que no esta el usuario
+      if (!user) {
+        return httpResponse.NotFoundException("Usuario no encontrado");
+      }
+      return httpResponse.SuccessResponse("Usuario encontrado", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async findByDni(dni: string): Promise<T_HttpResponse> {
     try {
       const user = await prismaUserRepository.findByDni(dni);

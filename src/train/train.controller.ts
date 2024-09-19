@@ -16,7 +16,8 @@ const upload: any = multer({ storage: storage });
 class TrainController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateTrainUnitBody;
-    const result = await trainService.createTrain(data);
+    const project_id = request.params.project_id;
+    const result = await trainService.createTrain(data, +project_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {

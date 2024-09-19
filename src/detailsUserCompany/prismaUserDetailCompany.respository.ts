@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { CompanyRepository } from "./detail-user-company.repository";
 import { DetalleUsuarioEmpresa } from "@prisma/client";
 

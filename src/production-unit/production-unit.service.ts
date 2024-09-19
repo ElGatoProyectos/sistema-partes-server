@@ -19,7 +19,8 @@ import validator from "validator";
 
 class ProductionUnitService {
   async createProductionUnit(
-    data: I_CreateProductionUnitBody
+    data: I_CreateProductionUnitBody,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const resultNameProjectUnit = await productionUnitValidation.findByName(
@@ -28,9 +29,7 @@ class ProductionUnitService {
       if (!resultNameProjectUnit.success) {
         return resultNameProjectUnit;
       }
-      const resultIdProject = await projectValidation.findById(
-        Number(data.proyecto_id)
-      );
+      const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear la Unidad de Producción con el id del proyecto proporcionado"
@@ -42,7 +41,7 @@ class ProductionUnitService {
       const productionUnit = {
         ...data,
         codigo: formattedCodigo,
-        proyecto_id: Number(data.proyecto_id),
+        proyecto_id: project_id,
       };
 
       const responseProductionUnit =
@@ -80,11 +79,12 @@ class ProductionUnitService {
 
   async updateProductionUnit(
     data: I_UpdateProductionUnitBody,
-    idProductionUnit: number
+    productionUnit_id: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const resultIdProductionUnit = await productionUnitValidation.findById(
-        idProductionUnit
+        productionUnit_id
       );
       if (!resultIdProductionUnit.success) {
         return httpResponse.BadRequestException(
@@ -104,9 +104,7 @@ class ProductionUnitService {
         }
       }
 
-      const resultIdProject = await projectValidation.findById(
-        Number(data.proyecto_id)
-      );
+      const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear la unidad de producción con el id del proyecto proporcionado"
@@ -114,12 +112,12 @@ class ProductionUnitService {
       }
       const productionUnit = {
         ...data,
-        proyecto_id: Number(data.proyecto_id),
+        proyecto_id: project_id,
       };
       const responseProductionUnit =
         await prismaProductionUnitRepository.updateProductionUnit(
           productionUnit,
-          idProductionUnit
+          productionUnit_id
         );
       const prouductionUnitMapper = new ProductionUnitResponseMapper(
         responseProductionUnit

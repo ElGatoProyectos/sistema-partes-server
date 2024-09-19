@@ -357,8 +357,9 @@ model Proyecto {
   costo_proyecto      Float
   estado              E_Proyecto_Estado
   eliminado           E_Estado_BD          @default(n)
-  fecha_creacion      DateTime             @db.Date()
+  fecha_inicio        DateTime             @db.Date()
   fecha_fin           DateTime             @db.Date()
+  fecha_creacion      DateTime             @default(now())
   plazo_proyecto      String
   color_primario      String?
   color_personalizado String?
@@ -368,7 +369,6 @@ model Proyecto {
   color_submenu       String?
   codigo_proyecto     String
   empresa_id          Int
-  color_proyecto      String
   Empresa             Empresa              @relation(fields: [empresa_id], references: [id])
   UnidadProduccion    UnidadProduccion[]
   Tren                Tren[]
