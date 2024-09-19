@@ -59,7 +59,7 @@ class CompanyMiddleware {
   ) {
     try {
       const id = request.params.id;
-      if (!validator.isNumeric) {
+      if (!validator.isNumeric(id)) {
         throw new Error("El id debe ser numérico");
       }
       nextFunction();

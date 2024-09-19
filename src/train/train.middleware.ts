@@ -47,7 +47,6 @@ class TrainMiddleware {
       cuadrillaDto.parse(request.body);
       nextFunction();
     } catch {
-      console.log("llegoooo");
       const result = httpResponse.BadRequestException(
         "Error al validar campos para actualizar el Tren"
       );
@@ -55,15 +54,33 @@ class TrainMiddleware {
     }
   }
 
-  verifyHeadersFields(
+  verifyHeadersFieldsId(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
     try {
       const id = request.params.id;
-      if (!validator.isNumeric) {
+      if (!validator.isNumeric(id)) {
         throw new Error("El id debe ser numérico");
+      }
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        " Error al validar el parámetro"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+  verifyHeadersFieldsProject(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      const project_id = request.params.project_id;
+      if (!validator.isNumeric(project_id)) {
+        throw new Error("El id del proyecto debe ser numérico");
       }
       nextFunction();
     } catch {

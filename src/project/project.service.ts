@@ -3,6 +3,7 @@ import prisma from "@/config/prisma.config";
 import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
   I_CreateCompanyBody,
+  I_UpdateProjectState,
   I_UpdateProyectBody,
 } from "./models/project.interface";
 import appRootPath from "app-root-path";
@@ -10,13 +11,13 @@ import { ProjectMulterProperties } from "./models/project.constant";
 import fs from "fs/promises";
 import { converToDate } from "@/common/utils/date";
 import { T_FindAll } from "@/common/models/pagination.types";
-import { userService } from "@/user/user.service";
 import validator from "validator";
-import { companyService } from "@/company/company.service";
 import { ProjectResponseMapper } from "./mapper/project.mapper";
 import { companyValidation } from "@/company/company.validation";
 import { userValidation } from "@/user/user.validation";
 import { projectValidation } from "./project.validation";
+import { jwtService } from "@/auth/jwt.service";
+import { E_Proyecto_Estado, Empresa, Usuario } from "@prisma/client";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -27,15 +28,27 @@ class ProjectService {
     }
   }
 
-  async createProject(data: I_CreateCompanyBody): Promise<T_HttpResponse> {
+  async createProject(
+    data: I_CreateCompanyBody,
+    tokenWithBearer: string
+  ): Promise<T_HttpResponse> {
     try {
-      data.empresa_id = Number(data.empresa_id);
-      const resultProject = await companyValidation.findById(data.empresa_id);
-      if (!resultProject.success) {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      const resultCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
+      if (!resultCompany.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el proyecto con el id de la empresa proporcionado"
         );
       }
+
+      const company = resultCompany.payload as Empresa;
 
       const resultCodeProject = this.isNumeric(data.codigo_proyecto);
       if (resultCodeProject) {
@@ -43,13 +56,16 @@ class ProjectService {
           "El campo codigo proyecto debe contener solo números"
         );
       }
-      const fecha_creacion = converToDate(data.fecha_creacion);
+      const fecha_creacion = converToDate(data.fecha_inicio);
       const fecha_fin = converToDate(data.fecha_fin);
-      const proyectFormat = {
+      let proyectFormat: any = {};
+      proyectFormat = {
         ...data,
+        estado: E_Proyecto_Estado.PENDIENTE,
         costo_proyecto: Number(data.costo_proyecto),
-        fecha_creacion,
+        fecha_inicio: fecha_creacion,
         fecha_fin,
+        empresa_id: company.id,
       };
       const project = await prismaProyectoRepository.createProject(
         proyectFormat
@@ -71,16 +87,26 @@ class ProjectService {
 
   async updateProject(
     data: I_UpdateProyectBody,
-    idProject: number
+    idProject: number,
+    tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
-      data.empresa_id = Number(data.empresa_id);
-      const companyResponse = await companyValidation.findById(data.empresa_id);
-      if (!companyResponse.success) {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      const resultCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
+      if (!resultCompany.success) {
         return httpResponse.BadRequestException(
-          "No se pudo crear el proyecto con el id de la empresa proporcionado"
+          "No se puede crear el proyecto con el id de la empresa proporcionado"
         );
       }
+
+      const company = resultCompany.payload as Empresa;
       const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
       if (resultCodigoProyecto) {
         return httpResponse.BadRequestException(
@@ -97,6 +123,7 @@ class ProjectService {
         costo_proyecto: data.costo_proyecto,
         fecha_creacion: fecha_creacion,
         fecha_fin: fecha_fin,
+        empresa_id: company.id,
       };
 
       const project = await prismaProyectoRepository.updateProject(
@@ -260,6 +287,33 @@ class ProjectService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar el proyecto",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateStateProject(
+    idProject: number,
+    data: I_UpdateProjectState
+  ): Promise<T_HttpResponse> {
+    try {
+      const projectResponse = await projectValidation.findById(idProject);
+      if (!projectResponse.success) {
+        return projectResponse;
+      } else {
+        const result = await prismaProyectoRepository.updateStateProject(
+          idProject,
+          data
+        );
+        return httpResponse.SuccessResponse(
+          "Estado del Proyecto cambiado correctamente",
+          result
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al cambiar el estado del Proyecto",
         error
       );
     } finally {

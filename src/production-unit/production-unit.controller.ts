@@ -14,6 +14,7 @@ import { productionUnitService } from "./production-unit.service";
 import { UnidadProduccion } from "@prisma/client";
 import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
 import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
+import validator from "validator";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -39,48 +40,58 @@ class ProductionUnitController {
               return response.status(401).json(responseValidate);
             } else {
               prouductionUnitDto.parse(request.body);
-              const data = request.body;
-              const result = await productionUnitService.createProductionUnit(
-                data
-              );
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
+              const project_id = request.params.project_id;
+              if (!validator.isNumeric(project_id)) {
+                const customError = httpResponse.BadRequestException(
+                  "El id del projecto debe ser numérico",
+                  error
+                );
+                response.status(customError.statusCode).json(customError);
               } else {
-                const project = result.payload as UnidadProduccion;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    ProductionUnitMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al guardar la imagen de la Unidad de Producción",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+                const data = request.body;
+                const result = await productionUnitService.createProductionUnit(
+                  data,
+                  +project_id
+                );
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as UnidadProduccion;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      ProductionUnitMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la imagen de la Unidad de Producción",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
               }
             }
           } catch (error) {
             const customError = httpResponse.BadRequestException(
-              " Error al validar los campos de la Unidad de Producción",
+              "Error al validar los campos de la Unidad de Producción",
               error
             );
             response.status(customError.statusCode).json(customError);
@@ -111,43 +122,53 @@ class ProductionUnitController {
             } else {
               prouductionUnitUpdateDto.parse(request.body);
               const data = request.body as I_UpdateProductionUnitBody;
-              const idProject = Number(request.params.id);
-              const result = await productionUnitService.updateProductionUnit(
-                data,
-                idProject
-              );
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
+              const productionUnit_id = Number(request.params.id);
+              const project_id = request.params.project_id;
+              if (!validator.isNumeric(project_id)) {
+                const customError = httpResponse.BadRequestException(
+                  "El id del projecto debe ser numérico",
+                  error
+                );
+                response.status(customError.statusCode).json(customError);
               } else {
-                const project = result.payload as UnidadProduccion;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    ProductionUnitMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al guardar la imagen de la Unidad de Producción",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+                const result = await productionUnitService.updateProductionUnit(
+                  data,
+                  productionUnit_id,
+                  +project_id
+                );
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as UnidadProduccion;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      ProductionUnitMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la imagen de la Unidad de Producción",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
               }
             }

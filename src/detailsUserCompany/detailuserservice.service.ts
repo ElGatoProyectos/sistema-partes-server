@@ -1,6 +1,5 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaDetailUserCompanyRepository } from "./prismaUserDetailCompany.respository";
-import prisma from "@/config/prisma.config";
 
 class DetailUserCompanyService {
   async createDetail(

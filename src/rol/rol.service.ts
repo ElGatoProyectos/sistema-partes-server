@@ -1,5 +1,5 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import prisma from "../config/prisma.config";
 import { prismaRolRepository } from "./prisma-rol.repository";
 import { I_CreateRolBD } from "./models/rol.interfaces";
 

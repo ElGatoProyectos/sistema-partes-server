@@ -1,7 +1,5 @@
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaUserRepository } from "./prisma-user.repository";
-import { I_CreateUserBD } from "./models/user.interface";
-import { prismaRolRepository } from "../rol/prisma-rol.repository";
 
 class UserValidation {
   async findByEmail(email: string): Promise<T_HttpResponse> {
@@ -48,30 +46,6 @@ class UserValidation {
         );
       // const userMapper = new UserResponseMapper(user);
       return httpResponse.SuccessResponse("Usuario encontrado con éxito", user);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar usuario",
-        error
-      );
-    }
-  }
-  async createUser(data: I_CreateUserBD): Promise<T_HttpResponse> {
-    try {
-      const role = await prismaRolRepository.existsName("ADMIN");
-      if (!role) {
-        return httpResponse.BadRequestException(
-          "El Rol que deseas buscar no existe"
-        );
-      }
-      const userFormat = {
-        ...data,
-        rol_id: role?.id,
-      };
-      const user = await prismaUserRepository.createUser(userFormat);
-      if (!user)
-        return httpResponse.NotFoundException("No se pudo crear el usuario");
-      // const userMapper = new UserResponseMapper(user);
-      return httpResponse.SuccessResponse("Usuario creado con éxito", user);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar usuario",

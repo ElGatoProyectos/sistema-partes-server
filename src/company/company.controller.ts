@@ -42,41 +42,52 @@ class CompanyController {
               return response.status(401).json(responseValidate);
             } else {
               empresaDto.parse(request.body);
-              const data = request.body as I_CreateCompanyBody;
-              const result = await companyService.createCompany(data);
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
-              } else {
-                const project = result.payload as Empresa;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    CompanyMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al guardar la foto de la empresa",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+              const tokenWithBearer = request.headers.authorization;
+              if (tokenWithBearer) {
+                const data = request.body as I_CreateCompanyBody;
+                const result = await companyService.createCompanyWithTokenUser(
+                  data,
+                  tokenWithBearer
+                );
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as Empresa;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      CompanyMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la foto de la empresa",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
+              } else {
+                const result = httpResponse.UnauthorizedException(
+                  "Error en la autenticacion al crear el usuario"
+                );
+                response.status(result.statusCode).json(result);
               }
             }
           } catch (error) {
@@ -111,45 +122,54 @@ class CompanyController {
               return response.status(401).json(responseValidate);
             } else {
               empresaUpdateDto.parse(request.body);
+              const tokenWithBearer = request.headers.authorization;
               const data = request.body as I_UpdateCompanyBody;
-              const idCompany = Number(request.params.id);
-              const result = await companyService.updateCompany(
-                data,
-                idCompany
-              );
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
-              } else {
-                const project = result.payload as Empresa;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    CompanyMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al actualizar la imagen de la empresa",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+              if (tokenWithBearer) {
+                const idCompany = Number(request.params.id);
+                const result = await companyService.updateCompanyWithTokenUser(
+                  data,
+                  idCompany,
+                  tokenWithBearer
+                );
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as Empresa;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      CompanyMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al actualizar la imagen de la empresa",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
+              } else {
+                const result = httpResponse.UnauthorizedException(
+                  "Error en la autenticacion al crear el usuario"
+                );
+                response.status(result.statusCode).json(result);
               }
             }
           } catch (error) {

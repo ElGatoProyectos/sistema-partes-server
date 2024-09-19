@@ -53,45 +53,56 @@ class ProjectController {
               return response.status(401).json(responseValidate);
             } else {
               proyectoDto.parse(request.body);
+              const tokenWithBearer = request.headers.authorization;
               const data = request.body;
-              const result = await projectService.createProject(data);
-              //en controlador si hay if tiene q tener su else
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
-              } else {
-                const project = result.payload as Proyecto;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    ProjectMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
-                  //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
-                  //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
-                  //de carpeta donde van a guardar
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al guardar la imagen",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+              if (tokenWithBearer) {
+                const result = await projectService.createProject(
+                  data,
+                  tokenWithBearer
+                );
+                //en controlador si hay if tiene q tener su else
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as Proyecto;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      ProjectMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
+                    //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
+                    //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
+                    //de carpeta donde van a guardar
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la imagen",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
+              } else {
+                const result = httpResponse.UnauthorizedException(
+                  "Error en la autenticacion al crear el proyecto"
+                );
+                response.status(result.statusCode).json(result);
               }
             }
           } catch (error) {
@@ -131,47 +142,51 @@ class ProjectController {
               return response.status(401).json(responseValidate);
             } else {
               proyectoDtoUpdate.parse(request.body);
+              const tokenWithBearer = request.headers.authorization;
               const data = request.body as I_UpdateProyectBody;
-              const idProject = Number(request.params.id);
-              const result = await projectService.updateProject(
-                data,
-                idProject
-              );
-              if (!result.success) {
-                response.status(result.statusCode).json(result);
-              } else {
-                const project = result.payload as Proyecto;
-                if (request.file) {
-                  const id = project.id;
-                  const direction = path.join(
-                    appRootPath.path,
-                    "static",
-                    ProjectMulterProperties.folder
-                  );
-                  const ext = ".png";
-                  const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
-                  //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
-                  //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
-                  //de carpeta donde van a guardar
-                  const filePath = path.join(direction, fileName);
-                  sharp(request.file.buffer)
-                    .resize({ width: 800 })
-                    .toFormat("png")
-                    .toFile(filePath, (err) => {
-                      if (err) {
-                        const customError = httpResponse.BadRequestException(
-                          "Error al guardar la imagen",
-                          err
-                        );
-                        response
-                          .status(customError.statusCode)
-                          .json(customError);
-                      } else {
-                        response.status(result.statusCode).json(result);
-                      }
-                    });
-                } else {
+              if (tokenWithBearer) {
+                const idProject = Number(request.params.id);
+                const result = await projectService.updateProject(
+                  data,
+                  idProject,
+                  tokenWithBearer
+                );
+                if (!result.success) {
                   response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as Proyecto;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      ProjectMulterProperties.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${ProjectMulterProperties.folder}_${id}${ext}`;
+                    //se hace de nuevo el path.join xq cmbina el directorio y el nombre del archivo para obtener la ruta
+                    //completa donde se guardará el archivo. Es mejor preparar la ruta antes x si el día de mañana cambias
+                    //de carpeta donde van a guardar
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la imagen",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          response.status(result.statusCode).json(result);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
                 }
               }
             }
@@ -252,6 +267,12 @@ class ProjectController {
   async updateStatus(request: express.Request, response: express.Response) {
     const idProject = Number(request.params.id);
     const result = await projectService.updateStatusProject(idProject);
+    response.status(result.statusCode).json(result);
+  }
+  async updateState(request: express.Request, response: express.Response) {
+    const idProject = Number(request.params.id);
+    const data = request.body;
+    const result = await projectService.updateStateProject(idProject, data);
     response.status(result.statusCode).json(result);
   }
 }

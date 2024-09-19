@@ -1,9 +1,9 @@
 import express from "@/config/express.config";
 import { projectController } from "./project.controller";
-import { userMiddleware } from "./project.middleware";
 import { authAuthmiddleware } from "@/auth/middlewares/auth.middleware";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 import { requestMiddleware } from "@/common/middlewares/request.middleware";
+import { projectMiddleware } from "./project.middleware";
 
 const projectRouter = express.Router();
 const prefix = "/projects";
@@ -12,7 +12,7 @@ projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}/user/:id`,
   authRoleMiddleware.authAdminAndProjectManager,
-  userMiddleware.verifyHeadersFields,
+  projectMiddleware.verifyHeadersFields,
   projectController.findAllProjectsXCompany
 );
 projectRouter.get(
@@ -24,20 +24,27 @@ projectRouter.get(
 projectRouter.get(
   `${prefix}/:id`,
   authRoleMiddleware.authAdminAndProjectManager,
-  userMiddleware.verifyHeadersFields,
+  projectMiddleware.verifyHeadersFields,
   projectController.findByIdProject
 );
 projectRouter.get(
   `${prefix}/file/:id`,
   authRoleMiddleware.authAdminAndProjectManager,
-  userMiddleware.verifyHeadersFields,
+  projectMiddleware.verifyHeadersFields,
   projectController.findImage
 );
 projectRouter.put(`${prefix}/:id`, projectController.updateProject);
+projectRouter.patch(
+  `${prefix}/:id`,
+  authRoleMiddleware.authAdminAndProjectManager,
+  projectMiddleware.verifyHeadersFields,
+  projectMiddleware.verifyFieldsUpdateState,
+  projectController.updateState
+);
 projectRouter.delete(
   `${prefix}/:id`,
   authRoleMiddleware.authAdminAndProjectManager,
-  userMiddleware.verifyHeadersFields,
+  projectMiddleware.verifyHeadersFields,
   projectController.updateStatus
 );
 

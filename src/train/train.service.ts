@@ -16,15 +16,16 @@ import { T_FindAll } from "@/common/models/pagination.types";
 import validator from "validator";
 
 class TrainService {
-  async createTrain(data: I_CreateTrainUnitBody): Promise<T_HttpResponse> {
+  async createTrain(
+    data: I_CreateTrainUnitBody,
+    project_id: number
+  ): Promise<T_HttpResponse> {
     try {
       const resultTrain = await trainValidation.findByName(data.nombre);
       if (!resultTrain.success) {
         return resultTrain;
       }
-      const resultIdProject = await projectValidation.findById(
-        Number(data.proyecto_id)
-      );
+      const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el Tren con el id del Proyecto proporcionado"
@@ -46,7 +47,7 @@ class TrainService {
         operario: 1,
         oficial: 1,
         peon: 1,
-        proyecto_id: Number(data.proyecto_id),
+        proyecto_id: project_id,
       };
 
       const responseTrain = await prismaTrainRepository.createTrain(

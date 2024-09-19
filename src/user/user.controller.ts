@@ -212,7 +212,7 @@ class UserController {
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUserBody;
-    const idUser = Number(request.params.id);
+    const idUser = Number(request.params.project_id);
     const result = await userService.updateUser(data, idUser);
     if (!result.success) {
       response.status(result.statusCode).json(result);
