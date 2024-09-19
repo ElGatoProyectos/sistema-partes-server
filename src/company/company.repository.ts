@@ -6,6 +6,8 @@ import {
 export abstract class CompanyRepository {
   findAll(skip: number, limit: number): void {}
 
+  findByIdUser(idUser: number): void {}
+
   findById(idCompany: number): void {}
 
   existsEmail(email: string): void {}

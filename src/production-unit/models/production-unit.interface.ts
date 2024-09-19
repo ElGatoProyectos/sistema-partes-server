@@ -15,10 +15,7 @@ export interface I_UpdateProductionUnitBodyValidation
 export interface I_ProductionUnit extends Omit<UnidadProduccion, "eliminado"> {}
 
 export interface I_ProductionUnitExcel {
-  Codigo: string;
-  Nombre: string;
-  Nota: string;
-}
-export interface I_ImportExcelRequest {
-  idProject: string;
+  CODIGO: string;
+  NOMBRE: string;
+  NOTA: string;
 }

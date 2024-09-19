@@ -133,9 +133,13 @@ class UserController {
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
+              const user_id = Number(request.params.id);
               userAndCompanyUpdateDto.parse(request.body);
               const data = request.body as I_CreateUserAndCompanyUpdate;
-              const result = await userService.updateUserAndCompany(data);
+              const result = await userService.updateUserAndCompany(
+                data,
+                user_id
+              );
               if (!result.success) {
                 response.status(result.statusCode).json(result);
               } else {

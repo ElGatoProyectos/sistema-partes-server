@@ -13,10 +13,7 @@ import { prouductionUnitDto } from "./dto/production-unit.dto";
 import { productionUnitService } from "./production-unit.service";
 import { UnidadProduccion } from "@prisma/client";
 import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
-import {
-  I_ImportExcelRequest,
-  I_UpdateProductionUnitBody,
-} from "./models/production-unit.interface";
+import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -240,18 +237,17 @@ class ProductionUnitController {
         if (err) {
           return response.status(500).json({ error: "Error uploading file" });
         }
-        const responseBody = request.body as I_ImportExcelRequest;
+        const project_id = Number(request.params.project_id);
         const file = request.file;
         if (!file) {
           return response.status(400).json({ error: "No se subió archivo" });
         }
 
         try {
-          prouductionUnitExcelDto.parse(request.body);
           const serviceResponse =
             await productionUnitService.registerProductionUnitMasive(
               file,
-              +responseBody.idProject
+              project_id
             );
 
           response.status(serviceResponse.statusCode).json(serviceResponse);

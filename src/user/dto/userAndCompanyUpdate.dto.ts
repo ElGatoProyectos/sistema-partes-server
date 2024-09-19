@@ -5,10 +5,10 @@ export const userAndCompanyUpdateDto = z.object({
   dni: z.string().min(8),
   nombre_completo: z.string(),
   telefono: z.string(),
-  contrasena: z.string().min(3),
+  contrasena: z.string().optional(),
   limite_proyecto: z.string(),
   limite_usuarios: z.string(),
-  id_user: z.string(),
+  eliminado: z.enum(["y", "n"]),
   nombre_empresa: z.string(),
   descripcion_empresa: z.string(),
   ruc: z.string(),
@@ -18,5 +18,4 @@ export const userAndCompanyUpdateDto = z.object({
   direccion_empresa_oficina: z.string(),
   email_empresa: z.string(),
   contacto_responsable: z.string(),
-  id_company: z.string(),
 });
