@@ -8,6 +8,14 @@ import {
 import prisma from "@/config/prisma.config";
 
 class PrismaCompanyRepository implements CompanyRepository {
+  async findByIdUser(idUser: number): Promise<Empresa | null> {
+    const company = await prisma.empresa.findFirst({
+      where: {
+        usuario_id: idUser,
+      },
+    });
+    return company;
+  }
   async existsEmail(email: string): Promise<Empresa | null> {
     const company = await prisma.empresa.findFirst({
       where: {

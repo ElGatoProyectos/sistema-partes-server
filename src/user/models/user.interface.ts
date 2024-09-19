@@ -1,9 +1,9 @@
-import { Empresa, Usuario } from "@prisma/client";
+import { E_Estado_BD, Empresa, Usuario } from "@prisma/client";
 //defini esquemas de base de datos
 export interface I_CreateUserBD
   extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
 export interface I_UpdateUserBD
-  extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
+  extends Omit<Usuario, "id" | "fecha_creacion"> {}
 
 export interface I_CreateUserBody
   extends Omit<
@@ -55,11 +55,11 @@ export interface I_CreateUserAndCompanyUpdate {
   dni: string;
   nombre_completo: string;
   telefono: string;
+  eliminado: E_Estado_BD;
   contrasena: string;
   limite_proyecto: string;
   limite_usuarios: string;
   rol_id: string;
-  id_user: string;
   nombre_empresa: string;
   descripcion_empresa: string;
   direccion_empresa_fiscal: string;
@@ -69,7 +69,6 @@ export interface I_CreateUserAndCompanyUpdate {
   telefono_empresa: string;
   email_empresa: string;
   contacto_responsable: string;
-  id_company: string;
 }
 
 export interface I_CreateUserAndCompanyBody {

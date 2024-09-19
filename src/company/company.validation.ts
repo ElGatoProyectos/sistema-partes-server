@@ -75,6 +75,24 @@ class CompanyValidation {
     }
   }
 
+  async findByIdUser(id: number): Promise<T_HttpResponse> {
+    try {
+      const company = await prismaCompanyRepository.findByIdUser(id);
+      if (!company)
+        return httpResponse.NotFoundException(
+          "No se encontró la empresa del Usuario"
+        );
+      return httpResponse.SuccessResponse(
+        "Empresa del Usuario encontrada con éxito",
+        company
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar empresa",
+        error
+      );
+    }
+  }
   async findById(id: number): Promise<T_HttpResponse> {
     try {
       const company = await prismaCompanyRepository.findById(id);

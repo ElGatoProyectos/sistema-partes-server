@@ -110,9 +110,9 @@ class ProductionUnitValidation {
   ): Promise<T_HttpResponse> {
     try {
       const productionUnit = {
-        codigo: String(data.Codigo),
-        nombre: data.Nombre,
-        nota: data.Nota,
+        codigo: String(data.CODIGO),
+        nombre: data.NOMBRE,
+        nota: data.NOTA,
         proyecto_id: Number(idProjectID),
       };
       const responseProductionUnit =

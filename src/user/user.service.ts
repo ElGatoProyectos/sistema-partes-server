@@ -1,4 +1,4 @@
-import { Empresa, Rol, Usuario } from "@prisma/client";
+import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyUpdate,
@@ -266,20 +266,20 @@ class UserService {
     }
   }
   async updateUserAndCompany(
-    data: I_CreateUserAndCompanyUpdate
+    data: I_CreateUserAndCompanyUpdate,
+    user_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const responseUser = await userValidation.findById(+data.id_user);
+      const responseUser = await userValidation.findById(user_id);
       if (!responseUser.success) {
         return responseUser;
       }
-      const responseCompany = await companyValidation.findById(
-        +data.id_company
-      );
+      const user = responseUser.payload as Usuario;
+
+      const responseCompany = await companyValidation.findByIdUser(user.id);
       if (!responseCompany.success) {
         return responseCompany;
       }
-      const user = responseUser.payload as Usuario;
       const company = responseCompany.payload as Empresa;
       if (user.email != data.email) {
         const responseEmailUser = await userValidation.findByEmail(data.email);
@@ -363,35 +363,39 @@ class UserService {
           "El Correo de la empresa ingresado no es válido"
         );
       }
-
       if (company.correo != data.email_empresa) {
         const responseEmailCompany = await companyValidation.findByEmail(
           data.email_empresa
         );
         if (!responseEmailCompany.success) return responseEmailCompany;
       }
-
-      const hashContrasena = bcryptService.hashPassword(data.contrasena);
+      let hashContrasena;
+      let userFormat: any = {};
       const role = await prismaRolRepository.existsName("USER");
       if (!role) {
         return httpResponse.BadRequestException(
           "El Rol que deseas buscar no existe"
         );
       }
-      let userFormat: I_CreateUserBD;
       userFormat = {
         email: data.email,
         dni: data.dni,
         nombre_completo: data.nombre_completo,
         telefono: data.telefono_empresa,
-        contrasena: hashContrasena,
+        eliminado: data.eliminado,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
         rol_id: role.id,
       };
+
+      if (data.contrasena !== "") {
+        hashContrasena = bcryptService.hashPassword(data.contrasena);
+        userFormat.contrasena = hashContrasena;
+      }
+
       const resultUser = await prismaUserRepository.updateUser(
         userFormat,
-        +data.id_user
+        user.id
       );
       const companyFormat = {
         nombre_empresa: data.nombre_empresa,
@@ -408,7 +412,7 @@ class UserService {
 
       const resultCompany = await prismaCompanyRepository.updateCompany(
         companyFormat,
-        +data.id_company
+        company.id
       );
       const resultUserAndCompany = {
         usuario: resultUser,

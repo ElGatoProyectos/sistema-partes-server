@@ -344,9 +344,9 @@ class ProductionUnitService {
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
           index++;
           if (
-            item.Codigo == undefined ||
-            item.Nombre == undefined ||
-            item.Nota == undefined
+            item.CODIGO == undefined ||
+            item.NOMBRE == undefined ||
+            item.NOTA == undefined
           ) {
             error++;
           }
@@ -363,15 +363,15 @@ class ProductionUnitService {
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
           //verificamos si tenemos el codigo
-          const codigo = parseInt(item.Codigo, 10); // Intenta convertir el string a número
+          const codigo = parseInt(item.CODIGO, 10); // Intenta convertir el string a número
 
-          if (!validator.isNumeric(item.Codigo)) {
+          if (!validator.isNumeric(item.CODIGO)) {
             errorNumber++; // Aumenta si el código no es un número válido
           } else {
             // Verifica si el código ya ha sido procesado
-            if (!seenCodes.has(item.Codigo)) {
+            if (!seenCodes.has(item.CODIGO)) {
               // errorNumber++; // Aumenta si hay duplicado
-              seenCodes.add(item.Codigo);
+              seenCodes.add(item.CODIGO);
             }
 
             // Verifica si el código actual no es mayor que el anterior
@@ -426,7 +426,7 @@ class ProductionUnitService {
       let productionUnit;
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-          code = await productionUnitValidation.findByCode(String(item.Codigo));
+          code = await productionUnitValidation.findByCode(String(item.CODIGO));
           if (!code.success) {
             productionUnit = code.payload as UnidadProduccion;
             await productionUnitValidation.updateProductionUnit(
@@ -437,9 +437,9 @@ class ProductionUnitService {
           } else {
             await prisma.unidadProduccion.create({
               data: {
-                codigo: String(item.Codigo),
-                nombre: item.Nombre,
-                nota: item.Nota,
+                codigo: String(item.CODIGO),
+                nombre: item.NOMBRE,
+                nota: item.NOTA,
                 proyecto_id: responseProject.id,
               },
             });

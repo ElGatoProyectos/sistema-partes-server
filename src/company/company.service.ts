@@ -156,7 +156,6 @@ class CompanyService {
         companyMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear empresa",
         error

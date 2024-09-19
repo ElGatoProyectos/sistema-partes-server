@@ -5,7 +5,7 @@ import prisma from "@/config/prisma.config";
 import LoginResponseMapper from "./mappers/login.mapper";
 import { T_ResponseToken } from "./models/auth.type";
 import { rolService } from "@/rol/rol.service";
-import { Rol } from "@prisma/client";
+import { E_Estado_BD, Rol } from "@prisma/client";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -13,6 +13,7 @@ class AuthService {
       const user = await prisma.usuario.findFirst({
         where: {
           OR: [{ email: body.username }, { dni: body.username }],
+          eliminado: E_Estado_BD.n,
           //contrasena: data.contrasena,
         },
       });

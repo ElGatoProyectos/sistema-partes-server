@@ -13,7 +13,6 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.update({
       where: {
         id: idUser,
-        eliminado: E_Estado_BD.n,
       },
       data: {
         rol_id: idRol,
@@ -25,7 +24,6 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         email,
-        eliminado: E_Estado_BD.n,
       },
     });
     return user;
@@ -41,7 +39,6 @@ class PrismaUserRepository implements UserRepository {
           nombre_completo: {
             contains: name,
           },
-          eliminado: E_Estado_BD.n,
         },
         skip,
         take: limit,
@@ -51,7 +48,6 @@ class PrismaUserRepository implements UserRepository {
           nombre_completo: {
             contains: name,
           },
-          eliminado: E_Estado_BD.n,
         },
       }),
     ]);
@@ -61,7 +57,6 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         dni,
-        eliminado: E_Estado_BD.n,
       },
     });
     return user;
@@ -70,7 +65,6 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
-        eliminado: E_Estado_BD.n,
       },
     });
 
@@ -116,7 +110,6 @@ class PrismaUserRepository implements UserRepository {
       prisma.usuario.findMany({
         where: {
           ...filters,
-          eliminado: E_Estado_BD.n,
           Rol: {
             rol: {
               not: "ADMIN",
@@ -136,7 +129,6 @@ class PrismaUserRepository implements UserRepository {
       prisma.usuario.count({
         where: {
           ...filters,
-          eliminado: E_Estado_BD.n,
           Rol: {
             rol: {
               not: "ADMIN",
@@ -162,7 +154,6 @@ class PrismaUserRepository implements UserRepository {
     const user = await prisma.usuario.findFirst({
       where: {
         id: idUser,
-        eliminado: E_Estado_BD.n,
       },
       include: {
         Rol: true,

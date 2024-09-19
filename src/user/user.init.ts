@@ -40,7 +40,7 @@ userRouter.post(
   userController.createUserandCompany
 );
 userRouter.put(
-  `${prefix}/company`,
+  `${prefix}/:id/company`,
   authRoleMiddleware.authAdmin,
   userController.updateUserandCompany
 );
