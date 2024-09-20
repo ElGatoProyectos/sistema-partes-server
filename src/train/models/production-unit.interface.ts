@@ -16,7 +16,6 @@ export interface I_UpdateTrainBodyValidation
 export interface I_Train extends Omit<Tren, "eliminado"> {}
 
 export interface I_Cuadrilla_Train {
-  idTrain: number;
   workers: number;
   official: number;
   pawns: number;

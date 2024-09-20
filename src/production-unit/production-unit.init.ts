@@ -40,7 +40,7 @@ prouductionUnitRouter.get(
   productionUnitController.findImage
 );
 prouductionUnitRouter.put(
-  `${prefix}/:id/proyect/:project_id`,
+  `${prefix}/:id/project/:project_id`,
   productionUnitController.update
 );
 prouductionUnitRouter.delete(

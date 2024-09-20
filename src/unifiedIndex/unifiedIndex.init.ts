@@ -1,5 +1,4 @@
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import { requestMiddleware } from "@/common/middlewares/request.middleware";
 import express from "@/config/express.config";
 import { unifiedIndexController } from "./unifiedIndex.controller";
 import { unifiedIndexMiddleware } from "./unifiedIndex.middleware";
@@ -16,7 +15,8 @@ unifiedIndexRouter.post(
 );
 
 unifiedIndexRouter.post(
-  `${prefix}/upload-excel`,
+  `${prefix}/upload-excel/company/:id`,
+  unifiedIndexMiddleware.verifyHeadersFields,
   authRoleMiddleware.authAdminAndProjectManager,
   unifiedIndexController.unifiedIndexReadExcel
 );

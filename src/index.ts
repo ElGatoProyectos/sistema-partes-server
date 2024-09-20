@@ -13,6 +13,7 @@ import resourseCategoryRouter from "./resourseCategory/resourseCategory.init";
 import unitRouter from "./unit/unit.init";
 import unifiedIndexRouter from "./unifiedIndex/unifiedIndex.init";
 import cors from "cors";
+import seedRouter from "./seed/seed.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(globalPrefix, trainRouter);
 app.use(globalPrefix, resourseCategoryRouter);
 app.use(globalPrefix, unitRouter);
 app.use(globalPrefix, unifiedIndexRouter);
+app.use(globalPrefix, seedRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

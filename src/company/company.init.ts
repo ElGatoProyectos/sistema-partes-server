@@ -1,5 +1,4 @@
 import express from "@/config/express.config";
-import { requestMiddleware } from "@/common/middlewares/request.middleware";
 import { companyController } from "./company.controller";
 import { companyMiddleware } from "./company.middleware";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";

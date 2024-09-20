@@ -10,15 +10,23 @@ import { UnifiedIndexResponseMapper } from "./mapper/unifiedIndex.mapper";
 import prisma from "@/config/prisma.config";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { companyValidation } from "@/company/company.validation";
-import { Empresa, IndiceUnificado } from "@prisma/client";
+import { Empresa, IndiceUnificado, Usuario } from "@prisma/client";
 import * as xlsx from "xlsx";
 import validator from "validator";
+import { jwtService } from "@/auth/jwt.service";
 
 class UnifiedIndexService {
   async createUnifiedIndex(
-    data: I_CreateUnifiedIndexBody
+    data: I_CreateUnifiedIndexBody,
+    tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
       const resultIdProject = await unifiedIndexValidation.findByName(
         data.nombre
       );
@@ -35,10 +43,13 @@ class UnifiedIndexService {
         }
       }
 
-      const resultIdCompany = await companyValidation.findById(data.empresa_id);
+      const resultIdCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
       if (!resultIdCompany.success) {
         return resultIdCompany;
       }
+      const company = resultIdCompany.payload as Empresa;
       const lastUnifiedIndex = await unifiedIndexValidation.codeMoreHigh();
       const lastUnifiedIndexResponse =
         lastUnifiedIndex.payload as IndiceUnificado;
@@ -50,6 +61,7 @@ class UnifiedIndexService {
 
       const unifiedIndexFormat = {
         ...data,
+        empresa_id: company.id,
         codigo: formattedCodigo,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
@@ -76,9 +88,15 @@ class UnifiedIndexService {
 
   async updateUnifiedIndex(
     data: I_UpdateUnifiedIndexBody,
-    idUnifiedIndex: number
+    idUnifiedIndex: number,
+    tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
       const resultIdResourseCategory = await unifiedIndexValidation.findById(
         idUnifiedIndex
       );
@@ -107,15 +125,13 @@ class UnifiedIndexService {
           return resultIdUnifiedIndex;
         }
       }
-
-      const resultIdCompany = await companyValidation.findById(data.empresa_id);
-      if (!resultIdCompany.success) {
-        return httpResponse.BadRequestException(
-          "No se encontró el id de la Empresa para crear el indice unificado"
-        );
-      }
+      const resultIdCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
+      const company = resultIdCompany.payload as Empresa;
       const unifiedIndexFormat = {
         ...data,
+        empresa_id: company.id,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
       const responseUnifiedIndex =
@@ -131,6 +147,7 @@ class UnifiedIndexService {
         resourseCategoryMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Indice Unificado",
         error

@@ -1,5 +1,9 @@
+import { userValidation } from "@/user/user.validation";
 import { httpResponse, T_HttpResponse } from "../common/http.response";
+import { I_CreateCompanyAdminBody } from "./models/company.interface";
 import { prismaCompanyRepository } from "./prisma-company.repository";
+import { Usuario } from "@prisma/client";
+import { CompanyResponseMapper } from "./mapper/company.mapper";
 
 class CompanyValidation {
   async findByEmail(email: string): Promise<T_HttpResponse> {
@@ -107,6 +111,36 @@ class CompanyValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar empresa",
+        error
+      );
+    }
+  }
+  async createCompanyOfTheAdmin(
+    data: I_CreateCompanyAdminBody
+  ): Promise<T_HttpResponse> {
+    try {
+      const userResponse = await userValidation.findByEmailAdmin(
+        "ale@gmail.com"
+      );
+      if (!userResponse.success) {
+        return userResponse;
+      }
+
+      const user = userResponse.payload as Usuario;
+      const companyFormat = {
+        ...data,
+        usuario_id: user.id,
+      };
+      const result = await prismaCompanyRepository.createCompany(companyFormat);
+
+      const companyMapper = new CompanyResponseMapper(result);
+      return httpResponse.CreatedResponse(
+        "Empresa creada correctamente",
+        companyMapper
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear empresa",
         error
       );
     }
