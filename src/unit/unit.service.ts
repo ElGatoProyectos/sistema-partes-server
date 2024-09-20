@@ -6,11 +6,20 @@ import { unitValidation } from "./unit.validation";
 import { prismaUnitRepository } from "./prisma-unit.repository";
 import { ResponseUnitMapper } from "./mapper/unit.mapper.dto";
 import { companyValidation } from "@/company/company.validation";
-import { Unidad } from "@prisma/client";
+import { Empresa, Unidad, Usuario } from "@prisma/client";
+import { jwtService } from "@/auth/jwt.service";
 
 class UnitService {
-  async createUnit(data: I_CreateUnitBody): Promise<T_HttpResponse> {
+  async createUnit(
+    data: I_CreateUnitBody,
+    tokenWithBearer: string
+  ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
       const resultName = await unitValidation.findByName(data.nombre);
       if (!resultName.success) {
         return resultName;
@@ -22,11 +31,13 @@ class UnitService {
         }
       }
 
-      const resultIdCompany = await companyValidation.findById(data.empresa_id);
+      const resultIdCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
       if (!resultIdCompany.success) {
         return resultIdCompany;
       }
-
+      const company = resultIdCompany.payload as Empresa;
       const lastUnit = await unitValidation.codeMoreHigh();
       const lastUnitResponse = lastUnit.payload as Unidad;
 
@@ -37,6 +48,7 @@ class UnitService {
 
       const unitFormat = {
         ...data,
+        empresa_id: company.id,
         codigo: formattedCodigo,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
@@ -59,9 +71,16 @@ class UnitService {
 
   async updateUnit(
     data: I_UpdateUnitBody,
-    idUnit: number
+    idUnit: number,
+    tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
       const resultIdUnit = await unitValidation.findById(idUnit);
       if (!resultIdUnit.success) {
         return resultIdUnit;
@@ -82,11 +101,16 @@ class UnitService {
         }
       }
 
-      const resultIdCompany = await companyValidation.findById(data.empresa_id);
+      const resultIdCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
       if (!resultIdCompany.success) resultIdCompany;
+
+      const company = resultIdCompany.payload as Empresa;
 
       const unitFormat = {
         ...data,
+        empresa_id: company.id,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
       };
 

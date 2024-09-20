@@ -16,7 +16,8 @@ unifiedIndexRouter.post(
 );
 
 unifiedIndexRouter.post(
-  `${prefix}/upload-excel`,
+  `${prefix}/upload-excel/company/:id`,
+  unifiedIndexMiddleware.verifyHeadersFields,
   authRoleMiddleware.authAdminAndProjectManager,
   unifiedIndexController.unifiedIndexReadExcel
 );

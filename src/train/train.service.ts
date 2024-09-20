@@ -70,7 +70,8 @@ class TrainService {
 
   async updateTrain(
     data: I_UpdateTrainBody,
-    idTrain: number
+    idTrain: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const resultIdTrain = await trainValidation.findById(idTrain);
@@ -86,9 +87,7 @@ class TrainService {
           return resultTrain;
         }
       }
-      const resultIdProject = await projectValidation.findById(
-        Number(data.proyecto_id)
-      );
+      const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el Tren con el id del proyecto proporcionado"
@@ -101,7 +100,7 @@ class TrainService {
         operario: data.operario,
         oficial: data.oficial,
         peon: data.peon,
-        proyecto_id: Number(data.proyecto_id),
+        proyecto_id: project_id,
       };
       const responseTrain = await prismaTrainRepository.updateTrain(
         trainFormat,
@@ -122,16 +121,16 @@ class TrainService {
     }
   }
 
-  async updateCuadrillaTrain(data: I_Cuadrilla_Train) {
+  async updateCuadrillaTrain(data: I_Cuadrilla_Train, train_id: number) {
     try {
-      const resultIdTrain = await trainValidation.findById(data.idTrain);
+      const resultIdTrain = await trainValidation.findById(train_id);
       if (!resultIdTrain.success) {
         return httpResponse.BadRequestException(
           "No se pudo encontrar el id del Tren que se quiere editar"
         );
       }
       const trainUpdate = await prismaTrainRepository.updateCuadrillaByIdTrain(
-        data.idTrain,
+        train_id,
         data.official,
         data.pawns,
         data.workers

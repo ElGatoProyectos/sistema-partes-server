@@ -7,27 +7,48 @@ import {
 import { unitService } from "./unit.service";
 import { T_FindAll } from "@/common/models/pagination.types";
 import multer from "multer";
+import { httpResponse } from "@/common/http.response";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 class UnitController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateUnitBody;
-    const result = await unitService.createUnit(data);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    const tokenWithBearer = request.headers.authorization;
+    if (tokenWithBearer) {
+      const result = await unitService.createUnit(data, tokenWithBearer);
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al crear la unidad"
+      );
       response.status(result.statusCode).json(result);
     }
   }
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUnitBody;
+    const tokenWithBearer = request.headers.authorization;
     const idUnit = Number(request.params.id);
-    const result = await unitService.updateUnit(data, idUnit);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    if (tokenWithBearer) {
+      const result = await unitService.updateUnit(
+        data,
+        idUnit,
+        tokenWithBearer
+      );
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al modiciar la unidad"
+      );
       response.status(result.statusCode).json(result);
     }
   }

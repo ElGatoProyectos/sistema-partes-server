@@ -65,7 +65,7 @@ class CompanyMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar los campos para traer las empresas"
+        " Error al validar el header"
       );
       response.status(result.statusCode).send(result);
     }

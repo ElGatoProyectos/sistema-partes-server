@@ -1,4 +1,3 @@
-import { trainExcelDto } from "./dto/train-excel.dto";
 import express from "@/config/express.config";
 import { trainService } from "./train.service";
 import {
@@ -27,8 +26,9 @@ class TrainController {
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateTrainBody;
-    const idTrain = Number(request.params.id);
-    const result = await trainService.updateTrain(data, idTrain);
+    const train_id = Number(request.params.id);
+    const project_id = Number(request.params.project_id);
+    const result = await trainService.updateTrain(data, train_id, project_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {
@@ -37,8 +37,9 @@ class TrainController {
   }
 
   async updateCuadrilla(request: express.Request, response: express.Response) {
+    const train_id = Number(request.params.id);
     const data = request.body as I_Cuadrilla_Train;
-    const result = await trainService.updateCuadrillaTrain(data);
+    const result = await trainService.updateCuadrillaTrain(data, train_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {
@@ -95,17 +96,16 @@ class TrainController {
       if (err) {
         return response.status(500).json({ error: "Error uploading file" });
       }
-      const responseBody = request.body as I_ImportExcelRequestTrain;
+      const project_id = Number(request.params.project_id);
       const file = request.file;
       if (!file) {
         return response.status(400).json({ error: "No se subió archivo" });
       }
 
       try {
-        trainExcelDto.parse(request.body);
         const serviceResponse = await trainService.registerTrainMasive(
           file,
-          +responseBody.idProject
+          +project_id
         );
 
         response.status(serviceResponse.statusCode).json(serviceResponse);

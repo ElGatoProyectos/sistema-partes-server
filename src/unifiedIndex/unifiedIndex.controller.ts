@@ -8,6 +8,7 @@ import {
 import { unifiedIndexService } from "./unifiedIndex.service";
 import multer from "multer";
 import { unifiedIndexExcelDto } from "./dto/unifiedIndexExcel.dto";
+import { httpResponse } from "@/common/http.response";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -15,10 +16,21 @@ const upload: any = multer({ storage: storage });
 class UnifiedIndexController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateUnifiedIndexBody;
-    const result = await unifiedIndexService.createUnifiedIndex(data);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    const tokenWithBearer = request.headers.authorization;
+    if (tokenWithBearer) {
+      const result = await unifiedIndexService.createUnifiedIndex(
+        data,
+        tokenWithBearer
+      );
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al crear el indice unificado"
+      );
       response.status(result.statusCode).json(result);
     }
   }
@@ -26,13 +38,22 @@ class UnifiedIndexController {
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUnifiedIndexBody;
     const idResourseCategory = Number(request.params.id);
-    const result = await unifiedIndexService.updateUnifiedIndex(
-      data,
-      idResourseCategory
-    );
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    const tokenWithBearer = request.headers.authorization;
+    if (tokenWithBearer) {
+      const result = await unifiedIndexService.updateUnifiedIndex(
+        data,
+        idResourseCategory,
+        tokenWithBearer
+      );
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al modificar el indice unificado"
+      );
       response.status(result.statusCode).json(result);
     }
   }
@@ -93,18 +114,17 @@ class UnifiedIndexController {
       if (err) {
         return response.status(500).json({ error: "Error uploading file" });
       }
-      const responseBody = request.body as I_ImportExcelRequestUnifiedIndex;
       const file = request.file;
       if (!file) {
         return response.status(400).json({ error: "No se subió archivo" });
       }
 
       try {
-        unifiedIndexExcelDto.parse(request.body);
+        const company_id = Number(request.params.id);
         const serviceResponse =
           await unifiedIndexService.registerUnifiedIndexMasive(
             file,
-            +responseBody.idCompany
+            +company_id
           );
 
         response.status(serviceResponse.statusCode).json(serviceResponse);

@@ -25,22 +25,23 @@ trainRouter.get(
   trainController.findByIdTrain
 );
 
-// trainRouter.put(
-//   `${prefix}/cuadrilla`,
-//   trainMiddleware.verifyFieldsUpdateCuadrilla,
-//   authRoleMiddleware.authAdminAndProjectManager,
-//   trainController.updateCuadrilla
-// );
+trainRouter.put(
+  `${prefix}/cuadrilla/:id`,
+  trainMiddleware.verifyFieldsUpdateCuadrilla,
+  authRoleMiddleware.authAdminAndProjectManager,
+  trainController.updateCuadrilla
+);
 
 trainRouter.post(
-  `${prefix}/proyect/:project_id`,
+  `${prefix}/project/:project_id`,
   trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyFields,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.create
 );
 trainRouter.post(
-  `${prefix}/upload-excel`,
+  `${prefix}/upload-excel/project/:project_id`,
+  trainMiddleware.verifyHeadersFieldsProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.trainReadExcel
 );
@@ -53,12 +54,12 @@ trainRouter.delete(
 );
 
 trainRouter.put(
-  `${prefix}/:id`
-  // trainMiddleware.verifyHeadersFieldsId
-  // trainMiddleware.verifyHeadersFieldsProject
-  // trainMiddleware.verifyFieldsUpdate,
-  // authRoleMiddleware.authAdminAndProjectManager,
-  // trainController.update
+  `${prefix}/:id/project/:project_id`,
+  trainMiddleware.verifyHeadersFieldsId,
+  trainMiddleware.verifyHeadersFieldsProject,
+  trainMiddleware.verifyFieldsUpdate,
+  authRoleMiddleware.authAdminAndProjectManager,
+  trainController.update
 );
 
 export default trainRouter;

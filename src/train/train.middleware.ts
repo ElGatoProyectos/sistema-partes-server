@@ -67,7 +67,7 @@ class TrainMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar el parámetro"
+        " Error al validar el header"
       );
       response.status(result.statusCode).send(result);
     }
@@ -85,7 +85,7 @@ class TrainMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar el parámetro"
+        " Error al validar el header"
       );
       response.status(result.statusCode).send(result);
     }

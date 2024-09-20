@@ -44,7 +44,7 @@ class UnitMiddleware {
   ) {
     try {
       const id = request.params.id;
-      if (!validator.isNumeric(id)) {
+      if (!validator.isNumeric) {
         throw new Error("El id debe ser numérico");
       }
       nextFunction();
