@@ -67,12 +67,12 @@ class TrainMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar el header"
+        "Error al validar el header"
       );
       response.status(result.statusCode).send(result);
     }
   }
-  verifyHeadersFieldsProject(
+  verifyHeadersFieldsIdProject(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
@@ -85,7 +85,7 @@ class TrainMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        " Error al validar el header"
+        "Error al validar el header"
       );
       response.status(result.statusCode).send(result);
     }

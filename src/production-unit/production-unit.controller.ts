@@ -121,18 +121,21 @@ class ProductionUnitController {
             } else {
               prouductionUnitUpdateDto.parse(request.body);
               const data = request.body as I_UpdateProductionUnitBody;
-              const productionUnit_id = Number(request.params.id);
+              const production_unit_id = request.params.id;
               const project_id = request.params.project_id;
-              if (!validator.isNumeric(project_id)) {
+              if (
+                !validator.isNumeric(production_unit_id) ||
+                !validator.isNumeric(project_id)
+              ) {
                 const customError = httpResponse.BadRequestException(
-                  "El id del projecto debe ser numérico",
+                  "Los id deben ser numéricos",
                   error
                 );
                 response.status(customError.statusCode).json(customError);
               } else {
                 const result = await productionUnitService.updateProductionUnit(
                   data,
-                  productionUnit_id,
+                  +production_unit_id,
                   +project_id
                 );
                 if (!result.success) {

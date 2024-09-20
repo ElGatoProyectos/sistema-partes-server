@@ -17,6 +17,7 @@ import sharp from "sharp";
 import { empresaUpdateDto } from "./dto/companyupdatedto";
 import { productionUnitService } from "@/production-unit/production-unit.service";
 import fs from "fs/promises";
+import validator from "validator";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -124,52 +125,63 @@ class CompanyController {
               empresaUpdateDto.parse(request.body);
               const tokenWithBearer = request.headers.authorization;
               const data = request.body as I_UpdateCompanyBody;
-              if (tokenWithBearer) {
-                const idCompany = Number(request.params.id);
-                const result = await companyService.updateCompanyWithTokenUser(
-                  data,
-                  idCompany,
-                  tokenWithBearer
+              const company_id = request.params.id;
+              if (!validator.isNumeric(company_id)) {
+                const customError = httpResponse.BadRequestException(
+                  "El id del projecto debe ser numérico",
+                  error
                 );
-                if (!result.success) {
-                  response.status(result.statusCode).json(result);
-                } else {
-                  const project = result.payload as Empresa;
-                  if (request.file) {
-                    const id = project.id;
-                    const direction = path.join(
-                      appRootPath.path,
-                      "static",
-                      CompanyMulterProperties.folder
-                    );
-                    const ext = ".png";
-                    const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
-                    const filePath = path.join(direction, fileName);
-                    sharp(request.file.buffer)
-                      .resize({ width: 800 })
-                      .toFormat("png")
-                      .toFile(filePath, (err) => {
-                        if (err) {
-                          const customError = httpResponse.BadRequestException(
-                            "Error al actualizar la imagen de la empresa",
-                            err
-                          );
-                          response
-                            .status(customError.statusCode)
-                            .json(customError);
-                        } else {
-                          response.status(result.statusCode).json(result);
-                        }
-                      });
-                  } else {
-                    response.status(result.statusCode).json(result);
-                  }
-                }
+                response.status(customError.statusCode).json(customError);
               } else {
-                const result = httpResponse.UnauthorizedException(
-                  "Error en la autenticacion al crear el usuario"
-                );
-                response.status(result.statusCode).json(result);
+                if (tokenWithBearer) {
+                  const result =
+                    await companyService.updateCompanyWithTokenUser(
+                      data,
+                      +company_id,
+                      tokenWithBearer
+                    );
+
+                  if (!result.success) {
+                    response.status(result.statusCode).json(result);
+                  } else {
+                    const project = result.payload as Empresa;
+                    if (request.file) {
+                      const id = project.id;
+                      const direction = path.join(
+                        appRootPath.path,
+                        "static",
+                        CompanyMulterProperties.folder
+                      );
+                      const ext = ".png";
+                      const fileName = `${CompanyMulterProperties.folder}_${id}${ext}`;
+                      const filePath = path.join(direction, fileName);
+                      sharp(request.file.buffer)
+                        .resize({ width: 800 })
+                        .toFormat("png")
+                        .toFile(filePath, (err) => {
+                          if (err) {
+                            const customError =
+                              httpResponse.BadRequestException(
+                                "Error al actualizar la imagen de la empresa",
+                                err
+                              );
+                            response
+                              .status(customError.statusCode)
+                              .json(customError);
+                          } else {
+                            response.status(result.statusCode).json(result);
+                          }
+                        });
+                    } else {
+                      response.status(result.statusCode).json(result);
+                    }
+                  }
+                } else {
+                  const result = httpResponse.UnauthorizedException(
+                    "Error en la autenticacion al crear el usuario"
+                  );
+                  response.status(result.statusCode).json(result);
+                }
               }
             }
           } catch (error) {

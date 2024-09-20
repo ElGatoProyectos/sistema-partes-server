@@ -175,36 +175,7 @@ class CompanyService {
       await prisma.$disconnect();
     }
   }
-  async createCompanyOfTheAdmin(
-    data: I_CreateCompanyAdminBody
-  ): Promise<T_HttpResponse> {
-    try {
-      const userResponse = await userService.findByEmail("ale@gmail.com");
-      if (!userResponse.success) {
-        return userResponse;
-      }
 
-      const user = userResponse.payload as Usuario;
-
-      const companyFormat = {
-        ...data,
-        usuario_id: user.id,
-      };
-      const result = await prismaCompanyRepository.createCompany(companyFormat);
-      const companyMapper = new CompanyResponseMapper(result);
-      return httpResponse.CreatedResponse(
-        "Empresa creada correctamente",
-        companyMapper
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al crear empresa",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
   async findAll(data: T_FindAll): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
@@ -402,6 +373,7 @@ class CompanyService {
   ): Promise<T_HttpResponse> {
     try {
       const companyResponseId = await companyValidation.findById(idCompany);
+
       if (!companyResponseId.success) return companyResponseId;
 
       const userTokenResponse = await jwtService.getUserFromToken(

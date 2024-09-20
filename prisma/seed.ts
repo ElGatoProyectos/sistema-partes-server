@@ -1,11 +1,11 @@
-import { rolService } from "../src/rol/rol.service";
 import { bcryptService } from "../src/auth/bcrypt.service";
 import prisma from "../src/config/prisma.config";
 import { I_CreateRolBody, I_Rol } from "../src/rol/models/rol.interfaces";
 import { I_CreateUserBD } from "../src/user/models/user.interface";
-import { userService } from "../src/user/user.service";
-import { companyService } from "../src/company/company.service";
 import { I_CreateCompanyAdminBody } from "../src/company/models/company.interface";
+import { userValidation } from "../src/user/user.validation";
+import { companyValidation } from "../src/company/company.validation";
+import { rolValidation } from "../src/rol/rol.validation";
 
 async function main() {
   const rolAdmin = {
@@ -39,10 +39,10 @@ async function main() {
     contacto_responsable: "Armando",
   };
 
-  await rolService.createRol(rolAdmin as I_CreateRolBody);
-  await rolService.createRol(rolUser as I_CreateRolBody);
-  await userService.createUserAsAdmin(user as I_CreateUserBD);
-  await companyService.createCompanyOfTheAdmin(
+  await rolValidation.createRol(rolAdmin as I_CreateRolBody);
+  await rolValidation.createRol(rolUser as I_CreateRolBody);
+  await userValidation.createUserAsAdmin(user as I_CreateUserBD);
+  await companyValidation.createCompanyOfTheAdmin(
     company as I_CreateCompanyAdminBody
   );
 }

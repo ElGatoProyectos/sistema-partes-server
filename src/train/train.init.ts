@@ -27,6 +27,7 @@ trainRouter.get(
 
 trainRouter.put(
   `${prefix}/cuadrilla/:id`,
+  trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyFieldsUpdateCuadrilla,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.updateCuadrilla
@@ -34,14 +35,14 @@ trainRouter.put(
 
 trainRouter.post(
   `${prefix}/project/:project_id`,
-  trainMiddleware.verifyHeadersFieldsId,
+  trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFields,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.create
 );
 trainRouter.post(
   `${prefix}/upload-excel/project/:project_id`,
-  trainMiddleware.verifyHeadersFieldsProject,
+  trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.trainReadExcel
 );
@@ -56,7 +57,7 @@ trainRouter.delete(
 trainRouter.put(
   `${prefix}/:id/project/:project_id`,
   trainMiddleware.verifyHeadersFieldsId,
-  trainMiddleware.verifyHeadersFieldsProject,
+  trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFieldsUpdate,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.update
