@@ -14,9 +14,14 @@ const upload: any = multer({ storage: storage });
 class UnitController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateUnitBody;
+    const project_id = request.params.project_id;
     const tokenWithBearer = request.headers.authorization;
     if (tokenWithBearer) {
-      const result = await unitService.createUnit(data, tokenWithBearer);
+      const result = await unitService.createUnit(
+        data,
+        tokenWithBearer,
+        +project_id
+      );
       if (!result.success) {
         response.status(result.statusCode).json(result);
       } else {
@@ -33,12 +38,14 @@ class UnitController {
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUnitBody;
     const tokenWithBearer = request.headers.authorization;
+    const project_id = request.params.project_id;
     const idUnit = Number(request.params.id);
     if (tokenWithBearer) {
       const result = await unitService.updateUnit(
         data,
         idUnit,
-        tokenWithBearer
+        tokenWithBearer,
+        +project_id
       );
       if (!result.success) {
         response.status(result.statusCode).json(result);
@@ -68,6 +75,7 @@ class UnitController {
   async findByName(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = request.params.project_id;
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
@@ -75,7 +83,11 @@ class UnitController {
       },
     };
     const name = request.query.name as string;
-    const result = await unitService.findByName(name, paginationOptions);
+    const result = await unitService.findByName(
+      name,
+      paginationOptions,
+      +project_id
+    );
     response.status(result.statusCode).json(result);
   }
 
@@ -85,13 +97,14 @@ class UnitController {
   ) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = request.params.project_id;
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
         limit: limit,
       },
     };
-    const result = await unitService.findAll(paginationOptions);
+    const result = await unitService.findAll(paginationOptions, +project_id);
     response.status(result.statusCode).json(result);
   }
 

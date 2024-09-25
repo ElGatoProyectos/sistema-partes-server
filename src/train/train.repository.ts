@@ -4,9 +4,9 @@ import {
 } from "./models/production-unit.interface";
 
 export abstract class TrainRepository {
-  findAll(skip: number, limit: number): void {}
+  findAll(skip: number, limit: number, project_id: number): void {}
 
-  findByCode(code: string): void {}
+  findByCode(code: string, project_id: number): void {}
 
   findById(idUser: number): void {}
 
@@ -19,13 +19,18 @@ export abstract class TrainRepository {
     pawns: number
   ): void {}
 
-  existsName(name: string): void {}
+  existsName(name: string, project_id: number): void {}
 
   updateTrain(data: I_UpdateTrainBody, idUser: number): void {}
 
   updateStatusTrain(idUser: number): void {}
 
-  searchNameTrain(name: string, skip: number, limit: number): void {}
+  searchNameTrain(
+    name: string,
+    skip: number,
+    limit: number,
+    project_id: number
+  ): void {}
 
-  codeMoreHigh(): void {}
+  codeMoreHigh(project_id: number): void {}
 }

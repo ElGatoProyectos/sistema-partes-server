@@ -5,24 +5,25 @@ import { TrainRepository } from "./train.repository";
 import {
   I_CreateTrainBD,
   I_Train,
-  I_UpdateTrainBody,
   I_UpdateTrainBodyValidation,
 } from "./models/production-unit.interface";
 
 class PrismaTrainRepository implements TrainRepository {
-  async findByCode(code: string): Promise<Tren | null> {
+  async findByCode(code: string, project_id: number): Promise<Tren | null> {
     const train = await prisma.tren.findFirst({
       where: {
         codigo: code,
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });
     return train;
   }
-  async existsName(name: string): Promise<Tren | null> {
+  async existsName(name: string, project_id: number): Promise<Tren | null> {
     const train = await prisma.tren.findFirst({
       where: {
         nombre: name,
+        proyecto_id: project_id,
       },
     });
     return train;
@@ -46,10 +47,11 @@ class PrismaTrainRepository implements TrainRepository {
     return updateTrain;
   }
 
-  async codeMoreHigh(): Promise<Tren | null> {
+  async codeMoreHigh(project_id: number): Promise<Tren | null> {
     const lastTrain = await prisma.tren.findFirst({
       where: {
-        eliminado: E_Estado_BD.n,
+        // eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
       },
       orderBy: { codigo: "desc" },
     });
@@ -75,7 +77,8 @@ class PrismaTrainRepository implements TrainRepository {
   async searchNameTrain(
     name: string,
     skip: number,
-    limit: number
+    limit: number,
+    project_id: number
   ): Promise<{ trains: I_Train[]; total: number }> {
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
@@ -84,6 +87,7 @@ class PrismaTrainRepository implements TrainRepository {
             contains: name,
           },
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
         skip,
         take: limit,
@@ -97,6 +101,7 @@ class PrismaTrainRepository implements TrainRepository {
             contains: name,
           },
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
       }),
     ]);
@@ -105,12 +110,14 @@ class PrismaTrainRepository implements TrainRepository {
 
   async findAll(
     skip: number,
-    limit: number
+    limit: number,
+    project_id: number
   ): Promise<{ trains: I_Train[]; total: number }> {
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
         where: {
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
         skip,
         take: limit,
@@ -121,6 +128,7 @@ class PrismaTrainRepository implements TrainRepository {
       prisma.tren.count({
         where: {
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
       }),
     ]);

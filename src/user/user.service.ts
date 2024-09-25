@@ -1,3 +1,4 @@
+import { sectionValidation } from "./../section/section.validation";
 import { Empresa, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
@@ -6,6 +7,7 @@ import {
   I_CreateUserBody,
   I_UpdateUserBD,
   I_UpdateUserBody,
+  IAssignUserPermissions,
 } from "./models/user.interface";
 import { prismaUserRepository } from "./prisma-user.repository";
 import prisma from "../config/prisma.config";
@@ -25,6 +27,7 @@ import { rolValidation } from "../rol/rol.validation";
 import { companyValidation } from "../company/company.validation";
 import { emailValid } from "../common/utils/email";
 import { prismaRolRepository } from "../rol/prisma-rol.repository";
+import { actionValidation } from "@/action/action.validation";
 
 class UserService {
   async findAll(data: T_FindAllUser): Promise<T_HttpResponse> {
@@ -506,6 +509,52 @@ class UserService {
       await prisma.$disconnect();
     }
   }
+
+  // async createPermissions(
+  //   data: IAssignUserPermissions
+  // ): Promise<T_HttpResponse> {
+  //   try {
+  //     const responseUser = await userValidation.findById(data.user_id);
+  //     if (!responseUser) {
+  //       return responseUser;
+  //     }
+  //     const responseRol = await rolValidation.findById(data.rol_id);
+  //     if (!responseRol) {
+  //       return responseUser;
+  //     }
+  //     for (let i = 0; i < data.sections.length; i++) {
+  //       const responseSection = await sectionValidation.findById(
+  //         data.sections[i].id
+  //       );
+  //       if (!responseSection) {
+  //         return responseSection;
+  //       }
+  //     }
+  //     for (let i = 0; i < data.actions.length; i++) {
+  //       const responseAction = await actionValidation.findById(
+  //         data.actions[i].id
+  //       );
+  //       if (!responseAction) {
+  //         return responseAction;
+  //       }
+  //     }
+  //     const permissionCreate = await prismaUserRepository.assignUserPermissions(
+  //       data
+  //     );
+
+  //     return httpResponse.CreatedResponse(
+  //       "El detalle usuario-empresa fue creado correctamente",
+  //       "jaj"
+  //     );
+  //   } catch (error) {
+  //     return httpResponse.InternalServerErrorException(
+  //       "Error al crear los permisos del Usuarios",
+  //       error
+  //     );
+  //   } finally {
+  //     await prisma.$disconnect();
+  //   }
+  // }
 
   async findByEmail(email: string): Promise<T_HttpResponse> {
     try {

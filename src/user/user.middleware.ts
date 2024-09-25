@@ -58,7 +58,7 @@ class UserMiddleware {
     }
   }
 
-  verifyHeadersFields(
+  verifyHeadersFieldsId(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
@@ -71,7 +71,43 @@ class UserMiddleware {
       nextFunction();
     } catch {
       const result = httpResponse.BadRequestException(
-        "Error al validar los campos para traer los usuarios"
+        "Error al validar los campos "
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+  verifyHeadersFieldsRolId(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      const id = request.params.rol_id;
+      if (!validator.isNumeric(id)) {
+        throw new Error("El rol_id debe ser numérico");
+      }
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        "Error al validar los campos"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+  verifyHeadersFieldsProjectId(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      const id = request.params.project_id;
+      if (!validator.isNumeric(id)) {
+        throw new Error("El project_id debe ser numérico");
+      }
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        "Error al validar los campos"
       );
       response.status(result.statusCode).send(result);
     }

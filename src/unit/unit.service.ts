@@ -8,11 +8,13 @@ import { ResponseUnitMapper } from "./mapper/unit.mapper.dto";
 import { companyValidation } from "@/company/company.validation";
 import { Empresa, Unidad, Usuario } from "@prisma/client";
 import { jwtService } from "@/auth/jwt.service";
+import { projectValidation } from "@/project/project.validation";
 
 class UnitService {
   async createUnit(
     data: I_CreateUnitBody,
-    tokenWithBearer: string
+    tokenWithBearer: string,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(
@@ -20,12 +22,24 @@ class UnitService {
       );
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
-      const resultName = await unitValidation.findByName(data.nombre);
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Tren con el id del Proyecto proporcionado"
+        );
+      }
+      const resultName = await unitValidation.findByName(
+        data.nombre,
+        project_id
+      );
       if (!resultName.success) {
         return resultName;
       }
       if (data.simbolo) {
-        const resultSymbol = await unitValidation.findBySymbol(data.simbolo);
+        const resultSymbol = await unitValidation.findBySymbol(
+          data.simbolo,
+          project_id
+        );
         if (!resultSymbol.success) {
           return resultSymbol;
         }
@@ -38,7 +52,7 @@ class UnitService {
         return resultIdCompany;
       }
       const company = resultIdCompany.payload as Empresa;
-      const lastUnit = await unitValidation.codeMoreHigh();
+      const lastUnit = await unitValidation.codeMoreHigh(project_id);
       const lastUnitResponse = lastUnit.payload as Unidad;
 
       // Incrementar el código en 1
@@ -51,6 +65,7 @@ class UnitService {
         empresa_id: company.id,
         codigo: formattedCodigo,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
+        project_id: project_id,
       };
 
       const responseUnit = await prismaUnitRepository.createUnit(unitFormat);
@@ -72,7 +87,8 @@ class UnitService {
   async updateUnit(
     data: I_UpdateUnitBody,
     idUnit: number,
-    tokenWithBearer: string
+    tokenWithBearer: string,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(
@@ -87,15 +103,28 @@ class UnitService {
       }
       const resultUnitFind = resultIdUnit.payload as Unidad;
 
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Tren con el id del Proyecto proporcionado"
+        );
+      }
+
       if (resultUnitFind.nombre != data.nombre) {
-        const resultName = await unitValidation.findByName(data.nombre);
+        const resultName = await unitValidation.findByName(
+          data.nombre,
+          project_id
+        );
         if (!resultName.success) {
           return resultName;
         }
       }
 
       if (data.simbolo && resultUnitFind.simbolo != data.simbolo) {
-        const resultSymbol = await unitValidation.findBySymbol(data.simbolo);
+        const resultSymbol = await unitValidation.findBySymbol(
+          data.simbolo,
+          project_id
+        );
         if (!resultSymbol.success) {
           return resultSymbol;
         }
@@ -112,6 +141,7 @@ class UnitService {
         ...data,
         empresa_id: company.id,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
+        project_id: project_id,
       };
 
       const responseUnit = await prismaUnitRepository.updateUnit(
@@ -155,13 +185,18 @@ class UnitService {
     }
   }
 
-  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
+  async findByName(
+    name: string,
+    data: T_FindAll,
+    project_id: number
+  ): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaUnitRepository.searchNameUnit(
         name,
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        project_id
       );
 
       if (!result) {
@@ -192,12 +227,13 @@ class UnitService {
     }
   }
 
-  async findAll(data: T_FindAll) {
+  async findAll(data: T_FindAll, project_id: number) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaUnitRepository.findAll(
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        project_id
       );
       const { units, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

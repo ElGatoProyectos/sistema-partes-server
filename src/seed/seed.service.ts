@@ -1,3 +1,4 @@
+import { actionService } from "@/action/actionservice.service";
 import { bcryptService } from "@/auth/bcrypt.service";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { companyValidation } from "@/company/company.validation";
@@ -5,6 +6,7 @@ import { I_CreateCompanyAdminBody } from "@/company/models/company.interface";
 import prisma from "@/config/prisma.config";
 import { I_CreateRolBody } from "@/rol/models/rol.interfaces";
 import { rolValidation } from "@/rol/rol.validation";
+import { sectionService } from "@/section/section.service";
 import { I_CreateUserBD } from "@/user/models/user.interface";
 import { userValidation } from "@/user/user.validation";
 
@@ -106,6 +108,98 @@ class SeedService {
         correo: "gestionpartes@gmail.com",
         contacto_responsable: "Armando",
       };
+      //SECCIONES
+      const seccion1 = {
+        nombre: "TREN",
+      };
+      const seccion2 = {
+        nombre: "REPORTE_TREN",
+      };
+      const seccion3 = {
+        nombre: "UNIDAD_DE_PRODUCCION",
+      };
+      const seccion4 = {
+        nombre: "USUARIO",
+      };
+      const seccion5 = {
+        nombre: "UNIDAD",
+      };
+      const seccion6 = {
+        nombre: "PARTIDA",
+      };
+      const seccion7 = {
+        nombre: "REPORTE_PARTIDA",
+      };
+      const seccion8 = {
+        nombre: "TRABAJOS",
+      };
+      const seccion9 = {
+        nombre: "MANO_DE_OBRA",
+      };
+      const seccion10 = {
+        nombre: "RECURSOS",
+      };
+      const seccion11 = {
+        nombre: "ASISTENCIA",
+      };
+      const seccion12 = {
+        nombre: "TRABAJOS_DEL_PROYECTO",
+      };
+      const seccion13 = {
+        nombre: "PARTE_DIARIO",
+      };
+      const seccion14 = {
+        nombre: "PARTE_DIARIO_PARTIDA",
+      };
+      const seccion15 = {
+        nombre: "PARTE_DIARIO_MANO_DE_OBRA",
+      };
+      const seccion16 = {
+        nombre: "PARTE_DIARIO_MATERIALES",
+      };
+      const seccion17 = {
+        nombre: "PARTE_DIARIO_EQUIPOS",
+      };
+      const seccion18 = {
+        nombre: "PARTE_DIARIO_SUBCONTRATAS",
+      };
+      const seccion19 = {
+        nombre: "PARTE_DIARIO_FOTOS",
+      };
+      const seccion20 = {
+        nombre: "PARTE_DIARIO_SEGUN_TRABAJO",
+      };
+      const seccion21 = {
+        nombre: "TABLA_PRECIOS",
+      };
+      const seccion22 = {
+        nombre: "TAREO_SEMANAL",
+      };
+      const seccion23 = {
+        nombre: "CONTROL_PRODUCCION",
+      };
+      const seccion24 = {
+        nombre: "RESTRICCION_DEL_TRABAJO",
+      };
+      //ACCIONES
+      const accion1 = {
+        nombre: "LECTURA",
+      };
+      const accion2 = {
+        nombre: "BUSCAR",
+      };
+      const accion3 = {
+        nombre: "CREACION",
+      };
+      const accion4 = {
+        nombre: "EDICION",
+      };
+      const accion5 = {
+        nombre: "ELIMINACION",
+      };
+      const accion6 = {
+        nombre: "CARGAR_EXCEL",
+      };
       await rolValidation.createRol(rol_admin as I_CreateRolBody);
       await rolValidation.createRol(rol_user as I_CreateRolBody);
       await rolValidation.createRol(rol_gerente_proyecto as I_CreateRolBody);
@@ -133,12 +227,42 @@ class SeedService {
       await companyValidation.createCompanyOfTheAdmin(
         company as I_CreateCompanyAdminBody
       );
+      await sectionService.createSection(seccion1);
+      await sectionService.createSection(seccion2);
+      await sectionService.createSection(seccion3);
+      await sectionService.createSection(seccion4);
+      await sectionService.createSection(seccion5);
+      await sectionService.createSection(seccion6);
+      await sectionService.createSection(seccion7);
+      await sectionService.createSection(seccion8);
+      await sectionService.createSection(seccion9);
+      await sectionService.createSection(seccion10);
+      await sectionService.createSection(seccion11);
+      await sectionService.createSection(seccion12);
+      await sectionService.createSection(seccion13);
+      await sectionService.createSection(seccion14);
+      await sectionService.createSection(seccion15);
+      await sectionService.createSection(seccion16);
+      await sectionService.createSection(seccion17);
+      await sectionService.createSection(seccion18);
+      await sectionService.createSection(seccion19);
+      await sectionService.createSection(seccion20);
+      await sectionService.createSection(seccion21);
+      await sectionService.createSection(seccion22);
+      await sectionService.createSection(seccion23);
+      await sectionService.createSection(seccion24);
+      await actionService.createAction(accion1);
+      await actionService.createAction(accion2);
+      await actionService.createAction(accion3);
+      await actionService.createAction(accion4);
+      await actionService.createAction(accion5);
+      await actionService.createAction(accion6);
       return httpResponse.SuccessResponse(
-        "Éxito al crear roles, usuario y empresa"
+        "Éxito al crear roles,secciones, acciones, usuario y empresa"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear roles, usuario y empresa",
+        "Error al crear roles,secciones, acciones, usuario y empresa",
         error
       );
     } finally {

@@ -31,9 +31,9 @@ class TrainValidation {
       );
     }
   }
-  async findByCode(code: string): Promise<T_HttpResponse> {
+  async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const train = await prismaTrainRepository.findByCode(code);
+      const train = await prismaTrainRepository.findByCode(code, project_id);
       if (train) {
         return httpResponse.NotFoundException(
           "Codigo del Tren encontrado",
@@ -62,9 +62,9 @@ class TrainValidation {
       );
     }
   }
-  async findByName(name: string): Promise<T_HttpResponse> {
+  async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const train = await prismaTrainRepository.existsName(name);
+      const train = await prismaTrainRepository.existsName(name, project_id);
       if (train) {
         return httpResponse.NotFoundException(
           "El nombre del Tren ya existe en la base de datos"
@@ -79,11 +79,11 @@ class TrainValidation {
     }
   }
 
-  async codeMoreHigh(): Promise<T_HttpResponse> {
+  async codeMoreHigh(project_id: number): Promise<T_HttpResponse> {
     try {
-      const train = await prismaTrainRepository.codeMoreHigh();
+      const train = await prismaTrainRepository.codeMoreHigh(project_id);
       if (!train) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
+        return httpResponse.SuccessResponse("No se encontraron resultados", 0);
       }
       return httpResponse.SuccessResponse("Tren encontrado", train);
     } catch (error) {
