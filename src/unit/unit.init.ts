@@ -9,40 +9,44 @@ const unitRouter = express.Router();
 const prefix = "/unit";
 
 unitRouter.get(
-  `${prefix}`,
+  `${prefix}/:project_id`,
+  unitMiddleware.verifyHeadersFieldsProject,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.allResoursesCategories
 );
 
 unitRouter.get(
-  `${prefix}/search`,
+  `${prefix}/search/:project_id`,
+  unitMiddleware.verifyHeadersFieldsProject,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.findByName
 );
 unitRouter.delete(
   `${prefix}/:id`,
-  unitMiddleware.verifyHeadersFields,
+  unitMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.updateStatus
 );
 
 unitRouter.get(
   `${prefix}/:id`,
-  unitMiddleware.verifyHeadersFields,
+  unitMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.findByIdUnit
 );
 
 unitRouter.post(
-  `${prefix}`,
+  `${prefix}/project/:project_id`,
+  unitMiddleware.verifyHeadersFieldsProject,
   unitMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.create
 );
 
 unitRouter.put(
-  `${prefix}/:id`,
-  unitMiddleware.verifyHeadersFields,
+  `${prefix}/:id/project/:project_id`,
+  unitMiddleware.verifyHeadersFieldsId,
+  unitMiddleware.verifyHeadersFieldsProject,
   unitMiddleware.verifyFieldsUpdate,
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.update

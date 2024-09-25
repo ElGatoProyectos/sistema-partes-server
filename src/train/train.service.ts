@@ -21,7 +21,10 @@ class TrainService {
     project_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultTrain = await trainValidation.findByName(data.nombre);
+      const resultTrain = await trainValidation.findByName(
+        data.nombre,
+        project_id
+      );
       if (!resultTrain.success) {
         return resultTrain;
       }
@@ -32,7 +35,9 @@ class TrainService {
         );
       }
 
-      const lastTrain = await trainValidation.codeMoreHigh();
+      const lastTrain = await trainValidation.codeMoreHigh(project_id);
+      console.log("esto da cuando creas tren ");
+      console.log(lastTrain);
       const lastTrainResponse = lastTrain.payload as Tren;
 
       // Incrementar el código en 1
@@ -42,7 +47,6 @@ class TrainService {
 
       const trainFormat = {
         ...data,
-        cuadrilla: data.cuadrilla + "-" + formattedCodigo,
         codigo: formattedCodigo,
         operario: 1,
         oficial: 1,
@@ -82,7 +86,10 @@ class TrainService {
       }
       const resultTrainFind = resultIdTrain.payload as Tren;
       if (resultTrainFind.nombre != data.nombre) {
-        const resultTrain = await trainValidation.findByName(data.nombre);
+        const resultTrain = await trainValidation.findByName(
+          data.nombre,
+          project_id
+        );
         if (!resultTrain.success) {
           return resultTrain;
         }
@@ -96,7 +103,6 @@ class TrainService {
       const trainResponse = resultIdTrain.payload as Tren;
       const trainFormat = {
         ...data,
-        cuadrilla: data.cuadrilla + "-" + trainResponse.codigo,
         operario: data.operario,
         oficial: data.oficial,
         peon: data.peon,
@@ -169,13 +175,18 @@ class TrainService {
     }
   }
 
-  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
+  async findByName(
+    name: string,
+    data: T_FindAll,
+    project_id: number
+  ): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaTrainRepository.searchNameTrain(
         name,
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        +project_id
       );
 
       const { trains, total } = result;
@@ -200,12 +211,13 @@ class TrainService {
     }
   }
 
-  async findAll(data: T_FindAll) {
+  async findAll(data: T_FindAll, project_id: number) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaTrainRepository.findAll(
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        project_id
       );
 
       const { trains, total } = result;
@@ -255,7 +267,7 @@ class TrainService {
     }
   }
 
-  async registerTrainMasive(file: any, projectId: number) {
+  async registerTrainMasive(file: any, project_id: number) {
     try {
       const buffer = file.buffer;
 
@@ -290,7 +302,7 @@ class TrainService {
           "Error al leer el archivo. Verificar los campos"
         );
       }
-      const project = await projectValidation.findById(projectId);
+      const project = await projectValidation.findById(project_id);
       if (!project.success) return project;
       const responseProject = project.payload as Proyecto;
       const seenCodes = new Set<string>();
@@ -379,7 +391,10 @@ class TrainService {
       let productionUnit;
       await Promise.all(
         sheetToJson.map(async (item: I_TrainExcel) => {
-          code = await trainValidation.findByCode(String(item["ID-TREN"]));
+          code = await trainValidation.findByCode(
+            String(item["ID-TREN"]),
+            project_id
+          );
           if (!code.success) {
             productionUnit = code.payload as Tren;
             await trainValidation.updateTrain(
@@ -393,7 +408,6 @@ class TrainService {
                 codigo: String(item["ID-TREN"]),
                 nombre: item.TREN,
                 nota: item.NOTA,
-                cuadrilla: item.TREN + "-" + item["ID-TREN"],
                 operario: 1,
                 oficial: 1,
                 peon: 1,

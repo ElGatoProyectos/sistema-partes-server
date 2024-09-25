@@ -1,17 +1,17 @@
 import { I_CreateUnitBD, I_UpdateUnitBody } from "./models/unit.interface";
 
 export abstract class UnitRepository {
-  findAll(skip: number, limit: number): void {}
+  findAll(skip: number, limit: number, project_id: number): void {}
 
-  findByCode(code: string): void {}
+  findByCode(code: string, project_id: number): void {}
 
   findById(idUnit: number): void {}
 
-  codeMoreHigh(): void {}
+  codeMoreHigh(project_id: number): void {}
 
-  existsName(name: string): void {}
+  existsName(name: string, project_id: number): void {}
 
-  existsSymbol(symbol: string): void {}
+  existsSymbol(symbol: string, project_id: number): void {}
 
   createUnit(data: I_CreateUnitBD): void {}
 
@@ -19,5 +19,10 @@ export abstract class UnitRepository {
 
   updateStatusUnit(idResourseCategory: number): void {}
 
-  searchNameUnit(name: string, skip: number, limit: number): void {}
+  searchNameUnit(
+    name: string,
+    skip: number,
+    limit: number,
+    project_id: number
+  ): void {}
 }

@@ -4,7 +4,6 @@ export class TrainResponseMapper implements Omit<Tren, "eliminado"> {
   id: number;
   codigo: string;
   nombre: string;
-  cuadrilla: string;
   nota: string;
   operario: number;
   oficial: number;
@@ -16,7 +15,6 @@ export class TrainResponseMapper implements Omit<Tren, "eliminado"> {
     this.id = train.id;
     this.codigo = train.codigo;
     this.nombre = train.nombre;
-    this.cuadrilla = train.cuadrilla ? train.cuadrilla : "";
     this.nota = train.nota ? train.nota : "";
     this.operario = train.operario;
     this.oficial = train.oficial;

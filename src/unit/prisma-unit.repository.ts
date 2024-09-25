@@ -2,35 +2,40 @@ import prisma from "@/config/prisma.config";
 import {
   I_CreateUnitBD,
   I_Unit,
-  I_UpdateUnitBody,
   I_UpdateUnitBodyValidation,
 } from "./models/unit.interface";
 import { E_Estado_BD, Unidad } from "@prisma/client";
 import { UnitRepository } from "./unit.repository";
 
 class PrismaUnitRepository implements UnitRepository {
-  async findByCode(code: string): Promise<Unidad | null> {
+  async findByCode(code: string, project_id: number): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {
         codigo: code,
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });
     return unit;
   }
-  async codeMoreHigh(): Promise<Unidad | null> {
+  async codeMoreHigh(project_id: number): Promise<Unidad | null> {
     const lastUnit = await prisma.unidad.findFirst({
       where: {
-        eliminado: E_Estado_BD.n,
+        // eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
       },
       orderBy: { codigo: "desc" },
     });
     return lastUnit;
   }
-  async existsSymbol(symbol: string): Promise<Unidad | null> {
+  async existsSymbol(
+    symbol: string,
+    project_id: number
+  ): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {
         simbolo: symbol,
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });
@@ -48,7 +53,8 @@ class PrismaUnitRepository implements UnitRepository {
   async searchNameUnit(
     name: string,
     skip: number,
-    limit: number
+    limit: number,
+    project_id: number
   ): Promise<{
     units: I_Unit[];
     total: number;
@@ -60,6 +66,7 @@ class PrismaUnitRepository implements UnitRepository {
             contains: name,
           },
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
         skip,
         take: limit,
@@ -73,6 +80,7 @@ class PrismaUnitRepository implements UnitRepository {
             contains: name,
           },
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
       }),
     ]);
@@ -81,7 +89,8 @@ class PrismaUnitRepository implements UnitRepository {
 
   async findAll(
     skip: number,
-    limit: number
+    limit: number,
+    project_id: number
   ): Promise<{
     units: I_Unit[];
     total: number;
@@ -90,6 +99,7 @@ class PrismaUnitRepository implements UnitRepository {
       prisma.unidad.findMany({
         where: {
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
         skip,
         take: limit,
@@ -100,6 +110,7 @@ class PrismaUnitRepository implements UnitRepository {
       prisma.unidad.count({
         where: {
           eliminado: E_Estado_BD.n,
+          proyecto_id: project_id,
         },
       }),
     ]);
@@ -119,11 +130,12 @@ class PrismaUnitRepository implements UnitRepository {
     return unit;
   }
 
-  async existsName(name: string): Promise<Unidad | null> {
+  async existsName(name: string, project_id: number): Promise<Unidad | null> {
     const resourseCategory = await prisma.unidad.findFirst({
       where: {
         nombre: name,
         eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
       },
     });
     return resourseCategory;

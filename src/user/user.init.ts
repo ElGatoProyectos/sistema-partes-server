@@ -22,7 +22,7 @@ userRouter.get(
 
 userRouter.get(
   `${prefix}/:id`,
-  userMiddleware.verifyHeadersFields,
+  userMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdmin,
   userController.findByIdUser
 );
@@ -61,15 +61,24 @@ userRouter.put(
 
 userRouter.put(
   `${prefix}/:id`,
-  userMiddleware.verifyHeadersFields,
+  userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyFieldsUpdate,
   authRoleMiddleware.authAdmin,
   userController.update
 );
 
+userRouter.patch(
+  `${prefix}/user/:id/rol/:rol_id/project/:project_id/permissions`,
+  // userMiddleware.verifyHeadersFieldsId,
+  // userMiddleware.verifyHeadersFieldsRolId,
+  // userMiddleware.verifyHeadersFieldsProjectId,
+  authRoleMiddleware.authAdmin,
+  userController.createPermissions
+);
+
 userRouter.delete(
   `${prefix}/:id`,
-  userMiddleware.verifyHeadersFields,
+  userMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdmin,
   userController.updateStatus
 );

@@ -5,8 +5,9 @@ import { I_UnitExcel } from "./models/unit.interface";
 class UnitValidation {
   async updateUnifiedIndex(
     data: I_UnitExcel,
-    idUnit: number,
-    idCompany: number
+    unit_id: number,
+    company_id: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const unifiedIndexFormat = {
@@ -14,12 +15,13 @@ class UnitValidation {
         nombre: data.NOMBRE,
         simbolo: data.SIMBOLO,
         descripcion: data.DESCRIPCION,
-        empresa_id: idCompany,
+        empresa_id: company_id,
+        proyecto_id: project_id,
       };
 
       const responseUnifiedIndex = await prismaUnitRepository.updateUnit(
         unifiedIndexFormat,
-        idUnit
+        unit_id
       );
       return httpResponse.SuccessResponse(
         "Unidad modificada correctamente",
@@ -32,9 +34,9 @@ class UnitValidation {
       );
     }
   }
-  async codeMoreHigh(): Promise<T_HttpResponse> {
+  async codeMoreHigh(project_id: number): Promise<T_HttpResponse> {
     try {
-      const responseUnit = await prismaUnitRepository.codeMoreHigh();
+      const responseUnit = await prismaUnitRepository.codeMoreHigh(project_id);
       if (!responseUnit) {
         return httpResponse.SuccessResponse("No se encontraron resultados", []);
       }
@@ -46,9 +48,9 @@ class UnitValidation {
       );
     }
   }
-  async findByCode(code: string): Promise<T_HttpResponse> {
+  async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const unit = await prismaUnitRepository.findByCode(code);
+      const unit = await prismaUnitRepository.findByCode(code, project_id);
       if (unit) {
         return httpResponse.NotFoundException("Unidad fue encontrada");
       }
@@ -79,9 +81,12 @@ class UnitValidation {
       );
     }
   }
-  async findByName(name: string): Promise<T_HttpResponse> {
+  async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const nameExists = await prismaUnitRepository.existsName(name);
+      const nameExists = await prismaUnitRepository.existsName(
+        name,
+        project_id
+      );
       if (nameExists) {
         return httpResponse.NotFoundException(
           "El nombre ingresado de la Unidad ya existe en la base de datos"
@@ -97,9 +102,15 @@ class UnitValidation {
       );
     }
   }
-  async findBySymbol(symbol: string): Promise<T_HttpResponse> {
+  async findBySymbol(
+    symbol: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
     try {
-      const symbolExists = await prismaUnitRepository.existsSymbol(symbol);
+      const symbolExists = await prismaUnitRepository.existsSymbol(
+        symbol,
+        project_id
+      );
       if (symbolExists) {
         return httpResponse.NotFoundException(
           "El simbolo ingresado de la Unidad ya existe en la base de datos"

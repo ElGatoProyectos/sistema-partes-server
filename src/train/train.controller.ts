@@ -62,6 +62,7 @@ class TrainController {
   async findByName(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = Number(request.params.project_id);
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
@@ -70,20 +71,25 @@ class TrainController {
     };
     //si buscaba como request.body no me llegaba bien para luego buscar
     const name = request.query.name as string;
-    const result = await trainService.findByName(name, paginationOptions);
+    const result = await trainService.findByName(
+      name,
+      paginationOptions,
+      project_id
+    );
     response.status(result.statusCode).json(result);
   }
 
   async allTrains(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = Number(request.params.project_id);
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
         limit: limit,
       },
     };
-    const result = await trainService.findAll(paginationOptions);
+    const result = await trainService.findAll(paginationOptions, project_id);
     response.status(result.statusCode).json(result);
   }
 

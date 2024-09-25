@@ -7,13 +7,15 @@ const trainRouter = express.Router();
 const prefix = "/train";
 
 trainRouter.get(
-  `${prefix}`,
+  `${prefix}/project/:project_id`,
+  trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.allTrains
 );
 
 trainRouter.get(
-  `${prefix}/search`,
+  `${prefix}/search/project/:project_id`,
+  trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.findByName
 );
