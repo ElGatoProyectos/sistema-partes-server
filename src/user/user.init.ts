@@ -72,7 +72,7 @@ userRouter.patch(
   // userMiddleware.verifyHeadersFieldsId,
   // userMiddleware.verifyHeadersFieldsRolId,
   // userMiddleware.verifyHeadersFieldsProjectId,
-  authRoleMiddleware.authAdmin,
+  // authRoleMiddleware.authAdmin,
   userController.createPermissions
 );
 

@@ -7,6 +7,7 @@ import {
 } from "./models/project.interface";
 import { ProjectRepository } from "./project.repository";
 import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
+import { T_FindAllProject } from "./dto/project.type";
 
 class PrismaProjectRepository implements ProjectRepository {
   async updateStateProject(
@@ -23,29 +24,33 @@ class PrismaProjectRepository implements ProjectRepository {
     return project;
   }
   async searchNameProject(
-    name: string,
-    skip: number,
-    limit: number
+    data: T_FindAllProject,
+    skip: number
   ): Promise<{ projects: I_Project[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.state) {
+      filters.estado = data.queryParams.state.toUpperCase();
+    }
+    if (data.queryParams.name) {
+      filters.nombre_completo = {
+        contains: data.queryParams.name,
+      };
+    }
     const [projects, total]: [I_Project[], number] = await prisma.$transaction([
       prisma.proyecto.findMany({
         where: {
-          nombre_completo: {
-            contains: name,
-          },
+          ...filters,
           eliminado: E_Estado_BD.n,
         },
-        skip,
-        take: limit,
+        skip: skip,
+        take: data.queryParams.limit,
         omit: {
           eliminado: true,
         },
       }),
       prisma.proyecto.count({
         where: {
-          nombre_completo: {
-            contains: name,
-          },
+          ...filters,
           eliminado: E_Estado_BD.n,
         },
       }),

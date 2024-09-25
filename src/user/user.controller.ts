@@ -211,28 +211,28 @@ class UserController {
     }
   }
 
-  // async createPermissions(
-  //   request: express.Request,
-  //   response: express.Response
-  // ) {
-  //   const data = request.body as IAssignUserPermissionsRequest;
-  //   const user_id = Number(request.params.id);
-  //   const rol_id = Number(request.params.rol_id);
-  //   const project_id = Number(request.params.project_id);
-  //   let permissions: IAssignUserPermissions = {
-  //     user_id: user_id,
-  //     rol_id: rol_id,
-  //     project_id: project_id,
-  //     sections: data.sections,
-  //     actions: data.sections,
-  //   };
-  //   const result = await userService.createPermissions(permissions);
-  //   if (!result.success) {
-  //     response.status(result.statusCode).json(result);
-  //   } else {
-  //     response.status(result.statusCode).json(result);
-  //   }
-  // }
+  async createPermissions(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const data = request.body as IAssignUserPermissionsRequest;
+    const user_id = Number(request.params.id);
+    const rol_id = Number(request.params.rol_id);
+    const project_id = Number(request.params.project_id);
+    let permissions: IAssignUserPermissions = {
+      user_id: user_id,
+      rol_id: rol_id,
+      project_id: project_id,
+      section: data.section,
+      actions: data.actions,
+    };
+    const result = await userService.createPermissions(permissions);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUserBody;

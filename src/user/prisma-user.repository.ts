@@ -10,33 +10,30 @@ import { UserRepository } from "./user.repository";
 import { Accion, E_Estado_BD, Seccion, Usuario } from "@prisma/client";
 
 class PrismaUserRepository implements UserRepository {
-  // async assignUserPermissions(data: IAssignUserPermissions) {
-  //   console.log("estoy en el servicio de permisos");
-  //   console.log(data);
-  //   const resultDetailUserProject = await prisma.detalleUsuarioProyecto.create({
-  //     data: {
-  //       usuario_id: data.user_id,
-  //       rol_id: data.rol_id,
-  //       projecto_id: data.project_id,
-  //     },
-  //   });
-  //   let permisos = [];
-  //   for (let i = 0; i < data.sections.length; i++) {
-  //     const permiso = await prisma.permisos.create({
-  //       data: {
-  //         seccion_id: data.sections[i].id,
-  //         accion_id: data.actions[i].id,
-  //         rol_id: data.rol_id,
-  //       },
-  //     });
-  //     permisos.push(permiso);
-  //   }
+  async assignUserPermissions(data: IAssignUserPermissions) {
+    const resultDetailUserProject = await prisma.detalleUsuarioProyecto.create({
+      data: {
+        usuario_id: data.user_id,
+        projecto_id: data.project_id,
+      },
+    });
+    let permisos = [];
+    for (let i = 0; i < data.actions.length; i++) {
+      const permiso = await prisma.permisos.create({
+        data: {
+          seccion_id: +data.section.id,
+          accion_id: data.actions[i].id,
+          rol_id: data.rol_id,
+        },
+      });
+      permisos.push(permiso);
+    }
 
-  //   return {
-  //     detalleUsuarioProyecto: resultDetailUserProject,
-  //     permisos,
-  //   };
-  // }
+    return {
+      detalleUsuarioProyecto: resultDetailUserProject,
+      permisos,
+    };
+  }
 
   async updaterRolUser(idUser: number, idRol: number): Promise<Usuario> {
     const user = await prisma.usuario.update({

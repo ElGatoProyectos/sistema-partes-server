@@ -89,11 +89,11 @@ export interface IAssignUserPermissions {
   user_id: number;
   rol_id: number;
   project_id: number;
-  sections: Seccion[];
+  section: Seccion;
   actions: Accion[];
 }
 export interface IAssignUserPermissionsRequest {
-  sections: Seccion[];
+  section: Seccion;
   actions: Accion[];
 }
 

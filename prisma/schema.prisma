@@ -68,10 +68,10 @@ enum E_TIPO_PARENTESCO_BD {
 }
 
 enum E_Proyecto_Estado {
-  ACTIVO
-  INACTIVO
-  PENDIENTE
-  FINALIZADO
+  CREADO
+  REPROGRAMADO
+  EJECUCION
+  TERMINADO
 }
 
 enum E_Trabajo_Estado {

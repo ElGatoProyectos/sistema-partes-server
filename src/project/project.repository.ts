@@ -1,3 +1,4 @@
+import { T_FindAllProject } from "./dto/project.type";
 import {
   I_CreateProjectBD,
   I_UpdateProjectState,
@@ -10,7 +11,7 @@ export abstract class ProjectRepository {
   findById(idProject: number): void {}
   updateStatusProject(idProject: number): void {}
   allProjectsuser(idProject: number, skip: number, limit: number): void {}
-  searchNameProject(name: string, skip: number, limit: number): void {}
+  searchNameProject(data: T_FindAllProject, skip: number): void {}
   updateStateProject(
     idProject: number,
     stateProject: I_UpdateProjectState

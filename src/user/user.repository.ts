@@ -24,5 +24,5 @@ export abstract class UserRepository {
 
   searchNameUser(name: string, skip: number, limit: number): void {}
 
-  // assignUserPermissions(data: IAssignUserPermissions): void {}
+  assignUserPermissions(data: IAssignUserPermissions): void {}
 }

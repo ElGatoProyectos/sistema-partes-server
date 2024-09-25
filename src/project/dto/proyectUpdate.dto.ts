@@ -7,7 +7,7 @@ export const proyectoDtoUpdate = z.object({
   nombre_consorcio: z.string().optional(),
   nombre_corto: z.string().min(3).optional(),
   costo_proyecto: z.string().optional(),
-  estado: z.enum(["ACTIVO", "INACTIVO", "PENDIENTE", "FINALIZADO"]),
+  estado: z.enum(["CREADO", "REPROGRAMADO", "EJECUCION", "TERMINADO"]),
   fecha_inicio: z.string().optional(),
   fecha_fin: z.string().optional(),
   plazo_proyecto: z.string().optional(),

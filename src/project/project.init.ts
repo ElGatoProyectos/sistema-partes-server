@@ -1,8 +1,6 @@
 import express from "@/config/express.config";
 import { projectController } from "./project.controller";
-import { authAuthmiddleware } from "@/auth/middlewares/auth.middleware";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import { requestMiddleware } from "@/common/middlewares/request.middleware";
 import { projectMiddleware } from "./project.middleware";
 
 const projectRouter = express.Router();

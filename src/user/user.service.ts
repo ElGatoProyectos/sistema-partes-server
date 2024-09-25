@@ -510,51 +510,51 @@ class UserService {
     }
   }
 
-  // async createPermissions(
-  //   data: IAssignUserPermissions
-  // ): Promise<T_HttpResponse> {
-  //   try {
-  //     const responseUser = await userValidation.findById(data.user_id);
-  //     if (!responseUser) {
-  //       return responseUser;
-  //     }
-  //     const responseRol = await rolValidation.findById(data.rol_id);
-  //     if (!responseRol) {
-  //       return responseUser;
-  //     }
-  //     for (let i = 0; i < data.sections.length; i++) {
-  //       const responseSection = await sectionValidation.findById(
-  //         data.sections[i].id
-  //       );
-  //       if (!responseSection) {
-  //         return responseSection;
-  //       }
-  //     }
-  //     for (let i = 0; i < data.actions.length; i++) {
-  //       const responseAction = await actionValidation.findById(
-  //         data.actions[i].id
-  //       );
-  //       if (!responseAction) {
-  //         return responseAction;
-  //       }
-  //     }
-  //     const permissionCreate = await prismaUserRepository.assignUserPermissions(
-  //       data
-  //     );
+  async createPermissions(
+    data: IAssignUserPermissions
+  ): Promise<T_HttpResponse> {
+    try {
+      const responseUser = await userValidation.findById(+data.user_id);
+      if (!responseUser) {
+        return responseUser;
+      }
 
-  //     return httpResponse.CreatedResponse(
-  //       "El detalle usuario-empresa fue creado correctamente",
-  //       "jaj"
-  //     );
-  //   } catch (error) {
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al crear los permisos del Usuarios",
-  //       error
-  //     );
-  //   } finally {
-  //     await prisma.$disconnect();
-  //   }
-  // }
+      const responseRol = await rolValidation.findById(+data.rol_id);
+      if (!responseRol) {
+        return responseUser;
+      }
+      // const action = await actionValidation.findByName("LECTURA");
+      const responseSection = await sectionValidation.findById(
+        +data.section.id
+      );
+      if (!responseSection) {
+        return responseSection;
+      }
+      for (let i = 0; i < data.actions.length; i++) {
+        const responseAction = await actionValidation.findById(
+          +data.actions[i].id
+        );
+        if (!responseAction) {
+          return responseAction;
+        }
+      }
+      const responsePermissions =
+        await prismaUserRepository.assignUserPermissions(data);
+      // const { detalleUsuarioProyecto, permisos } = responsePermissions;
+
+      return httpResponse.CreatedResponse(
+        "El detalle usuario-empresa fue creado correctamente",
+        responsePermissions
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear los permisos del Usuarios",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 
   async findByEmail(email: string): Promise<T_HttpResponse> {
     try {

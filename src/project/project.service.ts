@@ -18,6 +18,7 @@ import { userValidation } from "@/user/user.validation";
 import { projectValidation } from "./project.validation";
 import { jwtService } from "@/auth/jwt.service";
 import { E_Proyecto_Estado, Empresa, Usuario } from "@prisma/client";
+import { T_FindAllProject } from "./dto/project.type";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -61,7 +62,7 @@ class ProjectService {
       let proyectFormat: any = {};
       proyectFormat = {
         ...data,
-        estado: E_Proyecto_Estado.PENDIENTE,
+        estado: E_Proyecto_Estado.CREADO,
         costo_proyecto: Number(data.costo_proyecto),
         fecha_inicio: fecha_creacion,
         fecha_fin,
@@ -200,13 +201,12 @@ class ProjectService {
     }
   }
 
-  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
+  async findByName(data: T_FindAllProject): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaProyectoRepository.searchNameProject(
-        name,
-        skip,
-        data.queryParams.limit
+        data,
+        skip
       );
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
