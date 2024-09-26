@@ -30,13 +30,18 @@ import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
 
 class UserService {
-  async findAll(data: T_FindAllUser): Promise<T_HttpResponse> {
+  async findAll(data: T_FindAllUser, token: string): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
       const result = await prismaUserRepository.findAll(
         skip,
         data.queryParams.limit,
-        data.queryParams.name
+        data.queryParams.name,
+        userResponse
       );
 
       const { userAll, total } = result;
@@ -45,7 +50,6 @@ class UserService {
       //   (user: Usuario) => new UserResponseMapper(user)
       // );
       //numero de pagina donde estas
-
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
         total,
@@ -62,7 +66,48 @@ class UserService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al traer los usuarios",
+        "Error al traer los usuarios",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findAllUserCompany(
+    data: T_FindAllUser,
+    token: string
+  ): Promise<T_HttpResponse> {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      const result = await prismaUserRepository.getUsersForCompany(
+        skip,
+        data.queryParams.limit,
+        data.queryParams.name,
+        userResponse.id
+      );
+
+      const { userAll, total } = result;
+
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        limit: data.queryParams.limit,
+        pageCount,
+        data: userAll,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Usuarios de la empresa",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer los Usuarios de la empresa",
         error
       );
     } finally {

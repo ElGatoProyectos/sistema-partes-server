@@ -1,15 +1,70 @@
+import { rolValidation } from "@/rol/rol.validation";
 import prisma from "../config/prisma.config";
 import {
-  I_AllUsers,
   I_CreateUserBD,
+  I_Detalles,
   I_UpdateUserBD,
   I_User,
   IAssignUserPermissions,
 } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
-import { Accion, E_Estado_BD, Seccion, Usuario } from "@prisma/client";
+import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
+import { companyValidation } from "@/company/company.validation";
+import { I_Empresa } from "@/company/models/company.interface";
 
 class PrismaUserRepository implements UserRepository {
+  async getUsersForCompany(
+    skip: number,
+    limit: number,
+    name: string,
+    user_id: number
+  ): Promise<{ userAll: any[]; total: number }> {
+    const companyResponse = await companyValidation.findByIdUser(user_id);
+    let filters: any = {};
+    let users: any = [];
+    let total: any;
+    if (name) {
+      filters.nombre_completo = {
+        contains: name,
+      };
+    }
+    const company = companyResponse.payload as Empresa;
+    [users, total] = await prisma.$transaction([
+      prisma.detalleUsuarioEmpresa.findMany({
+        where: {
+          empresa_id: company.id,
+          Usuario: {
+            ...filters,
+          },
+        },
+        include: {
+          Usuario: {
+            include: {
+              Rol: true,
+            },
+          },
+          Empresa: true,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.detalleUsuarioEmpresa.count({
+        where: {
+          empresa_id: company.id,
+        },
+      }),
+    ]);
+    const userAll = users.map((item: I_Detalles) => {
+      const { Usuario, ...company } = item;
+      const { Rol, ...user } = Usuario;
+      return {
+        empresa: company,
+        usuario: user,
+        rol: Rol,
+      };
+    });
+    return { userAll, total };
+  }
   async assignUserPermissions(data: IAssignUserPermissions) {
     const resultDetailUserProject = await prisma.detalleUsuarioProyecto.create({
       data: {
@@ -122,58 +177,103 @@ class PrismaUserRepository implements UserRepository {
   async findAll(
     skip: number,
     limit: number,
-    name: string
+    name: string,
+    user: Usuario
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
-
+    let users: any = [];
+    let total: any;
+    let userAll: any = [];
     if (name) {
       filters.nombre_completo = {
         contains: name,
       };
     }
-
-    const [users, total] = await prisma.$transaction([
-      prisma.usuario.findMany({
-        where: {
-          ...filters,
-          Rol: {
-            rol: {
-              not: "ADMIN",
+    const rolResponse = await rolValidation.findById(user.rol_id);
+    const rolFind = rolResponse.payload as Rol;
+    if (rolFind.rol === "ADMIN") {
+      [users, total] = await prisma.$transaction([
+        prisma.empresa.findMany({
+          where: {
+            Usuario: {
+              ...filters,
             },
           },
-        },
-        include: {
-          Rol: true,
-          Empresa: true,
-        },
-        skip,
-        take: limit,
-        omit: {
-          contrasena: true,
-        },
-      }),
-      prisma.usuario.count({
-        where: {
-          ...filters,
-          Rol: {
-            rol: {
-              not: "ADMIN",
+          include: {
+            Usuario: {
+              include: {
+                Rol: true,
+              },
+              omit: {
+                contrasena: true,
+              },
+            }, // Esto incluirá la relación completa de usuarios
+          },
+          skip,
+          take: limit,
+        }),
+        prisma.empresa.count({}),
+      ]);
+      userAll = users.map((item: I_Empresa) => {
+        const { Usuario, ...company } = item;
+        const { Rol, ...user } = Usuario;
+        return {
+          empresa: company,
+          usuario: user,
+          rol: Rol,
+        };
+      });
+    }
+    if (rolFind.rol === "USER") {
+      const companyResponse = await companyValidation.findByIdUser(user.id);
+      const company = companyResponse.payload as Empresa;
+      [users, total] = await prisma.$transaction([
+        prisma.detalleUsuarioEmpresa.findMany({
+          where: {
+            empresa_id: company.id,
+            Usuario: {
+              ...filters,
             },
           },
-        },
-      }),
-    ]);
-
-    const userAll = users.map((item) => {
-      const { Rol, Empresa, ...user } = item;
-      return {
-        rol: Rol,
-        empresa: Empresa[0],
-        user,
-      };
-    });
-
+          include: {
+            Usuario: {
+              include: {
+                Rol: true,
+              },
+            },
+            Empresa: true,
+          },
+          skip,
+          take: limit,
+        }),
+        prisma.detalleUsuarioEmpresa.count({
+          where: {
+            empresa_id: company.id,
+          },
+        }),
+      ]);
+      userAll = users.map((item: I_Detalles) => {
+        const { Usuario, ...company } = item;
+        const { Rol, ...user } = Usuario;
+        return {
+          empresa: company,
+          usuario: user,
+          rol: Rol,
+        };
+      });
+    }
     return { userAll, total };
+
+    // userAll = users;
+
+    // const userAll: any = [];
+
+    // const { Rol, Empresa, ...user } = item;
+    // return {
+    //   rol: Rol,
+    //   empresa: Empresa[0],
+    //   user,
+    // };
   }
 
   async findById(idUser: number): Promise<I_User | null> {

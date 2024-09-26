@@ -23,6 +23,14 @@ class JWTService {
       userResponse.payload
     );
   }
+  async getRolFromToken(authorizationHeader: string): Promise<T_HttpResponse> {
+    const [bearer, token] = authorizationHeader.split(" ");
+    const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+    return httpResponse.SuccessResponse(
+      "Usuario encontrado",
+      tokenDecrypted.role
+    );
+  }
 }
 
 export const jwtService = new JWTService();
