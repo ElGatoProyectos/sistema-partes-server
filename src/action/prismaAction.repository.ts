@@ -4,6 +4,14 @@ import prisma from "@/config/prisma.config";
 import { I_CreateAccionBD } from "./models/action.repository";
 
 class PrismaActionRepository implements ActionRepository {
+  async findByName(name: string): Promise<Accion | null> {
+    const section = await prisma.accion.findFirst({
+      where: {
+        nombre: name,
+      },
+    });
+    return section;
+  }
   async createAction(data: I_CreateAccionBD): Promise<Accion | null> {
     const action = await prisma.accion.create({
       data,

@@ -14,6 +14,7 @@ import { proyectoDtoUpdate } from "./dto/proyectUpdate.dto";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 import { authService } from "@/auth/auth.service";
+import { T_FindAllProject } from "./dto/project.type";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.
 // esto es útil por si lo querés analizar o guardar en algun lugar
@@ -225,15 +226,19 @@ class ProjectController {
   findByName = async (request: express.Request, response: express.Response) => {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
+    const state = request.query.state as string;
+    const name = request.query.name as string;
+
+    let paginationOptions: T_FindAllProject = {
       queryParams: {
         page: page,
         limit: limit,
+        name: name,
+        state: state,
       },
     };
     //si buscaba como request.body no me llegaba bien para luego buscar
-    const name = request.query.name as string;
-    const result = await projectService.findByName(name, paginationOptions);
+    const result = await projectService.findByName(paginationOptions);
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {
@@ -247,20 +252,28 @@ class ProjectController {
   ) => {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const tokenWithBearer = request.headers.authorization;
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
         limit: limit,
       },
     };
-    const idCompany = request.params.id;
-    const result = await projectService.findAllProjectsXCompany(
-      +idCompany,
-      paginationOptions
-    );
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    // const user_id = request.params.id;
+    if (tokenWithBearer) {
+      const result = await projectService.findAllProjectsXCompany(
+        tokenWithBearer,
+        paginationOptions
+      );
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al crear el usuario"
+      );
       response.status(result.statusCode).json(result);
     }
   };

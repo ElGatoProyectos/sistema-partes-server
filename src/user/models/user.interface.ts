@@ -1,3 +1,4 @@
+import { I_Empresa } from "@/company/models/company.interface";
 import { Accion, E_Estado_BD, Empresa, Seccion, Usuario } from "@prisma/client";
 //defini esquemas de base de datos
 export interface I_CreateUserBD
@@ -89,12 +90,29 @@ export interface IAssignUserPermissions {
   user_id: number;
   rol_id: number;
   project_id: number;
-  sections: Seccion[];
+  section: Seccion;
   actions: Accion[];
 }
 export interface IAssignUserPermissionsRequest {
-  sections: Seccion[];
+  section: Seccion;
   actions: Accion[];
+}
+export interface I_Usuario extends Usuario {
+  Rol?: {
+    id: number;
+    nombre_secundario: string;
+    descripcion: string;
+    rol: string;
+    eliminado: string;
+  };
+}
+
+export interface I_Detalles {
+  id: number;
+  usuario_id: number;
+  empresa_id: number;
+  Usuario: I_Usuario;
+  Empresa: I_Empresa;
 }
 
 /// esto es xq los atributos van a ser parciales es decir todos van a ser opcionales

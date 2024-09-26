@@ -68,10 +68,10 @@ enum E_TIPO_PARENTESCO_BD {
 }
 
 enum E_Proyecto_Estado {
-  ACTIVO
-  INACTIVO
-  PENDIENTE
-  FINALIZADO
+  CREADO
+  REPROGRAMADO
+  EJECUCION
+  TERMINADO
 }
 
 enum E_Trabajo_Estado {
@@ -131,6 +131,7 @@ model Usuario {
   Partida                Partida[]
   ManoObra               ManoObra[]
   DetalleUsuarioProyecto DetalleUsuarioProyecto[]
+  Trabajo                Trabajo[]
 }
 
 //[success] actual
@@ -563,15 +564,18 @@ model Trabajo {
   fecha_finalizacion    DateTime                @db.Date //año más dia
   eliminado             E_Estado_BD             @default(n)
   fecha_creacion        DateTime                @default(now())
+  nota                  String?
   costo_partida         Int
   costo_mano_obra       Int
   costo_material        Int
   costo_equipo          Int
   costo_varios          Int
   tren_id               Int                     @unique
-  estado_trabajo        E_Trabajo_Estado
+  estado_trabajo        E_Trabajo_Estado        @default(PROGRAMADO)
   up_id                 Int                     @unique
   proyecto_id           Int
+  usuario_id            Int
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
   Tren                  Tren                    @relation(fields: [tren_id], references: [id])
   UnidadProduccion      UnidadProduccion        @relation(fields: [up_id], references: [id])

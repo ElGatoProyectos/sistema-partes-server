@@ -7,13 +7,15 @@ import { authController } from "./auth.controller";
 
 const authRouter = express.Router();
 
-const prefix = "/auth/login";
+const prefix = "/auth";
 
 authRouter.post(
-  `${prefix}`,
+  `${prefix}/login`,
   loginMiddleware.validateBody,
   authController.login
   //authRoleMiddleware.authAdmin
 );
+
+authRouter.post(`${prefix}/me`, authController.me);
 
 export default authRouter;

@@ -10,8 +10,14 @@ const prefix = "/users";
 
 userRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndProjectManagerAndUser,
   userController.allUsers
+);
+
+userRouter.get(
+  `${prefix}/company`,
+  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  userController.allUsersForCompany
 );
 
 userRouter.get(
@@ -48,7 +54,7 @@ userRouter.put(
 userRouter.post(
   `${prefix}/user`,
   userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndProjectManagerAndUser,
   userController.createUserAndSearchToken
 );
 
@@ -69,10 +75,10 @@ userRouter.put(
 
 userRouter.patch(
   `${prefix}/user/:id/rol/:rol_id/project/:project_id/permissions`,
-  // userMiddleware.verifyHeadersFieldsId,
-  // userMiddleware.verifyHeadersFieldsRolId,
-  // userMiddleware.verifyHeadersFieldsProjectId,
-  authRoleMiddleware.authAdmin,
+  userMiddleware.verifyHeadersFieldsId,
+  userMiddleware.verifyHeadersFieldsRolId,
+  userMiddleware.verifyHeadersFieldsProjectId,
+  // authRoleMiddleware.authAdmin,
   userController.createPermissions
 );
 

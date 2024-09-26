@@ -1,3 +1,4 @@
+import { I_Usuario } from "@/user/models/user.interface";
 import { Empresa } from "@prisma/client";
 
 export interface I_CreateCompanyBD
@@ -14,3 +15,8 @@ export interface I_UpdateCompanyBody
   extends Omit<Empresa, "id" | "eliminado" | "fecha_creacion"> {}
 
 export interface I_Company extends Omit<Empresa, "eliminado"> {}
+
+//esto sirve para el findAll de user
+export interface I_Empresa extends Empresa {
+  Usuario: I_Usuario; // Relación con el usuario
+}

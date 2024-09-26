@@ -1,6 +1,5 @@
 import express from "@/config/express.config";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import { requestMiddleware } from "@/common/middlewares/request.middleware";
 import { unitController } from "./unit.controller";
 import { unitMiddleware } from "./unit.middleware";
 
@@ -21,6 +20,7 @@ unitRouter.get(
   authRoleMiddleware.authAdminAndProjectManager,
   unitController.findByName
 );
+
 unitRouter.delete(
   `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,

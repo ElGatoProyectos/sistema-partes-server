@@ -101,7 +101,6 @@ class UserController {
               }
             }
           } catch (error) {
-            console.log(error);
             const customError = httpResponse.BadRequestException(
               "Error al validar los campos al crear el usuario y la empresa",
               error
@@ -211,28 +210,28 @@ class UserController {
     }
   }
 
-  // async createPermissions(
-  //   request: express.Request,
-  //   response: express.Response
-  // ) {
-  //   const data = request.body as IAssignUserPermissionsRequest;
-  //   const user_id = Number(request.params.id);
-  //   const rol_id = Number(request.params.rol_id);
-  //   const project_id = Number(request.params.project_id);
-  //   let permissions: IAssignUserPermissions = {
-  //     user_id: user_id,
-  //     rol_id: rol_id,
-  //     project_id: project_id,
-  //     sections: data.sections,
-  //     actions: data.sections,
-  //   };
-  //   const result = await userService.createPermissions(permissions);
-  //   if (!result.success) {
-  //     response.status(result.statusCode).json(result);
-  //   } else {
-  //     response.status(result.statusCode).json(result);
-  //   }
-  // }
+  async createPermissions(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const data = request.body as IAssignUserPermissionsRequest;
+    const user_id = Number(request.params.id);
+    const rol_id = Number(request.params.rol_id);
+    const project_id = Number(request.params.project_id);
+    let permissions: IAssignUserPermissions = {
+      user_id: user_id,
+      rol_id: rol_id,
+      project_id: project_id,
+      section: data.section,
+      actions: data.actions,
+    };
+    const result = await userService.createPermissions(permissions);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUserBody;
@@ -293,8 +292,49 @@ class UserController {
         name,
       },
     };
-    const result = await userService.findAll(paginationOptions);
-    response.status(result.statusCode).json(result);
+    const tokenWithBearer = request.headers.authorization;
+    if (tokenWithBearer) {
+      const result = await userService.findAll(
+        paginationOptions,
+        tokenWithBearer
+      );
+
+      response.status(result.statusCode).json(result);
+    } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al buscar todos los Usuarios"
+      );
+      response.status(result.statusCode).json(result);
+    }
+  }
+  async allUsersForCompany(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const name = request.query.name as string;
+    let paginationOptions: T_FindAllUser = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        name,
+      },
+    };
+    const tokenWithBearer = request.headers.authorization;
+    if (tokenWithBearer) {
+      const result = await userService.findAllUserCompany(
+        paginationOptions,
+        tokenWithBearer
+      );
+
+      response.status(result.statusCode).json(result);
+    } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al buscar los Usuarios de la Empresa"
+      );
+      response.status(result.statusCode).json(result);
+    }
   }
 }
 

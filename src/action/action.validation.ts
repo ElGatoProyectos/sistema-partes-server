@@ -16,6 +16,22 @@ class ActionValidation {
       );
     }
   }
+  async findByName(name: string): Promise<T_HttpResponse> {
+    try {
+      const action = await prismaActionRepository.findByName(name);
+      if (!action) {
+        return httpResponse.NotFoundException(
+          "Nombre de la Acción no encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse("Acción encontrada", action);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar nombre de la Acción",
+        error
+      );
+    }
+  }
 }
 
 export const actionValidation = new ActionValidation();

@@ -5,7 +5,8 @@ import prisma from "@/config/prisma.config";
 import LoginResponseMapper from "./mappers/login.mapper";
 import { T_ResponseToken } from "./models/auth.type";
 import { rolService } from "@/rol/rol.service";
-import { E_Estado_BD, Rol } from "@prisma/client";
+import { E_Estado_BD, Rol, Usuario } from "@prisma/client";
+import { authValidation } from "./auth.validation";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -69,6 +70,33 @@ class AuthService {
     } catch (error) {
       // console.log(error);
       return httpResponse.UnauthorizedException("Error en la autenticación");
+    }
+  }
+
+  async findMe(token: string) {
+    try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      const permisos = await authValidation.findRolPermisssion(
+        userResponse.rol_id
+      );
+      let formatUser = {
+        usuario: userResponse,
+        permisos: permisos.payload,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito en la autenticación",
+        formatUser
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear el usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }
