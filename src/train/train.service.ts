@@ -36,8 +36,6 @@ class TrainService {
       }
 
       const lastTrain = await trainValidation.codeMoreHigh(project_id);
-      console.log("esto da cuando creas tren ");
-      console.log(lastTrain);
       const lastTrainResponse = lastTrain.payload as Tren;
 
       // Incrementar el código en 1

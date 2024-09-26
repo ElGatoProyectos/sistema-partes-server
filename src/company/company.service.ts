@@ -11,7 +11,7 @@ import { CompanyResponseMapper } from "./mapper/company.mapper";
 import { CompanyMulterProperties } from "./models/company.constant";
 import appRootPath from "app-root-path";
 import fs from "fs/promises";
-import { wordIsNumeric } from "../common/utils/number";
+import { lettersInNumbers } from "../common/utils/number";
 import { largeMinEleven } from "../common/utils/largeMinEleven";
 import { userValidation } from "../user/user.validation";
 import { companyValidation } from "./company.validation";
@@ -47,7 +47,7 @@ class CompanyService {
       if (!responseRuc.success) return responseRuc;
 
       if (data.ruc) {
-        const resultRuc = wordIsNumeric(data.ruc);
+        const resultRuc = lettersInNumbers(data.ruc);
         if (resultRuc) {
           return httpResponse.BadRequestException(
             "El campo Ruc debe contener solo números"
@@ -61,7 +61,7 @@ class CompanyService {
         }
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      const resultPhoneCompany = lettersInNumbers(data.telefono);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
@@ -126,7 +126,7 @@ class CompanyService {
       if (!responseRuc.success) return responseRuc;
 
       if (data.ruc) {
-        const resultRuc = wordIsNumeric(data.ruc);
+        const resultRuc = lettersInNumbers(data.ruc);
         if (resultRuc) {
           return httpResponse.BadRequestException(
             "El campo Ruc debe contener solo números"
@@ -140,7 +140,7 @@ class CompanyService {
         }
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      const resultPhoneCompany = lettersInNumbers(data.telefono);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
@@ -325,7 +325,7 @@ class CompanyService {
         if (!responseRuc.success) return responseRuc;
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      const resultPhoneCompany = lettersInNumbers(data.telefono);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
@@ -407,7 +407,7 @@ class CompanyService {
         if (!responseRuc.success) return responseRuc;
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono);
+      const resultPhoneCompany = lettersInNumbers(data.telefono);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
