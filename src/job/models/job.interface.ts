@@ -2,7 +2,11 @@ import { Trabajo } from "@prisma/client";
 
 export interface I_CreateJobBD extends Omit<Trabajo, "id"> {}
 
-export interface I_CreateJobBody extends Omit<Trabajo, "id"> {}
+export interface I_CreateJobBody
+  extends Omit<Trabajo, "id" | "fecha_inicio" | "fecha_finalizacion"> {
+  fecha_inicio: string;
+  fecha_finalizacion: string;
+}
 
 export interface I_UpdateJobBody extends Omit<Trabajo, "id"> {}
 

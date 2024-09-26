@@ -16,7 +16,7 @@ import { bcryptService } from "../auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
 import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
 import validator from "validator";
-import { wordIsNumeric } from "../common/utils/number";
+import { lettersInNumbers } from "../common/utils/number";
 import { prismaCompanyRepository } from "../company/prisma-company.repository";
 import { jwtService } from "../auth/jwt.service";
 import { detailUserCompanyService } from "../detailsUserCompany/detailuserservice.service";
@@ -134,14 +134,14 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
-      const resultDni = wordIsNumeric(data.dni);
+      const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
       }
 
-      const resultPhone = wordIsNumeric(data.telefono);
+      const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El campo telefono debe contener solo números"
@@ -196,35 +196,35 @@ class UserService {
           "El formato del email ingresado no es válido"
         );
       }
-      const resultDni = wordIsNumeric(data.dni);
+      const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
       }
 
-      const resultPhone = wordIsNumeric(data.telefono);
+      const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El campo telefono debe contener solo números"
         );
       }
 
-      const resultLimitProject = wordIsNumeric(data.limite_proyecto);
+      const resultLimitProject = lettersInNumbers(data.limite_proyecto);
       if (resultLimitProject) {
         return httpResponse.BadRequestException(
           "El campo limite proyecto debe contener solo números"
         );
       }
 
-      const resultLimitUsers = wordIsNumeric(data.limite_usuarios);
+      const resultLimitUsers = lettersInNumbers(data.limite_usuarios);
       if (resultLimitUsers) {
         return httpResponse.BadRequestException(
           "El campo limite usuarios debe contener solo números"
         );
       }
 
-      const resultRuc = wordIsNumeric(data.ruc);
+      const resultRuc = lettersInNumbers(data.ruc);
       if (resultRuc) {
         return httpResponse.BadRequestException(
           "El campo Ruc debe contener solo números"
@@ -237,7 +237,7 @@ class UserService {
         );
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono_empresa);
+      const resultPhoneCompany = lettersInNumbers(data.telefono_empresa);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
@@ -343,35 +343,35 @@ class UserService {
           "El formato del email ingresado no es válido"
         );
       }
-      const resultDni = wordIsNumeric(data.dni);
+      const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
       }
 
-      const resultPhone = wordIsNumeric(data.telefono);
+      const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El campo telefono debe contener solo números"
         );
       }
 
-      const resultLimitProject = wordIsNumeric(data.limite_proyecto);
+      const resultLimitProject = lettersInNumbers(data.limite_proyecto);
       if (resultLimitProject) {
         return httpResponse.BadRequestException(
           "El campo limite proyecto debe contener solo números"
         );
       }
 
-      const resultLimitUsers = wordIsNumeric(data.limite_usuarios);
+      const resultLimitUsers = lettersInNumbers(data.limite_usuarios);
       if (resultLimitUsers) {
         return httpResponse.BadRequestException(
           "El campo limite usuarios debe contener solo números"
         );
       }
 
-      const resultRuc = wordIsNumeric(data.ruc);
+      const resultRuc = lettersInNumbers(data.ruc);
       if (resultRuc) {
         return httpResponse.BadRequestException(
           "El campo Ruc debe contener solo números"
@@ -384,7 +384,7 @@ class UserService {
         );
       }
 
-      const resultPhoneCompany = wordIsNumeric(data.telefono_empresa);
+      const resultPhoneCompany = lettersInNumbers(data.telefono_empresa);
       if (resultPhoneCompany) {
         return httpResponse.BadRequestException(
           "El campo telefono de la empresa debe contener solo números"
@@ -495,14 +495,14 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
-      const resultDni = wordIsNumeric(data.dni);
+      const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
       }
 
-      const resultPhone = wordIsNumeric(data.telefono);
+      const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El campo telefono debe contener solo números"
@@ -682,14 +682,14 @@ class UserService {
         }
       }
 
-      const resultDni = wordIsNumeric(data.dni);
+      const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El dni ingresado solo debe contener números"
         );
       }
 
-      const resultPhone = wordIsNumeric(data.telefono);
+      const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
         return httpResponse.BadRequestException(
           "El teléfono ingresado solo debe contener números"

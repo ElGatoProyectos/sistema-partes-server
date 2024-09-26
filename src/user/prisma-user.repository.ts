@@ -197,8 +197,22 @@ class PrismaUserRepository implements UserRepository {
           where: {
             Usuario: {
               ...filters,
+              Rol: {
+                rol: {
+                  not: "ADMIN",
+                },
+              },
             },
           },
+
+          //     where: {
+          //       ...filters,
+          //       Rol: {
+          //         rol: {
+          //           not: "ADMIN",
+          //         },
+          //       },
+          //     },
           include: {
             Usuario: {
               include: {

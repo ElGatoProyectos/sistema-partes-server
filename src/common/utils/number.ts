@@ -1,6 +1,6 @@
 import validator from "validator";
 
-export function wordIsNumeric(word: string): Boolean {
+export function lettersInNumbers(word: string): Boolean {
   if (!validator.isNumeric(word)) {
     return true;
   } else {

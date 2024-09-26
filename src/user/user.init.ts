@@ -15,7 +15,7 @@ userRouter.get(
 );
 
 userRouter.get(
-  `${prefix}/company`,
+  `${prefix}/detailsUserCompany`,
   authRoleMiddleware.authAdminAndProjectManagerAndUser,
   userController.allUsersForCompany
 );
@@ -78,7 +78,7 @@ userRouter.patch(
   userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyHeadersFieldsRolId,
   userMiddleware.verifyHeadersFieldsProjectId,
-  // authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndCostControl,
   userController.createPermissions
 );
 

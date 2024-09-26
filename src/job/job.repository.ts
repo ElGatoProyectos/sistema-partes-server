@@ -11,7 +11,7 @@ export abstract class JobRepository {
 
   existsName(name: string, project_id: number): void {}
 
-  updateJob(data: I_UpdateJobBody): void {}
+  updateJob(data: I_UpdateJobBody, job_id: number): void {}
 
   updateStatusJob(idUser: number): void {}
 
