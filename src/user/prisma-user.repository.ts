@@ -226,7 +226,18 @@ class PrismaUserRepository implements UserRepository {
           skip,
           take: limit,
         }),
-        prisma.empresa.count({}),
+        prisma.empresa.count({
+          where: {
+            Usuario: {
+              ...filters,
+              Rol: {
+                rol: {
+                  not: "ADMIN",
+                },
+              },
+            },
+          },
+        }),
       ]);
       userAll = users.map((item: I_Empresa) => {
         const { Usuario, ...company } = item;
