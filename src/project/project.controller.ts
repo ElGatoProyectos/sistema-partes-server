@@ -252,20 +252,28 @@ class ProjectController {
   ) => {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const tokenWithBearer = request.headers.authorization;
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
         limit: limit,
       },
     };
-    const idCompany = request.params.id;
-    const result = await projectService.findAllProjectsXCompany(
-      +idCompany,
-      paginationOptions
-    );
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
+    // const user_id = request.params.id;
+    if (tokenWithBearer) {
+      const result = await projectService.findAllProjectsXCompany(
+        tokenWithBearer,
+        paginationOptions
+      );
+      if (!result.success) {
+        response.status(result.statusCode).json(result);
+      } else {
+        response.status(result.statusCode).json(result);
+      }
     } else {
+      const result = httpResponse.UnauthorizedException(
+        "Error en la autenticacion al crear el usuario"
+      );
       response.status(result.statusCode).json(result);
     }
   };

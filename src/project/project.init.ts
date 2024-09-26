@@ -8,9 +8,8 @@ const prefix = "/projects";
 
 projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
-  `${prefix}/user/:id`,
+  `${prefix}`,
   authRoleMiddleware.authAdminAndProjectManager,
-  projectMiddleware.verifyHeadersFields,
   projectController.findAllProjectsXCompany
 );
 projectRouter.get(

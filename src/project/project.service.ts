@@ -233,15 +233,20 @@ class ProjectService {
     }
   }
 
-  async findAllProjectsXCompany(idUser: number, data: T_FindAll) {
+  async findAllProjectsXCompany(token: string, data: T_FindAll) {
     try {
-      const userResponse = await userValidation.findById(idUser);
-      if (!userResponse.success) {
-        return userResponse;
-      }
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      const companyResponse = await companyValidation.findByIdUser(
+        userResponse.id
+      );
+      const company = companyResponse.payload as Empresa;
+
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaProyectoRepository.allProjectsuser(
-        idUser,
+        company.id,
         skip,
         data.queryParams.limit
       );
