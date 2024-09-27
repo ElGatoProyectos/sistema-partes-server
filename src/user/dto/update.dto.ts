@@ -9,4 +9,5 @@ export const userUpdateDto = z.object({
   eliminado: z.enum(["y", "n"]),
   limite_proyecto: z.number().optional(),
   limite_usuarios: z.number().optional(),
+  rol_id: z.number(),
 });

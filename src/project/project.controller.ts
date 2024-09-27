@@ -253,10 +253,14 @@ class ProjectController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const tokenWithBearer = request.headers.authorization;
-    let paginationOptions: T_FindAll = {
+    const name = request.query.name as string;
+    const state = request.query.state as string;
+    let paginationOptions: T_FindAllProject = {
       queryParams: {
         page: page,
         limit: limit,
+        name: name,
+        state: state,
       },
     };
     // const user_id = request.params.id;

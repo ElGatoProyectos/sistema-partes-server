@@ -19,7 +19,6 @@ class PrismaUserRepository implements UserRepository {
     name: string,
     company_id: number
   ): Promise<{ userAll: any[]; total: number }> {
-    console.log("llega al priiiisma")
     let filters: any = {};
     let users: any = [];
     let total: any;

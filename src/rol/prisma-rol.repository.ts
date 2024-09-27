@@ -20,7 +20,13 @@ class PrismaRolRepository implements RolRepository {
     return user;
   }
   async findAll(): Promise<Rol[]> {
-    const roles = await prisma.rol.findMany();
+    const roles = await prisma.rol.findMany({
+      where: {
+        rol: {
+          notIn: ["ADMIN", "USER"], // Excluye tanto "ADMIN" como "USER"
+        },
+      },
+    });
     return roles;
   }
   async findById(idRol: number): Promise<I_Rol | null> {

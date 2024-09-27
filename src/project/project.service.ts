@@ -233,7 +233,7 @@ class ProjectService {
     }
   }
 
-  async findAllProjectsXCompany(token: string, data: T_FindAll) {
+  async findAllProjectsXCompany(token: string, data: T_FindAllProject) {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse) return userTokenResponse;
@@ -247,8 +247,8 @@ class ProjectService {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaProyectoRepository.allProjectsuser(
         company.id,
-        skip,
-        data.queryParams.limit
+        data,
+        skip
       );
       const { projects, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
