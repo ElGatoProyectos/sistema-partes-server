@@ -78,7 +78,7 @@ class TrainMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      const project_id = request.params.project_id;
+      const project_id = request.get("project-id") as string;
       if (!validator.isNumeric(project_id)) {
         throw new Error("El id del proyecto debe ser numérico");
       }

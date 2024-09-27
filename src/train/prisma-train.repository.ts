@@ -7,6 +7,7 @@ import {
   I_Train,
   I_UpdateTrainBodyValidation,
 } from "./models/production-unit.interface";
+import { T_FindAllTrain } from "./models/train.types";
 
 class PrismaTrainRepository implements TrainRepository {
   async findByCode(code: string, project_id: number): Promise<Tren | null> {
@@ -110,23 +111,31 @@ class PrismaTrainRepository implements TrainRepository {
 
   async findAll(
     skip: number,
-    limit: number,
+    data: T_FindAllTrain,
     project_id: number
   ): Promise<{ trains: I_Train[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.name) {
+      filters.nombre = {
+        contains: data.queryParams.name,
+      };
+    }
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },
         skip,
-        take: limit,
+        take: data.queryParams.limit,
         omit: {
           eliminado: true,
         },
       }),
       prisma.tren.count({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },

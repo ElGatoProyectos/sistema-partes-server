@@ -14,7 +14,7 @@ import prisma from "../config/prisma.config";
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { bcryptService } from "../auth/bcrypt.service";
 import { UserResponseMapper } from "./mappers/user.mapper";
-import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
+import { T_FindAll } from "../common/models/pagination.types";
 import validator from "validator";
 import { lettersInNumbers } from "../common/utils/number";
 import { prismaCompanyRepository } from "../company/prisma-company.repository";
@@ -29,6 +29,7 @@ import { emailValid } from "../common/utils/email";
 import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
 import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
+import { T_FindAllUser } from "./models/user.types";
 
 class UserService {
   async findAll(data: T_FindAllUser, token: string): Promise<T_HttpResponse> {

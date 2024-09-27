@@ -7,14 +7,14 @@ const trainRouter = express.Router();
 const prefix = "/train";
 
 trainRouter.get(
-  `${prefix}/project/:project_id`,
+  `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.allTrains
 );
 
 trainRouter.get(
-  `${prefix}/search/project/:project_id`,
+  `${prefix}/search`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.findByName
@@ -36,14 +36,14 @@ trainRouter.put(
 );
 
 trainRouter.post(
-  `${prefix}/project/:project_id`,
+  `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFields,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.create
 );
 trainRouter.post(
-  `${prefix}/upload-excel/project/:project_id`,
+  `${prefix}/upload-excel`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminAndProjectManager,
   trainController.trainReadExcel
@@ -57,7 +57,7 @@ trainRouter.delete(
 );
 
 trainRouter.put(
-  `${prefix}/:id/project/:project_id`,
+  `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFieldsUpdate,

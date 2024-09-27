@@ -28,11 +28,15 @@ class ProjectMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      proyectoStateDto.parse(request.body);
-      nextFunction();
+      if (request.query.state) {
+        proyectoStateDto.parse({ state: request.query.state });
+        nextFunction();
+      } else {
+        nextFunction();
+      }
     } catch {
       const result = httpResponse.BadRequestException(
-        "Error al validar campos para actualizar el estado del Proyecto"
+        "El estado ingresado no es válido"
       );
       response.status(result.statusCode).send(result);
     }

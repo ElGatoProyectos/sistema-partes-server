@@ -1,4 +1,4 @@
-import { T_FindAll, T_FindAllUser } from "../common/models/pagination.types";
+import { T_FindAll } from "../common/models/pagination.types";
 import express from "@/config/express.config";
 import {
   I_CreateUserAndCompany,
@@ -21,6 +21,7 @@ import appRootPath from "app-root-path";
 import sharp from "sharp";
 import { userAndCompanyDto } from "./dto/userAndCompany.dto";
 import { userAndCompanyUpdateDto } from "./dto/userAndCompanyUpdate.dto";
+import { T_FindAllUser } from "./models/user.types";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.
 // esto es útil por si lo querés analizar o guardar en algun lugar

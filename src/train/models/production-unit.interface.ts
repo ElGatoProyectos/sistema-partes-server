@@ -1,5 +1,4 @@
 import { Tren } from "@prisma/client";
-import { string } from "zod";
 
 export interface I_CreateTrainBD extends Omit<Tren, "id"> {}
 

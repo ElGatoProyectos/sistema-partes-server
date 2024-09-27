@@ -8,6 +8,7 @@ import {
 } from "./models/production-unit.interface";
 import { T_FindAll } from "@/common/models/pagination.types";
 import multer from "multer";
+import { T_FindAllTrain } from "./models/train.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -15,7 +16,7 @@ const upload: any = multer({ storage: storage });
 class TrainController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateTrainUnitBody;
-    const project_id = request.params.project_id;
+    const project_id = request.get("project-id") as string;
     const result = await trainService.createTrain(data, +project_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -27,7 +28,7 @@ class TrainController {
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateTrainBody;
     const train_id = Number(request.params.id);
-    const project_id = Number(request.params.project_id);
+    const project_id = request.get("project-id") as string;
     const result = await trainService.updateTrain(data, train_id, project_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -62,7 +63,7 @@ class TrainController {
   async findByName(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    const project_id = Number(request.params.project_id);
+    const project_id = request.get("project-id") as string;
     let paginationOptions: T_FindAll = {
       queryParams: {
         page: page,
@@ -74,7 +75,7 @@ class TrainController {
     const result = await trainService.findByName(
       name,
       paginationOptions,
-      project_id
+      +project_id
     );
     response.status(result.statusCode).json(result);
   }
@@ -82,11 +83,14 @@ class TrainController {
   async allTrains(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    const project_id = Number(request.params.project_id);
-    let paginationOptions: T_FindAll = {
+    const project_id = request.get("project-id") as string;
+    // const project_id = Number(request.params.project_id);
+    const name = request.query.name as string;
+    let paginationOptions: T_FindAllTrain = {
       queryParams: {
         page: page,
         limit: limit,
+        name: name,
       },
     };
     const result = await trainService.findAll(paginationOptions, project_id);
@@ -100,9 +104,11 @@ class TrainController {
     // Usando multer para manejar la subida de archivos en memoria
     upload.single("train-file")(request, response, async (err: any) => {
       if (err) {
-        return response.status(500).json({ error: "Error uploading file" });
+        console.log(err);
+        return response.status(500).json({ error: "Error al leer el archivo" });
       }
-      const project_id = Number(request.params.project_id);
+      // const project_id = Number(request.params.project_id);
+      const project_id = request.get("project-id") as string;
       const file = request.file;
       if (!file) {
         return response.status(400).json({ error: "No se subió archivo" });

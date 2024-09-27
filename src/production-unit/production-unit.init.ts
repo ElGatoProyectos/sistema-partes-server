@@ -6,10 +6,7 @@ import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 const prouductionUnitRouter = express.Router();
 const prefix = "/unidad-de-produccion";
 
-prouductionUnitRouter.post(
-  `${prefix}/:project_id`,
-  productionUnitController.create
-);
+prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel/:project_id`,
   productionUnitMiddleware.verifyHeadersFields,
