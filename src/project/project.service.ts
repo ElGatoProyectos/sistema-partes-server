@@ -82,7 +82,6 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear proyecto",
         error
@@ -123,7 +122,7 @@ class ProjectService {
       const proyectFormat = {
         ...data,
         costo_proyecto: data.costo_proyecto,
-        fecha_creacion: fecha_creacion,
+        fecha_inicio: fecha_creacion,
         fecha_fin: fecha_fin,
         empresa_id: company.id,
       };
@@ -138,7 +137,6 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el proyecto",
         error
