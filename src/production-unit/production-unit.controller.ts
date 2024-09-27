@@ -35,11 +35,11 @@ class ProductionUnitController {
             const responseValidate = authService.verifyRolProject(
               request.get("Authorization") as string
             );
+            const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
               prouductionUnitDto.parse(request.body);
-              const project_id = request.params.project_id;
               if (!validator.isNumeric(project_id)) {
                 const customError = httpResponse.BadRequestException(
                   "El id del projecto debe ser numérico",

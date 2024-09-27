@@ -9,7 +9,10 @@ import { ProjectMulterProperties } from "@/project/models/project.constant";
 import { Proyecto } from "@prisma/client";
 import { proyectoDto } from "./dto/project.dto";
 import fs from "fs/promises";
-import { I_UpdateProyectBody } from "./models/project.interface";
+import {
+  I_UpdateProjectState,
+  I_UpdateProyectBody,
+} from "./models/project.interface";
 import { proyectoDtoUpdate } from "./dto/proyectUpdate.dto";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
@@ -288,9 +291,20 @@ class ProjectController {
   }
   async updateState(request: express.Request, response: express.Response) {
     const idProject = Number(request.params.id);
-    const data = request.body;
-    const result = await projectService.updateStateProject(idProject, data);
-    response.status(result.statusCode).json(result);
+    // const data = request.body;
+    const project_state = request.query.state as string;
+    if (project_state) {
+      const result = await projectService.updateStateProject(
+        idProject,
+        project_state
+      );
+      response.status(result.statusCode).json(result);
+    } else {
+      const result = httpResponse.BadRequestException(
+        "Falta el campo estado para poder hacerse la acción"
+      );
+      response.status(result.statusCode).json(result);
+    }
   }
 }
 

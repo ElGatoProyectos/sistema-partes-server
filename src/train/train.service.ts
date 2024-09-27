@@ -14,6 +14,7 @@ import * as xlsx from "xlsx";
 import prisma from "@/config/prisma.config";
 import { T_FindAll } from "@/common/models/pagination.types";
 import validator from "validator";
+import { T_FindAllTrain } from "./models/train.types";
 
 class TrainService {
   async createTrain(
@@ -73,7 +74,7 @@ class TrainService {
   async updateTrain(
     data: I_UpdateTrainBody,
     idTrain: number,
-    project_id: number
+    project_id: string
   ): Promise<T_HttpResponse> {
     try {
       const resultIdTrain = await trainValidation.findById(idTrain);
@@ -86,13 +87,13 @@ class TrainService {
       if (resultTrainFind.nombre != data.nombre) {
         const resultTrain = await trainValidation.findByName(
           data.nombre,
-          project_id
+          +project_id
         );
         if (!resultTrain.success) {
           return resultTrain;
         }
       }
-      const resultIdProject = await projectValidation.findById(project_id);
+      const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear el Tren con el id del proyecto proporcionado"
@@ -104,7 +105,7 @@ class TrainService {
         operario: data.operario,
         oficial: data.oficial,
         peon: data.peon,
-        proyecto_id: project_id,
+        proyecto_id: +project_id,
       };
       const responseTrain = await prismaTrainRepository.updateTrain(
         trainFormat,
@@ -209,13 +210,13 @@ class TrainService {
     }
   }
 
-  async findAll(data: T_FindAll, project_id: number) {
+  async findAll(data: T_FindAllTrain, project_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaTrainRepository.findAll(
         skip,
-        data.queryParams.limit,
-        project_id
+        data,
+        +project_id
       );
 
       const { trains, total } = result;

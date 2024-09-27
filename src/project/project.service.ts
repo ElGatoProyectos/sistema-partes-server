@@ -34,7 +34,6 @@ class ProjectService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
-      console.log(data);
       const userTokenResponse = await jwtService.getUserFromToken(
         tokenWithBearer
       );
@@ -300,16 +299,22 @@ class ProjectService {
   }
   async updateStateProject(
     idProject: number,
-    data: I_UpdateProjectState
+    project_state: string
   ): Promise<T_HttpResponse> {
     try {
       const projectResponse = await projectValidation.findById(idProject);
+      const estadoEnum = this.stringToProyectoEstado(project_state);
+      if (estadoEnum === undefined) {
+        return httpResponse.NotFoundException(
+          "El estado ingresado del proyecto no coincide con las opciones"
+        );
+      }
       if (!projectResponse.success) {
         return projectResponse;
       } else {
         const result = await prismaProyectoRepository.updateStateProject(
           idProject,
-          data
+          estadoEnum
         );
         return httpResponse.SuccessResponse(
           "Estado del Proyecto cambiado correctamente",
@@ -324,6 +329,14 @@ class ProjectService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+  stringToProyectoEstado(estado: string): E_Proyecto_Estado | undefined {
+    if (
+      Object.values(E_Proyecto_Estado).includes(estado as E_Proyecto_Estado)
+    ) {
+      return estado as E_Proyecto_Estado;
+    }
+    return undefined;
   }
 }
 

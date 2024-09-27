@@ -12,13 +12,13 @@ rolRouter.post(`${prefix}`, authRoleMiddleware.authAdmin, rolController.create);
 rolRouter.get(
   `${prefix}/:id`,
   rolMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndProjectManagerAndUser,
   rolController.findByIdRol
 );
 
 rolRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authViewAll,
   rolController.allRoles
 );
 

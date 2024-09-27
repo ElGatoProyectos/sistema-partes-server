@@ -1,3 +1,4 @@
+import { E_Proyecto_Estado } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 import {
   I_CreateProjectBD,
@@ -18,7 +19,7 @@ export abstract class ProjectRepository {
   searchNameProject(data: T_FindAllProject, skip: number): void {}
   updateStateProject(
     idProject: number,
-    stateProject: I_UpdateProjectState
+    stateProject: E_Proyecto_Estado
   ): void {}
   codeMoreHigh(company_id: number): void {}
 }

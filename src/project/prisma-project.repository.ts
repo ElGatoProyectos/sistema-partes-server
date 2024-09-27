@@ -22,12 +22,12 @@ class PrismaProjectRepository implements ProjectRepository {
   }
   async updateStateProject(
     idProject: number,
-    stateProject: I_UpdateProjectState
+    stateProject: E_Proyecto_Estado | undefined
   ): Promise<Proyecto> {
     const project = await prisma.proyecto.update({
       where: { id: idProject },
       data: {
-        estado: stateProject.estado,
+        estado: stateProject,
       },
     });
 

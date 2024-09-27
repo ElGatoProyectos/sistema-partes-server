@@ -9,6 +9,7 @@ const prefix = "/projects";
 projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}`,
+  projectMiddleware.verifyFieldsUpdateState,
   authRoleMiddleware.authAdminAndProjectManager,
   projectController.findAllProjectsXCompany
 );
@@ -33,9 +34,9 @@ projectRouter.get(
 projectRouter.put(`${prefix}/:id`, projectController.updateProject);
 projectRouter.patch(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndProjectManager,
   projectMiddleware.verifyHeadersFields,
   projectMiddleware.verifyFieldsUpdateState,
+  authRoleMiddleware.authAdminAndProjectManager,
   projectController.updateState
 );
 projectRouter.delete(

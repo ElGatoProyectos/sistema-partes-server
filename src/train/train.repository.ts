@@ -2,9 +2,10 @@ import {
   I_CreateTrainBD,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
+import { T_FindAllTrain } from "./models/train.types";
 
 export abstract class TrainRepository {
-  findAll(skip: number, limit: number, project_id: number): void {}
+  findAll(skip: number, data: T_FindAllTrain, project_id: number): void {}
 
   findByCode(code: string, project_id: number): void {}
 
