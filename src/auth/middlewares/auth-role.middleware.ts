@@ -92,6 +92,39 @@ class AuthRoleMiddleware {
       response.status(customError.statusCode).send(customError);
     }
   }
+  authAdminAndCostControlAndUser(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    const customError = httpResponse.UnauthorizedException(
+      "Error en la autenticación"
+    );
+    try {
+      const authorization = request.get("Authorization") as string;
+
+      if (!authorization) {
+        return response.status(customError.statusCode).send(customError);
+      }
+
+      const [bearer, token] = authorization.split(" ");
+
+      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
+      if (
+        tokenDecrypted.role === "ADMIN" ||
+        tokenDecrypted.role === "CONTROL_COSTOS" ||
+        tokenDecrypted.role === "USER"
+      ) {
+        nextFunction();
+      } else {
+        response.status(customError.statusCode).send(customError);
+      }
+    } catch (error) {
+      response.status(customError.statusCode).send(customError);
+    }
+  }
   authAdminAndProjectManagerAndUser(
     request: express.Request,
     response: express.Response,

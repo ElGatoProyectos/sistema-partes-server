@@ -15,19 +15,19 @@ projectRouter.get(
 );
 projectRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authViewAll,
   projectController.findByName
 );
 //ojo!!!! lo q pongas abajo ya q cuando coloque el /search abajo no me funcionaba la ruta
 projectRouter.get(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   projectMiddleware.verifyHeadersFields,
   projectController.findByIdProject
 );
 projectRouter.get(
   `${prefix}/file/:id`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authViewAll,
   projectMiddleware.verifyHeadersFields,
   projectController.findImage
 );
@@ -36,12 +36,12 @@ projectRouter.patch(
   `${prefix}/:id`,
   projectMiddleware.verifyHeadersFields,
   projectMiddleware.verifyFieldsUpdateState,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   projectController.updateState
 );
 projectRouter.delete(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   projectMiddleware.verifyHeadersFields,
   projectController.updateStatus
 );

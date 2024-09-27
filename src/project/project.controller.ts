@@ -50,9 +50,10 @@ class ProjectController {
           try {
             // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
             //despues los valores
-            const responseValidate = authService.verifyRolProject(
-              request.get("Authorization") as string
-            );
+            const responseValidate =
+              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
+                request.get("Authorization") as string
+              );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
@@ -139,9 +140,10 @@ class ProjectController {
           try {
             // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
             //despues los valores
-            const responseValidate = authService.verifyRolProject(
-              request.get("Authorization") as string
-            );
+            const responseValidate =
+              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
+                request.get("Authorization") as string
+              );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
