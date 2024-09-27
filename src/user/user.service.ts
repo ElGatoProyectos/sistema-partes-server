@@ -511,6 +511,14 @@ class UserService {
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+
+      const rolResponse = await rolValidation.findById(data.rol_id);
+      if (!rolResponse.success) {
+        return rolResponse;
+      }
+
+      const rol = rolResponse.payload as Rol;
+
       const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
@@ -530,18 +538,18 @@ class UserService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
-      const role = await prismaRolRepository.existsName("USER");
-      if (!role) {
-        return httpResponse.BadRequestException(
-          "El Rol que deseas buscar no existe"
-        );
-      }
+      // const role = await prismaRolRepository.existsName("USER");
+      // if (!role) {
+      //   return httpResponse.BadRequestException(
+      //     "El Rol que deseas buscar no existe"
+      //   );
+      // }
       const userFormat: I_UpdateUserBD = {
         ...data,
         contrasena: hashContrasena,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
-        rol_id: role.id,
+        rol_id: rol.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);
       const resultCompanyFindByUser =

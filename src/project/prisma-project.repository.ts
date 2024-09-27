@@ -69,25 +69,36 @@ class PrismaProjectRepository implements ProjectRepository {
   }
 
   async allProjectsuser(
-    idCompany: number,
-    skip: number,
-    limit: number
+    company_id: number,
+    data: T_FindAllProject,
+    skip: number
   ): Promise<{ projects: I_Project[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.state) {
+      filters.estado = data.queryParams.state.toUpperCase();
+    }
+    if (data.queryParams.name) {
+      filters.nombre_completo = {
+        contains: data.queryParams.name,
+      };
+    }
     const [projects, total]: [I_Project[], number] = await prisma.$transaction([
       prisma.proyecto.findMany({
         where: {
-          empresa_id: idCompany,
+          ...filters,
+          empresa_id: company_id,
           eliminado: E_Estado_BD.n,
         },
         skip,
-        take: limit,
+        take: data.queryParams.limit,
         omit: {
           eliminado: true,
         },
       }),
       prisma.proyecto.count({
         where: {
-          empresa_id: idCompany,
+          ...filters,
+          empresa_id: company_id,
           eliminado: E_Estado_BD.n,
         },
       }),
