@@ -15,7 +15,8 @@ userRouter.get(
 );
 
 userRouter.get(
-  `${prefix}/detailsUserCompany`,
+  `${prefix}/detailsUserCompany/:id`,
+  userMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminAndProjectManagerAndUser,
   userController.allUsersForCompany
 );
@@ -37,7 +38,7 @@ userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdmin,
-  userController.createUser
+  userController.createUserAndSearchToken //antes aca era create pero no te lo asignarba a una empresa
 );
 
 userRouter.post(
@@ -51,12 +52,12 @@ userRouter.put(
   userController.updateUserandCompany
 );
 
-userRouter.post(
-  `${prefix}/user`,
-  userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminAndProjectManagerAndUser,
-  userController.createUserAndSearchToken
-);
+// userRouter.post(
+//   `${prefix}/user`,
+//   userMiddleware.verifyFieldsRegistry,
+//   authRoleMiddleware.authAdminAndProjectManagerAndUser,
+//   userController.createUserAndSearchToken
+// );
 
 userRouter.put(
   `${prefix}/rol`,

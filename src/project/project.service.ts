@@ -17,7 +17,7 @@ import { companyValidation } from "@/company/company.validation";
 import { userValidation } from "@/user/user.validation";
 import { projectValidation } from "./project.validation";
 import { jwtService } from "@/auth/jwt.service";
-import { E_Proyecto_Estado, Empresa, Usuario } from "@prisma/client";
+import { E_Proyecto_Estado, Empresa, Proyecto, Usuario } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 
 class ProjectService {
@@ -34,6 +34,7 @@ class ProjectService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      console.log(data);
       const userTokenResponse = await jwtService.getUserFromToken(
         tokenWithBearer
       );
@@ -51,17 +52,21 @@ class ProjectService {
 
       const company = resultCompany.payload as Empresa;
 
-      const resultCodeProject = this.isNumeric(data.codigo_proyecto);
-      if (resultCodeProject) {
-        return httpResponse.BadRequestException(
-          "El campo codigo proyecto debe contener solo números"
-        );
-      }
+      const lastProject = await projectValidation.codeMoreHigh(company.id);
+      const lastProjectResponse = lastProject.payload as Proyecto;
+
+      // Incrementar el código en 1
+      const nextCodigo =
+        (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+
       const fecha_creacion = converToDate(data.fecha_inicio);
       const fecha_fin = converToDate(data.fecha_fin);
       let proyectFormat: any = {};
       proyectFormat = {
         ...data,
+        codigo_proyecto: formattedCodigo,
         estado: E_Proyecto_Estado.CREADO,
         costo_proyecto: Number(data.costo_proyecto),
         fecha_inicio: fecha_creacion,
@@ -77,6 +82,7 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear proyecto",
         error
@@ -108,12 +114,7 @@ class ProjectService {
       }
 
       const company = resultCompany.payload as Empresa;
-      const resultCodigoProyecto = this.isNumeric(data.codigo_proyecto);
-      if (resultCodigoProyecto) {
-        return httpResponse.BadRequestException(
-          "El campo codigo proyecto debe contener solo números"
-        );
-      }
+
       const projectResponse = await projectValidation.findById(idProject);
       if (!projectResponse.success) return projectResponse;
       let fecha_creacion = new Date(data.fecha_creacion);
@@ -137,6 +138,7 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el proyecto",
         error

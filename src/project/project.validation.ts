@@ -16,6 +16,20 @@ class ProjectValidation {
       );
     }
   }
+  async codeMoreHigh(company_id: number): Promise<T_HttpResponse> {
+    try {
+      const project = await prismaProyectoRepository.codeMoreHigh(company_id);
+      if (!project) {
+        return httpResponse.SuccessResponse("No se encontraron resultados", 0);
+      }
+      return httpResponse.SuccessResponse("Proyecto encontrado", project);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Proyecto",
+        error
+      );
+    }
+  }
 }
 
 export const projectValidation = new ProjectValidation();
