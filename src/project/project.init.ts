@@ -10,7 +10,7 @@ projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}`,
   projectMiddleware.verifyFieldsUpdateState,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authViewAll,
   projectController.findAllProjectsXCompany
 );
 projectRouter.get(
