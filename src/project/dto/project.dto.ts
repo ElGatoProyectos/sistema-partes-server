@@ -6,7 +6,6 @@ export const proyectoDto = z.object({
   direccion: z.string(),
   nombre_consorcio: z.string(),
   nombre_corto: z.string().min(3),
-  costo_proyecto: z.string(),
   fecha_inicio: z.string(),
   fecha_fin: z.string(),
   plazo_proyecto: z.string(),

@@ -28,6 +28,7 @@ import { companyValidation } from "../company/company.validation";
 import { emailValid } from "../common/utils/email";
 import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
+import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
 
 class UserService {
   async findAll(data: T_FindAllUser, token: string): Promise<T_HttpResponse> {
@@ -76,19 +77,33 @@ class UserService {
 
   async findAllUserCompany(
     data: T_FindAllUser,
-    token: string
+    user_id: number
   ): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse) return userTokenResponse;
-      const userResponse = userTokenResponse.payload as Usuario;
+      const userResponse = await userValidation.findById(user_id);
+      if (!userResponse.success) {
+        return userResponse;
+      }
+      const user = userResponse.payload as Usuario;
+      const companyResponse = await companyValidation.findByIdUser(user.id);
+      if (!companyResponse.success) {
+        return companyResponse;
+      }
+      const company = companyResponse.payload as Empresa;
+
+      const detailResponse = await detailUserCompanyValidation.findByIdCompany(
+        company.id
+      );
+      if (!detailResponse.success) {
+        return httpResponse.SuccessResponse("No se encontraron resultados", []);
+      }
 
       const result = await prismaUserRepository.getUsersForCompany(
         skip,
         data.queryParams.limit,
         data.queryParams.name,
-        userResponse.id
+        company.id
       );
 
       const { userAll, total } = result;
@@ -106,6 +121,7 @@ class UserService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer los Usuarios de la empresa",
         error

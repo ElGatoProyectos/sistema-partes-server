@@ -17,9 +17,9 @@ class PrismaUserRepository implements UserRepository {
     skip: number,
     limit: number,
     name: string,
-    user_id: number
+    company_id: number
   ): Promise<{ userAll: any[]; total: number }> {
-    const companyResponse = await companyValidation.findByIdUser(user_id);
+    console.log("llega al priiiisma")
     let filters: any = {};
     let users: any = [];
     let total: any;
@@ -28,11 +28,10 @@ class PrismaUserRepository implements UserRepository {
         contains: name,
       };
     }
-    const company = companyResponse.payload as Empresa;
     [users, total] = await prisma.$transaction([
       prisma.detalleUsuarioEmpresa.findMany({
         where: {
-          empresa_id: company.id,
+          empresa_id: company_id,
           Usuario: {
             ...filters,
           },
@@ -50,7 +49,7 @@ class PrismaUserRepository implements UserRepository {
       }),
       prisma.detalleUsuarioEmpresa.count({
         where: {
-          empresa_id: company.id,
+          empresa_id: company_id,
         },
       }),
     ]);
@@ -288,17 +287,6 @@ class PrismaUserRepository implements UserRepository {
       });
     }
     return { userAll, total };
-
-    // userAll = users;
-
-    // const userAll: any = [];
-
-    // const { Rol, Empresa, ...user } = item;
-    // return {
-    //   rol: Rol,
-    //   empresa: Empresa[0],
-    //   user,
-    // };
   }
 
   async findById(idUser: number): Promise<I_User | null> {

@@ -10,6 +10,16 @@ import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 
 class PrismaProjectRepository implements ProjectRepository {
+  async codeMoreHigh(company_id: number): Promise<Proyecto | null> {
+    const lastProject = await prisma.proyecto.findFirst({
+      where: {
+        // eliminado: E_Estado_BD.n,
+        empresa_id: company_id,
+      },
+      orderBy: { codigo_proyecto: "desc" },
+    });
+    return lastProject;
+  }
   async updateStateProject(
     idProject: number,
     stateProject: I_UpdateProjectState

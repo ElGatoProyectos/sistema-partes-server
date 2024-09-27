@@ -314,6 +314,7 @@ class UserController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const name = request.query.name as string;
+    const user_id = Number(request.params.id);
     let paginationOptions: T_FindAllUser = {
       queryParams: {
         page: page,
@@ -321,20 +322,12 @@ class UserController {
         name,
       },
     };
-    const tokenWithBearer = request.headers.authorization;
-    if (tokenWithBearer) {
-      const result = await userService.findAllUserCompany(
-        paginationOptions,
-        tokenWithBearer
-      );
+    const result = await userService.findAllUserCompany(
+      paginationOptions,
+      user_id
+    );
 
-      response.status(result.statusCode).json(result);
-    } else {
-      const result = httpResponse.UnauthorizedException(
-        "Error en la autenticacion al buscar los Usuarios de la Empresa"
-      );
-      response.status(result.statusCode).json(result);
-    }
+    response.status(result.statusCode).json(result);
   }
 }
 

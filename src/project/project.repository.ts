@@ -16,4 +16,5 @@ export abstract class ProjectRepository {
     idProject: number,
     stateProject: I_UpdateProjectState
   ): void {}
+  codeMoreHigh(company_id: number): void {}
 }

@@ -32,11 +32,13 @@ class JobService {
       const jobFormat = {
         ...data,
         codigo: formattedCodigo,
-        costo_partida: data.costo_partida != 0 ? data.costo_partida : 0,
-        costo_mano_obra: data.costo_mano_obra != 0 ? data.costo_mano_obra : 0,
-        costo_material: data.costo_material != 0 ? data.costo_material : 0,
-        costo_equipo: data.costo_equipo != 0 ? data.costo_equipo : 0,
-        costo_varios: data.costo_varios != 0 ? data.costo_varios : 0,
+        costo_partida: data.costo_partida != undefined ? data.costo_partida : 0,
+        costo_mano_obra:
+          data.costo_mano_obra != undefined ? data.costo_mano_obra : 0,
+        costo_material:
+          data.costo_material != undefined ? data.costo_material : 0,
+        costo_equipo: data.costo_equipo != undefined ? data.costo_equipo : 0,
+        costo_varios: data.costo_varios != undefined ? data.costo_varios : 0,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
       };
@@ -46,8 +48,9 @@ class JobService {
         jobResponse
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
-        "Error al crear Tren",
+        "Error al crear Trabajo",
         error
       );
     } finally {
