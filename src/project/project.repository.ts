@@ -2,6 +2,7 @@ import { E_Proyecto_Estado } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 import {
   I_CreateProjectBD,
+  I_UpdateColorsProject,
   I_UpdateProjectState,
   I_UpdateProyectBody,
 } from "./models/project.interface";
@@ -22,5 +23,5 @@ export abstract class ProjectRepository {
     stateProject: E_Proyecto_Estado
   ): void {}
   codeMoreHigh(company_id: number): void {}
-  // updateColorsProject(project_id,)
+  updateColorsProject(project_id: number, data: I_UpdateColorsProject): void {}
 }

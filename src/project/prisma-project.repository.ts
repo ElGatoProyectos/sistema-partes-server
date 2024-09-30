@@ -4,6 +4,7 @@ import {
   I_CreateProjectBD,
   I_UpdateProjectBD,
   I_UpdateProjectState,
+  I_UpdateColorsProject,
 } from "./models/project.interface";
 import { ProjectRepository } from "./project.repository";
 import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
@@ -153,6 +154,19 @@ class PrismaProjectRepository implements ProjectRepository {
 
   async createProject(data: I_CreateProjectBD): Promise<Proyecto> {
     const project = await prisma.proyecto.create({
+      data: data,
+    });
+    return project;
+  }
+
+  async updateColorsProject(
+    project_id: number,
+    data: I_UpdateColorsProject
+  ): Promise<Proyecto> {
+    const project = await prisma.proyecto.update({
+      where: {
+        id: project_id,
+      },
       data: data,
     });
     return project;
