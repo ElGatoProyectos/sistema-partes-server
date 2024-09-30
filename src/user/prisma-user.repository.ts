@@ -54,9 +54,10 @@ class PrismaUserRepository implements UserRepository {
     ]);
     const userAll = users.map((item: I_Detalles) => {
       const { Usuario, ...company } = item;
+      const { Empresa } = item;
       const { Rol, ...user } = Usuario;
       return {
-        empresa: company,
+        empresa: Empresa,
         usuario: user,
         rol: Rol,
       };

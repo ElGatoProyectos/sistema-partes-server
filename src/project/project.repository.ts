@@ -24,4 +24,5 @@ export abstract class ProjectRepository {
   ): void {}
   codeMoreHigh(company_id: number): void {}
   updateColorsProject(project_id: number, data: I_UpdateColorsProject): void {}
+  totalProjectsByCompany(company_id: number): void {}
 }

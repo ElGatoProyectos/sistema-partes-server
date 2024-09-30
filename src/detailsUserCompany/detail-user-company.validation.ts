@@ -23,6 +23,28 @@ class DetailUserCompanyValidation {
       );
     }
   }
+  async findUserByCompany(company_id: number): Promise<T_HttpResponse> {
+    try {
+      const countUsersByCompany =
+        await prismaDetailUserCompanyRepository.countUsersForCompany(
+          company_id
+        );
+      if (!countUsersByCompany) {
+        return httpResponse.NotFoundException(
+          "La empresa proporcionada para buscar sus usuarios no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Se encontró la cantidad de usuarios de la empresa",
+        countUsersByCompany
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la cantidad de usuarios de la empresa",
+        error
+      );
+    }
+  }
 }
 
 export const detailUserCompanyValidation = new DetailUserCompanyValidation();

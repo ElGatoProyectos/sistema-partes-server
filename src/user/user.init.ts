@@ -15,7 +15,7 @@ userRouter.get(
 );
 
 userRouter.get(
-  `${prefix}/detailsUserCompany/:id`,
+  `${prefix}/details_user_company/:id`,
   userMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminAndProjectManagerAndUser,
   userController.allUsersForCompany

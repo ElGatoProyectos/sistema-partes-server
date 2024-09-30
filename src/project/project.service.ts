@@ -52,6 +52,22 @@ class ProjectService {
 
       const company = resultCompany.payload as Empresa;
 
+      const totalProjects = await projectValidation.totalProjectsByCompany(
+        company.id
+      );
+
+      if (!totalProjects.success) {
+        return totalProjects;
+      }
+
+      const total = totalProjects.payload as Number;
+
+      if (total === userResponse.limite_proyecto) {
+        return httpResponse.BadRequestException(
+          "Alcanzó el límite de proyectos la empresa"
+        );
+      }
+
       const lastProject = await projectValidation.codeMoreHigh(company.id);
       const lastProjectResponse = lastProject.payload as Proyecto;
 
@@ -307,8 +323,30 @@ class ProjectService {
       if (!projectResponse.success) {
         return projectResponse;
       } else {
-        const result = await prismaProyectoRepository.updateStatusProject(
-          idProject
+        const project = projectResponse.payload as Proyecto;
+        const projectFormat = {
+          color_primario: data.color_primario
+            ? data.color_primario
+            : project.color_primario,
+          color_personalizado: data.color_personalizado
+            ? data.color_personalizado
+            : project.color_personalizado,
+          color_linea: data.color_linea
+            ? data.color_linea
+            : project.color_linea,
+          color_detalle: data.color_detalle
+            ? data.color_detalle
+            : project.color_detalle,
+          color_menu: data.color_menu
+            ? data.color_primario
+            : project.color_primario,
+          color_submenu: data.color_primario
+            ? data.color_primario
+            : project.color_primario,
+        };
+        const result = await prismaProyectoRepository.updateColorsProject(
+          idProject,
+          data
         );
         return httpResponse.SuccessResponse(
           "Proyecto eliminado correctamente",
