@@ -92,7 +92,7 @@ class AuthRoleMiddleware {
       response.status(customError.statusCode).send(customError);
     }
   }
-  authAdminAndCostControlAndUser(
+  authAdminAndGeneralProjectAndCostControlAndUser(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction

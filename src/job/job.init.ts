@@ -10,14 +10,14 @@ const prefix = "/job";
 jobRouter.post(
   `${prefix}`,
   jobMiddleware.verifyFields,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   jobController.create
 );
 
 jobRouter.delete(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   jobController.updateStatus
 );
 

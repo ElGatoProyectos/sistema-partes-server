@@ -65,7 +65,7 @@ class AuthRoleMiddleware {
             response.status(customError.statusCode).send(customError);
         }
     }
-    authAdminAndCostControlAndUser(request, response, nextFunction) {
+    authAdminAndGeneralProjectAndCostControlAndUser(request, response, nextFunction) {
         const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
         try {
             const authorization = request.get("Authorization");
