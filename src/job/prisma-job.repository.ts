@@ -60,6 +60,7 @@ class PrismaJobRepository implements JobRepository {
     limit: number,
     project_id: number
   ): Promise<{ jobs: I_Job[]; total: number }> {
+    let filters: any = {};
     const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
       prisma.trabajo.findMany({
         where: {

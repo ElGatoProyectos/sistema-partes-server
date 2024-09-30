@@ -6,7 +6,7 @@ export const userDto = z.object({
   nombre_completo: z.string(),
   telefono: z.string(),
   contrasena: z.string().min(3),
-  limite_proyecto: z.number(),
-  limite_usuarios: z.number(),
+  // limite_proyecto: z.number(),
+  // limite_usuarios: z.number(),
   rol_id: z.number(),
 });

@@ -33,3 +33,12 @@ export interface I_UpdateProyectBody
   extends Omit<Proyecto, "id" | "costo_proyecto"> {
   costo_proyecto: string;
 }
+
+// export interface I_UpdateColorsProject{
+//   color_primario: ,
+//   color_personalizado: z.string().optional(),
+//   color_linea: z.string().optional(),
+//   color_detalle: z.string().optional(),
+//   color_menu: z.string().optional(),
+//   color_submenu: z.string().optional(),
+// }

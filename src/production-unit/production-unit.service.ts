@@ -16,6 +16,7 @@ import { productionUnitValidation } from "./productionUnit.validation";
 import { projectValidation } from "@/project/project.validation";
 import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
 import validator from "validator";
+import { T_FindAllUp } from "./models/up.types";
 
 class ProductionUnitService {
   async createProductionUnit(
@@ -74,7 +75,7 @@ class ProductionUnitService {
     const nextCodigo = (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
 
     // Formatear el código con ceros a la izquierda
-    return nextCodigo.toString().padStart(3, "0");
+    return nextCodigo.toString().padStart(4, "0");
   }
 
   async updateProductionUnit(
@@ -234,12 +235,17 @@ class ProductionUnitService {
     }
   }
 
-  async findAll(data: T_FindAll) {
+  async findAll(data: T_FindAllUp, project_id: number) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
       const result = await prismaProductionUnitRepository.findAllPagination(
         skip,
-        data.queryParams.limit
+        data,
+        project_id
       );
       const { productionUnits, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

@@ -2,11 +2,14 @@ import {
   I_CreateProductionUnitBD,
   I_UpdateProductionUnitBody,
 } from "./models/production-unit.interface";
+import { T_FindAllUp } from "./models/up.types";
 
 export abstract class ProudctionUnitRepository {
-  findAll(): void {}
-
-  findAllPagination(skip: number, limit: number): void {}
+  findAllPagination(
+    skip: number,
+    data: T_FindAllUp,
+    project_id: number
+  ): void {}
 
   findByCode(code: string): void {}
 

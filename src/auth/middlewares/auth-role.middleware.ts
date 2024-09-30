@@ -114,6 +114,7 @@ class AuthRoleMiddleware {
       // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
       if (
         tokenDecrypted.role === "ADMIN" ||
+        tokenDecrypted.role === "GERENTE_PROYECTO" ||
         tokenDecrypted.role === "CONTROL_COSTOS" ||
         tokenDecrypted.role === "USER"
       ) {

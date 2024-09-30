@@ -548,8 +548,8 @@ class UserService {
       const userFormat: I_UpdateUserBD = {
         ...data,
         contrasena: hashContrasena,
-        limite_proyecto: Number(data.limite_proyecto),
-        limite_usuarios: Number(data.limite_usuarios),
+        limite_proyecto: Number(0),
+        limite_usuarios: Number(0),
         rol_id: rol.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);

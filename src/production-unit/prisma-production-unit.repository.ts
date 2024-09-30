@@ -7,6 +7,7 @@ import {
 } from "./models/production-unit.interface";
 import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
+import { T_FindAllUp } from "./models/up.types";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
   async findByCode(code: string): Promise<UnidadProduccion | null> {
@@ -18,10 +19,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     });
     return productionUnit;
   }
-  async findAll(): Promise<UnidadProduccion[]> {
-    const productionUnits = await prisma.unidadProduccion.findMany();
-    return productionUnits;
-  }
+
   async existsName(name: string): Promise<UnidadProduccion | null> {
     const productionUnit = await prisma.unidadProduccion.findFirst({
       where: {
@@ -93,22 +91,32 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
 
   async findAllPagination(
     skip: number,
-    limit: number
+    data: T_FindAllUp,
+    project_id: number
   ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.name) {
+      filters.nombre = {
+        contains: data.queryParams.name,
+      };
+    }
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
           where: {
+            ...filters,
+            proyecto_id: project_id,
             eliminado: E_Estado_BD.n,
           },
           skip,
-          take: limit,
+          take: data.queryParams.limit,
           omit: {
             eliminado: true,
           },
         }),
         prisma.unidadProduccion.count({
           where: {
+            ...filters,
             eliminado: E_Estado_BD.n,
           },
         }),

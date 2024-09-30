@@ -213,6 +213,10 @@ class TrainService {
   async findAll(data: T_FindAllTrain, project_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
       const result = await prismaTrainRepository.findAll(
         skip,
         data,

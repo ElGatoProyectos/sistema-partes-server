@@ -22,4 +22,5 @@ export abstract class ProjectRepository {
     stateProject: E_Proyecto_Estado
   ): void {}
   codeMoreHigh(company_id: number): void {}
+  // updateColorsProject(project_id,)
 }

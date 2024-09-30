@@ -12,8 +12,13 @@ class JobController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateJobBody;
     const tokenWithBearer = request.headers.authorization;
+    const project_id = request.get("project-id") as string;
     if (tokenWithBearer) {
-      const result = await jobService.createJob(data);
+      const result = await jobService.createJob(
+        data,
+        tokenWithBearer,
+        project_id
+      );
       if (!result.success) {
         response.status(result.statusCode).json(result);
       } else {
@@ -50,11 +55,11 @@ class JobController {
   //   }
   // }
 
-  // async updateStatus(request: express.Request, response: express.Response) {
-  //   const idTrain = Number(request.params.id);
-  //   const result = await trainService.updateStatusTrain(idTrain);
-  //   response.status(result.statusCode).json(result);
-  // }
+  async updateStatus(request: express.Request, response: express.Response) {
+    const job_id = Number(request.params.id);
+    const result = await jobService.updateStatusJob(job_id);
+    response.status(result.statusCode).json(result);
+  }
 
   // async findByIdTrain(request: express.Request, response: express.Response) {
   //   const idTrain = Number(request.params.id);

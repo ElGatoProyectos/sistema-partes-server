@@ -570,9 +570,9 @@ model Trabajo {
   costo_material        Int
   costo_equipo          Int
   costo_varios          Int
-  tren_id               Int                     @unique
+  tren_id               Int
   estado_trabajo        E_Trabajo_Estado        @default(PROGRAMADO)
-  up_id                 Int                     @unique
+  up_id                 Int
   proyecto_id           Int
   usuario_id            Int
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
