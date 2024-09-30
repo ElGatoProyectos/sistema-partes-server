@@ -315,47 +315,34 @@ class ProjectService {
     }
   }
   async updateColorsProject(
-    idProject: number,
+    project_id: number,
     data: I_UpdateColorsProject
   ): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await projectValidation.findById(idProject);
+      const projectResponse = await projectValidation.findById(project_id);
       if (!projectResponse.success) {
         return projectResponse;
       } else {
-        const project = projectResponse.payload as Proyecto;
-        const projectFormat = {
-          color_primario: data.color_primario
-            ? data.color_primario
-            : project.color_primario,
-          color_personalizado: data.color_personalizado
-            ? data.color_personalizado
-            : project.color_personalizado,
-          color_linea: data.color_linea
-            ? data.color_linea
-            : project.color_linea,
-          color_detalle: data.color_detalle
-            ? data.color_detalle
-            : project.color_detalle,
-          color_menu: data.color_menu
-            ? data.color_primario
-            : project.color_primario,
-          color_submenu: data.color_primario
-            ? data.color_primario
-            : project.color_primario,
+        const projectFormat: I_UpdateColorsProject = {
+          color_primario: data.color_primario,
+          color_personalizado: data.color_personalizado,
+          color_linea: data.color_linea,
+          color_detalle: data.color_detalle,
+          color_menu: data.color_menu,
+          color_submenu: data.color_primario,
         };
         const result = await prismaProyectoRepository.updateColorsProject(
-          idProject,
-          data
+          project_id,
+          projectFormat
         );
         return httpResponse.SuccessResponse(
-          "Proyecto eliminado correctamente",
+          "Los colores del Proyecto fueron cambiados correctamente",
           result
         );
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al eliminar el proyecto",
+        "Error al cambiar los colore del Proyecto",
         error
       );
     } finally {

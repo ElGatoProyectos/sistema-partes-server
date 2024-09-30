@@ -37,7 +37,7 @@ userRouter.get(
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   userController.createUserAndSearchToken //antes aca era create pero no te lo asignarba a una empresa
 );
 

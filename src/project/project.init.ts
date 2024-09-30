@@ -21,7 +21,7 @@ projectRouter.get(
 //ojo!!!! lo q pongas abajo ya q cuando coloque el /search abajo no me funcionaba la ruta
 projectRouter.get(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   projectMiddleware.verifyHeadersFields,
   projectController.findByIdProject
 );
@@ -36,12 +36,19 @@ projectRouter.patch(
   `${prefix}/:id`,
   projectMiddleware.verifyHeadersFields,
   projectMiddleware.verifyFieldsUpdateState,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   projectController.updateState
+);
+projectRouter.patch(
+  `${prefix}/colors_project/:project_id`,
+  projectMiddleware.verifyHeadersFieldsIdProject,
+  projectMiddleware.verifyColors,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  projectController.updateColors
 );
 projectRouter.delete(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndCostControlAndUser,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   projectMiddleware.verifyHeadersFields,
   projectController.updateStatus
 );

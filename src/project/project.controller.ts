@@ -308,23 +308,12 @@ class ProjectController {
       response.status(result.statusCode).json(result);
     }
   }
-  // async updateColors(request: express.Request, response: express.Response) {
-  //   const idProject = Number(request.params.id);
-  //   // const data = request.body;
-  //   const project_state = request.query.state as string;
-  //   if (project_state) {
-  //     const result = await projectService.(
-  //       idProject,
-  //       project_state
-  //     );
-  //     response.status(result.statusCode).json(result);
-  //   } else {
-  //     const result = httpResponse.BadRequestException(
-  //       "Falta el campo estado para poder hacerse la acción"
-  //     );
-  //     response.status(result.statusCode).json(result);
-  //   }
-  // }
+  async updateColors(request: express.Request, response: express.Response) {
+    const project_id = Number(request.params.project_id);
+    const data = request.body;
+    const result = await projectService.updateColorsProject(project_id, data);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const projectController = new ProjectController();

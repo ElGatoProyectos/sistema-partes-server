@@ -97,7 +97,17 @@ class UserService {
         company.id
       );
       if (!detailResponse.success) {
-        return httpResponse.SuccessResponse("No se encontraron resultados", []);
+        const formData = {
+          total: 0,
+          page: 1,
+          limit: data.queryParams.limit,
+          pageCount: 0,
+          data: [],
+        };
+        return httpResponse.SuccessResponse(
+          "No se encontraron resultados",
+          formData
+        );
       }
 
       const result = await prismaUserRepository.getUsersForCompany(
@@ -564,12 +574,7 @@ class UserService {
       }
 
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
-      // const role = await prismaRolRepository.existsName("USER");
-      // if (!role) {
-      //   return httpResponse.BadRequestException(
-      //     "El Rol que deseas buscar no existe"
-      //   );
-      // }
+
       const userFormat: I_UpdateUserBD = {
         ...data,
         contrasena: hashContrasena,
