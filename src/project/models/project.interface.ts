@@ -34,11 +34,11 @@ export interface I_UpdateProyectBody
   costo_proyecto: string;
 }
 
-// export interface I_UpdateColorsProject{
-//   color_primario: ,
-//   color_personalizado: z.string().optional(),
-//   color_linea: z.string().optional(),
-//   color_detalle: z.string().optional(),
-//   color_menu: z.string().optional(),
-//   color_submenu: z.string().optional(),
-// }
+export interface I_UpdateColorsProject {
+  color_primario: string;
+  color_personalizado: string;
+  color_linea: string;
+  color_detalle: string;
+  color_menu: string;
+  color_submenu: string;
+}

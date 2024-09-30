@@ -3,6 +3,7 @@ import prisma from "@/config/prisma.config";
 import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
   I_CreateCompanyBody,
+  I_UpdateColorsProject,
   I_UpdateProjectState,
   I_UpdateProyectBody,
 } from "./models/project.interface";
@@ -275,6 +276,32 @@ class ProjectService {
   }
 
   async updateStatusProject(idProject: number): Promise<T_HttpResponse> {
+    try {
+      const projectResponse = await projectValidation.findById(idProject);
+      if (!projectResponse.success) {
+        return projectResponse;
+      } else {
+        const result = await prismaProyectoRepository.updateStatusProject(
+          idProject
+        );
+        return httpResponse.SuccessResponse(
+          "Proyecto eliminado correctamente",
+          result
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al eliminar el proyecto",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateColorsProject(
+    idProject: number,
+    data: I_UpdateColorsProject
+  ): Promise<T_HttpResponse> {
     try {
       const projectResponse = await projectValidation.findById(idProject);
       if (!projectResponse.success) {
