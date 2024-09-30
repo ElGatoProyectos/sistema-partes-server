@@ -9,41 +9,36 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel`,
-  productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.get(
   `${prefix}`,
-  productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.findImage
 );
-prouductionUnitRouter.put(
-  `${prefix}/:id/project/:project_id`,
-  productionUnitController.update
-);
+prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminAndCostControlAndUser,
   productionUnitController.updateStatus
 );
 

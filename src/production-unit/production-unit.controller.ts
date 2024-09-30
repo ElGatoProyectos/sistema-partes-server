@@ -14,6 +14,7 @@ import { UnidadProduccion } from "@prisma/client";
 import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
 import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
 import validator from "validator";
+import { T_FindAllUp } from "./models/up.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -122,7 +123,7 @@ class ProductionUnitController {
               prouductionUnitUpdateDto.parse(request.body);
               const data = request.body as I_UpdateProductionUnitBody;
               const production_unit_id = request.params.id;
-              const project_id = request.params.project_id;
+              const project_id = request.get("project-id") as string;
               if (
                 !validator.isNumeric(production_unit_id) ||
                 !validator.isNumeric(project_id)
@@ -227,14 +228,20 @@ class ProductionUnitController {
   findAll = async (request: express.Request, response: express.Response) => {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
+    const name = request.query.name as string;
+    const project_id = request.get("project-id") as string;
+    let paginationOptions: T_FindAllUp = {
       queryParams: {
         page: page,
         limit: limit,
+        name: name,
       },
     };
     const idCompany = request.params.id;
-    const result = await productionUnitService.findAll(paginationOptions);
+    const result = await productionUnitService.findAll(
+      paginationOptions,
+      +project_id
+    );
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {
@@ -260,7 +267,8 @@ class ProductionUnitController {
         if (err) {
           return response.status(500).json({ error: "Error uploading file" });
         }
-        const project_id = Number(request.params.project_id);
+        // const project_id = Number(request.params.project_id);
+        const project_id = request.get("project-id") as string;
         const file = request.file;
         if (!file) {
           return response.status(400).json({ error: "No se subió archivo" });
@@ -270,7 +278,7 @@ class ProductionUnitController {
           const serviceResponse =
             await productionUnitService.registerProductionUnitMasive(
               file,
-              project_id
+              +project_id
             );
 
           response.status(serviceResponse.statusCode).json(serviceResponse);

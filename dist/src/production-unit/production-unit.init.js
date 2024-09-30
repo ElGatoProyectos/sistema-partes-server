@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const production_unit_controller_1 = require("./production-unit.controller");
+const express_config_1 = __importDefault(require("@/config/express.config"));
+const production_unit_middleware_1 = require("./production-unit.middleware");
+const auth_role_middleware_1 = require("@/auth/middlewares/auth-role.middleware");
+const prouductionUnitRouter = express_config_1.default.Router();
+const prefix = "/unidad-de-produccion";
+prouductionUnitRouter.post(`${prefix}`, production_unit_controller_1.productionUnitController.create);
+prouductionUnitRouter.post(`${prefix}/upload-excel`, production_unit_middleware_1.productionUnitMiddleware.verifyHeadersFields, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.productionUnitReadExcel);
+prouductionUnitRouter.get(`${prefix}`, production_unit_middleware_1.productionUnitMiddleware.verifyHeadersFields, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.findAll);
+prouductionUnitRouter.get(`${prefix}/search`, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.findByName);
+prouductionUnitRouter.get(`${prefix}/:id`, production_unit_middleware_1.productionUnitMiddleware.verifyHeadersFields, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.findById);
+prouductionUnitRouter.get(`${prefix}/file/:id`, production_unit_middleware_1.productionUnitMiddleware.verifyHeadersFields, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.findImage);
+prouductionUnitRouter.put(`${prefix}/:id/project/:project_id`, production_unit_controller_1.productionUnitController.update);
+prouductionUnitRouter.delete(`${prefix}/:id`, production_unit_middleware_1.productionUnitMiddleware.verifyHeadersFields, auth_role_middleware_1.authRoleMiddleware.authAdminAndProjectManager, production_unit_controller_1.productionUnitController.updateStatus);
+exports.default = prouductionUnitRouter;
