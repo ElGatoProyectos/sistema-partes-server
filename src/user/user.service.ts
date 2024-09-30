@@ -503,6 +503,35 @@ class UserService {
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+      const resultCompanyFindByUser =
+        await companyValidation.findByUserForCompany(userResponse.id);
+
+      if (!resultCompanyFindByUser.success) {
+        return httpResponse.UnauthorizedException(
+          "No tiene acceso para crear usuarios"
+        );
+      }
+
+      const company = resultCompanyFindByUser.payload as Empresa;
+
+      const usersToCompany =
+        await detailUserCompanyValidation.findUserByCompany(company.id);
+      if (!usersToCompany.success) {
+        return usersToCompany;
+      }
+      const totalUsersCompany = usersToCompany.payload as Number;
+
+      if (totalUsersCompany === userResponse.limite_usuarios) {
+        return httpResponse.BadRequestException(
+          "Haz alcanzado el limite usuarios que puedes ingresar"
+        );
+      }
+
       const responseEmail = await userValidation.findByEmail(data.email);
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
@@ -533,11 +562,7 @@ class UserService {
           "El campo telefono debe contener solo números"
         );
       }
-      const userTokenResponse = await jwtService.getUserFromToken(
-        tokenWithBearer
-      );
-      if (!userTokenResponse) return userTokenResponse;
-      const userResponse = userTokenResponse.payload as Usuario;
+
       const hashContrasena = bcryptService.hashPassword(data.contrasena);
       // const role = await prismaRolRepository.existsName("USER");
       // if (!role) {
@@ -553,23 +578,31 @@ class UserService {
         rol_id: rol.id,
       };
       const resultUser = await prismaUserRepository.createUser(userFormat);
-      const resultCompanyFindByUser =
-        await prismaCompanyRepository.findCompanyByUser(userResponse.id);
-      if (resultCompanyFindByUser) {
-        const detailUserCompany = await detailUserCompanyService.createDetail(
-          resultUser.id,
-          resultCompanyFindByUser?.id
-        );
-        return httpResponse.CreatedResponse(
-          "El detalle usuario-empresa fue creado correctamente",
-          detailUserCompany.payload
-        );
-      } else {
-        return httpResponse.BadRequestException(
-          "No se encontró el id de la empresa del usuario logueado",
-          null
-        );
-      }
+      const detailUserCompany = await detailUserCompanyService.createDetail(
+        resultUser.id,
+        company?.id
+      );
+      return httpResponse.CreatedResponse(
+        "El detalle usuario-empresa fue creado correctamente",
+        detailUserCompany.payload
+      );
+      // const resultCompanyFindByUser =
+      //   await prismaCompanyRepository.findCompanyByUser(userResponse.id);
+      // if (resultCompanyFindByUser) {
+      //   const detailUserCompany = await detailUserCompanyService.createDetail(
+      //     resultUser.id,
+      //     resultCompanyFindByUser?.id
+      //   );
+      //   return httpResponse.CreatedResponse(
+      //     "El detalle usuario-empresa fue creado correctamente",
+      //     detailUserCompany.payload
+      //   );
+      // } else {
+      //   return httpResponse.BadRequestException(
+      //     "No se encontró el id de la empresa del usuario logueado",
+      //     null
+      //   );
+      // }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al crear el usuario",

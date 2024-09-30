@@ -30,6 +30,18 @@ class ProjectValidation {
       );
     }
   }
+  async totalProjectsByCompany(company_id: number): Promise<T_HttpResponse> {
+    try {
+      const totalResponse =
+        await prismaProyectoRepository.totalProjectsByCompany(company_id);
+      return httpResponse.SuccessResponse("Empresa encontrada", totalResponse);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar por la Empresa",
+        error
+      );
+    }
+  }
 }
 
 export const projectValidation = new ProjectValidation();

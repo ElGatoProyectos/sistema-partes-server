@@ -11,6 +11,14 @@ import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 
 class PrismaProjectRepository implements ProjectRepository {
+  async totalProjectsByCompany(company_id: number): Promise<Number> {
+    const usersCompany = await prisma.proyecto.count({
+      where: {
+        empresa_id: company_id,
+      },
+    });
+    return usersCompany;
+  }
   async codeMoreHigh(company_id: number): Promise<Proyecto | null> {
     const lastProject = await prisma.proyecto.findFirst({
       where: {
