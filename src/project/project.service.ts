@@ -24,6 +24,7 @@ import {
 } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 import { rolValidation } from "@/rol/rol.validation";
+import { weekService } from "@/week/week.service";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -44,6 +45,16 @@ class ProjectService {
       );
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
+
+      // const date = new Date();
+
+      // console.log("este año es " + date.getFullYear());
+      // const weekResponse = await weekService.findByYear(date.getFullYear());
+      // if (!weekResponse) {
+      //   console.log("ENTRO AL IF :0");
+      //   return weekResponse;
+      // }
+      // await weekService.createWeek(date.getFullYear());
 
       const resultCompany = await companyValidation.findByIdUser(
         userResponse.id
@@ -142,12 +153,11 @@ class ProjectService {
 
       const projectResponse = await projectValidation.findById(idProject);
       if (!projectResponse.success) return projectResponse;
-      let fecha_creacion = new Date(data.fecha_creacion);
+      let fecha_creacion = new Date(data.fecha_inicio);
       let fecha_fin = new Date(data.fecha_fin);
 
       const proyectFormat = {
         ...data,
-        costo_proyecto: data.costo_proyecto,
         fecha_inicio: fecha_creacion,
         fecha_fin: fecha_fin,
         empresa_id: company.id,
