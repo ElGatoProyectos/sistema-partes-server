@@ -46,77 +46,78 @@ class ProjectService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
 
-      // const date = new Date();
+      const date = new Date();
 
-      // console.log("este año es " + date.getFullYear());
-      // const weekResponse = await weekService.findByYear(date.getFullYear());
-      // if (!weekResponse) {
+      // const weekResponse = await weekService.findByYear(2025);
+      // console.log("da como respuesta");
+      // console.log(weekResponse);
+      // if (!weekResponse.success) {
       //   console.log("ENTRO AL IF :0");
       //   return weekResponse;
       // }
-      // await weekService.createWeek(date.getFullYear());
+      await weekService.createWeek(date.getFullYear());
 
-      const resultCompany = await companyValidation.findByIdUser(
-        userResponse.id
-      );
-      if (!resultCompany.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id de la empresa proporcionado"
-        );
-      }
+      // const resultCompany = await companyValidation.findByIdUser(
+      //   userResponse.id
+      // );
+      // if (!resultCompany.success) {
+      //   return httpResponse.BadRequestException(
+      //     "No se puede crear el proyecto con el id de la empresa proporcionado"
+      //   );
+      // }
 
-      const company = resultCompany.payload as Empresa;
+      // const company = resultCompany.payload as Empresa;
 
-      const totalProjects = await projectValidation.totalProjectsByCompany(
-        company.id
-      );
+      // const totalProjects = await projectValidation.totalProjectsByCompany(
+      //   company.id
+      // );
 
-      if (!totalProjects.success) {
-        return totalProjects;
-      }
+      // if (!totalProjects.success) {
+      //   return totalProjects;
+      // }
 
-      const total = totalProjects.payload as Number;
+      // const total = totalProjects.payload as Number;
 
-      const rolResponse = await rolValidation.findByName("ADMIN");
-      const rol = rolResponse.payload as Rol;
+      // const rolResponse = await rolValidation.findByName("ADMIN");
+      // const rol = rolResponse.payload as Rol;
 
-      if (
-        userResponse.rol_id != rol.id &&
-        total === userResponse.limite_proyecto
-      ) {
-        return httpResponse.BadRequestException(
-          "Alcanzó el límite de proyectos la empresa"
-        );
-      }
+      // if (
+      //   userResponse.rol_id != rol.id &&
+      //   total === userResponse.limite_proyecto
+      // ) {
+      //   return httpResponse.BadRequestException(
+      //     "Alcanzó el límite de proyectos la empresa"
+      //   );
+      // }
 
-      const lastProject = await projectValidation.codeMoreHigh(company.id);
-      const lastProjectResponse = lastProject.payload as Proyecto;
+      // const lastProject = await projectValidation.codeMoreHigh(company.id);
+      // const lastProjectResponse = lastProject.payload as Proyecto;
 
-      // Incrementar el código en 1
-      const nextCodigo =
-        (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
+      // // Incrementar el código en 1
+      // const nextCodigo =
+      //   (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
 
-      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+      // const formattedCodigo = nextCodigo.toString().padStart(3, "0");
 
-      const fecha_creacion = converToDate(data.fecha_inicio);
-      const fecha_fin = converToDate(data.fecha_fin);
-      let proyectFormat: any = {};
-      proyectFormat = {
-        ...data,
-        codigo_proyecto: formattedCodigo,
-        estado: E_Proyecto_Estado.CREADO,
-        costo_proyecto: Number(data.costo_proyecto),
-        fecha_inicio: fecha_creacion,
-        fecha_fin,
-        empresa_id: company.id,
-      };
-      const project = await prismaProyectoRepository.createProject(
-        proyectFormat
-      );
-      const projectMapper = new ProjectResponseMapper(project);
+      // const fecha_creacion = converToDate(data.fecha_inicio);
+      // const fecha_fin = converToDate(data.fecha_fin);
+      // let proyectFormat: any = {};
+      // proyectFormat = {
+      //   ...data,
+      //   codigo_proyecto: formattedCodigo,
+      //   estado: E_Proyecto_Estado.CREADO,
+      //   costo_proyecto: Number(data.costo_proyecto),
+      //   fecha_inicio: fecha_creacion,
+      //   fecha_fin,
+      //   empresa_id: company.id,
+      // };
+      // const project = await prismaProyectoRepository.createProject(
+      //   proyectFormat
+      // );
+      // const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",
-        projectMapper
+        "projectMapper"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -349,7 +350,7 @@ class ProjectService {
           color_linea: data.color_linea,
           color_detalle: data.color_detalle,
           color_menu: data.color_menu,
-          color_submenu: data.color_primario,
+          color_submenu: data.color_submenu,
         };
         const result = await prismaProyectoRepository.updateColorsProject(
           project_id,

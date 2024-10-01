@@ -7,16 +7,20 @@ class WeekService {
     try {
       let currentStartDate = new Date(year, 0, 1); // Año, mes (0 es enero), día (1)
       let weekNumber = 1;
-
+      let week;
       for (let i = 0; i < 104; i++) {
         let currentYear = currentStartDate.getFullYear();
         // Calcula el fin de la semana (6 días después del inicio)
         const currentEndDate = this.addDays(currentStartDate, 6);
-        let month = (currentStartDate.getMonth() + 1)
-          .toString()
-          .padStart(2, "0");
+        // let month = (currentStartDate.getMonth() + 1)
+        //   .toString()
+        //   .padStart(2, "0");
+        if (weekNumber > 52) {
+          weekNumber = 0;
+        }
+        week = weekNumber.toString().padStart(2, "0");
         const result = await prismaWeekRepository.createUnit(
-          String(currentYear) + "." + month,
+          String(currentYear) + "." + week,
           currentStartDate,
           currentEndDate
         );

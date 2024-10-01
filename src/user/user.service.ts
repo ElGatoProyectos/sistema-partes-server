@@ -530,10 +530,11 @@ class UserService {
       const company = resultCompanyFindByUser.payload as Empresa;
 
       const usersToCompany =
-        await detailUserCompanyValidation.findUserByCompany(company.id);
-      if (!usersToCompany.success) {
-        return usersToCompany;
-      }
+        await detailUserCompanyValidation.totalUserByCompany(company.id);
+      //[NOTE] COMENTE ESTO XQ SI NO TENES EMPRESA EN DETALLE TE LARGA ERROR X EJEMPLO SI LO CREABA EL ADMIN TE LARGARIA ERROR
+      // if (!usersToCompany.success) {
+      //   return usersToCompany;
+      // }
       const totalUsersCompany = usersToCompany.payload as Number;
 
       if (totalUsersCompany === userResponse.limite_usuarios) {
@@ -552,7 +553,7 @@ class UserService {
           `El usuario con el dni ${data.dni} ya existe`
         );
 
-      const rolResponse = await rolValidation.findById(data.rol_id);
+      const rolResponse = await rolValidation.findByName("NO_ASIGNADO");
       if (!rolResponse.success) {
         return rolResponse;
       }

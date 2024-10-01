@@ -88,6 +88,11 @@ class SeedService {
         descripcion: "Es el asistente de almacen",
         rol: "ASISTENTE_ALMACEN",
       };
+      const rol_no_asignado = {
+        nombre_secundario: "NO_ASIGNADO",
+        descripcion: "No tiene rol asignado",
+        rol: "NO_ASIGNADO",
+      };
       const user = {
         email: "ale@gmail.com",
         dni: "12345678",
@@ -221,6 +226,7 @@ class SeedService {
       await rolValidation.createRol(rol_asistente_ssomma as I_CreateRolBody);
       await rolValidation.createRol(rol_logistica as I_CreateRolBody);
       await rolValidation.createRol(rol_asistente_almacen as I_CreateRolBody);
+      await rolValidation.createRol(rol_no_asignado as I_CreateRolBody);
 
       await userValidation.createUserAsAdmin(user as I_CreateUserBD);
 

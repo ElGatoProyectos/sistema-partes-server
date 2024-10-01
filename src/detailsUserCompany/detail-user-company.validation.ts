@@ -23,7 +23,28 @@ class DetailUserCompanyValidation {
       );
     }
   }
-  async findUserByCompany(company_id: number): Promise<T_HttpResponse> {
+  async findByIdUser(user_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDetailUserCompanyRepository.findByIdUser(
+        user_id
+      );
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "Detalle Usuario-Empresa de la empresa proporcionada no encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Detalle Usuario-Empresa encontrado de la empresa proporcionada",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Detalle Usuario-Empresa ",
+        error
+      );
+    }
+  }
+  async totalUserByCompany(company_id: number): Promise<T_HttpResponse> {
     try {
       const countUsersByCompany =
         await prismaDetailUserCompanyRepository.countUsersForCompany(

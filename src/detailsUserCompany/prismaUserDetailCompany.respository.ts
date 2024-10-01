@@ -3,6 +3,14 @@ import { CompanyRepository } from "./detail-user-company.repository";
 import { DetalleUsuarioEmpresa } from "@prisma/client";
 
 class PrismaDetailUserCompanyRepository implements CompanyRepository {
+  async findByIdUser(user_id: number): Promise<DetalleUsuarioEmpresa | null> {
+    const detail = await prisma.detalleUsuarioEmpresa.findFirst({
+      where: {
+        usuario_id: user_id,
+      },
+    });
+    return detail;
+  }
   async countUsersForCompany(company_id: number): Promise<Number> {
     const usersCompany = await prisma.detalleUsuarioEmpresa.count({
       where: {
