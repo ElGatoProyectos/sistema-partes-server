@@ -83,7 +83,13 @@ class PrismaProjectRepository implements ProjectRepository {
     skip: number
   ): Promise<{ projects: I_Project[]; total: number }> {
     let filters: any = {};
-    if (data.queryParams.state) {
+    // if (data.queryParams.state) {
+    //   filters.estado = data.queryParams.state.toUpperCase();
+    // }
+    if (
+      data.queryParams.state &&
+      data.queryParams.state.toUpperCase() !== "TODOS"
+    ) {
       filters.estado = data.queryParams.state.toUpperCase();
     }
     if (data.queryParams.name) {

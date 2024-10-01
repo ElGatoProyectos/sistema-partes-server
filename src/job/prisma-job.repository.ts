@@ -2,6 +2,9 @@ import { E_Estado_BD, Trabajo } from "@prisma/client";
 import { JobRepository } from "./job.repository";
 import { I_CreateJobBD, I_Job, I_UpdateJobBody } from "./models/job.interface";
 import prisma from "@/config/prisma.config";
+import { T_FindAllTrain } from "@/train/models/train.types";
+import { T_FindAllJob } from "./models/job.types";
+import { converToDate } from "@/common/utils/date";
 
 class PrismaJobRepository implements JobRepository {
   async createJob(data: I_CreateJobBD): Promise<Trabajo> {
@@ -57,24 +60,45 @@ class PrismaJobRepository implements JobRepository {
   }
   async findAll(
     skip: number,
-    limit: number,
+    data: T_FindAllJob,
     project_id: number
   ): Promise<{ jobs: I_Job[]; total: number }> {
     let filters: any = {};
+    let fecha_inicio;
+    let fecha_finalizacion;
+    if (data.queryParams.name) {
+      filters.nombre = {
+        contains: data.queryParams.name,
+      };
+    }
+    if (data.queryParams.fecha_inicio) {
+      fecha_inicio = converToDate(data.queryParams.fecha_inicio);
+      filters.fecha_inicio = {
+        gte: fecha_inicio,
+      };
+    }
+    if (data.queryParams.fecha_finalizacion) {
+      fecha_finalizacion = converToDate(data.queryParams.fecha_finalizacion);
+      filters.fecha_finalizacion = {
+        gte: fecha_finalizacion,
+      };
+    }
     const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
       prisma.trabajo.findMany({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },
         skip,
-        take: limit,
+        take: data.queryParams.limit,
         omit: {
           eliminado: true,
         },
       }),
       prisma.trabajo.count({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },

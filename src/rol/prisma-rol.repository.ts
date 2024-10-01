@@ -4,6 +4,15 @@ import { RolRepository } from "./rol.repository";
 import { E_Estado_BD, Rol } from "@prisma/client";
 
 class PrismaRolRepository implements RolRepository {
+  async findByName(name: string): Promise<Rol | null> {
+    const rol = await prisma.rol.findFirst({
+      where: {
+        rol: name,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return rol;
+  }
   async existsName(name: string): Promise<Rol | null> {
     const rolResponse = await prisma.rol.findFirst({
       where: {

@@ -5,6 +5,8 @@ export abstract class RolRepository {
 
   findById(idRol: number): void {}
 
+  findByName(name: string): void {}
+
   createRol(data: I_CreateRolBD): void {}
 
   existsName(name: String): void {}

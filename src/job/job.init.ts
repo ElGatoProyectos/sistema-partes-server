@@ -13,6 +13,12 @@ jobRouter.post(
   authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   jobController.create
 );
+jobRouter.get(
+  `${prefix}`,
+  jobMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  jobController.allJobs
+);
 
 jobRouter.delete(
   `${prefix}/:id`,

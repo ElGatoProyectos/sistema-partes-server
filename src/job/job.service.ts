@@ -9,6 +9,7 @@ import { I_CreateJobBody } from "./models/job.interface";
 import { prismaJobRepository } from "./prisma-job.repository";
 import { jwtService } from "@/auth/jwt.service";
 import { projectValidation } from "@/project/project.validation";
+import { T_FindAllJob } from "./models/job.types";
 
 class JobService {
   async createJob(
@@ -95,6 +96,39 @@ class JobService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar el Trabajo",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAll(data: T_FindAllJob, project_id: number) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaJobRepository.findAll(skip, data, +project_id);
+
+      const { jobs, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: jobs,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Trabajos",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todas los Trabajos",
         error
       );
     } finally {

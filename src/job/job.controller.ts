@@ -4,6 +4,7 @@ import multer from "multer";
 import { I_CreateJobBody } from "./models/job.interface";
 import { jobService } from "./job.service";
 import { httpResponse } from "@/common/http.response";
+import { T_FindAllJob } from "./models/job.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -87,19 +88,25 @@ class JobController {
   //   response.status(result.statusCode).json(result);
   // }
 
-  // async allTrains(request: express.Request, response: express.Response) {
-  //   const page = parseInt(request.query.page as string) || 1;
-  //   const limit = parseInt(request.query.limit as string) || 20;
-  //   const project_id = Number(request.params.project_id);
-  //   let paginationOptions: T_FindAll = {
-  //     queryParams: {
-  //       page: page,
-  //       limit: limit,
-  //     },
-  //   };
-  //   const result = await trainService.findAll(paginationOptions, project_id);
-  //   response.status(result.statusCode).json(result);
-  // }
+  async allJobs(request: express.Request, response: express.Response) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const name = request.query.name as string;
+    const fecha_inicio = request.query.fecha_inicio as string;
+    const fecha_finalizacion = request.query.fecha_finalizacion as string;
+    const project_id = request.get("project-id") as string;
+    let paginationOptions: T_FindAllJob = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        name: name,
+        fecha_inicio: fecha_inicio,
+        fecha_finalizacion: fecha_finalizacion,
+      },
+    };
+    const result = await jobService.findAll(paginationOptions, +project_id);
+    response.status(result.statusCode).json(result);
+  }
 
   // trainReadExcel = async (
   //   request: express.Request,

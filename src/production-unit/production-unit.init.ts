@@ -12,6 +12,10 @@ prouductionUnitRouter.post(
   authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   productionUnitController.productionUnitReadExcel
 );
+prouductionUnitRouter.post(
+  `${prefix}/upload-photo/:id`,
+  productionUnitController.uploadImageForProject
+);
 prouductionUnitRouter.get(
   `${prefix}`,
   authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,

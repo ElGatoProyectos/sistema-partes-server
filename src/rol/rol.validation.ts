@@ -18,6 +18,21 @@ class RolValidation {
       );
     }
   }
+  async findByName(name: string): Promise<T_HttpResponse> {
+    try {
+      const rol = await prismaRolRepository.findByName(name);
+      if (!rol)
+        return httpResponse.NotFoundException(
+          "No se encontró el rol con el nombre que desea buscar"
+        );
+      return httpResponse.SuccessResponse("Rol encontrado con éxito", rol);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar rol",
+        error
+      );
+    }
+  }
   async createRol(data: I_CreateRolBD): Promise<T_HttpResponse> {
     try {
       const rol = await prismaRolRepository.createRol(data);
