@@ -150,12 +150,12 @@ class PrismaProjectRepository implements ProjectRepository {
     return projectUpdate;
   }
   async updateProject(
-    dataa: I_UpdateProjectBD,
+    dataProject: I_UpdateProjectBD,
     idProject: number
   ): Promise<Proyecto> {
     const updatedData: I_CreateProjectBD = {
-      ...dataa,
-      costo_proyecto: Number(dataa.costo_proyecto),
+      ...dataProject,
+      costo_proyecto: Number(dataProject.costo_proyecto),
     };
 
     const project = await prisma.proyecto.update({
