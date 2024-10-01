@@ -1,3 +1,4 @@
+import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { jwtService } from "./jwt.service";
 import { bcryptService } from "@/auth/bcrypt.service";
@@ -5,8 +6,16 @@ import prisma from "@/config/prisma.config";
 import LoginResponseMapper from "./mappers/login.mapper";
 import { T_ResponseToken } from "./models/auth.type";
 import { rolService } from "@/rol/rol.service";
-import { E_Estado_BD, Rol, Usuario } from "@prisma/client";
+import {
+  DetalleUsuarioEmpresa,
+  E_Estado_BD,
+  Empresa,
+  Rol,
+  Usuario,
+} from "@prisma/client";
 import { authValidation } from "./auth.validation";
+import { companyValidation } from "@/company/company.validation";
+import { rolValidation } from "@/rol/rol.validation";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -104,10 +113,44 @@ class AuthService {
       const permisos = await authValidation.findRolPermisssion(
         userResponse.rol_id
       );
-      let formatUser = {
+
+      const rolResponseUser = await rolValidation.findByName("USER");
+      const rolResponseAdmin = await rolValidation.findByName("ADMIN");
+      if (!rolResponseUser.success) {
+        return rolResponseUser;
+      }
+      if (!rolResponseAdmin.success) {
+        return rolResponseAdmin;
+      }
+      let companyResponse: any = {};
+      let formatUser: any = {};
+      formatUser = {
         usuario: userResponse,
         permisos: permisos.payload,
       };
+      const rolUser = rolResponseUser.payload as Rol;
+      const rolAdmin = rolResponseAdmin.payload as Rol;
+      if (
+        userResponse.rol_id === rolUser.id ||
+        userResponse.rol_id === rolAdmin.id
+      ) {
+        companyResponse = await companyValidation.findByIdUser(userResponse.id);
+        if (!companyResponse.success) {
+          return companyResponse;
+        }
+        formatUser.empresa = companyResponse.payload;
+      } else {
+        companyResponse = await detailUserCompanyValidation.findByIdUser(
+          userResponse.id
+        );
+        if (!companyResponse.success) {
+          return companyResponse;
+        }
+        const detail = companyResponse.payload as DetalleUsuarioEmpresa;
+        const companyFind = await companyValidation.findById(detail.empresa_id);
+        formatUser.empresa = companyFind.payload;
+      }
+
       return httpResponse.SuccessResponse(
         "Éxito en la autenticación",
         formatUser

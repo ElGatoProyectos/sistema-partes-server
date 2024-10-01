@@ -19,7 +19,7 @@ class AuthController {
       }
     } else {
       const result = httpResponse.UnauthorizedException(
-        "Error en la autenticacion al crear el usuario"
+        "Error en la autenticacion"
       );
       response.status(result.statusCode).json(result);
     }

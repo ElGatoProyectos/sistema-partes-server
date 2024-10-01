@@ -3,5 +3,7 @@ export abstract class CompanyRepository {
 
   findByIdCompany(company_id: number): void {}
 
+  findByIdUser(user_id: number): void {}
+
   countUsersForCompany(company_id: number): void {}
 }
