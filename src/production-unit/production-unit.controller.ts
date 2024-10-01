@@ -7,14 +7,18 @@ import sharp from "sharp";
 import fs from "fs/promises";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { authService } from "@/auth/auth.service";
-import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
+import {
+  ProductionUnitMulterFileProject,
+  ProductionUnitMulterProperties,
+} from "./models/production-unit.constant";
 import { prouductionUnitDto } from "./dto/production-unit.dto";
 import { productionUnitService } from "./production-unit.service";
-import { UnidadProduccion } from "@prisma/client";
+import { Proyecto, UnidadProduccion } from "@prisma/client";
 import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
 import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
 import validator from "validator";
 import { T_FindAllUp } from "./models/up.types";
+import { projectValidation } from "@/project/project.validation";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -178,6 +182,92 @@ class ProductionUnitController {
           } catch (error) {
             const customError = httpResponse.BadRequestException(
               "Error al validar los campos ",
+              error
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    );
+  };
+
+  uploadImageForProject = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    upload.single(ProductionUnitMulterFileProject.field)(
+      request,
+      response,
+      async (error: any) => {
+        if (error) {
+          const customError = httpResponse.BadRequestException(
+            "Error al procesar la imagen de la Unidad de Producción",
+            error
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          try {
+            const responseValidate =
+              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
+                request.get("Authorization") as string
+              );
+            const project_id = request.params.id;
+            if (!responseValidate?.success) {
+              return response.status(401).json(responseValidate);
+            } else {
+              if (!validator.isNumeric(project_id)) {
+                const customError = httpResponse.BadRequestException(
+                  "El id del projecto debe ser numérico",
+                  error
+                );
+                response.status(customError.statusCode).json(customError);
+              } else {
+                const result = await projectValidation.findById(+project_id);
+                if (!result.success) {
+                  response.status(result.statusCode).json(result);
+                } else {
+                  const project = result.payload as Proyecto;
+                  if (request.file) {
+                    const id = project.id;
+                    const direction = path.join(
+                      appRootPath.path,
+                      "static",
+                      ProductionUnitMulterFileProject.folder
+                    );
+                    const ext = ".png";
+                    const fileName = `${"Project"}_${id}${ext}`;
+                    const filePath = path.join(direction, fileName);
+                    sharp(request.file.buffer)
+                      .resize({ width: 800 })
+                      .toFormat("png")
+                      .toFile(filePath, (err) => {
+                        if (err) {
+                          const customError = httpResponse.BadRequestException(
+                            "Error al guardar la imagen de la Sectorización del proyecto",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        } else {
+                          const customError = httpResponse.SuccessResponse(
+                            "Imagen de la sectorización guardada correctamente",
+                            err
+                          );
+                          response
+                            .status(customError.statusCode)
+                            .json(customError);
+                        }
+                      });
+                  } else {
+                    response.status(result.statusCode).json(result);
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            const customError = httpResponse.BadRequestException(
+              "Error al validar los campos para guardar la imagen de la Sectorización del Proyecto",
               error
             );
             response.status(customError.statusCode).json(customError);

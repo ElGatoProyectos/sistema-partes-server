@@ -4,22 +4,26 @@ import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
   I_CreateCompanyBody,
   I_UpdateColorsProject,
-  I_UpdateProjectState,
   I_UpdateProyectBody,
 } from "./models/project.interface";
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "./models/project.constant";
 import fs from "fs/promises";
 import { converToDate } from "@/common/utils/date";
-import { T_FindAll } from "@/common/models/pagination.types";
 import validator from "validator";
 import { ProjectResponseMapper } from "./mapper/project.mapper";
 import { companyValidation } from "@/company/company.validation";
-import { userValidation } from "@/user/user.validation";
 import { projectValidation } from "./project.validation";
 import { jwtService } from "@/auth/jwt.service";
-import { E_Proyecto_Estado, Empresa, Proyecto, Usuario } from "@prisma/client";
+import {
+  E_Proyecto_Estado,
+  Empresa,
+  Proyecto,
+  Rol,
+  Usuario,
+} from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
+import { rolValidation } from "@/rol/rol.validation";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -62,7 +66,13 @@ class ProjectService {
 
       const total = totalProjects.payload as Number;
 
-      if (total === userResponse.limite_proyecto) {
+      const rolResponse = await rolValidation.findByName("ADMIN");
+      const rol = rolResponse.payload as Rol;
+
+      if (
+        userResponse.rol_id != rol.id &&
+        total === userResponse.limite_proyecto
+      ) {
         return httpResponse.BadRequestException(
           "Alcanzó el límite de proyectos la empresa"
         );

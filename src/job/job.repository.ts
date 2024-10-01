@@ -1,7 +1,8 @@
+import { T_FindAllTrain } from "@/train/models/train.types";
 import { I_CreateJobBD, I_UpdateJobBody } from "./models/job.interface";
 
 export abstract class JobRepository {
-  findAll(skip: number, limit: number, project_id: number): void {}
+  findAll(skip: number, data: T_FindAllTrain, project_id: number): void {}
 
   findByCode(code: string, project_id: number): void {}
 
