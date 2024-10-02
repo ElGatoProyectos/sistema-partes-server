@@ -5,6 +5,7 @@ import {
   I_CreateUserAndCompanyUpdate,
   I_CreateUserBD,
   I_CreateUserBody,
+  I_UpdateUser,
   I_UpdateUserBD,
   I_UpdateUserBody,
   IAssignUserPermissions,
@@ -30,6 +31,9 @@ import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
 import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
 import { T_FindAllUser } from "./models/user.types";
+import { prismaDetailUserProjectRepository } from "./detailUserProject/prismaUserProject.repository";
+import { projectValidation } from "@/project/project.validation";
+import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
 
 class UserService {
   async findAll(data: T_FindAllUser, token: string): Promise<T_HttpResponse> {
@@ -632,6 +636,9 @@ class UserService {
       if (!responseRol) {
         return responseUser;
       }
+
+      const responseProject = await projectValidation.findById(data.project_id);
+      if (!responseProject.success) return responseProject;
       // const action = await actionValidation.findByName("LECTURA");
       const responseSection = await sectionValidation.findById(
         +data.section.id
@@ -724,8 +731,12 @@ class UserService {
     idUser: number
   ): Promise<T_HttpResponse> {
     try {
+      console.log("el id del usuario es " + idUser);
       const userResponse = await userValidation.findById(idUser);
-      if (!userResponse.success) return userResponse;
+      if (!userResponse.success) {
+        console.log("entro al no encontrado");
+        return userResponse;
+      }
       const userFind = userResponse.payload as Usuario;
 
       if (userFind.email != data.email) {
@@ -764,15 +775,8 @@ class UserService {
       if (!roleResponse.success) return roleResponse;
       const resultRole = roleResponse.payload as Rol;
       let hashContrasena;
-      let userFormat: I_UpdateUserBD = {
+      let userFormat: I_UpdateUser = {
         ...data,
-        limite_proyecto: data.limite_proyecto
-          ? Number(data.limite_proyecto)
-          : userFind.limite_proyecto,
-        limite_usuarios: data.limite_usuarios
-          ? Number(data.limite_usuarios)
-          : userFind.limite_usuarios,
-        rol_id: resultRole.id,
       };
 
       if (data.contrasena && data.contrasena !== "") {
@@ -816,19 +820,36 @@ class UserService {
     }
   }
 
-  async updateRolUser(idUser: number, idRol: number): Promise<T_HttpResponse> {
+  async updateRolUser(
+    usuario_id: number,
+    rol_id: number,
+    projecto_id: number
+  ): Promise<T_HttpResponse> {
     try {
-      const userResponse = await userValidation.findById(idUser);
+      const userResponse = await userValidation.findById(usuario_id);
       if (!userResponse.success) return userResponse;
-      const rolResponse = await rolValidation.findById(idRol);
+      const rolResponse = await rolValidation.findById(rol_id);
       if (!rolResponse.success) return rolResponse;
-      const result = await prismaUserRepository.updaterRolUser(idUser, idRol);
+      const projectResponse = await projectValidation.findById(projecto_id);
+      if (!projectResponse.success) return projectResponse;
+      const result = await prismaUserRepository.updaterRolUser(
+        usuario_id,
+        rol_id
+      );
+      const detailFormat = {
+        usuario_id: usuario_id,
+        projecto_id: projecto_id,
+      };
+      const detailUserProject =
+        await detailProjectValidation.createDetailUserProject(detailFormat);
+      if (!detailUserProject.success) return detailUserProject;
       const resultMapper = new UserResponseMapper(result);
       return httpResponse.SuccessResponse(
         "Se ha cambiado de rol correctamente",
         resultMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al cambiar de rol",
         error

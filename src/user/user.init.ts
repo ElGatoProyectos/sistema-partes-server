@@ -62,7 +62,8 @@ userRouter.put(
 userRouter.put(
   `${prefix}/rol`,
   userMiddleware.verifyFieldsUpdateRol,
-  authRoleMiddleware.authAdmin,
+  userMiddleware.verifyHeadersFieldsIdProjectHeader,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   userController.updateRol
 );
 
@@ -75,10 +76,10 @@ userRouter.put(
 );
 
 userRouter.patch(
-  `${prefix}/user/:id/rol/:rol_id/project/:project_id/permissions`,
+  `${prefix}/user/:id/rol/:rol_id/permissions`,
   userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyHeadersFieldsRolId,
-  userMiddleware.verifyHeadersFieldsProjectId,
+  userMiddleware.verifyHeadersFieldsIdProjectHeader,
   authRoleMiddleware.authAdminAndCostControl,
   userController.createPermissions
 );

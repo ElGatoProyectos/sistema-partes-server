@@ -3,5 +3,6 @@ export type T_FindAllTrain = {
     page: number;
     limit: number;
     name: string;
+    codigo: string;
   };
 };

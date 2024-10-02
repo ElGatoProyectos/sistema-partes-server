@@ -100,6 +100,11 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
         contains: data.queryParams.name,
       };
     }
+    if (data.queryParams.codigo) {
+      filters.codigo = {
+        contains: data.queryParams.codigo,
+      };
+    }
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({

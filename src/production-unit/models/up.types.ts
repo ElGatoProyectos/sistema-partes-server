@@ -3,5 +3,6 @@ export type T_FindAllUp = {
     page: number;
     limit: number;
     name: string;
+    codigo: string;
   };
 };

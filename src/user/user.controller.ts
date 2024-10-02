@@ -218,11 +218,12 @@ class UserController {
     const data = request.body as IAssignUserPermissionsRequest;
     const user_id = Number(request.params.id);
     const rol_id = Number(request.params.rol_id);
-    const project_id = Number(request.params.project_id);
+    // const project_id = Number(request.params.project_id);
+    const project_id = request.get("project-id") as string;
     let permissions: IAssignUserPermissions = {
       user_id: user_id,
       rol_id: rol_id,
-      project_id: project_id,
+      project_id: +project_id,
       section: data.section,
       actions: data.actions,
     };
@@ -236,7 +237,7 @@ class UserController {
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUserBody;
-    const idUser = Number(request.params.project_id);
+    const idUser = Number(request.params.id);
     const result = await userService.updateUser(data, idUser);
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -253,7 +254,12 @@ class UserController {
 
   async updateRol(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateRolUserBody;
-    const result = await userService.updateRolUser(data.idUser, data.idRol);
+    const project_id = request.get("project-id") as string;
+    const result = await userService.updateRolUser(
+      data.usuario_id,
+      data.rol_id,
+      +project_id
+    );
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {

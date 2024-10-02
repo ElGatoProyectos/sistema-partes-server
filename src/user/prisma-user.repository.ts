@@ -3,6 +3,7 @@ import prisma from "../config/prisma.config";
 import {
   I_CreateUserBD,
   I_Detalles,
+  I_UpdateUser,
   I_UpdateUserBD,
   I_User,
   IAssignUserPermissions,
@@ -158,7 +159,7 @@ class PrismaUserRepository implements UserRepository {
     });
     return userUpdate;
   }
-  async updateUser(data: I_UpdateUserBD, idUser: number): Promise<Usuario> {
+  async updateUser(data: I_UpdateUser, idUser: number): Promise<Usuario> {
     const user = await prisma.usuario.update({
       where: { id: idUser },
       data,
