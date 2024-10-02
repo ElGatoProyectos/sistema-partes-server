@@ -1,7 +1,7 @@
 import express from "@/config/express.config";
 
 import multer from "multer";
-import { I_CreateJobBody } from "./models/job.interface";
+import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";
 import { jobService } from "./job.service";
 import { httpResponse } from "@/common/http.response";
 import { T_FindAllJob } from "./models/job.types";
@@ -14,36 +14,25 @@ class JobController {
     const data = request.body as I_CreateJobBody;
     const tokenWithBearer = request.headers.authorization;
     const project_id = request.get("project-id") as string;
-    if (tokenWithBearer) {
-      const result = await jobService.createJob(
-        data,
-        tokenWithBearer,
-        project_id
-      );
-      if (!result.success) {
-        response.status(result.statusCode).json(result);
-      } else {
-        response.status(result.statusCode).json(result);
-      }
+    const result = await jobService.createJob(data, project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
     } else {
-      const result = httpResponse.UnauthorizedException(
-        "Error en la autenticacion al crear la unidad"
-      );
       response.status(result.statusCode).json(result);
     }
   }
 
-  // async update(request: express.Request, response: express.Response) {
-  //   const data = request.body as I_UpdateTrainBody;
-  //   const train_id = Number(request.params.id);
-  //   const project_id = Number(request.params.project_id);
-  //   const result = await trainService.updateTrain(data, train_id, project_id);
-  //   if (!result.success) {
-  //     response.status(result.statusCode).json(result);
-  //   } else {
-  //     response.status(result.statusCode).json(result);
-  //   }
-  // }
+  async update(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateJobBody;
+    const job_id = Number(request.params.id);
+    const project_id = request.get("project-id") as string;
+    const result = await jobService.updateJob(data, job_id, +project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
 
   // async updateCuadrilla(request: express.Request, response: express.Response) {
   //   const train_id = Number(request.params.id);
@@ -68,29 +57,10 @@ class JobController {
     response.status(result.statusCode).json(result);
   }
 
-  // async findByName(request: express.Request, response: express.Response) {
-  //   const page = parseInt(request.query.page as string) || 1;
-  //   const limit = parseInt(request.query.limit as string) || 20;
-  //   const project_id = Number(request.params.project_id);
-  //   let paginationOptions: T_FindAll = {
-  //     queryParams: {
-  //       page: page,
-  //       limit: limit,
-  //     },
-  //   };
-  //   //si buscaba como request.body no me llegaba bien para luego buscar
-  //   const name = request.query.name as string;
-  //   const result = await trainService.findByName(
-  //     name,
-  //     paginationOptions,
-  //     project_id
-  //   );
-  //   response.status(result.statusCode).json(result);
-  // }
-
   async allJobs(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const codigo = request.query.codigo as string;
     const name = request.query.name as string;
     const fecha_inicio = request.query.fecha_inicio as string;
     const fecha_finalizacion = request.query.fecha_finalizacion as string;
@@ -100,6 +70,7 @@ class JobController {
         page: page,
         limit: limit,
         name: name,
+        codigo: codigo,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
       },

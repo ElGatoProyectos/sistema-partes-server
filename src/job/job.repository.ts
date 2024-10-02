@@ -1,5 +1,4 @@
-import { T_FindAllTrain } from "@/train/models/train.types";
-import { I_CreateJobBD, I_UpdateJobBody } from "./models/job.interface";
+import { I_CreateJobBD, I_UpdateJobBD } from "./models/job.interface";
 import { T_FindAllJob } from "./models/job.types";
 
 export abstract class JobRepository {
@@ -13,7 +12,7 @@ export abstract class JobRepository {
 
   existsName(name: string, project_id: number): void {}
 
-  updateJob(data: I_UpdateJobBody, job_id: number): void {}
+  updateJob(data: I_UpdateJobBD, job_id: number): void {}
 
   updateStatusJob(idUser: number): void {}
 

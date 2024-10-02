@@ -4,7 +4,6 @@ import {
   I_CreateUserBD,
   I_Detalles,
   I_UpdateUser,
-  I_UpdateUserBD,
   I_User,
   IAssignUserPermissions,
 } from "./models/user.interface";
@@ -12,21 +11,32 @@ import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
 import { companyValidation } from "@/company/company.validation";
 import { I_Empresa } from "@/company/models/company.interface";
+import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {
   async getUsersForCompany(
     skip: number,
-    limit: number,
-    name: string,
+    data: T_FindAllUser,
+    rol: Rol,
     company_id: number
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
     let users: any = [];
     let total: any;
-    if (name) {
+    if (data.queryParams.name) {
       filters.nombre_completo = {
-        contains: name,
+        contains: data.queryParams.name,
       };
+    }
+    if (data.queryParams.estado) {
+      if (data.queryParams.estado === "y") {
+        filters.estado = E_Estado_BD.y;
+      } else {
+        filters.estado = E_Estado_BD.n;
+      }
+    }
+    if (rol) {
+      filters.rol_id = rol.id;
     }
     [users, total] = await prisma.$transaction([
       prisma.detalleUsuarioEmpresa.findMany({
@@ -45,11 +55,14 @@ class PrismaUserRepository implements UserRepository {
           Empresa: true,
         },
         skip,
-        take: limit,
+        take: data.queryParams.limit,
       }),
       prisma.detalleUsuarioEmpresa.count({
         where: {
           empresa_id: company_id,
+          Usuario: {
+            ...filters,
+          },
         },
       }),
     ]);

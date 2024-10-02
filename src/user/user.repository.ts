@@ -1,10 +1,11 @@
-import { Usuario } from "@prisma/client";
+import { Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserBD,
   I_UpdateUser,
   I_UpdateUserBD,
   IAssignUserPermissions,
 } from "./models/user.interface";
+import { T_FindAllUser } from "./models/user.types";
 
 export abstract class UserRepository {
   findAll(skip: number, limit: number, filters: string, user: Usuario): void {}
@@ -21,8 +22,8 @@ export abstract class UserRepository {
 
   getUsersForCompany(
     skip: number,
-    limit: number,
-    name: string,
+    data: T_FindAllUser,
+    rol: Rol,
     user_id: number
   ): void {}
 

@@ -3,7 +3,6 @@ import {
   I_Project,
   I_CreateProjectBD,
   I_UpdateProjectBD,
-  I_UpdateProjectState,
   I_UpdateColorsProject,
 } from "./models/project.interface";
 import { ProjectRepository } from "./project.repository";

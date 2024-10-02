@@ -4,17 +4,18 @@ import { trainValidation } from "@/train/train.validation";
 import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
 import { converToDate } from "@/common/utils/date";
 import { jobValidation } from "./job.validation";
-import { Trabajo, Tren, UnidadProduccion, Usuario } from "@prisma/client";
-import { I_CreateJobBody } from "./models/job.interface";
+import { Trabajo, Usuario } from "@prisma/client";
+import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";
 import { prismaJobRepository } from "./prisma-job.repository";
 import { jwtService } from "@/auth/jwt.service";
 import { projectValidation } from "@/project/project.validation";
 import { T_FindAllJob } from "./models/job.types";
+import { JobResponseMapper } from "./mappers/job.mapper";
+import { userValidation } from "@/user/user.validation";
 
 class JobService {
   async createJob(
     data: I_CreateJobBody,
-    token: string,
     project_id: string
   ): Promise<T_HttpResponse> {
     try {
@@ -37,10 +38,9 @@ class JobService {
       const lastJob = await jobValidation.codeMoreHigh(+project_id);
       const lastJobResponse = lastJob.payload as Trabajo;
 
-      const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse) return userTokenResponse;
-      const userResponse = userTokenResponse.payload as Usuario;
-
+      const userResponse = await userValidation.findById(data.usuario_id);
+      if (!userResponse.success) return userResponse;
+      const user = userResponse.payload as Usuario;
       // Incrementar el código en 1
       const nextCodigo = (parseInt(lastJobResponse?.codigo) || 0) + 1;
 
@@ -65,7 +65,7 @@ class JobService {
         up_id: data.up_id,
         tren_id: data.tren_id,
         proyecto_id: +project_id,
-        usuario_id: userResponse.id,
+        usuario_id: user.id,
       };
       const jobResponse = await prismaJobRepository.createJob(jobFormat);
       return httpResponse.CreatedResponse(
@@ -147,6 +147,66 @@ class JobService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar el Trabajo",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateJob(
+    data: I_UpdateJobBody,
+    job_id: number,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const resultIdJob = await jobValidation.findById(job_id);
+      if (!resultIdJob.success) {
+        return httpResponse.BadRequestException(
+          "No se pudo encontrar el id del Trabajo que se quiere editar"
+        );
+      }
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede actualizar el Trabajo con el id del proyecto proporcionado"
+        );
+      }
+      const resultJobFind = resultIdJob.payload as Trabajo;
+      if (resultJobFind.nombre != data.nombre) {
+        const resultTrain = await trainValidation.findByName(
+          data.nombre,
+          +project_id
+        );
+        if (!resultTrain.success) {
+          return resultTrain;
+        }
+      }
+      const trainResponse = await trainValidation.findById(data.tren_id);
+      if (!trainResponse.success) return trainResponse;
+
+      const upResponse = await productionUnitValidation.findById(data.up_id);
+      if (!upResponse.success) return upResponse;
+      const fecha_inicio = converToDate(data.fecha_inicio);
+      const fecha_finalizacion = converToDate(data.fecha_finalizacion);
+      const trainFormat = {
+        ...data,
+        fecha_inicio: fecha_inicio,
+        fecha_finalizacion: fecha_finalizacion,
+        proyecto_id: +project_id,
+      };
+      const responseJob = await prismaJobRepository.updateJob(
+        trainFormat,
+        project_id
+      );
+      const jobMapper = new JobResponseMapper(responseJob);
+      return httpResponse.SuccessResponse(
+        "Trabajo modificado correctamente",
+        jobMapper
+      );
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar el Trabajo",
         error
       );
     } finally {

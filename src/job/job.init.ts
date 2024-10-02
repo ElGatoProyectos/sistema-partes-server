@@ -34,4 +34,12 @@ jobRouter.get(
   jobController.findById
 );
 
+jobRouter.put(
+  `${prefix}/:id`,
+  jobMiddleware.verifyHeadersFieldsId,
+  jobMiddleware.verifyFieldsUpdate,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  jobController.update
+);
+
 export default jobRouter;
