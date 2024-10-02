@@ -62,11 +62,11 @@ class JobController {
     response.status(result.statusCode).json(result);
   }
 
-  // async findByIdTrain(request: express.Request, response: express.Response) {
-  //   const idTrain = Number(request.params.id);
-  //   const result = await trainService.findById(idTrain);
-  //   response.status(result.statusCode).json(result);
-  // }
+  async findById(request: express.Request, response: express.Response) {
+    const job_id = Number(request.params.id);
+    const result = await jobService.findById(job_id);
+    response.status(result.statusCode).json(result);
+  }
 
   // async findByName(request: express.Request, response: express.Response) {
   //   const page = parseInt(request.query.page as string) || 1;

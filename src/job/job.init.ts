@@ -27,4 +27,11 @@ jobRouter.delete(
   jobController.updateStatus
 );
 
+jobRouter.get(
+  `${prefix}/:id`,
+  jobMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  jobController.findById
+);
+
 export default jobRouter;

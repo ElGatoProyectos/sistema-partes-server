@@ -71,7 +71,7 @@ userRouter.put(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   userController.update
 );
 
