@@ -841,14 +841,6 @@ class UserService {
       if (!projectResponse.success) return projectResponse;
       const project = projectResponse.payload as Proyecto;
 
-      const userExistInDetailProject =
-        await detailProjectValidation.findByIdUser(user.id, project.id);
-
-      if (userExistInDetailProject.success) {
-        return httpResponse.BadRequestException(
-          "El usuario ya tiene asignado un proyecto"
-        );
-      }
       const rolResponse = await rolValidation.findById(rol_id);
       if (!rolResponse.success) return rolResponse;
 
@@ -857,6 +849,14 @@ class UserService {
         rol_id
       );
       if (action === "CREACION") {
+        const userExistInDetailProject =
+          await detailProjectValidation.findByIdUser(user.id, project.id);
+
+        if (userExistInDetailProject.success) {
+          return httpResponse.BadRequestException(
+            "El usuario ya tiene asignado un proyecto"
+          );
+        }
         const detailFormat = {
           usuario_id: usuario_id,
           projecto_id: projecto_id,
