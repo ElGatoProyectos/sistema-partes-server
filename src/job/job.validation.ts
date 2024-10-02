@@ -1,19 +1,31 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaJobRepository } from "./prisma-job.repository";
+import { I_JobExcel } from "./models/job.interface";
 
 class JobValidation {
   // async updateTrain(
-  //   data: I_TrainExcel,
+  //   data: I_JobExcel,
   //   idProductionUnit: number,
   //   idProjectID: number
   // ): Promise<T_HttpResponse> {
   //   try {
+  //     const [dia, mes, anio] = data.INICIO.split("/").map(Number);
+  //     const [dia2, mes2, anio2] = data.FINALIZA.split("/").map(Number);
+  //     const fechaInicio = new Date(anio, mes - 1, dia);
+  //     const fechaFin = new Date(anio2, mes2 - 1, dia2);
   //     const train = {
-  //       codigo: String(data["ID-TREN"]),
-  //       nombre: data.TREN,
-  //       nota: data.NOTA,
-  //       cuadrilla: data.TREN + "-" + data["ID-TREN"],
-  //       proyecto_id: Number(idProjectID),
+  //       codigo: data["ID-TRABAJO"],
+  //       nombre: data.TRABAJOS,
+  //       tren_id: +data.TREN,
+  //       up_id: +data["UNIDAD-DE-PRODUCCION"],
+  //       fecha_inicio: fechaInicio,
+  //       fecha_finalizacion: fechaFin,
+  //       duracion: data.DURA,
+  //       costo_partida: data.;
+  //       costo_mano_obra:
+  //       costo_material:
+  //       costo_equipo:
+  //       costo_varios:
   //     };
   //     const responseTrain = await prismaTrainRepository.updateTrain(
   //       train,

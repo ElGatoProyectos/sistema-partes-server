@@ -207,7 +207,6 @@ class JobService {
         jobMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Trabajo",
         error

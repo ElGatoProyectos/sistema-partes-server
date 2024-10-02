@@ -75,7 +75,7 @@ class ProductionUnitService {
     const nextCodigo = (parseInt(lastProductionUnitResponse?.codigo) || 0) + 1;
 
     // Formatear el código con ceros a la izquierda
-    return nextCodigo.toString().padStart(4, "0");
+    return nextCodigo.toString().padStart(3, "0");
   }
 
   async updateProductionUnit(
@@ -430,7 +430,10 @@ class ProductionUnitService {
       let productionUnit;
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-          code = await productionUnitValidation.findByCode(String(item.CODIGO));
+          code = await productionUnitValidation.findByCode(
+            String(item.CODIGO),
+            responseProject.id
+          );
           if (!code.success) {
             productionUnit = code.payload as UnidadProduccion;
             await productionUnitValidation.updateProductionUnit(

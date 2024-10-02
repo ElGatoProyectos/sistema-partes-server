@@ -17,7 +17,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     let users: any = [];
     let total: any;
     if (data.queryParams.name) {
-      filters.nombre = {
+      filters.nombre_completo = {
         contains: data.queryParams.name,
       };
     }

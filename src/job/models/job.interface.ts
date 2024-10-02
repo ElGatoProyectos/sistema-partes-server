@@ -36,6 +36,24 @@ export interface I_UpdateJobBody
 
 export interface I_Job extends Omit<Trabajo, "eliminado"> {}
 
+export interface I_JobExcel {
+  "ID-TRABAJO": string;
+  TRABAJOS: string;
+  TREN: string;
+  "UNIDAD-DE-PRODUCCION": string;
+  INICIO: string;
+  DURA: string;
+  FINALIZA: string;
+  COSTO: string;
+  MAT: string;
+  MO: string;
+  EQ: string;
+  HE: string;
+}
+export interface I_ImportExcelRequestTrain {
+  idProject: string;
+}
+
 // export interface I_CreateJobBody2
 //   extends Omit<
 //     Trabajo,
@@ -75,14 +93,4 @@ export interface I_Job extends Omit<Trabajo, "eliminado"> {}
 //   up_id: number;
 //   proyecto_id: number;
 //   usuario_id: number;
-// }
-
-// export interface I_TrainExcel {
-//   //coloco asi el primero ya q sino me da error sin el -
-//   "ID-TREN": string;
-//   TREN: string;
-//   NOTA: string;
-// }
-// export interface I_ImportExcelRequestTrain {
-//   idProject: string;
 // }
