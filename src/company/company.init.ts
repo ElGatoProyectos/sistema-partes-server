@@ -23,14 +23,14 @@ companyRouter.get(
 companyRouter.get(
   `${prefix}/file/:id`,
   companyMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   companyController.findImage
 );
 
 companyRouter.get(
   `${prefix}/:id`,
   companyMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   companyController.findByIdCompany
 );
 

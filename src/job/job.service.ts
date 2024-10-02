@@ -135,6 +135,24 @@ class JobService {
       await prisma.$disconnect();
     }
   }
+  async findById(job_id: number): Promise<T_HttpResponse> {
+    try {
+      const jobResponse = await prismaJobRepository.findById(job_id);
+      if (!jobResponse) {
+        return httpResponse.NotFoundException(
+          "El id del Trabajo no fue no encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse("Trabajo encontrado", jobResponse);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Trabajo",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
 
 export const jobService = new JobService();
