@@ -319,12 +319,14 @@ class ProductionUnitController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const name = request.query.name as string;
+    const codigo = request.query.codigo as string;
     const project_id = request.get("project-id") as string;
     let paginationOptions: T_FindAllUp = {
       queryParams: {
         page: page,
         limit: limit,
         name: name,
+        codigo: codigo,
       },
     };
     const idCompany = request.params.id;

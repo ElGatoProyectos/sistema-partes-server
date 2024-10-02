@@ -5,6 +5,16 @@ export interface I_CreateUserBD
   extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
 export interface I_UpdateUserBD
   extends Omit<Usuario, "id" | "fecha_creacion"> {}
+export interface I_UpdateUser
+  extends Omit<
+    Usuario,
+    | "id"
+    | "fecha_creacion"
+    | "eliminado"
+    | "fecha_creacion"
+    | "limite_proyecto"
+    | "limite_usuarios"
+  > {}
 
 export interface I_CreateUserBody
   extends Omit<
@@ -82,8 +92,8 @@ export interface I_UpdateUserAndCompanyBody {
 }
 
 export interface I_UpdateRolUserBody {
-  idUser: number;
-  idRol: number;
+  usuario_id: number;
+  rol_id: number;
 }
 
 export interface IAssignUserPermissions {

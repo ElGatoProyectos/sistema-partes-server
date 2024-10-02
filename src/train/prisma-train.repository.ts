@@ -120,6 +120,11 @@ class PrismaTrainRepository implements TrainRepository {
         contains: data.queryParams.name,
       };
     }
+    if (data.queryParams.codigo) {
+      filters.codigo = {
+        contains: data.queryParams.codigo,
+      };
+    }
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
       prisma.tren.findMany({
         where: {
