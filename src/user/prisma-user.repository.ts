@@ -103,7 +103,7 @@ class PrismaUserRepository implements UserRepository {
     };
   }
 
-  async updaterRolUser(idUser: number, idRol: number): Promise<Usuario> {
+  async updateRolUser(idUser: number, idRol: number): Promise<Usuario> {
     const user = await prisma.usuario.update({
       where: {
         id: idUser,

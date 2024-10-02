@@ -8,4 +8,6 @@ export abstract class DetailUserProjectRepository {
     data: T_FindAllDetailUserProject,
     project_id: number
   ): void {}
+  deleteUserByDetail(detailUserProject: number): void {}
+  findByUser(user_id: number, project: number): void {}
 }

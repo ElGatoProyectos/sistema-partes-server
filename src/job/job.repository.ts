@@ -14,6 +14,8 @@ export abstract class JobRepository {
 
   updateJob(data: I_UpdateJobBD, job_id: number): void {}
 
+  updateJobFromExcel(data: I_UpdateJobBD, job_id: number): void {}
+
   updateStatusJob(idUser: number): void {}
 
   searchNameJob(

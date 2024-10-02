@@ -18,7 +18,7 @@ export abstract class UserRepository {
 
   updateStatusUser(user_id: number): void {}
 
-  updaterRolUser(user_id: number, rol_id: number): void {}
+  updateRolUser(user_id: number, rol_id: number): void {}
 
   getUsersForCompany(
     skip: number,

@@ -1,11 +1,26 @@
 import { E_Estado_BD, Trabajo } from "@prisma/client";
 import { JobRepository } from "./job.repository";
-import { I_CreateJobBD, I_Job, I_UpdateJobBD } from "./models/job.interface";
+import {
+  I_CreateJobBD,
+  I_Job,
+  I_UpdateJobBD,
+  I_UpdateJobBDValidationExcel,
+} from "./models/job.interface";
 import prisma from "@/config/prisma.config";
 import { T_FindAllJob } from "./models/job.types";
 import { converToDate } from "@/common/utils/date";
 
 class PrismaJobRepository implements JobRepository {
+  async updateJobFromExcel(
+    data: I_UpdateJobBDValidationExcel,
+    job_id: number
+  ): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: data,
+    });
+    return job;
+  }
   async createJob(data: I_CreateJobBD): Promise<Trabajo> {
     const job = await prisma.trabajo.create({
       data,

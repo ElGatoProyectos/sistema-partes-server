@@ -97,6 +97,7 @@ export interface I_UpdateUserAndCompanyBody {
 export interface I_UpdateRolUserBody {
   usuario_id: number;
   rol_id: number;
+  action: string;
 }
 
 export interface IAssignUserPermissions {
