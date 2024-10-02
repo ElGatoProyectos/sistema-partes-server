@@ -1,4 +1,4 @@
-import { E_Estado_BD, Usuario, Rol } from "@prisma/client";
+import { E_Estado_BD, Usuario, Rol, $Enums } from "@prisma/client";
 
 export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
   id: number;
@@ -6,6 +6,7 @@ export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
   dni: string;
   nombre_completo: string;
   telefono: string;
+  estado: E_Estado_BD | null;
   eliminado: E_Estado_BD;
   limite_proyecto: number;
   fecha_creacion: Date;
@@ -24,5 +25,6 @@ export class UserResponseMapper implements Omit<Usuario, "contrasena"> {
     this.fecha_creacion = user.fecha_creacion;
     this.rol_id = user.rol_id;
     this.limite_usuarios = user.limite_usuarios;
+    this.estado = user.estado;
   }
 }

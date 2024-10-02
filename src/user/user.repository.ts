@@ -1,6 +1,7 @@
-import { Accion, Seccion, Usuario } from "@prisma/client";
+import { Usuario } from "@prisma/client";
 import {
   I_CreateUserBD,
+  I_UpdateUser,
   I_UpdateUserBD,
   IAssignUserPermissions,
 } from "./models/user.interface";
@@ -12,7 +13,7 @@ export abstract class UserRepository {
 
   createUser(data: I_CreateUserBD): void {}
 
-  updateUser(data: I_UpdateUserBD, user_id: number): void {}
+  updateUser(data: I_UpdateUser, user_id: number): void {}
 
   updateStatusUser(user_id: number): void {}
 

@@ -8,7 +8,6 @@ export const userAndCompanyUpdateDto = z.object({
   contrasena: z.string().optional(),
   limite_proyecto: z.string(),
   limite_usuarios: z.string(),
-  eliminado: z.enum(["y", "n"]),
   nombre_empresa: z.string(),
   descripcion_empresa: z.string(),
   ruc: z.string(),

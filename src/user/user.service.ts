@@ -731,10 +731,8 @@ class UserService {
     idUser: number
   ): Promise<T_HttpResponse> {
     try {
-      console.log("el id del usuario es " + idUser);
       const userResponse = await userValidation.findById(idUser);
       if (!userResponse.success) {
-        console.log("entro al no encontrado");
         return userResponse;
       }
       const userFind = userResponse.payload as Usuario;

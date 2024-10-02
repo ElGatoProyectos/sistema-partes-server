@@ -2,9 +2,10 @@ import { I_Empresa } from "@/company/models/company.interface";
 import { Accion, E_Estado_BD, Empresa, Seccion, Usuario } from "@prisma/client";
 //defini esquemas de base de datos
 export interface I_CreateUserBD
-  extends Omit<Usuario, "id" | "eliminado" | "fecha_creacion"> {}
+  extends Omit<Usuario, "id" | "estado" | "eliminado" | "fecha_creacion"> {}
 export interface I_UpdateUserBD
-  extends Omit<Usuario, "id" | "fecha_creacion"> {}
+  extends Omit<Usuario, "id" | "estado" | "fecha_creacion"> {}
+//[note] Para este debe estar "estado"
 export interface I_UpdateUser
   extends Omit<
     Usuario,
@@ -15,11 +16,18 @@ export interface I_UpdateUser
     | "limite_proyecto"
     | "limite_usuarios"
   > {}
+//[note] Para este también debe estar "estado"
+export interface I_UpdateUserBody
+  extends Omit<Usuario, "id" | "limite_proyecto" | "limite_usuarios"> {
+  limite_proyecto: string;
+  limite_usuarios: string;
+}
 
 export interface I_CreateUserBody
   extends Omit<
     Usuario,
     | "id"
+    | "estado"
     | "eliminado"
     | "fecha_creacion"
     | "limite_proyecto"
@@ -29,13 +37,8 @@ export interface I_CreateUserBody
   limite_usuarios: string;
 }
 
-export interface I_UpdateUserBody
-  extends Omit<Usuario, "id" | "limite_proyecto" | "limite_usuarios"> {
-  limite_proyecto: string;
-  limite_usuarios: string;
-}
-
-export interface I_User extends Omit<Usuario, "contrasena" | "eliminado"> {}
+export interface I_User
+  extends Omit<Usuario, "contrasena" | "eliminado" | "estado"> {}
 export interface I_AllUsers {
   user: Usuario;
   rol: Rol;
