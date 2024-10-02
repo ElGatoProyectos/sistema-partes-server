@@ -7,7 +7,6 @@ import { jobValidation } from "./job.validation";
 import { Trabajo, Usuario } from "@prisma/client";
 import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";
 import { prismaJobRepository } from "./prisma-job.repository";
-import { jwtService } from "@/auth/jwt.service";
 import { projectValidation } from "@/project/project.validation";
 import { T_FindAllJob } from "./models/job.types";
 import { JobResponseMapper } from "./mappers/job.mapper";
@@ -172,6 +171,9 @@ class JobService {
         );
       }
       const resultJobFind = resultIdJob.payload as Trabajo;
+      const userResponse = await userValidation.findById(data.usuario_id);
+      if (!userResponse.success) return userResponse;
+      const user = userResponse.payload as Usuario;
       if (resultJobFind.nombre != data.nombre) {
         const resultTrain = await trainValidation.findByName(
           data.nombre,
@@ -193,6 +195,7 @@ class JobService {
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
         proyecto_id: +project_id,
+        usuario_id: user.id,
       };
       const responseJob = await prismaJobRepository.updateJob(
         trainFormat,

@@ -8,4 +8,5 @@ export const jobUpdateDto = z.object({
   fecha_inicio: z.string().optional(),
   fecha_finalizacion: z.string().optional(),
   duracion: z.number().optional(),
+  usuario_id: z.number(),
 });
