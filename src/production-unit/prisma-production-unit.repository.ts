@@ -10,10 +10,14 @@ import prisma from "@/config/prisma.config";
 import { T_FindAllUp } from "./models/up.types";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
-  async findByCode(code: string): Promise<UnidadProduccion | null> {
+  async findByCode(
+    code: string,
+    project_id: number
+  ): Promise<UnidadProduccion | null> {
     const productionUnit = await prisma.unidadProduccion.findFirst({
       where: {
         codigo: code,
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });

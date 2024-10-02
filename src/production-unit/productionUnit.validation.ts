@@ -1,16 +1,14 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
-import {
-  I_ProductionUnitExcel,
-  I_UpdateProductionUnitBody,
-} from "./models/production-unit.interface";
+import { I_ProductionUnitExcel } from "./models/production-unit.interface";
 
 class ProductionUnitValidation {
-  async findByCode(code: string): Promise<T_HttpResponse> {
+  async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {
       const productionUnit = await prismaProductionUnitRepository.findByCode(
-        code
+        code,
+        project_id
       );
       if (productionUnit) {
         return httpResponse.NotFoundException(

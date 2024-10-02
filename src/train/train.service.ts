@@ -424,7 +424,6 @@ class TrainService {
 
       return httpResponse.SuccessResponse("Trenes creados correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer el Tren",

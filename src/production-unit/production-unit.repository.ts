@@ -11,7 +11,7 @@ export abstract class ProudctionUnitRepository {
     project_id: number
   ): void {}
 
-  findByCode(code: string): void {}
+  findByCode(code: string, project_id: number): void {}
 
   findById(idUser: number): void {}
 
