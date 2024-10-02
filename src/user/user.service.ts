@@ -1,5 +1,5 @@
 import { sectionValidation } from "./../section/section.validation";
-import { Empresa, Rol, Usuario } from "@prisma/client";
+import { Empresa, Proyecto, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyUpdate,
@@ -827,29 +827,57 @@ class UserService {
     }
   }
 
-  async updateRolUser(
+  async updateRolUserAndCreateProyect(
     usuario_id: number,
     rol_id: number,
-    projecto_id: number
+    projecto_id: number,
+    action: string
   ): Promise<T_HttpResponse> {
     try {
       const userResponse = await userValidation.findById(usuario_id);
       if (!userResponse.success) return userResponse;
-      const rolResponse = await rolValidation.findById(rol_id);
-      if (!rolResponse.success) return rolResponse;
+      const user = userResponse.payload as Usuario;
       const projectResponse = await projectValidation.findById(projecto_id);
       if (!projectResponse.success) return projectResponse;
-      const result = await prismaUserRepository.updaterRolUser(
+      const project = projectResponse.payload as Proyecto;
+
+      const userExistInDetailProject =
+        await detailProjectValidation.findByIdUser(user.id, project.id);
+
+      if (userExistInDetailProject.success) {
+        return httpResponse.BadRequestException(
+          "El usuario ya tiene asignado un proyecto"
+        );
+      }
+      const rolResponse = await rolValidation.findById(rol_id);
+      if (!rolResponse.success) return rolResponse;
+
+      const result = await prismaUserRepository.updateRolUser(
         usuario_id,
         rol_id
       );
-      const detailFormat = {
-        usuario_id: usuario_id,
-        projecto_id: projecto_id,
-      };
-      const detailUserProject =
-        await detailProjectValidation.createDetailUserProject(detailFormat);
-      if (!detailUserProject.success) return detailUserProject;
+      if (action === "CREACION") {
+        const detailFormat = {
+          usuario_id: usuario_id,
+          projecto_id: projecto_id,
+        };
+        const detailUserProject =
+          await detailProjectValidation.createDetailUserProject(detailFormat);
+        if (!detailUserProject.success) return detailUserProject;
+        const resultMapper = new UserResponseMapper(result);
+        return httpResponse.SuccessResponse(
+          "Se ha cambiado de rol y se le ha asignado un Proyecto correctamente",
+          resultMapper
+        );
+      }
+
+      // const detailFormat = {
+      //   usuario_id: usuario_id,
+      //   projecto_id: projecto_id,
+      // };
+      // const detailUserProject =
+      //   await detailProjectValidation.createDetailUserProject(detailFormat);
+      // if (!detailUserProject.success) return detailUserProject;
       const resultMapper = new UserResponseMapper(result);
       return httpResponse.SuccessResponse(
         "Se ha cambiado de rol correctamente",

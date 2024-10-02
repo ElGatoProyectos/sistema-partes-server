@@ -8,6 +8,12 @@ export interface I_CreateJobBD
 export interface I_UpdateJobBD
   extends Omit<Trabajo, "id" | "eliminado" | "fecha_creacion"> {}
 
+export interface I_UpdateJobBDValidationExcel
+  extends Omit<
+    Trabajo,
+    "id" | "nota" | "estado_trabajo" | "eliminado" | "fecha_creacion"
+  > {}
+
 export interface I_CreateJobBody
   extends Omit<
     Trabajo,

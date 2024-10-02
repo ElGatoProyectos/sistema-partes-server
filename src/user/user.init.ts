@@ -60,11 +60,11 @@ userRouter.put(
 // );
 
 userRouter.put(
-  `${prefix}/rol`,
+  `${prefix}/users_project`,
   userMiddleware.verifyFieldsUpdateRol,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,
   authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
-  userController.updateRol
+  userController.createDetailUserProjectandChangeRol
 );
 
 userRouter.put(

@@ -20,6 +20,31 @@ class DetailProjectValidation {
       );
     }
   }
+  async findByIdUser(
+    user_id: number,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDetailUserProjectRepository.findByUser(
+        user_id,
+        project_id
+      );
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "Id del Usuario con el id del Proyecto no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Id Usuario del proyecto fue encontrado",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Tren",
+        error
+      );
+    }
+  }
 }
 
 export const detailProjectValidation = new DetailProjectValidation();

@@ -25,6 +25,23 @@ class DetailUserProjectController {
 
     response.status(result.statusCode).json(result);
   }
+
+  async deleteUserFromProject(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const project_id = request.get("project-id") as string;
+    const user_id = Number(request.params.id);
+    const result = await detailUserProjectService.deleteUserFromProject(
+      user_id,
+      +project_id
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
 }
 
 export const detailUserProjectController = new DetailUserProjectController();

@@ -252,13 +252,17 @@ class UserController {
     response.status(result.statusCode).json(result);
   }
 
-  async updateRol(request: express.Request, response: express.Response) {
+  async createDetailUserProjectandChangeRol(
+    request: express.Request,
+    response: express.Response
+  ) {
     const data = request.body as I_UpdateRolUserBody;
     const project_id = request.get("project-id") as string;
-    const result = await userService.updateRolUser(
+    const result = await userService.updateRolUserAndCreateProyect(
       data.usuario_id,
       data.rol_id,
-      +project_id
+      +project_id,
+      data.action
     );
     if (!result.success) {
       response.status(result.statusCode).json(result);

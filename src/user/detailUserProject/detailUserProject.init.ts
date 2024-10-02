@@ -13,5 +13,11 @@ detailUserProjectRouter.get(
   authRoleMiddleware.authAdminAndProjectManagerAndUser,
   detailUserProjectController.allUsersByProject
 );
+detailUserProjectRouter.delete(
+  `${prefix}/:id`,
+  userMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  detailUserProjectController.deleteUserFromProject
+);
 
 export default detailUserProjectRouter;

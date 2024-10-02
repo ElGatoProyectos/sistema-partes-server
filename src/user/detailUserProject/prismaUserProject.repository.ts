@@ -8,6 +8,31 @@ import {
 import { DetalleUsuarioProyecto } from "@prisma/client";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
+  async findByUser(
+    user_id: number,
+    project_id: number
+  ): Promise<DetalleUsuarioProyecto | null> {
+    const detail = await prisma.detalleUsuarioProyecto.findFirst({
+      where: {
+        usuario_id: user_id,
+        projecto_id: project_id,
+      },
+    });
+    return detail;
+  }
+  async deleteUserByDetail(
+    idDetailUserProject: number
+  ): Promise<DetalleUsuarioProyecto> {
+    const detailUserProjectDeleted = await prisma.detalleUsuarioProyecto.delete(
+      {
+        where: {
+          id: idDetailUserProject,
+        },
+      }
+    );
+    return detailUserProjectDeleted;
+  }
+
   async getAllUsersOfProject(
     skip: number,
     data: T_FindAllDetailUserProject,

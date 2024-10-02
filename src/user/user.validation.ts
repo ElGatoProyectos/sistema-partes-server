@@ -2,6 +2,10 @@ import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaUserRepository } from "./prisma-user.repository";
 import { I_CreateUserBD } from "./models/user.interface";
+import { rolValidation } from "@/rol/rol.validation";
+import { projectValidation } from "@/project/project.validation";
+import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
+import { UserResponseMapper } from "./mappers/user.mapper";
 
 class UserValidation {
   async findByEmail(email: string): Promise<T_HttpResponse> {
@@ -96,6 +100,35 @@ class UserValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar usuario",
+        error
+      );
+    }
+  }
+  async updateRolUser(
+    usuario_id: number,
+    rol_id: number,
+    projecto_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const userResponse = await userValidation.findById(usuario_id);
+      if (!userResponse.success) return userResponse;
+      const rolResponse = await rolValidation.findById(rol_id);
+      if (!rolResponse.success) return rolResponse;
+      const projectResponse = await projectValidation.findById(projecto_id);
+      if (!projectResponse.success) return projectResponse;
+      const result = await prismaUserRepository.updateRolUser(
+        usuario_id,
+        rol_id
+      );
+
+      const resultMapper = new UserResponseMapper(result);
+      return httpResponse.SuccessResponse(
+        "Se ha cambiado de rol correctamente",
+        resultMapper
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al cambiar de rol",
         error
       );
     }
