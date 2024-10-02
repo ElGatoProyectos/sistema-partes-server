@@ -787,6 +787,8 @@ class UserService {
       if (data.contrasena && data.contrasena !== "") {
         hashContrasena = bcryptService.hashPassword(data.contrasena);
         userFormat.contrasena = hashContrasena;
+      } else {
+        userFormat.contrasena = userFind.contrasena;
       }
 
       const result = await prismaUserRepository.updateUser(userFormat, idUser);
