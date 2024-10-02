@@ -30,7 +30,7 @@ import { emailValid } from "../common/utils/email";
 import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
 import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
-import { T_FindAllUser } from "./models/user.types";
+import { T_FindAllUser, T_FindAllUserCompany } from "./models/user.types";
 import { prismaDetailUserProjectRepository } from "./detailUserProject/prismaUserProject.repository";
 import { projectValidation } from "@/project/project.validation";
 import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
@@ -81,11 +81,12 @@ class UserService {
   }
 
   async findAllUserCompany(
-    data: T_FindAllUser,
+    data: T_FindAllUserCompany,
     user_id: number
   ): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      let rol: any = null;
       const userResponse = await userValidation.findById(user_id);
       if (!userResponse.success) {
         return userResponse;
@@ -113,11 +114,18 @@ class UserService {
           formData
         );
       }
+      if (data.queryParams.rol) {
+        const rolResponse = await rolValidation.findByName(
+          data.queryParams.rol
+        );
+        if (!rolResponse.success) return rolResponse;
+        rol = rolResponse.payload as Rol;
+      }
 
       const result = await prismaUserRepository.getUsersForCompany(
         skip,
-        data.queryParams.limit,
-        data.queryParams.name,
+        data,
+        rol,
         company.id
       );
 
@@ -136,7 +144,6 @@ class UserService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer los Usuarios de la empresa",
         error
@@ -847,7 +854,6 @@ class UserService {
         resultMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al cambiar de rol",
         error

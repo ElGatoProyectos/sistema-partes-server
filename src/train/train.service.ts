@@ -96,10 +96,9 @@ class TrainService {
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear el Tren con el id del proyecto proporcionado"
+          "No se puede actualizar el Tren con el id del proyecto proporcionado"
         );
       }
-      const trainResponse = resultIdTrain.payload as Tren;
       const trainFormat = {
         ...data,
         operario: data.operario,

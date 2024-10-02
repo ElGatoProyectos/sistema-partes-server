@@ -21,7 +21,7 @@ import appRootPath from "app-root-path";
 import sharp from "sharp";
 import { userAndCompanyDto } from "./dto/userAndCompany.dto";
 import { userAndCompanyUpdateDto } from "./dto/userAndCompanyUpdate.dto";
-import { T_FindAllUser } from "./models/user.types";
+import { T_FindAllUser, T_FindAllUserCompany } from "./models/user.types";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.
 // esto es útil por si lo querés analizar o guardar en algun lugar
@@ -292,11 +292,13 @@ class UserController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const name = request.query.name as string;
+    const state = request.query.state as string;
     let paginationOptions: T_FindAllUser = {
       queryParams: {
         page: page,
         limit: limit,
         name,
+        estado: state,
       },
     };
     const tokenWithBearer = request.headers.authorization;
@@ -321,12 +323,16 @@ class UserController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const name = request.query.name as string;
+    const state = request.query.state as string;
+    const rol = request.query.rol as string;
     const user_id = Number(request.params.id);
-    let paginationOptions: T_FindAllUser = {
+    let paginationOptions: T_FindAllUserCompany = {
       queryParams: {
         page: page,
         limit: limit,
         name,
+        estado: state,
+        rol: rol,
       },
     };
     const result = await userService.findAllUserCompany(

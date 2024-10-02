@@ -1,8 +1,7 @@
 import { E_Estado_BD, Trabajo } from "@prisma/client";
 import { JobRepository } from "./job.repository";
-import { I_CreateJobBD, I_Job, I_UpdateJobBody } from "./models/job.interface";
+import { I_CreateJobBD, I_Job, I_UpdateJobBD } from "./models/job.interface";
 import prisma from "@/config/prisma.config";
-import { T_FindAllTrain } from "@/train/models/train.types";
 import { T_FindAllJob } from "./models/job.types";
 import { converToDate } from "@/common/utils/date";
 
@@ -13,7 +12,7 @@ class PrismaJobRepository implements JobRepository {
     });
     return job;
   }
-  async updateJob(data: I_UpdateJobBody, job_id: number): Promise<Trabajo> {
+  async updateJob(data: I_UpdateJobBD, job_id: number): Promise<Trabajo> {
     const job = await prisma.trabajo.update({
       where: { id: job_id },
       data: data,
@@ -66,6 +65,11 @@ class PrismaJobRepository implements JobRepository {
     let filters: any = {};
     let fecha_inicio;
     let fecha_finalizacion;
+    if (data.queryParams.codigo) {
+      filters.codigo = {
+        contains: data.queryParams.codigo,
+      };
+    }
     if (data.queryParams.name) {
       filters.nombre = {
         contains: data.queryParams.name,
