@@ -6,4 +6,5 @@ export const userUpdateDto = z.object({
   nombre_completo: z.string().optional(),
   telefono: z.string().optional(),
   contrasena: z.string().optional(),
+  estado: z.enum(["y", "n"]),
 });

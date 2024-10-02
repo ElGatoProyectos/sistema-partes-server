@@ -121,6 +121,7 @@ model Usuario {
   telefono               String
   limite_proyecto        Int                      @default(1)
   limite_usuarios        Int
+  estado                 E_Estado_BD?             @default(n)
   eliminado              E_Estado_BD              @default(n)
   contrasena             String
   fecha_creacion         DateTime                 @default(now())
