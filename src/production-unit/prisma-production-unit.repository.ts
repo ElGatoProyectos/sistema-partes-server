@@ -116,7 +116,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     //     contains: data.queryParams.search,
     //   };
     // }
-    if (arrayNumbers.includes(data.queryParams.search)) {
+    if (arrayNumbers.includes(data.queryParams.search.charAt(0))) {
       filters.codigo = {
         contains: data.queryParams.search,
       };
@@ -125,6 +125,8 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
         contains: data.queryParams.search,
       };
     }
+    console.log("el filtro tiene ");
+    console.log(filters);
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({

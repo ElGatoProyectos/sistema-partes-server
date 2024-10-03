@@ -582,7 +582,7 @@ model Trabajo {
   id                    Int                     @id @default(autoincrement())
   codigo                String
   nombre                String
-  duracion              Int
+  duracion              Float
   fecha_inicio          DateTime                @db.Date //año más dia
   fecha_finalizacion    DateTime                @db.Date //año más dia
   eliminado             E_Estado_BD             @default(n)
