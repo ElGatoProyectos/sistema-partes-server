@@ -99,14 +99,12 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     project_id: number
   ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
     let filters: any = {};
-    if (data.queryParams.name) {
+    if (data.queryParams.search) {
       filters.nombre = {
-        contains: data.queryParams.name,
+        contains: data.queryParams.search,
       };
-    }
-    if (data.queryParams.codigo) {
       filters.codigo = {
-        contains: data.queryParams.codigo,
+        contains: data.queryParams.search,
       };
     }
     const [productionUnits, total]: [I_ProductionUnit[], number] =

@@ -42,4 +42,11 @@ jobRouter.put(
   jobController.update
 );
 
+jobRouter.post(
+  `${prefix}/upload-excel`,
+  jobMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  jobController.jobReadExcel
+);
+
 export default jobRouter;

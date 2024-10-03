@@ -46,10 +46,10 @@ export interface I_JobExcel {
   "ID-TRABAJO": string;
   TRABAJOS: string;
   TREN: string;
-  "UNIDAD-DE-PRODUCCION": string;
-  INICIO: string;
+  "UNIDAD DE PRODUCCION": string;
+  INICIO: number;
   DURA: string;
-  FINALIZA: string;
+  FINALIZA: number;
   COSTO: string;
   MAT: string;
   MO: string;

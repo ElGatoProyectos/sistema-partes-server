@@ -3,7 +3,6 @@ import express from "@/config/express.config";
 import multer from "multer";
 import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";
 import { jobService } from "./job.service";
-import { httpResponse } from "@/common/http.response";
 import { T_FindAllJob } from "./models/job.types";
 
 const storage = multer.memoryStorage();
@@ -12,7 +11,6 @@ const upload: any = multer({ storage: storage });
 class JobController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateJobBody;
-    const tokenWithBearer = request.headers.authorization;
     const project_id = request.get("project-id") as string;
     const result = await jobService.createJob(data, project_id);
     if (!result.success) {
@@ -33,17 +31,6 @@ class JobController {
       response.status(result.statusCode).json(result);
     }
   }
-
-  // async updateCuadrilla(request: express.Request, response: express.Response) {
-  //   const train_id = Number(request.params.id);
-  //   const data = request.body as I_Cuadrilla_Train;
-  //   const result = await trainService.updateCuadrillaTrain(data, train_id);
-  //   if (!result.success) {
-  //     response.status(result.statusCode).json(result);
-  //   } else {
-  //     response.status(result.statusCode).json(result);
-  //   }
-  // }
 
   async updateStatus(request: express.Request, response: express.Response) {
     const job_id = Number(request.params.id);
@@ -79,33 +66,33 @@ class JobController {
     response.status(result.statusCode).json(result);
   }
 
-  // trainReadExcel = async (
-  //   request: express.Request,
-  //   response: express.Response
-  // ) => {
-  //   // Usando multer para manejar la subida de archivos en memoria
-  //   upload.single("train-file")(request, response, async (err: any) => {
-  //     if (err) {
-  //       return response.status(500).json({ error: "Error uploading file" });
-  //     }
-  //     const project_id = Number(request.params.project_id);
-  //     const file = request.file;
-  //     if (!file) {
-  //       return response.status(400).json({ error: "No se subió archivo" });
-  //     }
+  jobReadExcel = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    // Usando multer para manejar la subida de archivos en memoria
+    upload.single("job-file")(request, response, async (err: any) => {
+      if (err) {
+        return response.status(500).json({ error: "Error uploading file" });
+      }
+      const project_id = request.get("project-id") as string;
+      const file = request.file;
+      if (!file) {
+        return response.status(400).json({ error: "No se subió archivo" });
+      }
 
-  //     try {
-  //       const serviceResponse = await trainService.registerTrainMasive(
-  //         file,
-  //         +project_id
-  //       );
+      try {
+        const serviceResponse = await jobService.registerJobMasive(
+          file,
+          +project_id
+        );
 
-  //       response.status(serviceResponse.statusCode).json(serviceResponse);
-  //     } catch (error) {
-  //       response.status(500).json(error);
-  //     }
-  //   });
-  // };
+        response.status(serviceResponse.statusCode).json(serviceResponse);
+      } catch (error) {
+        response.status(500).json(error);
+      }
+    });
+  };
 }
 
 export const jobController = new JobController();

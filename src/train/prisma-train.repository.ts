@@ -115,14 +115,12 @@ class PrismaTrainRepository implements TrainRepository {
     project_id: number
   ): Promise<{ trains: I_Train[]; total: number }> {
     let filters: any = {};
-    if (data.queryParams.name) {
+    if (data.queryParams.search) {
       filters.nombre = {
-        contains: data.queryParams.name,
+        contains: data.queryParams.search,
       };
-    }
-    if (data.queryParams.codigo) {
       filters.codigo = {
-        contains: data.queryParams.codigo,
+        contains: data.queryParams.search,
       };
     }
     const [trains, total]: [I_Train[], number] = await prisma.$transaction([
