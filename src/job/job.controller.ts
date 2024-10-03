@@ -76,6 +76,7 @@ class JobController {
         return response.status(500).json({ error: "Error uploading file" });
       }
       const project_id = request.get("project-id") as string;
+      const tokenWithBearer = request.headers.authorization as string;
       const file = request.file;
       if (!file) {
         return response.status(400).json({ error: "No se subió archivo" });
@@ -84,7 +85,8 @@ class JobController {
       try {
         const serviceResponse = await jobService.registerJobMasive(
           file,
-          +project_id
+          +project_id,
+          tokenWithBearer
         );
 
         response.status(serviceResponse.statusCode).json(serviceResponse);

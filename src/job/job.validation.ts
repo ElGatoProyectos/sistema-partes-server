@@ -3,48 +3,52 @@ import { prismaJobRepository } from "./prisma-job.repository";
 import { I_JobExcel } from "./models/job.interface";
 
 class JobValidation {
-  // async updateJob(
-  //   data: I_JobExcel,
-  //   job_id: number,
-  //   project_id: number,
-  //   usuario_id: number
-  // ): Promise<T_HttpResponse> {
-  //   try {
-  //     const [dia, mes, anio] = data.INICIO.split("/").map(Number);
-  //     const [dia2, mes2, anio2] = data.FINALIZA.split("/").map(Number);
-  //     const fechaInicio = new Date(anio, mes - 1, dia);
-  //     const fechaFin = new Date(anio2, mes2 - 1, dia2);
-  //     const job = {
-  //       codigo: data["ID-TRABAJO"],
-  //       nombre: data.TRABAJOS,
-  //       tren_id: +data.TREN,
-  //       up_id: +data["UNIDAD DE PRODUCCION"],
-  //       fecha_inicio: fechaInicio,
-  //       fecha_finalizacion: fechaFin,
-  //       duracion: +data.DURA,
-  //       costo_partida: 0,
-  //       costo_mano_obra: 0,
-  //       costo_material: 0,
-  //       costo_equipo: 0,
-  //       costo_varios: 0,
-  //       proyecto_id: project_id,
-  //       usuario_id: usuario_id,
-  //     };
-  //     const responseTrain = await prismaJobRepository.updateJobFromExcel(
-  //       job,
-  //       job_id
-  //     );
-  //     return httpResponse.SuccessResponse(
-  //       "Trabajo modificado correctamente",
-  //       responseTrain
-  //     );
-  //   } catch (error) {
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al modificar el Trabajo",
-  //       error
-  //     );
-  //   }
-  // }
+  async updateJob(
+    data: I_JobExcel,
+    job_id: number,
+    project_id: number,
+    usuario_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const excelEpoch = new Date(1899, 11, 30);
+      const inicioDate = new Date(
+        excelEpoch.getTime() + data.INICIO * 86400000
+      );
+      const endDate = new Date(excelEpoch.getTime() + data.FINALIZA * 86400000);
+      inicioDate.setUTCHours(0, 0, 0, 0);
+      endDate.setUTCHours(0, 0, 0, 0);
+      const formattedDuracion = parseFloat(data.DURA).toFixed(1);
+      const jobFormat = {
+        codigo: data["ID-TRABAJO"],
+        nombre: data.TRABAJOS,
+        tren_id: +data.TREN,
+        up_id: +data["UNIDAD DE PRODUCCION"],
+        fecha_inicio: inicioDate,
+        fecha_finalizacion: endDate,
+        duracion: +formattedDuracion,
+        costo_partida: 0,
+        costo_mano_obra: 0,
+        costo_material: 0,
+        costo_equipo: 0,
+        costo_varios: 0,
+        proyecto_id: project_id,
+        usuario_id: usuario_id,
+      };
+      const responseTrain = await prismaJobRepository.updateJobFromExcel(
+        jobFormat,
+        job_id
+      );
+      return httpResponse.SuccessResponse(
+        "Trabajo modificado correctamente",
+        responseTrain
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar el Trabajo",
+        error
+      );
+    }
+  }
   async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {
       const job = await prismaJobRepository.findByCode(code, project_id);

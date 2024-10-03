@@ -4,7 +4,7 @@ import { trainValidation } from "@/train/train.validation";
 import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
 import { converToDate } from "@/common/utils/date";
 import { jobValidation } from "./job.validation";
-import { Proyecto, Trabajo, Usuario } from "@prisma/client";
+import { E_Trabajo_Estado, Proyecto, Trabajo, Usuario } from "@prisma/client";
 import {
   I_CreateJobBody,
   I_JobExcel,
@@ -16,6 +16,8 @@ import { T_FindAllJob } from "./models/job.types";
 import { JobResponseMapper } from "./mappers/job.mapper";
 import { userValidation } from "@/user/user.validation";
 import * as xlsx from "xlsx";
+import validator from "validator";
+import { jwtService } from "@/auth/jwt.service";
 
 class JobService {
   async createJob(
@@ -220,7 +222,7 @@ class JobService {
       await prisma.$disconnect();
     }
   }
-  async registerJobMasive(file: any, projectId: number) {
+  async registerJobMasive(file: any, projectId: number, token: string) {
     try {
       const buffer = file.buffer;
 
@@ -228,6 +230,11 @@ class JobService {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_JobExcel[];
+
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
       let error = 0;
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
@@ -239,21 +246,21 @@ class JobService {
 
       //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
       //Usamos rango 0 para verificar q estamos leyendo las primeras filas
-      // const firstTwoRows: any = xlsx.utils
-      //   .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
-      //   .slice(0, 2); //nos limitamos a las primeras 2
-      // //verificamos si están vacias las primeras filas
-      // const isEmptyRow = (row: any[]) =>
-      //   row.every((cell) => cell === null || cell === undefined || cell === "");
-      // //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
-      // if (
-      //   firstTwoRows.length < 2 ||
-      //   (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
-      // ) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      const firstTwoRows: any = xlsx.utils
+        .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
+        .slice(0, 2); //nos limitamos a las primeras 2
+      //verificamos si están vacias las primeras filas
+      const isEmptyRow = (row: any[]) =>
+        row.every((cell) => cell === null || cell === undefined || cell === "");
+      //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
+      if (
+        firstTwoRows.length < 2 ||
+        (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
+      ) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       const project = await projectValidation.findById(projectId);
       if (!project.success) return project;
@@ -263,58 +270,42 @@ class JobService {
       let previousCodigo: number | null = null;
 
       //[note] aca si hay espacio en blanco.
-      await Promise.all(
-        sheetToJson.map(async (item: I_JobExcel, index: number) => {
-          index++;
-          // if (
-          //   item["ID-TRABAJO"] == undefined ||
-          //   item.TRABAJOS == undefined ||
-          //   item.TREN == undefined ||
-          //   item["UNIDAD DE PRODUCCION"] ||
-          //   item.INICIO ||
-          //   item.DURA ||
-          //   item.FINALIZA
-          // ) {
-          //   error++;
-          // }
-          console.log(
-            "id " +
-              item["ID-TRABAJO"] +
-              " trabajo " +
-              item.TRABAJOS +
-              " tren " +
-              item.TREN +
-              " up " +
-              item["UNIDAD DE PRODUCCION"] +
-              " inicio " +
-              item.INICIO +
-              " duracion " +
-              item.DURA +
-              " finaliza " +
-              item.FINALIZA
-          );
-        })
-      );
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_JobExcel, index: number) => {
+      //     index++;
+      //     if (
+      //       item["ID-TRABAJO"] == undefined ||
+      //       item.TRABAJOS == undefined ||
+      //       item.TREN == undefined ||
+      //       item["UNIDAD DE PRODUCCION"] == undefined ||
+      //       item.INICIO == undefined ||
+      //       item.DURA == undefined ||
+      //       item.FINALIZA == undefined
+      //     ) {
+      //       error++;
+      //     }
+      //   })
+      // );
 
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
-        );
-      }
+      // if (error > 0) {
+      //   return httpResponse.BadRequestException(
+      //     "Error al leer el archivo. Verificar los campos"
+      //   );
+      // }
 
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
       // await Promise.all(
-      //   sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+      //   sheetToJson.map(async (item: I_JobExcel) => {
       //     //verificamos si tenemos el codigo
-      //     const codigo = parseInt(item.CODIGO, 10); // Intenta convertir el string a número
+      //     const codigo = parseInt(item["ID-TRABAJO"], 10); // Intenta convertir el string a número
 
-      //     if (!validator.isNumeric(item.CODIGO)) {
+      //     if (!validator.isNumeric(item["ID-TRABAJO"])) {
       //       errorNumber++; // Aumenta si el código no es un número válido
       //     } else {
       //       // Verifica si el código ya ha sido procesado
-      //       if (!seenCodes.has(item.CODIGO)) {
+      //       if (!seenCodes.has(item["ID-TRABAJO"])) {
       //         // errorNumber++; // Aumenta si hay duplicado
-      //         seenCodes.add(item.CODIGO);
+      //         seenCodes.add(item["ID-TRABAJO"]);
       //       }
 
       //       // Verifica si el código actual no es mayor que el anterior
@@ -335,10 +326,10 @@ class JobService {
 
       // //[NOTE] Acá verifico si el primer elemento es 001
       // const sortedCodesArray = Array.from(seenCodes)
-      //   .map((item) => item.padStart(3, "0"))
+      //   .map((item) => item.padStart(4, "0"))
       //   .sort((a, b) => parseInt(a) - parseInt(b));
 
-      // if (sortedCodesArray[0] != "001") {
+      // if (sortedCodesArray[0] != "0001") {
       //   errorNumber++;
       // }
 
@@ -364,44 +355,88 @@ class JobService {
       //   );
       // }
 
-      // //[SUCCESS] Guardo o actualizo la Unidad de Producción
-      // let code;
-      // let productionUnit;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_ProductionUnitExcel) => {
-      //     code = await productionUnitValidation.findByCode(
-      //       String(item.CODIGO),
-      //       responseProject.id
-      //     );
-      //     if (!code.success) {
-      //       productionUnit = code.payload as UnidadProduccion;
-      //       await productionUnitValidation.updateProductionUnit(
-      //         item,
-      //         +productionUnit.id,
-      //         responseProject.id
-      //       );
-      //     } else {
-      //       await prisma.unidadProduccion.create({
-      //         data: {
-      //           codigo: String(item.CODIGO),
-      //           nombre: item.NOMBRE,
-      //           nota: item.NOTA,
-      //           proyecto_id: responseProject.id,
-      //         },
-      //       });
-      //     }
-      //   })
-      // );
-
-      // await prisma.$disconnect();
-
-      return httpResponse.SuccessResponse(
-        "Unidad de producción creada correctamente!"
+      //[NOTE] ACÁ VERIFICAMOS SI LOS TRENES Y LAS UNIDADES DE PRODUCCIÓN EXISTEN
+      await Promise.all(
+        sheetToJson.map(async (item: I_JobExcel, index: number) => {
+          index++;
+          const trainResponse = await trainValidation.findById(+item.TREN);
+          if (!trainResponse.success) {
+            error++;
+          }
+          const upResponse = await productionUnitValidation.findById(
+            +item["UNIDAD DE PRODUCCION"]
+          );
+          if (!upResponse.success) {
+            error++;
+          }
+        })
       );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
+
+      // //[SUCCESS] Guardo o actualizo la Unidad de Producción
+      let code;
+      let job;
+      await Promise.all(
+        sheetToJson.map(async (item: I_JobExcel) => {
+          code = await jobValidation.findByCode(
+            String(item["ID-TRABAJO"]),
+            responseProject.id
+          );
+          if (!code.success) {
+            job = code.payload as Trabajo;
+            await jobValidation.updateJob(
+              item,
+              job.id,
+              responseProject.id,
+              userResponse.id
+            );
+          } else {
+            const excelEpoch = new Date(1899, 11, 30);
+            const inicioDate = new Date(
+              excelEpoch.getTime() + item.INICIO * 86400000
+            );
+            const endDate = new Date(
+              excelEpoch.getTime() + item.FINALIZA * 86400000
+            );
+            inicioDate.setUTCHours(0, 0, 0, 0);
+            endDate.setUTCHours(0, 0, 0, 0);
+            const formattedDuracion = parseFloat(item.DURA).toFixed(1);
+            await prisma.trabajo.create({
+              data: {
+                codigo: String(item["ID-TRABAJO"]),
+                nombre: item.TRABAJOS,
+                duracion: +formattedDuracion,
+                fecha_inicio: inicioDate,
+                fecha_finalizacion: endDate,
+                nota: "",
+                costo_partida: 0,
+                costo_mano_obra: 0,
+                costo_material: 0,
+                costo_equipo: 0,
+                costo_varios: 0,
+                tren_id: +item.TREN,
+                estado_trabajo: E_Trabajo_Estado.PROGRAMADO,
+                up_id: +item["UNIDAD DE PRODUCCION"],
+                proyecto_id: responseProject.id,
+                usuario_id: userResponse.id,
+              },
+            });
+          }
+        })
+      );
+
+      await prisma.$disconnect();
+
+      return httpResponse.SuccessResponse("Trabajos creados correctamente!");
     } catch (error) {
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
-        "Error al leer la Unidad de Producción",
+        "Error al leer los Trabajos",
         error
       );
     }
