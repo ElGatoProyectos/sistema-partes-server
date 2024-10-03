@@ -318,15 +318,13 @@ class ProductionUnitController {
   findAll = async (request: express.Request, response: express.Response) => {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    const name = request.query.name as string;
-    const codigo = request.query.codigo as string;
+    const search = request.query.search as string;
     const project_id = request.get("project-id") as string;
     let paginationOptions: T_FindAllUp = {
       queryParams: {
         page: page,
         limit: limit,
-        name: name,
-        codigo: codigo,
+        search: search,
       },
     };
     const idCompany = request.params.id;

@@ -85,14 +85,13 @@ class TrainController {
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
     // const project_id = Number(request.params.project_id);
-    const name = request.query.name as string;
+    const search = request.query.search as string;
     const codigo = request.query.codigo as string;
     let paginationOptions: T_FindAllTrain = {
       queryParams: {
         page: page,
         limit: limit,
-        name: name,
-        codigo: codigo,
+        search: search,
       },
     };
     const result = await trainService.findAll(paginationOptions, project_id);
