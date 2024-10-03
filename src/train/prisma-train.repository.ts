@@ -115,11 +115,13 @@ class PrismaTrainRepository implements TrainRepository {
     project_id: number
   ): Promise<{ trains: I_Train[]; total: number }> {
     let filters: any = {};
-    if (data.queryParams.search) {
-      filters.nombre = {
+    const arrayNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    if (arrayNumbers.includes(data.queryParams.search)) {
+      filters.codigo = {
         contains: data.queryParams.search,
       };
-      filters.codigo = {
+    } else {
+      filters.nombre = {
         contains: data.queryParams.search,
       };
     }
@@ -134,6 +136,9 @@ class PrismaTrainRepository implements TrainRepository {
         take: data.queryParams.limit,
         omit: {
           eliminado: true,
+        },
+        orderBy: {
+          codigo: "asc",
         },
       }),
       prisma.tren.count({

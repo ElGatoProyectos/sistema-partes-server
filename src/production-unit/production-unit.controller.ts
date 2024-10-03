@@ -211,7 +211,7 @@ class ProductionUnitController {
               authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
                 request.get("Authorization") as string
               );
-            const project_id = request.params.id;
+            const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
@@ -278,8 +278,24 @@ class ProductionUnitController {
   };
 
   findImage = async (request: express.Request, response: express.Response) => {
-    const idProject = Number(request.params.id);
-    const result = await productionUnitService.findIdImage(idProject);
+    const productionUnit_id = Number(request.params.id);
+    const result = await productionUnitService.findIdImage(productionUnit_id);
+    if (typeof result.payload === "string") {
+      fs.readFile(result.payload);
+      response.sendFile(result.payload);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  };
+
+  findImageSectorizacionProject = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    const project_id = request.get("project-id") as string;
+    const result = await productionUnitService.findIdImageSectorizacion(
+      +project_id
+    );
     if (typeof result.payload === "string") {
       fs.readFile(result.payload);
       response.sendFile(result.payload);

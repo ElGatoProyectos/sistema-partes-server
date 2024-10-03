@@ -13,7 +13,7 @@ prouductionUnitRouter.post(
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.post(
-  `${prefix}/upload-photo/:id`,
+  `${prefix}/upload-photo`,
   productionUnitController.uploadImageForProject
 );
 prouductionUnitRouter.get(
@@ -37,6 +37,12 @@ prouductionUnitRouter.get(
   productionUnitMiddleware.verifyHeadersFields,
   authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
   productionUnitController.findImage
+);
+prouductionUnitRouter.get(
+  `${prefix}/sectorization/project`,
+  productionUnitMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  productionUnitController.findImageSectorizacionProject
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
