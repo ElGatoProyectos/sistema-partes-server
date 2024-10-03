@@ -116,17 +116,18 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     //     contains: data.queryParams.search,
     //   };
     // }
-    if (arrayNumbers.includes(data.queryParams.search.charAt(0))) {
-      filters.codigo = {
-        contains: data.queryParams.search,
-      };
-    } else {
-      filters.nombre = {
-        contains: data.queryParams.search,
-      };
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.nombre = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.codigo = {
+          contains: data.queryParams.search,
+        };
+      }
     }
-    console.log("el filtro tiene ");
-    console.log(filters);
+
     const [productionUnits, total]: [I_ProductionUnit[], number] =
       await prisma.$transaction([
         prisma.unidadProduccion.findMany({
