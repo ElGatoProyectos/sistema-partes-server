@@ -8,6 +8,8 @@ import {
 import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 import { T_FindAllUp } from "./models/up.types";
+import { isNumeric } from "validator";
+import { lettersInNumbers } from "@/common/utils/number";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
   async findByCode(
@@ -99,11 +101,27 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     project_id: number
   ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
     let filters: any = {};
-    if (data.queryParams.search) {
-      filters.nombre = {
+    const arrayNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    // if (!lettersInNumbers(data.queryParams.search)) {
+    //   console.log("no tiene");
+    // } else {
+    //   console.log("tiene");
+    // }
+    // if (isNumeric(data.queryParams.search)) {
+    //   filters.codigo = {
+    //     contains: data.queryParams.search,
+    //   };
+    // } else {
+    //   filters.nombre = {
+    //     contains: data.queryParams.search,
+    //   };
+    // }
+    if (arrayNumbers.includes(data.queryParams.search)) {
+      filters.codigo = {
         contains: data.queryParams.search,
       };
-      filters.codigo = {
+    } else {
+      filters.nombre = {
         contains: data.queryParams.search,
       };
     }
@@ -119,6 +137,9 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
           take: data.queryParams.limit,
           omit: {
             eliminado: true,
+          },
+          orderBy: {
+            codigo: "asc",
           },
         }),
         prisma.unidadProduccion.count({

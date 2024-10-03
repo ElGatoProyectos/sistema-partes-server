@@ -9,7 +9,10 @@ import prisma from "@/config/prisma.config";
 import fs from "fs/promises";
 import * as xlsx from "xlsx";
 import appRootPath from "app-root-path";
-import { ProductionUnitMulterProperties } from "./models/production-unit.constant";
+import {
+  ProductionUnitMulterFileProject,
+  ProductionUnitMulterProperties,
+} from "./models/production-unit.constant";
 import { Proyecto, UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
@@ -170,6 +173,43 @@ class ProductionUnitService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar la imagen de la Unidad de Producción",
+        error
+      );
+    } finally {
+      await prisma.$disconnect;
+    }
+  }
+  async findIdImageSectorizacion(project_id: number) {
+    try {
+      const projectResponse = await projectValidation.findById(project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const project = projectResponse.payload as Proyecto;
+
+      const imagePath =
+        appRootPath +
+        "/static/" +
+        ProductionUnitMulterFileProject.folder +
+        "/" +
+        "Project" +
+        "_" +
+        project.id +
+        ".png";
+      console.log(imagePath);
+      try {
+        // se verifica primero si el archivo existe en el path que colocaste y luego si es accesible
+        await fs.access(imagePath, fs.constants.F_OK);
+      } catch (error) {
+        return httpResponse.BadRequestException(
+          " La Imagen de la Sectorización del Proyecto no fue encontrada"
+        );
+      }
+
+      return httpResponse.SuccessResponse("Imagen encontrada", imagePath);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la imagen de la Sectorización del Proyecto",
         error
       );
     } finally {
