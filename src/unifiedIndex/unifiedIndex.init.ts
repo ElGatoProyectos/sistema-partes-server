@@ -17,13 +17,13 @@ unifiedIndexRouter.post(
 unifiedIndexRouter.post(
   `${prefix}/upload-excel/company/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.unifiedIndexReadExcel
 );
 
 unifiedIndexRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.allUnifiedIndex
 );
 
@@ -44,14 +44,14 @@ unifiedIndexRouter.put(
   `${prefix}/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
   unifiedIndexMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.update
 );
 
 unifiedIndexRouter.delete(
   `${prefix}/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.updateStatus
 );
 

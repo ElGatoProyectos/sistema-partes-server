@@ -37,10 +37,9 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate =
-              authService.verifyRolProjectUserAndAdminAndCostManager(
-                request.get("Authorization") as string
-              );
+            const responseValidate = authService.verifyRolProjectAdminUser(
+              request.get("Authorization") as string
+            );
             const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
@@ -119,10 +118,9 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate =
-              authService.verifyRolProjectUserAndAdminAndCostManager(
-                request.get("Authorization") as string
-              );
+            const responseValidate = authService.verifyRolProjectAdminUser(
+              request.get("Authorization") as string
+            );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
@@ -209,10 +207,9 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate =
-              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
-                request.get("Authorization") as string
-              );
+            const responseValidate = authService.verifyRolProjectAdminUser(
+              request.get("Authorization") as string
+            );
             const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);

@@ -9,13 +9,8 @@ import { ProjectMulterProperties } from "@/project/models/project.constant";
 import { Proyecto } from "@prisma/client";
 import { proyectoDto } from "./dto/project.dto";
 import fs from "fs/promises";
-import {
-  I_UpdateProjectState,
-  I_UpdateProyectBody,
-} from "./models/project.interface";
+import { I_UpdateProyectBody } from "./models/project.interface";
 import { proyectoDtoUpdate } from "./dto/proyectUpdate.dto";
-import { T_FindAll } from "@/common/models/pagination.types";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 import { authService } from "@/auth/auth.service";
 import { T_FindAllProject } from "./dto/project.type";
 
@@ -50,10 +45,9 @@ class ProjectController {
           try {
             // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
             //despues los valores
-            const responseValidate =
-              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
-                request.get("Authorization") as string
-              );
+            const responseValidate = authService.verifyRolProjectAdminUser(
+              request.get("Authorization") as string
+            );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
@@ -140,10 +134,9 @@ class ProjectController {
           try {
             // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
             //despues los valores
-            const responseValidate =
-              authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
-                request.get("Authorization") as string
-              );
+            const responseValidate = authService.verifyRolProjectAdminUser(
+              request.get("Authorization") as string
+            );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
             } else {
