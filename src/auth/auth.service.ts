@@ -63,46 +63,8 @@ class AuthService {
     } finally {
     }
   }
-  verifyRolProject(authorization: string) {
-    try {
-      const [bearer, token] = authorization.split(" ");
 
-      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
-
-      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-      if (
-        tokenDecrypted.role === "ADMIN" ||
-        tokenDecrypted.role === "GERENTE_PROYECTO"
-      ) {
-        return httpResponse.SuccessResponse("Éxito en la autenticación");
-      }
-    } catch (error) {
-      // console.log(error);
-      return httpResponse.UnauthorizedException("Error en la autenticación");
-    }
-  }
-  verifyRolProjectUserAndAdminAndCostManager(authorization: string) {
-    try {
-      const [bearer, token] = authorization.split(" ");
-
-      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
-
-      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-      if (
-        tokenDecrypted.role === "ADMIN" ||
-        tokenDecrypted.role === "CONTROL_COSTOS" ||
-        tokenDecrypted.role === "USER"
-      ) {
-        return httpResponse.SuccessResponse("Éxito en la autenticación");
-      }
-    } catch (error) {
-      // console.log(error);
-      return httpResponse.UnauthorizedException("Error en la autenticación");
-    }
-  }
-  verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
-    authorization: string
-  ) {
+  verifyRolProjectAdminUser(authorization: string) {
     try {
       const [bearer, token] = authorization.split(" ");
 
@@ -112,9 +74,34 @@ class AuthService {
       if (
         tokenDecrypted.role === "ADMIN" ||
         tokenDecrypted.role === "GERENTE_PROYECTO" ||
+        tokenDecrypted.role === "USER" ||
         tokenDecrypted.role === "CONTROL_COSTOS" ||
-        tokenDecrypted.role === "USER"
+        tokenDecrypted.role === "ASISTENTE_CONTROL_COSTOS" ||
+        tokenDecrypted.role === "INGENIERO_PRODUCCION" ||
+        tokenDecrypted.role === "ASISTENTE_PRODUCCION" ||
+        tokenDecrypted.role === "MAESTRO_OBRA" ||
+        tokenDecrypted.role === "CAPATAZ" ||
+        tokenDecrypted.role === "ADMINISTRACION_OBRA" ||
+        tokenDecrypted.role === "INGENIERO_SSOMMA" ||
+        tokenDecrypted.role === "ASISTENTE_SSOMMA" ||
+        tokenDecrypted.role === "LOGISTICA" ||
+        tokenDecrypted.role === "ASISTENTE_ALMACEN"
       ) {
+        return httpResponse.SuccessResponse("Éxito en la autenticación");
+      }
+    } catch (error) {
+      // console.log(error);
+      return httpResponse.UnauthorizedException("Error en la autenticación");
+    }
+  }
+  verifyRolProject(authorization: string) {
+    try {
+      const [bearer, token] = authorization.split(" ");
+
+      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
+      if (tokenDecrypted.role === "ADMIN") {
         return httpResponse.SuccessResponse("Éxito en la autenticación");
       }
     } catch (error) {

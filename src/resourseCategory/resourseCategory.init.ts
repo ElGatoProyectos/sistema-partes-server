@@ -10,27 +10,27 @@ const prefix = "/resourseCategory";
 
 resourseCategoryRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.allResoursesCategories
 );
 
 resourseCategoryRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.findByName
 );
 
 resourseCategoryRouter.get(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.findByIdResourseCategory
 );
 
 resourseCategoryRouter.post(
   `${prefix}`,
   resourseCategoryMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.create
 );
 
@@ -38,14 +38,14 @@ resourseCategoryRouter.put(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
   resourseCategoryMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.update
 );
 
 resourseCategoryRouter.delete(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   resourseCategoryController.updateStatus
 );
 

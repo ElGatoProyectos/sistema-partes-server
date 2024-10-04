@@ -9,7 +9,7 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel`,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.post(
@@ -18,37 +18,37 @@ prouductionUnitRouter.post(
 );
 prouductionUnitRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.findImage
 );
 prouductionUnitRouter.get(
   `${prefix}/sectorization/project`,
   productionUnitMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.findImageSectorizacionProject
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   productionUnitController.updateStatus
 );
 

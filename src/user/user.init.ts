@@ -10,14 +10,14 @@ const prefix = "/users";
 
 userRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  authRoleMiddleware.authAdminUser,
   userController.allUsers
 );
 
 userRouter.get(
   `${prefix}/details_user_company/:id`,
   userMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  authRoleMiddleware.authAdminUser,
   userController.allUsersForCompany
 );
 
@@ -37,7 +37,7 @@ userRouter.get(
 userRouter.post(
   `${prefix}`,
   userMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   userController.createUserAndSearchToken //antes aca era create pero no te lo asignarba a una empresa
 );
 
@@ -63,7 +63,7 @@ userRouter.put(
   `${prefix}/users_project`,
   userMiddleware.verifyFieldsUpdateRol,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   userController.createDetailUserProjectandChangeRol
 );
 
@@ -71,7 +71,7 @@ userRouter.put(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   userController.update
 );
 
@@ -80,7 +80,7 @@ userRouter.patch(
   userMiddleware.verifyHeadersFieldsId,
   userMiddleware.verifyHeadersFieldsRolId,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,
-  authRoleMiddleware.authAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   userController.createPermissions
 );
 

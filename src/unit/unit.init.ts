@@ -10,28 +10,28 @@ const prefix = "/unit";
 unitRouter.get(
   `${prefix}/:project_id`,
   unitMiddleware.verifyHeadersFieldsProject,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.allResoursesCategories
 );
 
 unitRouter.get(
   `${prefix}/search/:project_id`,
   unitMiddleware.verifyHeadersFieldsProject,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.findByName
 );
 
 unitRouter.delete(
   `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.updateStatus
 );
 
 unitRouter.get(
   `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.findByIdUnit
 );
 
@@ -39,7 +39,7 @@ unitRouter.post(
   `${prefix}/project/:project_id`,
   unitMiddleware.verifyHeadersFieldsProject,
   unitMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.create
 );
 
@@ -48,7 +48,7 @@ unitRouter.put(
   unitMiddleware.verifyHeadersFieldsId,
   unitMiddleware.verifyHeadersFieldsProject,
   unitMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminAndProjectManager,
+  authRoleMiddleware.authAdminUser,
   unitController.update
 );
 

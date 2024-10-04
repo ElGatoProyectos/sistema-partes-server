@@ -10,24 +10,24 @@ projectRouter.post(`${prefix}`, projectController.create);
 projectRouter.get(
   `${prefix}`,
   projectMiddleware.verifyFieldsUpdateState,
-  authRoleMiddleware.authViewAll,
+  authRoleMiddleware.authAdminUser,
   projectController.findAllProjectsXCompany
 );
 projectRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authViewAll,
+  authRoleMiddleware.authAdminUser,
   projectController.findByName
 );
 //ojo!!!! lo q pongas abajo ya q cuando coloque el /search abajo no me funcionaba la ruta
 projectRouter.get(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   projectMiddleware.verifyHeadersFields,
   projectController.findByIdProject
 );
 projectRouter.get(
   `${prefix}/file/:id`,
-  authRoleMiddleware.authViewAll,
+  authRoleMiddleware.authAdminUser,
   projectMiddleware.verifyHeadersFields,
   projectController.findImage
 );
@@ -36,19 +36,19 @@ projectRouter.patch(
   `${prefix}/:id`,
   projectMiddleware.verifyHeadersFields,
   projectMiddleware.verifyFieldsUpdateState,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   projectController.updateState
 );
 projectRouter.patch(
   `${prefix}/colors_project/:project_id`,
   projectMiddleware.verifyHeadersFieldsIdProject,
   projectMiddleware.verifyColors,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   projectController.updateColors
 );
 projectRouter.delete(
   `${prefix}/:id`,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authAdminUser,
   projectMiddleware.verifyHeadersFields,
   projectController.updateStatus
 );

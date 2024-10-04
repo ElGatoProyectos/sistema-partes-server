@@ -10,27 +10,27 @@ const prefix = "/job";
 jobRouter.post(
   `${prefix}`,
   jobMiddleware.verifyFields,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.create
 );
 jobRouter.get(
   `${prefix}`,
   jobMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.allJobs
 );
 
 jobRouter.delete(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.updateStatus
 );
 
 jobRouter.get(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.findById
 );
 
@@ -38,14 +38,14 @@ jobRouter.put(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
   jobMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.update
 );
 
 jobRouter.post(
   `${prefix}/upload-excel`,
   jobMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authUserAndAdminAndCostControl,
+  authRoleMiddleware.authAdminUser,
   jobController.jobReadExcel
 );
 

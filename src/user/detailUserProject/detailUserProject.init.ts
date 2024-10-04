@@ -10,13 +10,13 @@ const prefix = "/users_project";
 detailUserProjectRouter.get(
   `${prefix}`,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,
-  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  authRoleMiddleware.authAdminUser,
   detailUserProjectController.allUsersByProject
 );
 detailUserProjectRouter.delete(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndProjectManagerAndUser,
+  authRoleMiddleware.authAdminUser,
   detailUserProjectController.deleteUserFromProject
 );
 
