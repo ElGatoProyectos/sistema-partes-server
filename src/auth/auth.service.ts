@@ -81,6 +81,25 @@ class AuthService {
       return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }
+  verifyRolProjectUserAndAdminAndCostManager(authorization: string) {
+    try {
+      const [bearer, token] = authorization.split(" ");
+
+      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+      // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
+      if (
+        tokenDecrypted.role === "ADMIN" ||
+        tokenDecrypted.role === "CONTROL_COSTOS" ||
+        tokenDecrypted.role === "USER"
+      ) {
+        return httpResponse.SuccessResponse("Éxito en la autenticación");
+      }
+    } catch (error) {
+      // console.log(error);
+      return httpResponse.UnauthorizedException("Error en la autenticación");
+    }
+  }
   verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(
     authorization: string
   ) {

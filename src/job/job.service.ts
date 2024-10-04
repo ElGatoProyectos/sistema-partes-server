@@ -4,7 +4,14 @@ import { trainValidation } from "@/train/train.validation";
 import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
 import { converToDate } from "@/common/utils/date";
 import { jobValidation } from "./job.validation";
-import { E_Trabajo_Estado, Proyecto, Trabajo, Usuario } from "@prisma/client";
+import {
+  E_Trabajo_Estado,
+  Proyecto,
+  Trabajo,
+  Tren,
+  UnidadProduccion,
+  Usuario,
+} from "@prisma/client";
 import {
   I_CreateJobBody,
   I_JobExcel,
@@ -270,102 +277,107 @@ class JobService {
       let previousCodigo: number | null = null;
 
       //[note] aca si hay espacio en blanco.
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_JobExcel, index: number) => {
-      //     index++;
-      //     if (
-      //       item["ID-TRABAJO"] == undefined ||
-      //       item.TRABAJOS == undefined ||
-      //       item.TREN == undefined ||
-      //       item["UNIDAD DE PRODUCCION"] == undefined ||
-      //       item.INICIO == undefined ||
-      //       item.DURA == undefined ||
-      //       item.FINALIZA == undefined
-      //     ) {
-      //       error++;
-      //     }
-      //   })
-      // );
+      await Promise.all(
+        sheetToJson.map(async (item: I_JobExcel, index: number) => {
+          index++;
+          if (
+            item["ID-TRABAJO"] == undefined ||
+            item.TRABAJOS == undefined ||
+            item.TREN == undefined ||
+            item["UNIDAD DE PRODUCCION"] == undefined ||
+            item.INICIO == undefined ||
+            item.DURA == undefined ||
+            item.FINALIZA == undefined
+          ) {
+            error++;
+          }
+        })
+      );
 
-      // if (error > 0) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_JobExcel) => {
-      //     //verificamos si tenemos el codigo
-      //     const codigo = parseInt(item["ID-TRABAJO"], 10); // Intenta convertir el string a número
+      await Promise.all(
+        sheetToJson.map(async (item: I_JobExcel) => {
+          //verificamos si tenemos el codigo
+          const codigo = parseInt(item["ID-TRABAJO"], 10); // Intenta convertir el string a número
 
-      //     if (!validator.isNumeric(item["ID-TRABAJO"])) {
-      //       errorNumber++; // Aumenta si el código no es un número válido
-      //     } else {
-      //       // Verifica si el código ya ha sido procesado
-      //       if (!seenCodes.has(item["ID-TRABAJO"])) {
-      //         // errorNumber++; // Aumenta si hay duplicado
-      //         seenCodes.add(item["ID-TRABAJO"]);
-      //       }
+          if (!validator.isNumeric(item["ID-TRABAJO"])) {
+            errorNumber++; // Aumenta si el código no es un número válido
+          } else {
+            // Verifica si el código ya ha sido procesado
+            if (!seenCodes.has(item["ID-TRABAJO"])) {
+              // errorNumber++; // Aumenta si hay duplicado
+              seenCodes.add(item["ID-TRABAJO"]);
+            }
 
-      //       // Verifica si el código actual no es mayor que el anterior
-      //       if (previousCodigo !== null && codigo <= previousCodigo) {
-      //         errorNumber++;
-      //       }
+            // Verifica si el código actual no es mayor que el anterior
+            if (previousCodigo !== null && codigo <= previousCodigo) {
+              errorNumber++;
+            }
 
-      //       previousCodigo = codigo;
-      //     }
-      //   })
-      // );
+            previousCodigo = codigo;
+          }
+        })
+      );
 
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       // //[NOTE] Acá verifico si el primer elemento es 001
-      // const sortedCodesArray = Array.from(seenCodes)
-      //   .map((item) => item.padStart(4, "0"))
-      //   .sort((a, b) => parseInt(a) - parseInt(b));
+      const sortedCodesArray = Array.from(seenCodes)
+        .map((item) => item.padStart(4, "0"))
+        .sort((a, b) => parseInt(a) - parseInt(b));
 
-      // if (sortedCodesArray[0] != "0001") {
-      //   errorNumber++;
-      // }
+      if (sortedCodesArray[0] != "0001") {
+        errorNumber++;
+      }
 
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
       // //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
-      // for (let i = 1; i < sortedCodesArray.length; i++) {
-      //   const currentCode = parseInt(sortedCodesArray[i]);
-      //   const previousCode = parseInt(sortedCodesArray[i - 1]);
+      for (let i = 1; i < sortedCodesArray.length; i++) {
+        const currentCode = parseInt(sortedCodesArray[i]);
+        const previousCode = parseInt(sortedCodesArray[i - 1]);
 
-      //   if (currentCode !== previousCode + 1) {
-      //     errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-      //     break; // Puedes detener el ciclo en el primer error
-      //   }
-      // }
+        if (currentCode !== previousCode + 1) {
+          errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
+          break; // Puedes detener el ciclo en el primer error
+        }
+      }
 
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     "Error al leer el archivo. Verificar los campos"
-      //   );
-      // }
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. Verificar los campos"
+        );
+      }
 
       //[NOTE] ACÁ VERIFICAMOS SI LOS TRENES Y LAS UNIDADES DE PRODUCCIÓN EXISTEN
       await Promise.all(
         sheetToJson.map(async (item: I_JobExcel, index: number) => {
           index++;
-          const trainResponse = await trainValidation.findById(+item.TREN);
+          const trainResponse = await trainValidation.findByCodeValidation(
+            item.TREN,
+            projectId
+          );
           if (!trainResponse.success) {
             error++;
           }
-          const upResponse = await productionUnitValidation.findById(
-            +item["UNIDAD DE PRODUCCION"]
-          );
+          const upResponse =
+            await productionUnitValidation.findByCodeValidation(
+              item["UNIDAD DE PRODUCCION"],
+              projectId
+            );
           if (!upResponse.success) {
             error++;
           }
@@ -406,6 +418,17 @@ class JobService {
             inicioDate.setUTCHours(0, 0, 0, 0);
             endDate.setUTCHours(0, 0, 0, 0);
             const formattedDuracion = parseFloat(item.DURA).toFixed(1);
+            const upResponse =
+              await productionUnitValidation.findByCodeValidation(
+                item["UNIDAD DE PRODUCCION"],
+                projectId
+              );
+            const up = upResponse.payload as UnidadProduccion;
+            const trainResponse = await trainValidation.findByCodeValidation(
+              item.TREN,
+              projectId
+            );
+            const train = trainResponse.payload as Tren;
             await prisma.trabajo.create({
               data: {
                 codigo: String(item["ID-TRABAJO"]),
@@ -419,9 +442,9 @@ class JobService {
                 costo_material: 0,
                 costo_equipo: 0,
                 costo_varios: 0,
-                tren_id: +item.TREN,
+                tren_id: train.id,
                 estado_trabajo: E_Trabajo_Estado.PROGRAMADO,
-                up_id: +item["UNIDAD DE PRODUCCION"],
+                up_id: up.id,
                 proyecto_id: responseProject.id,
                 usuario_id: userResponse.id,
               },

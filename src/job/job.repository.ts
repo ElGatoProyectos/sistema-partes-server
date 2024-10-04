@@ -18,12 +18,5 @@ export abstract class JobRepository {
 
   updateStatusJob(idUser: number): void {}
 
-  searchNameJob(
-    name: string,
-    skip: number,
-    limit: number,
-    project_id: number
-  ): void {}
-
   codeMoreHigh(project_id: number): void {}
 }
