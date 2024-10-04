@@ -8,17 +8,10 @@ const unitRouter = express.Router();
 const prefix = "/unit";
 
 unitRouter.get(
-  `${prefix}/:project_id`,
-  unitMiddleware.verifyHeadersFieldsProject,
+  `${prefix}`,
+  unitMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   unitController.allResoursesCategories
-);
-
-unitRouter.get(
-  `${prefix}/search/:project_id`,
-  unitMiddleware.verifyHeadersFieldsProject,
-  authRoleMiddleware.authAdminUser,
-  unitController.findByName
 );
 
 unitRouter.delete(
@@ -36,17 +29,23 @@ unitRouter.get(
 );
 
 unitRouter.post(
-  `${prefix}/project/:project_id`,
-  unitMiddleware.verifyHeadersFieldsProject,
+  `${prefix}`,
+  unitMiddleware.verifyHeadersFieldsIdProject,
   unitMiddleware.verifyFieldsRegistry,
   authRoleMiddleware.authAdminUser,
   unitController.create
 );
+unitRouter.post(
+  `${prefix}/upload-excel`,
+  unitMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  unitController.unitReadExcel
+);
 
 unitRouter.put(
-  `${prefix}/:id/project/:project_id`,
+  `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,
-  unitMiddleware.verifyHeadersFieldsProject,
+  unitMiddleware.verifyHeadersFieldsIdProject,
   unitMiddleware.verifyFieldsUpdate,
   authRoleMiddleware.authAdminUser,
   unitController.update

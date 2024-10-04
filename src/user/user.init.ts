@@ -13,7 +13,11 @@ userRouter.get(
   authRoleMiddleware.authAdminUser,
   userController.allUsers
 );
-
+userRouter.post(
+  `${prefix}/company`,
+  authRoleMiddleware.authAdmin,
+  userController.createUserandCompany
+);
 userRouter.get(
   `${prefix}/details_user_company/:id`,
   userMiddleware.verifyHeadersFieldsId,
@@ -41,11 +45,6 @@ userRouter.post(
   userController.createUserAndSearchToken //antes aca era create pero no te lo asignarba a una empresa
 );
 
-userRouter.post(
-  `${prefix}/company`,
-  authRoleMiddleware.authAdmin,
-  userController.createUserandCompany
-);
 userRouter.put(
   `${prefix}/:id/company`,
   authRoleMiddleware.authAdmin,

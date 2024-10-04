@@ -82,17 +82,13 @@ class UserService {
 
   async findAllUserCompany(
     data: T_FindAllUserCompany,
-    user_id: number
+    company_id: number
   ): Promise<T_HttpResponse> {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       let rol: any = null;
-      const userResponse = await userValidation.findById(user_id);
-      if (!userResponse.success) {
-        return userResponse;
-      }
-      const user = userResponse.payload as Usuario;
-      const companyResponse = await companyValidation.findByIdUser(user.id);
+
+      const companyResponse = await companyValidation.findById(company_id);
       if (!companyResponse.success) {
         return companyResponse;
       }

@@ -50,42 +50,6 @@ class PrismaUnitRepository implements UnitRepository {
   //   });
   //   return resourseCategory;
   // }
-  async searchNameUnit(
-    name: string,
-    skip: number,
-    limit: number,
-    project_id: number
-  ): Promise<{
-    units: I_Unit[];
-    total: number;
-  }> {
-    const [units, total]: [I_Unit[], number] = await prisma.$transaction([
-      prisma.unidad.findMany({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-        skip,
-        take: limit,
-        omit: {
-          eliminado: true,
-        },
-      }),
-      prisma.unidad.count({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-      }),
-    ]);
-    return { units, total };
-  }
 
   async findAll(
     skip: number,
