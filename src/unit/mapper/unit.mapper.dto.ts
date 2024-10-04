@@ -5,7 +5,6 @@ export class ResponseUnitMapper implements Omit<Unidad, "eliminado"> {
   codigo: string;
   nombre: string;
   simbolo: string;
-  descripcion: string;
   empresa_id: number;
   fecha_creacion: Date;
   proyecto_id: number;
@@ -15,7 +14,6 @@ export class ResponseUnitMapper implements Omit<Unidad, "eliminado"> {
     this.codigo = unit.codigo;
     this.nombre = unit.nombre;
     this.simbolo = unit.simbolo ? unit.simbolo : "";
-    this.descripcion = unit.descripcion ? unit.descripcion : "";
     this.empresa_id = unit.empresa_id;
     this.fecha_creacion = unit.fecha_creacion;
     this.proyecto_id = unit.proyecto_id;

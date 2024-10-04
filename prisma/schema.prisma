@@ -641,7 +641,6 @@ model Unidad {
   codigo         String
   nombre         String
   simbolo        String?
-  descripcion    String?
   empresa_id     Int
   proyecto_id    Int
   Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])

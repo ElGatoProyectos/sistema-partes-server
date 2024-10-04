@@ -329,7 +329,7 @@ class UserController {
     const name = request.query.name as string;
     const state = request.query.state as string;
     const rol = request.query.rol as string;
-    const user_id = Number(request.params.id);
+    const company_id = Number(request.params.id);
     let paginationOptions: T_FindAllUserCompany = {
       queryParams: {
         page: page,
@@ -341,7 +341,7 @@ class UserController {
     };
     const result = await userService.findAllUserCompany(
       paginationOptions,
-      user_id
+      company_id
     );
 
     response.status(result.statusCode).json(result);

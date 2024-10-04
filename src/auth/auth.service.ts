@@ -163,7 +163,7 @@ class AuthService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear el usuario",
+        "Error en la autenticación del usuario",
         error
       );
     } finally {

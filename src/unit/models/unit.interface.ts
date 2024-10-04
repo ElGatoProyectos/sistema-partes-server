@@ -13,8 +13,7 @@ export interface I_UpdateUnitBodyValidation
 export interface I_Unit extends Omit<Unidad, "eliminado"> {}
 
 export interface I_UnitExcel {
-  "ID-UNIT": string;
-  NOMBRE: string;
+  "ID-UNIDAD": string;
   SIMBOLO: string;
   DESCRIPCION: string;
 }

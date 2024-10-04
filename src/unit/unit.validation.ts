@@ -3,7 +3,7 @@ import { prismaUnitRepository } from "./prisma-unit.repository";
 import { I_UnitExcel } from "./models/unit.interface";
 
 class UnitValidation {
-  async updateUnifiedIndex(
+  async updateUnit(
     data: I_UnitExcel,
     unit_id: number,
     company_id: number,
@@ -11,10 +11,9 @@ class UnitValidation {
   ): Promise<T_HttpResponse> {
     try {
       const unifiedIndexFormat = {
-        codigo: String(data["ID-UNIT"]),
-        nombre: data.NOMBRE,
+        codigo: String(data["ID-UNIDAD"]),
         simbolo: data.SIMBOLO,
-        descripcion: data.DESCRIPCION,
+        nombre: data.DESCRIPCION,
         empresa_id: company_id,
         proyecto_id: project_id,
       };

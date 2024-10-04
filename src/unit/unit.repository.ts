@@ -18,11 +18,4 @@ export abstract class UnitRepository {
   updateUnit(data: I_UpdateUnitBody, idUnit: number): void {}
 
   updateStatusUnit(idResourseCategory: number): void {}
-
-  searchNameUnit(
-    name: string,
-    skip: number,
-    limit: number,
-    project_id: number
-  ): void {}
 }
