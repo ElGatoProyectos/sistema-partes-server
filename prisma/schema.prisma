@@ -558,20 +558,20 @@ model Partida {
   id_interno            String
   item                  String
   partida               String
-  metrado_inicial       Float
+  metrado_inicial       Float?
   metrado_total         Float
-  precio                Float
+  precio                Float?
   parcial               Float?                  @default(0)
-  mano_de_obra_unitaria String
-  material_unitario     String
-  equipo_unitario       String
-  subcontrata_varios    String
+  mano_de_obra_unitaria String?
+  material_unitario     String?
+  equipo_unitario       String?
+  subcontrata_varios    String?
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)
-  unidad_id             Int
+  unidad_id             Int?
   usuario_id            Int
   proyecto_id           Int
-  Unidad                Unidad                  @relation(fields: [unidad_id], references: [id])
+  Unidad                Unidad?                 @relation(fields: [unidad_id], references: [id])
   Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
