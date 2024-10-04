@@ -9,21 +9,21 @@ const prefix = "/train";
 trainRouter.get(
   `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.allTrains
 );
 
 trainRouter.get(
   `${prefix}/search`,
   trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.findByName
 );
 
 trainRouter.get(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.findByIdTrain
 );
 
@@ -31,7 +31,7 @@ trainRouter.put(
   `${prefix}/cuadrilla/:id`,
   trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyFieldsUpdateCuadrilla,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.updateCuadrilla
 );
 
@@ -39,20 +39,20 @@ trainRouter.post(
   `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFields,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.create
 );
 trainRouter.post(
   `${prefix}/upload-excel`,
   trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.trainReadExcel
 );
 
 trainRouter.delete(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.updateStatus
 );
 
@@ -60,7 +60,7 @@ trainRouter.put(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   trainController.update
 );
 

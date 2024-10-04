@@ -60,7 +60,7 @@ class AuthRoleMiddleware {
       response.status(customError.statusCode).send(customError);
     }
   }
-  authAdminAndCostControl(
+  authUserAndAdminAndCostControl(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
@@ -82,7 +82,8 @@ class AuthRoleMiddleware {
       // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
       if (
         tokenDecrypted.role === "ADMIN" ||
-        tokenDecrypted.role === "CONTROL_COSTOS"
+        tokenDecrypted.role === "CONTROL_COSTOS" ||
+        tokenDecrypted.role === "USER"
       ) {
         nextFunction();
       } else {

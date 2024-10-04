@@ -40,6 +40,26 @@ class TrainValidation {
           train
         );
       }
+      return httpResponse.SuccessResponse("Tren no encontrado", train);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código del Tren",
+        error
+      );
+    }
+  }
+  async findByCodeValidation(
+    code: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const train = await prismaTrainRepository.findByCode(code, project_id);
+      if (!train) {
+        return httpResponse.NotFoundException(
+          "Codigo del Tren no encontrado",
+          train
+        );
+      }
       return httpResponse.SuccessResponse("Tren encontrado", train);
     } catch (error) {
       return httpResponse.InternalServerErrorException(

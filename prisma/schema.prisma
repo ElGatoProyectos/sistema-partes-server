@@ -555,7 +555,7 @@ model Tren {
 //[success] actual
 model Partida {
   id                    Int                     @id @default(autoincrement())
-  id_interno            String                  @unique //es código
+  id_interno            String
   item                  String
   partida               String
   metrado_inicial       Float
@@ -567,6 +567,7 @@ model Partida {
   equipo_unitario       String
   subcontrata_varios    String
   fecha_creacion        DateTime                @default(now())
+  eliminado             E_Estado_BD             @default(n)
   unidad_id             Int
   usuario_id            Int
   proyecto_id           Int

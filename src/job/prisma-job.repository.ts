@@ -148,39 +148,6 @@ class PrismaJobRepository implements JobRepository {
     });
     return lastJob;
   }
-  async searchNameJob(
-    name: string,
-    skip: number,
-    limit: number,
-    project_id: number
-  ): Promise<{ jobs: I_Job[]; total: number }> {
-    const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
-      prisma.trabajo.findMany({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-        skip,
-        take: limit,
-        omit: {
-          eliminado: true,
-        },
-      }),
-      prisma.trabajo.count({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-      }),
-    ]);
-    return { jobs, total };
-  }
 }
 
 export const prismaJobRepository = new PrismaJobRepository();

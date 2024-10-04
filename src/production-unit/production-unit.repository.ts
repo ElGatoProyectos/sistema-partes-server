@@ -28,5 +28,5 @@ export abstract class ProudctionUnitRepository {
 
   searchNameProductionUnit(name: string, skip: number, limit: number): void {}
 
-  codeMoreHigh(): void {}
+  codeMoreHigh(project_id: number): void {}
 }

@@ -35,10 +35,11 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     });
     return productionUnit;
   }
-  async codeMoreHigh(): Promise<UnidadProduccion | null> {
+  async codeMoreHigh(project_id: number): Promise<UnidadProduccion | null> {
     const lastProductionUnit = await prisma.unidadProduccion.findFirst({
       where: {
-        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+        // eliminado: E_Estado_BD.n,
       },
       orderBy: { codigo: "desc" },
     });
@@ -101,21 +102,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     project_id: number
   ): Promise<{ productionUnits: I_ProductionUnit[]; total: number }> {
     let filters: any = {};
-    const arrayNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-    // if (!lettersInNumbers(data.queryParams.search)) {
-    //   console.log("no tiene");
-    // } else {
-    //   console.log("tiene");
-    // }
-    // if (isNumeric(data.queryParams.search)) {
-    //   filters.codigo = {
-    //     contains: data.queryParams.search,
-    //   };
-    // } else {
-    //   filters.nombre = {
-    //     contains: data.queryParams.search,
-    //   };
-    // }
+
     if (data.queryParams.search) {
       if (isNaN(data.queryParams.search as any)) {
         filters.nombre = {

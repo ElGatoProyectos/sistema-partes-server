@@ -9,7 +9,7 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel`,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.post(
@@ -18,37 +18,37 @@ prouductionUnitRouter.post(
 );
 prouductionUnitRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.findImage
 );
 prouductionUnitRouter.get(
   `${prefix}/sectorization/project`,
   productionUnitMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.findImageSectorizacionProject
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminAndGeneralProjectAndCostControlAndUser,
+  authRoleMiddleware.authUserAndAdminAndCostControl,
   productionUnitController.updateStatus
 );
 

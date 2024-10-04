@@ -1,6 +1,9 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaJobRepository } from "./prisma-job.repository";
 import { I_JobExcel } from "./models/job.interface";
+import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
+import { Tren, UnidadProduccion } from "@prisma/client";
+import { trainValidation } from "@/train/train.validation";
 
 class JobValidation {
   async updateJob(
@@ -18,11 +21,21 @@ class JobValidation {
       inicioDate.setUTCHours(0, 0, 0, 0);
       endDate.setUTCHours(0, 0, 0, 0);
       const formattedDuracion = parseFloat(data.DURA).toFixed(1);
+      const upResponse = await productionUnitValidation.findByCodeValidation(
+        data["UNIDAD DE PRODUCCION"],
+        project_id
+      );
+      const up = upResponse.payload as UnidadProduccion;
+      const trainResponse = await trainValidation.findByCodeValidation(
+        data.TREN,
+        project_id
+      );
+      const train = trainResponse.payload as Tren;
       const jobFormat = {
         codigo: data["ID-TRABAJO"],
         nombre: data.TRABAJOS,
-        tren_id: +data.TREN,
-        up_id: +data["UNIDAD DE PRODUCCION"],
+        tren_id: train.id,
+        up_id: up.id,
         fecha_inicio: inicioDate,
         fecha_finalizacion: endDate,
         duracion: +formattedDuracion,

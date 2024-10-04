@@ -40,7 +40,7 @@ class ProductionUnitService {
         );
       }
 
-      const formattedCodigo = await this.getNextProductionUnitCode();
+      const formattedCodigo = await this.getNextProductionUnitCode(project_id);
 
       const productionUnit = {
         ...data,
@@ -69,8 +69,10 @@ class ProductionUnitService {
     }
   }
 
-  async getNextProductionUnitCode(): Promise<string> {
-    const lastProductionUnit = await productionUnitValidation.codeMoreHigh();
+  async getNextProductionUnitCode(project_id: number): Promise<string> {
+    const lastProductionUnit = await productionUnitValidation.codeMoreHigh(
+      project_id
+    );
     const lastProductionUnitResponse =
       lastProductionUnit.payload as UnidadProduccion;
 

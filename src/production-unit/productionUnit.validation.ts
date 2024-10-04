@@ -17,12 +17,38 @@ class ProductionUnitValidation {
         );
       }
       return httpResponse.SuccessResponse(
-        "Proyecto encontrado",
+        "Unidad de Producción encontrado",
         productionUnit
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar proyecto",
+        error
+      );
+    }
+  }
+  async findByCodeValidation(
+    code: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const productionUnit = await prismaProductionUnitRepository.findByCode(
+        code,
+        project_id
+      );
+      if (!productionUnit) {
+        return httpResponse.NotFoundException(
+          "Codigo de la Unidad de Producción no encontrado",
+          productionUnit
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Unidad de Producción encontrado",
+        productionUnit
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Unidad de Producción",
         error
       );
     }
@@ -43,7 +69,7 @@ class ProductionUnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar proyecto",
+        "Error al buscar Unidad de Producción",
         error
       );
     }
@@ -71,20 +97,21 @@ class ProductionUnitValidation {
     }
   }
 
-  async codeMoreHigh(): Promise<T_HttpResponse> {
+  async codeMoreHigh(project_id: number): Promise<T_HttpResponse> {
     try {
-      const productionUnit =
-        await prismaProductionUnitRepository.codeMoreHigh();
+      const productionUnit = await prismaProductionUnitRepository.codeMoreHigh(
+        project_id
+      );
       if (!productionUnit) {
         return httpResponse.SuccessResponse("No se encontraron resultados", []);
       }
       return httpResponse.SuccessResponse(
-        "Proyecto encontrado",
+        "Unidad de Producción encontrado",
         productionUnit
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar proyecto",
+        "Error al buscar Unidad de Producción",
         error
       );
     }
