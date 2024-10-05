@@ -13,6 +13,12 @@ detailUserProjectRouter.get(
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.allUsersByProject
 );
+detailUserProjectRouter.get(
+  `${prefix}/unassigned`,
+  userMiddleware.verifyHeadersFieldsIdProjectHeader,
+  authRoleMiddleware.authAdminUser,
+  detailUserProjectController.allUsersByProjectUnassigned
+);
 detailUserProjectRouter.delete(
   `${prefix}/:id`,
   userMiddleware.verifyHeadersFieldsId,
