@@ -47,6 +47,47 @@ class DetailUserProjectService {
       await prisma.$disconnect();
     }
   }
+  async findAllUnassigned(
+    data: T_FindAllDetailUserProject,
+    project_id: string
+  ) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result =
+        await prismaDetailUserProjectRepository.getAllUsersOfProjectUnassigned(
+          skip,
+          data,
+          +project_id
+        );
+
+      const { userAll, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: userAll,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Usuarios del Proyecto sin asignar",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Usuarios del Proyecto sin asignar",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async deleteUserFromProject(
     user_id: number,
     project_id: number

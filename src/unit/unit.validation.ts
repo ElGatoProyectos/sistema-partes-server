@@ -61,6 +61,24 @@ class UnitValidation {
       );
     }
   }
+  async findByCodeValidation(
+    code: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const unit = await prismaUnitRepository.findByCode(code, project_id);
+      if (!unit) {
+        return httpResponse.NotFoundException("Unidad no fue encontrada");
+      }
+      return httpResponse.SuccessResponse("La Unidad fue encontrada", unit);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Unidad ",
+        error
+      );
+    }
+  }
+
   async findById(idResourseCategory: number): Promise<T_HttpResponse> {
     try {
       const unitResponse = await prismaUnitRepository.findById(

@@ -388,11 +388,12 @@ class UnitService {
       let unit;
       await Promise.all(
         sheetToJson.map(async (item: I_UnitExcel) => {
-          code = await unitValidation.findByCode(
+          code = await unitValidation.findByCodeValidation(
             String(item["ID-UNIDAD"]),
             project_id
           );
-          if (!code.success) {
+          if (code.success) {
+            console.log("el id " + item["ID-UNIDAD"] + " entro a actualizar");
             unit = code.payload as Unidad;
             await unitValidation.updateUnit(
               item,
@@ -401,6 +402,7 @@ class UnitService {
               responseProject.id
             );
           } else {
+            console.log("el id " + item["ID-UNIDAD"] + " entro a crear");
             await prisma.unidad.create({
               data: {
                 codigo: String(item["ID-UNIDAD"]),
