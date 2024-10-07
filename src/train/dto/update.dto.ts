@@ -6,4 +6,7 @@ export const trainUpdateDto = z.object({
   operario: z.number().optional(),
   oficial: z.number().optional(),
   peon: z.number().optional(),
+  // "workers": 22,
+  // "official": 33,
+  // "pawns": 31
 });

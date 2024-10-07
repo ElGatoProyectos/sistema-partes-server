@@ -101,11 +101,18 @@ class TrainService {
       }
       const trainFormat = {
         ...data,
-        operario: data.operario,
-        oficial: data.oficial,
-        peon: data.peon,
         proyecto_id: +project_id,
       };
+      if (data.operario != resultTrainFind.operario) {
+        trainFormat.operario = data.operario;
+      }
+      if (data.oficial != resultTrainFind.oficial) {
+        trainFormat.oficial = data.oficial;
+      }
+      if (data.peon != resultTrainFind.peon) {
+        trainFormat.peon = data.peon;
+      }
+
       const responseTrain = await prismaTrainRepository.updateTrain(
         trainFormat,
         idTrain
