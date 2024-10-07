@@ -9,11 +9,9 @@ export interface I_UpdateDepartureBD
   extends Omit<Partida, "id" | "eliminado" | "fecha_creacion"> {}
 
 export interface I_UpdateDepartureBDValidationExcel
-  extends Omit<
-    Partida,
-    "id" | "nota" | "estado_trabajo" | "eliminado" | "fecha_creacion"
-  > {}
-
+  extends Omit<Partida, "id" | "eliminado" | "fecha_creacion"> {}
+export interface I_UpdateDeaprtureBodyValidation
+  extends Omit<Partida, "id" | "eliminado" | "fecha_creacion"> {}
 export interface I_CreateDepartureBody
   extends Omit<
     Partida,
@@ -43,16 +41,15 @@ export interface I_UpdateDepartureBody
 export interface I_Departure extends Omit<Partida, "eliminado"> {}
 
 export interface I_DepartureExcel {
-  "ID-TRABAJO": string;
-  TRABAJOS: string;
-  TREN: string;
-  "UNIDAD DE PRODUCCION": string;
-  INICIO: number;
-  DURA: string;
-  FINALIZA: number;
-  COSTO: string;
-  MAT: string;
-  MO: string;
-  EQ: string;
-  HE: string;
+  "ID-PARTIDA": string;
+  ITEM: string;
+  PARTIDA: string;
+  UNI: string;
+  METRADO: number;
+  PRECIO: string;
+  PARCIAL: number;
+  "MANO DE OBRA UNITARIO": string;
+  "MATERIAL UNITARIO": string;
+  "EQUIPO UNITARIO": string;
+  "SUBCONTRATA - VARIOS UNITARIO": string;
 }

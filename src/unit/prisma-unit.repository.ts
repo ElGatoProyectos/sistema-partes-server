@@ -34,7 +34,9 @@ class PrismaUnitRepository implements UnitRepository {
   ): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {
-        simbolo: symbol,
+        simbolo: {
+          contains: symbol,
+        },
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
@@ -95,14 +97,14 @@ class PrismaUnitRepository implements UnitRepository {
   }
 
   async existsName(name: string, project_id: number): Promise<Unidad | null> {
-    const resourseCategory = await prisma.unidad.findFirst({
+    const unit = await prisma.unidad.findFirst({
       where: {
         nombre: name,
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
     });
-    return resourseCategory;
+    return unit;
   }
 
   async createUnit(data: I_CreateUnitBD): Promise<Unidad> {

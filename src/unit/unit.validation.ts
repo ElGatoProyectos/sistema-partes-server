@@ -10,7 +10,7 @@ class UnitValidation {
     project_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const unifiedIndexFormat = {
+      const unitFormat = {
         codigo: String(data["ID-UNIDAD"]),
         simbolo: data.SIMBOLO,
         nombre: data.DESCRIPCION,
@@ -19,7 +19,7 @@ class UnitValidation {
       };
 
       const responseUnifiedIndex = await prismaUnitRepository.updateUnit(
-        unifiedIndexFormat,
+        unitFormat,
         unit_id
       );
       return httpResponse.SuccessResponse(
@@ -47,20 +47,7 @@ class UnitValidation {
       );
     }
   }
-  async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
-    try {
-      const unit = await prismaUnitRepository.findByCode(code, project_id);
-      if (unit) {
-        return httpResponse.NotFoundException("Unidad fue encontrada");
-      }
-      return httpResponse.SuccessResponse("La Unidad fue encontrada", unit);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar la Unidad ",
-        error
-      );
-    }
-  }
+
   async findByCodeValidation(
     code: string,
     project_id: number
@@ -114,7 +101,7 @@ class UnitValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar la Categoria del recurso en la base de datos",
+        " Error al buscar el nombre de la Partida en la base de datos",
         error
       );
     }
@@ -128,13 +115,39 @@ class UnitValidation {
         symbol,
         project_id
       );
-      if (symbolExists) {
+      if (!symbolExists) {
         return httpResponse.NotFoundException(
-          "El simbolo ingresado de la Unidad ya existe en la base de datos"
+          "El simbolo ingresado de la Unidad no existe en la base de datos"
         );
       }
       return httpResponse.SuccessResponse(
-        "El simbolo no existe, puede proceguir"
+        "El simbolo de la Unidad existe, puede proceguir",
+        symbolExists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        " Error al buscar el simbolo de la Unidad en la base de datos",
+        error
+      );
+    }
+  }
+  async findBySymbolForCreate(
+    symbol: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const symbolExists = await prismaUnitRepository.existsSymbol(
+        symbol,
+        project_id
+      );
+      if (symbolExists) {
+        return httpResponse.NotFoundException(
+          "El simbolo ingresado de la Unidad existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El simbolo de la Unidad no existe, puede proceguir",
+        symbolExists
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

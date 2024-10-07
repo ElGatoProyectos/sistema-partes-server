@@ -47,8 +47,7 @@ class JobController {
   async allJobs(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    const codigo = request.query.codigo as string;
-    const name = request.query.name as string;
+    const search = request.query.search as string;
     const fecha_inicio = request.query.fecha_inicio as string;
     const fecha_finalizacion = request.query.fecha_finalizacion as string;
     const project_id = request.get("project-id") as string;
@@ -56,8 +55,7 @@ class JobController {
       queryParams: {
         page: page,
         limit: limit,
-        name: name,
-        codigo: codigo,
+        search: search,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
       },

@@ -15,9 +15,7 @@ export abstract class DepartureRepository {
 
   existsName(name: string, project_id: number): void {}
 
-  updateDeparture(data: I_UpdateDepartureBD, job_id: number): void {}
-
-  updateDepartureFromExcel(data: I_UpdateDepartureBD, job_id: number): void {}
+  updateDeparture(data: I_UpdateDepartureBD, departure_id: number): void {}
 
   updateStatusDeparture(idUser: number): void {}
 

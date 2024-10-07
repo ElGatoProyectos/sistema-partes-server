@@ -80,15 +80,16 @@ class PrismaJobRepository implements JobRepository {
     let filters: any = {};
     let fecha_inicio;
     let fecha_finalizacion;
-    if (data.queryParams.codigo) {
-      filters.codigo = {
-        contains: data.queryParams.codigo,
-      };
-    }
-    if (data.queryParams.name) {
-      filters.nombre = {
-        contains: data.queryParams.name,
-      };
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.nombre = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.codigo = {
+          contains: data.queryParams.search,
+        };
+      }
     }
     if (data.queryParams.fecha_inicio) {
       fecha_inicio = converToDate(data.queryParams.fecha_inicio);

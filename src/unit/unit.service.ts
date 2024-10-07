@@ -42,7 +42,7 @@ class UnitService {
         return resultName;
       }
       if (data.simbolo) {
-        const resultSymbol = await unitValidation.findBySymbol(
+        const resultSymbol = await unitValidation.findBySymbolForCreate(
           data.simbolo,
           project_id
         );
@@ -81,7 +81,6 @@ class UnitService {
         unitMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear la Unidad",
         error
@@ -185,6 +184,33 @@ class UnitService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Unidad",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findBySymbol(
+    symbol: string,
+    project_id: string
+  ): Promise<T_HttpResponse> {
+    try {
+      const responseUnit = await prismaUnitRepository.existsSymbol(
+        symbol,
+        +project_id
+      );
+      if (!responseUnit) {
+        return httpResponse.NotFoundException(
+          "El simbolo de la Unidad no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El simbolo de la Unidad fue encontrada",
+        responseUnit
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el simbolo de la Unidad",
         error
       );
     } finally {
@@ -300,7 +326,6 @@ class UnitService {
       await Promise.all(
         sheetToJson.map(async (item: I_UnitExcel, index: number) => {
           index++;
-          console.log("id " + item["ID-UNIDAD"]);
           if (
             item["ID-UNIDAD"] == undefined ||
             item.DESCRIPCION == undefined ||
@@ -312,7 +337,6 @@ class UnitService {
       );
 
       if (error > 0) {
-        console.log("hay blanco");
         return httpResponse.BadRequestException(
           "Error al leer el archivo. Verificar los campos"
         );
@@ -344,7 +368,6 @@ class UnitService {
       );
 
       if (errorNumber > 0) {
-        console.log("hay letras y numeros");
         return httpResponse.BadRequestException(
           "Error al leer el archivo. Verificar los campos"
         );
@@ -360,7 +383,6 @@ class UnitService {
       }
 
       if (errorNumber > 0) {
-        console.log("no comienza como 001");
         return httpResponse.BadRequestException(
           "Error al leer el archivo. Verificar los campos"
         );
@@ -377,7 +399,6 @@ class UnitService {
       }
 
       if (errorNumber > 0) {
-        console.log("es mayor a 1!!");
         return httpResponse.BadRequestException(
           "Error al leer el archivo. Verificar los campos"
         );
@@ -393,7 +414,6 @@ class UnitService {
             project_id
           );
           if (code.success) {
-            console.log("el id " + item["ID-UNIDAD"] + " entro a actualizar");
             unit = code.payload as Unidad;
             await unitValidation.updateUnit(
               item,
@@ -402,7 +422,6 @@ class UnitService {
               responseProject.id
             );
           } else {
-            console.log("el id " + item["ID-UNIDAD"] + " entro a crear");
             await prisma.unidad.create({
               data: {
                 codigo: String(item["ID-UNIDAD"]),
@@ -420,7 +439,6 @@ class UnitService {
 
       return httpResponse.SuccessResponse("Unidades creadas correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer las Unidades",
