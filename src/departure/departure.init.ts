@@ -7,11 +7,11 @@ const departureRouter = express.Router();
 
 const prefix = "/departure";
 
-departureRouter.get(
+departureRouter.post(
   `${prefix}/upload-excel`,
   departureMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
-  departureController.unitReadExcel
+  departureController.departureReadExcel
 );
 
 export default departureRouter;
