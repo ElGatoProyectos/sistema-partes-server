@@ -559,13 +559,13 @@ model Partida {
   item                  String
   partida               String
   metrado_inicial       Float?
-  metrado_total         Float
+  metrado_total         Float?
   precio                Float?
   parcial               Float?                  @default(0)
-  mano_de_obra_unitaria String?
-  material_unitario     String?
-  equipo_unitario       String?
-  subcontrata_varios    String?
+  mano_de_obra_unitaria Float?
+  material_unitario     Float?
+  equipo_unitario       Float?
+  subcontrata_varios    Float?
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)
   unidad_id             Int?
