@@ -18,6 +18,7 @@ import jobRouter from "./job/job.init";
 import detailUserProjectRouter from "./user/detailUserProject/detailUserProject.init";
 import detailUserCompanyRouter from "./detailsUserCompany/detailUserCompany.init";
 import departureRouter from "./departure/departure.init";
+import departureJobRouter from "./departure/departure-job/departure-job.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -43,6 +44,7 @@ app.use(globalPrefix, jobRouter);
 app.use(globalPrefix, detailUserProjectRouter);
 app.use(globalPrefix, detailUserCompanyRouter);
 app.use(globalPrefix, departureRouter);
+app.use(globalPrefix, departureJobRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

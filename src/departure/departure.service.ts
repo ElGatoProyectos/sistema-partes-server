@@ -56,6 +56,7 @@ class DepartureService {
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_DepartureExcel[];
       let error = 0;
       let errorNumber = 0;
+      let errorMessages: string[] = [];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -78,7 +79,7 @@ class DepartureService {
         (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
       ) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          "Error al leer el archivo. El archivo no puede tener más de 2 filas en blanco "
         );
       }
 
@@ -100,30 +101,29 @@ class DepartureService {
       );
 
       if (error > 0) {
-        console.log("hay blanco");
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          "Error al leer el archivo. Los campos ID-PARTIDA, ITEM Y PARTIDA son obligatorios"
         );
       }
 
       //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel) => {
-          //verificamos si tenemos el codigo
-          const codigo = parseInt(item["ID-PARTIDA"], 10); // Intenta convertir el string a número
+          const codigo = parseInt(item["ID-PARTIDA"], 10);
 
           if (!validator.isNumeric(item["ID-PARTIDA"])) {
-            errorNumber++; // Aumenta si el código no es un número válido
+            errorNumber++;
+            errorMessages.push("El ID-PARTIDA no puede contener letras.");
           } else {
-            // Verifica si el código ya ha sido procesado
             if (!seenCodes.has(item["ID-PARTIDA"])) {
-              // errorNumber++; // Aumenta si hay duplicado
               seenCodes.add(item["ID-PARTIDA"]);
             }
 
-            // Verifica si el código actual no es mayor que el anterior
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
+              errorMessages.push(
+                "El campo ID-PARTIDA deben ser menor del siguiente que le procede."
+              );
             }
 
             previousCodigo = codigo;
@@ -132,9 +132,10 @@ class DepartureService {
       );
 
       if (errorNumber > 0) {
-        console.log("hay letras y numeros");
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+            ", "
+          )}`
         );
       }
 
@@ -145,12 +146,14 @@ class DepartureService {
 
       if (sortedCodesArray[0] != "001") {
         errorNumber++;
+        errorMessages.push("El primer campo ID-PARTIDA debe comenzar con 001.");
       }
 
       if (errorNumber > 0) {
-        console.log("no comienza como 001");
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+            ", "
+          )}`
         );
       }
       //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
@@ -160,14 +163,18 @@ class DepartureService {
 
         if (currentCode !== previousCode + 1) {
           errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
+          errorMessages.push(
+            "La diferencia entre campos ID-PARTIDA solo puede ser 1."
+          );
           break; // Puedes detener el ciclo en el primer error
         }
       }
 
       if (errorNumber > 0) {
-        console.log("es mayor a 1!!");
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+            ", "
+          )}`
         );
       }
 
@@ -182,13 +189,18 @@ class DepartureService {
             );
             if (!unit.success) {
               errorNumber++;
+              errorMessages.push(
+                "Una Unidad ingresada no está guardada en la base de datos."
+              );
             }
           }
         })
       );
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+            ", "
+          )}`
         );
       }
 
@@ -203,8 +215,6 @@ class DepartureService {
           );
           if (code.success) {
             departure = code.payload as Partida;
-            console.log("--------------");
-            console.log("hay que actualizar");
             departure = code.payload as Partida;
             await departureValidation.updateDeparture(
               departure.id,
@@ -213,7 +223,6 @@ class DepartureService {
               responseProject.id
             );
           } else {
-            console.log("asi queda la creaciónn ");
             const unitResponse = await unitValidation.findBySymbol(
               String(item.UNI),
               project_id
@@ -254,7 +263,6 @@ class DepartureService {
 
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer las Partidas",

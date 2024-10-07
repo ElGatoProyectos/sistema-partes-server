@@ -8,7 +8,7 @@ const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class DepartureController {
-  unitReadExcel = async (
+  departureReadExcel = async (
     request: express.Request,
     response: express.Response
   ) => {
