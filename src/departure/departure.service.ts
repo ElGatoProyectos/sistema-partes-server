@@ -223,14 +223,22 @@ class DepartureService {
               id_interno: String(item["ID-PARTIDA"]),
               item: item.ITEM,
               partida: item.PARTIDA,
-              metrado_inicial: item.METRADO,
-              metrado_total: item.METRADO,
-              precio: +item.PRECIO,
-              parcial: item.PARCIAL,
-              mano_de_obra_unitaria: 0,
-              material_unitario: 0,
-              equipo_unitario: 0,
-              subcontrata_varios: 0,
+              metrado_inicial: item.METRADO ? +item.METRADO : 0,
+              metrado_total: item.METRADO ? +item.METRADO : 0,
+              precio: +item.PRECIO ? +item.PRECIO : 0,
+              parcial: item.PARCIAL ? +item.PARCIAL : 0,
+              mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
+                ? +item["MANO DE OBRA UNITARIO"]
+                : 0,
+              material_unitario: item["MATERIAL UNITARIO"]
+                ? +item["MATERIAL UNITARIO"]
+                : 0,
+              equipo_unitario: item["EQUIPO UNITARIO"]
+                ? +item["EQUIPO UNITARIO"]
+                : 0,
+              subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
+                ? +item["SUBCONTRATA - VARIOS UNITARIO"]
+                : 0,
               usuario_id: userResponse.id,
               unidad_id: item.UNI ? unit.id : null,
               proyecto_id: project_id,
