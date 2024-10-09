@@ -2,9 +2,10 @@ import {
   I_CreateUnifiedIndexBD,
   I_UpdateUnifiedIndexBody,
 } from "./models/unifiedIndex.interface";
+import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 export abstract class UnifiedIndexRepository {
-  findAll(skip: number, limit: number): void {}
+  findAll(skip: number, data: T_FindAllUnifiedIndex): void {}
 
   findByCode(code: string): void {}
 
@@ -24,6 +25,4 @@ export abstract class UnifiedIndexRepository {
   ): void {}
 
   updateStatusUnifiedIndex(idUnifiedIndex: number): void {}
-
-  searchNameUnifiedIndex(name: string, skip: number, limit: number): void {}
 }

@@ -9,6 +9,7 @@ import { unifiedIndexService } from "./unifiedIndex.service";
 import multer from "multer";
 import { unifiedIndexExcelDto } from "./dto/unifiedIndexExcel.dto";
 import { httpResponse } from "@/common/http.response";
+import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -75,30 +76,15 @@ class UnifiedIndexController {
     response.status(result.statusCode).json(result);
   }
 
-  async findByName(request: express.Request, response: express.Response) {
-    const page = parseInt(request.query.page as string) || 1;
-    const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
-      queryParams: {
-        page: page,
-        limit: limit,
-      },
-    };
-    const name = request.query.name as string;
-    const result = await unifiedIndexService.findByName(
-      name,
-      paginationOptions
-    );
-    response.status(result.statusCode).json(result);
-  }
-
   async allUnifiedIndex(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
+    const search = request.query.search as string;
+    let paginationOptions: T_FindAllUnifiedIndex = {
       queryParams: {
         page: page,
         limit: limit,
+        search: search,
       },
     };
     const result = await unifiedIndexService.findAll(paginationOptions);

@@ -10,7 +10,7 @@ const prefix = "/unified-index";
 unifiedIndexRouter.post(
   `${prefix}`,
   unifiedIndexMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.create
 );
 
@@ -28,15 +28,9 @@ unifiedIndexRouter.get(
 );
 
 unifiedIndexRouter.get(
-  `${prefix}/search`,
-  authRoleMiddleware.authAdmin,
-  unifiedIndexController.findByName
-);
-
-unifiedIndexRouter.get(
   `${prefix}/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminUser,
   unifiedIndexController.findByIdUnifiedIndex
 );
 

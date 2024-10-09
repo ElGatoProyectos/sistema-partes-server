@@ -7,6 +7,7 @@ import {
   I_UpdateUnifiedIndexBodyValidation,
 } from "./models/unifiedIndex.interface";
 import { UnifiedIndexRepository } from "./unifiedIndex.repository";
+import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
   async codeMoreHigh(): Promise<IndiceUnificado | null> {
@@ -37,61 +38,41 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
     return unifiedIndex;
   }
 
-  async searchNameUnifiedIndex(
-    name: string,
-    skip: number,
-    limit: number
-  ): Promise<{
-    unifiedIndex: I_UnifiedIndex[];
-    total: number;
-  }> {
-    const [unifiedIndex, total]: [I_UnifiedIndex[], number] =
-      await prisma.$transaction([
-        prisma.indiceUnificado.findMany({
-          where: {
-            nombre: {
-              contains: name,
-            },
-            eliminado: E_Estado_BD.n,
-          },
-          skip,
-          take: limit,
-          omit: {
-            eliminado: true,
-          },
-        }),
-        prisma.indiceUnificado.count({
-          where: {
-            nombre: {
-              contains: name,
-            },
-            eliminado: E_Estado_BD.n,
-          },
-        }),
-      ]);
-    return { unifiedIndex, total };
-  }
   async findAll(
     skip: number,
-    limit: number
+    data: T_FindAllUnifiedIndex
   ): Promise<{
     unifiedIndex: I_UnifiedIndex[];
     total: number;
   }> {
+    let filters: any = {};
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.nombre = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.codigo = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
     const [unifiedIndex, total]: [I_UnifiedIndex[], number] =
       await prisma.$transaction([
         prisma.indiceUnificado.findMany({
           where: {
+            ...filters,
             eliminado: E_Estado_BD.n,
           },
           skip,
-          take: limit,
+          take: data.queryParams.limit,
           omit: {
             eliminado: true,
           },
         }),
         prisma.indiceUnificado.count({
           where: {
+            ...filters,
             eliminado: E_Estado_BD.n,
           },
         }),

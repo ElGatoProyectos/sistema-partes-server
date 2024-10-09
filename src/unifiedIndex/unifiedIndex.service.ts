@@ -14,6 +14,7 @@ import { Empresa, IndiceUnificado, Usuario } from "@prisma/client";
 import * as xlsx from "xlsx";
 import validator from "validator";
 import { jwtService } from "@/auth/jwt.service";
+import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 class UnifiedIndexService {
   async createUnifiedIndex(
@@ -147,7 +148,6 @@ class UnifiedIndexService {
         resourseCategoryMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Indice Unificado",
         error
@@ -181,47 +181,10 @@ class UnifiedIndexService {
     }
   }
 
-  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
+  async findAll(data: T_FindAllUnifiedIndex) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaUnifiedIndexRepository.searchNameUnifiedIndex(
-        name,
-        skip,
-        data.queryParams.limit
-      );
-
-      const { unifiedIndex, total } = result;
-      const pageCount = Math.ceil(total / data.queryParams.limit);
-      const formData = {
-        total,
-        page: data.queryParams.page,
-        // x ejemplo 20
-        limit: data.queryParams.limit,
-        //cantidad de paginas que hay
-        pageCount,
-        data: unifiedIndex,
-      };
-      return httpResponse.SuccessResponse(
-        "Éxito al buscar Indices Unificados",
-        formData
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar Indices Unificados",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
-  async findAll(data: T_FindAll) {
-    try {
-      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaUnifiedIndexRepository.findAll(
-        skip,
-        data.queryParams.limit
-      );
+      const result = await prismaUnifiedIndexRepository.findAll(skip, data);
 
       const { unifiedIndex, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

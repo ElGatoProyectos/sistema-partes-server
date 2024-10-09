@@ -28,54 +28,52 @@ class DepartureJobValidation {
       if (departure.precio) {
         let suma = 0;
         const resultado = data.METRADO * departure.precio;
-        console.log(
-          "esto da del codigo de la partida " +
-            departure.id +
-            " de multiplicar el metrado " +
-            data.METRADO +
-            " por el precio de la partida " +
-            departure.precio +
-            " el siguiente resultado " +
-            resultado
-        );
-        suma = resultado + job.costo_partida;
-        // const responseTrain = await prismaJobRepository.updateJobCost(
-        //   suma,
-        //   job.id
+        // console.log(
+        //   "la partida " +
+        //     data.PARTIDA +
+        //     " viene con valor de la base de datos el trabajo " +
+        //     job.costo_partida +
+        //     " esto da del codigo de la partida " +
+        //     departure.id +
+        //     " de multiplicar el metrado " +
+        //     data.METRADO +
+        //     " por el precio de la partida " +
+        //     departure.precio +
+        //     " el siguiente resultado " +
+        //     resultado +
+        //     " para el id del trabajo " +
+        //     job.id
         // );
+        suma = resultado + job.costo_partida;
+        console.log("el resultado de la suma da  " + suma);
+        await prismaJobRepository.updateJobCost(suma, job.id);
       }
-
-      //     let departureFormat: any = {
-      //       id_interno: String(data["ID-PARTIDA"]) || "",
-      //       item: data.ITEM || "",
-      //       partida: data.PARTIDA || "",
-      //       metrado_inicial: data.METRADO,
-      //       metrado_total: data.METRADO,
-      //       precio: +data.PRECIO,
-      //       parcial: data.PARCIAL,
-      //       mano_de_obra_unitaria: 0,
-      //       material_unitario: 0,
-      //       equipo_unitario: 0,
-      //       subcontrata_varios: 0,
-      //       usuario_id: usuario_id,
-      //       proyecto_id: project_id,
-      //     };
-      //     if (data.UNI) {
-      //       const unitResponse = await unitValidation.findBySymbol(
-      //         data.UNI,
-      //         project_id
-      //       );
-      //       const unit = unitResponse.payload as Unidad;
-      //       departureFormat.unidad_id = unit.id;
-      //     }
-      //     const responseUnifiedIndex =
-      //       await prismaDepartureRepository.updateDeparture(
-      //         departureFormat,
-      //         departure_id
-      //       );
+      if (departure.mano_de_obra_unitaria) {
+        let suma = 0;
+        const resultado = data.METRADO * departure.mano_de_obra_unitaria;
+        suma = resultado + job.costo_partida;
+        await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
+      }
+      if (departure.material_unitario) {
+        let suma = 0;
+        const resultado = data.METRADO * departure.material_unitario;
+        suma = resultado + job.costo_partida;
+        await prismaJobRepository.updateJobMaterialCost(suma, job.id);
+      }
+      if (departure.equipo_unitario) {
+        let suma = 0;
+        const resultado = data.METRADO * departure.equipo_unitario;
+        suma = resultado + job.costo_partida;
+        await prismaJobRepository.updateJobEquipment(suma, job.id);
+      }
+      if (departure.subcontrata_varios) {
+        let suma = 0;
+        const resultado = data.METRADO * departure.subcontrata_varios;
+        suma = resultado + job.costo_partida;
+        await prismaJobRepository.updateJobSeveral(suma, job.id);
+      }
       return httpResponse.SuccessResponse(
-        "Partida-Trabajo modificada correctamente",
-        "responseUnifiedIndex"
+        "Partida-Trabajo modificada correctamente"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
