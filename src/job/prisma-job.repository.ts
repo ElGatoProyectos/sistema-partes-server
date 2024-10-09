@@ -34,13 +34,57 @@ class PrismaJobRepository implements JobRepository {
     });
     return job;
   }
-  // async updateJobCost(cost:number, job_id: number): Promise<Trabajo> {
-  //   const job = await prisma.trabajo.update({
-  //     where: { id: job_id },
-  //     costo: data,
-  //   });
-  //   return job;
-  // }
+  async updateJobCost(cost: number, job_id: number): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: {
+        costo_partida: cost,
+      },
+    });
+    return job;
+  }
+  async updateJobCostOfLabor(labor: number, job_id: number): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: {
+        costo_mano_obra: labor,
+      },
+    });
+    return job;
+  }
+  async updateJobMaterialCost(
+    material: number,
+    job_id: number
+  ): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: {
+        costo_material: material,
+      },
+    });
+    return job;
+  }
+  async updateJobEquipment(
+    equipment: number,
+    job_id: number
+  ): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: {
+        costo_equipo: equipment,
+      },
+    });
+    return job;
+  }
+  async updateJobSeveral(several: number, job_id: number): Promise<Trabajo> {
+    const job = await prisma.trabajo.update({
+      where: { id: job_id },
+      data: {
+        costo_varios: several,
+      },
+    });
+    return job;
+  }
   async updateStatusJob(job_id: number): Promise<Trabajo | null> {
     const job = await prisma.trabajo.findFirst({
       where: {
