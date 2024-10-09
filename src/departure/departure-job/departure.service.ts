@@ -4,7 +4,7 @@ import prisma from "@/config/prisma.config";
 import { I_DepartureJobExcel } from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
 import { projectValidation } from "@/project/project.validation";
-import { Proyecto } from "@prisma/client";
+import { Partida, Proyecto } from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
@@ -74,13 +74,13 @@ class DepartureJobService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes lineas: ${errorRows.join(
+          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
 
-      //[success] buscar si existe el id del trabajo
+      //[note] buscar si existe el id del trabajo
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
@@ -98,12 +98,12 @@ class DepartureJobService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+          `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
-      //[success] separar el id de la Partida y buscar si existe
+      //[note] separar el id de la Partida y buscar si existe
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
@@ -125,12 +125,12 @@ class DepartureJobService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+          `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
-      //[success] buscar si existe el id de la Unidad
+      //[note] buscar si existe el id de la Unidad
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
@@ -148,24 +148,48 @@ class DepartureJobService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+          `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+      //[success] Verifico si el metrado supera al de la partida
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+          index++;
+          const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
+
+          const codeDeparture = departureWithComa[0];
+
+          const departureResponse =
+            await departureValidation.findByCodeValidation(
+              codeDeparture,
+              project.id
+            );
+          const partida = departureResponse.payload as Partida;
+
+          if (partida.metrado_inicial) {
+            if (Number(item.METRADO) > partida.metrado_inicial) {
+              error++;
+              errorRows.push(index + 1);
+            }
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El metrado ingresado de la partida es mayor de la que está guardada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      let code;
-      let departure;
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel) => {
-          code = await departureJobValidation.updateDepartureJob(
-            item,
-            project_id
-          );
-        })
-      );
 
+      for (const item of sheetToJson) {
+        await departureJobValidation.updateDepartureJob(item, project_id);
+      }
       await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(

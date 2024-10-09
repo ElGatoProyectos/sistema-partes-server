@@ -93,9 +93,9 @@ class DepartureService {
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
           index++;
           if (
-            item["ID-PARTIDA"] == undefined ||
-            item.ITEM == undefined ||
-            item.PARTIDA == undefined
+            item["ID-PARTIDA"] === undefined ||
+            item.ITEM === undefined ||
+            item.PARTIDA === undefined
           ) {
             error++;
             errorRows.push(index + 1);
@@ -110,11 +110,31 @@ class DepartureService {
           )}.`
         );
       }
+      //[note] Verifico si tiene 4 digitos.
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          index++;
+          const codigoSinEspacios = item["ID-PARTIDA"].trim();
+          if (codigoSinEspacios.length != 4) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.Los códigos sólo pueden tener 4 digitos .Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
 
       //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
           index++;
+          // indicas que la cadena debe ser interpretada como un número decimal (base 10)
           const codigo = parseInt(item["ID-PARTIDA"], 10);
 
           if (!validator.isNumeric(item["ID-PARTIDA"])) {
@@ -138,18 +158,18 @@ class DepartureService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.Hay letras en códigos, ni ser menor o igual al siguiente.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.Hay letras en códigos o que sea menor o igual al siguiente.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );
       }
 
-      //[NOTE] Acá verifico si el primer elemento es 001
+      // //[NOTE] Acá verifico si el primer elemento es 001
       const sortedCodesArray = Array.from(seenCodes)
         .map((item) => item.padStart(3, "0"))
         .sort((a, b) => parseInt(a) - parseInt(b));
 
-      if (sortedCodesArray[0] != "001") {
+      if (sortedCodesArray[0] != "0001") {
         errorNumber++;
       }
 
@@ -158,7 +178,7 @@ class DepartureService {
           "El primer código del archivo debe ser 001"
         );
       }
-      //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
+      // //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
       for (let i = 1; i < sortedCodesArray.length; i++) {
         const currentCode = parseInt(sortedCodesArray[i]);
         const previousCode = parseInt(sortedCodesArray[i - 1]);
@@ -201,61 +221,61 @@ class DepartureService {
       }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      let code;
-      let departure;
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel) => {
-          code = await departureValidation.findByCodeValidation(
-            String(item["ID-PARTIDA"]),
-            project_id
-          );
-          if (code.success) {
-            departure = code.payload as Partida;
-            departure = code.payload as Partida;
-            await departureValidation.updateDeparture(
-              departure.id,
-              item,
-              userResponse.id,
-              responseProject.id
-            );
-          } else {
-            const unitResponse = await unitValidation.findBySymbol(
-              String(item.UNI),
-              project_id
-            );
-            const unit = unitResponse.payload as Unidad;
-            const data = {
-              id_interno: String(item["ID-PARTIDA"]),
-              item: item.ITEM,
-              partida: item.PARTIDA,
-              metrado_inicial: item.METRADO ? +item.METRADO : 0,
-              metrado_total: item.METRADO ? +item.METRADO : 0,
-              precio: +item.PRECIO ? +item.PRECIO : 0,
-              parcial: item.PARCIAL ? +item.PARCIAL : 0,
-              mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
-                ? +item["MANO DE OBRA UNITARIO"]
-                : 0,
-              material_unitario: item["MATERIAL UNITARIO"]
-                ? +item["MATERIAL UNITARIO"]
-                : 0,
-              equipo_unitario: item["EQUIPO UNITARIO"]
-                ? +item["EQUIPO UNITARIO"]
-                : 0,
-              subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
-                ? +item["SUBCONTRATA - VARIOS UNITARIO"]
-                : 0,
-              usuario_id: userResponse.id,
-              unidad_id: item.UNI ? unit.id : null,
-              proyecto_id: project_id,
-            };
-            await prisma.partida.create({
-              data: data,
-            });
-          }
-        })
-      );
+      // let code;
+      // let departure;
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_DepartureExcel) => {
+      //     code = await departureValidation.findByCodeValidation(
+      //       String(item["ID-PARTIDA"]),
+      //       project_id
+      //     );
+      //     if (code.success) {
+      //       departure = code.payload as Partida;
+      //       departure = code.payload as Partida;
+      //       await departureValidation.updateDeparture(
+      //         departure.id,
+      //         item,
+      //         userResponse.id,
+      //         responseProject.id
+      //       );
+      //     } else {
+      //       const unitResponse = await unitValidation.findBySymbol(
+      //         String(item.UNI),
+      //         project_id
+      //       );
+      //       const unit = unitResponse.payload as Unidad;
+      //       const data = {
+      //         id_interno: String(item["ID-PARTIDA"]),
+      //         item: item.ITEM,
+      //         partida: item.PARTIDA,
+      //         metrado_inicial: item.METRADO ? +item.METRADO : 0,
+      //         metrado_total: item.METRADO ? +item.METRADO : 0,
+      //         precio: +item.PRECIO ? +item.PRECIO : 0,
+      //         parcial: item.PARCIAL ? +item.PARCIAL : 0,
+      //         mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
+      //           ? +item["MANO DE OBRA UNITARIO"]
+      //           : 0,
+      //         material_unitario: item["MATERIAL UNITARIO"]
+      //           ? +item["MATERIAL UNITARIO"]
+      //           : 0,
+      //         equipo_unitario: item["EQUIPO UNITARIO"]
+      //           ? +item["EQUIPO UNITARIO"]
+      //           : 0,
+      //         subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
+      //           ? +item["SUBCONTRATA - VARIOS UNITARIO"]
+      //           : 0,
+      //         usuario_id: userResponse.id,
+      //         unidad_id: item.UNI ? unit.id : null,
+      //         proyecto_id: project_id,
+      //       };
+      //       await prisma.partida.create({
+      //         data: data,
+      //       });
+      //     }
+      //   })
+      // );
 
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
 
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {
