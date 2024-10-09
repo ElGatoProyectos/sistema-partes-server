@@ -85,6 +85,7 @@ class PrismaJobRepository implements JobRepository {
     project_id: number
   ): Promise<{ jobs: I_Job[]; total: number }> {
     let filters: any = {};
+    let filtersTrain: any = {};
     let fecha_inicio;
     let fecha_finalizacion;
     if (data.queryParams.search) {
@@ -110,10 +111,18 @@ class PrismaJobRepository implements JobRepository {
         gte: fecha_finalizacion,
       };
     }
+    if (data.queryParams.nameTrain) {
+      filtersTrain.nombre = {
+        contains: data.queryParams.nameTrain,
+      };
+    }
     const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
       prisma.trabajo.findMany({
         where: {
           ...filters,
+          Tren: {
+            ...filtersTrain,
+          },
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },
@@ -126,6 +135,9 @@ class PrismaJobRepository implements JobRepository {
       prisma.trabajo.count({
         where: {
           ...filters,
+          Tren: {
+            ...filtersTrain,
+          },
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },
