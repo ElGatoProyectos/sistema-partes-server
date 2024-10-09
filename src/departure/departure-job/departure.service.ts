@@ -7,7 +7,7 @@ import { projectValidation } from "@/project/project.validation";
 import { Proyecto } from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
-// import { departureJobValidation } from "./departureJob.validation";
+import { departureJobValidation } from "./departureJob.validation";
 
 class DepartureJobService {
   async updateDepartureJobMasive(file: any, project_id: number) {
@@ -157,14 +157,14 @@ class DepartureJobService {
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
       let code;
       let departure;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureJobExcel) => {
-      //     code = await departureJobValidation.updateDepartureJob(
-      //       item,
-      //       project_id
-      //     );
-      //   })
-      // );
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel) => {
+          code = await departureJobValidation.updateDepartureJob(
+            item,
+            project_id
+          );
+        })
+      );
 
       await prisma.$disconnect();
 

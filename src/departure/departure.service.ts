@@ -57,6 +57,7 @@ class DepartureService {
       let error = 0;
       let errorNumber = 0;
       let errorMessages: string[] = [];
+      let errorRows: number[] = [];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -79,7 +80,8 @@ class DepartureService {
         (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
       ) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. El archivo no puede tener más de 2 filas en blanco "
+          // "Error al leer el archivo. El archivo no puede tener más de 2 filas en blanco "
+          "hola blanco "
         );
       }
 
@@ -96,19 +98,23 @@ class DepartureService {
             item.PARTIDA == undefined
           ) {
             error++;
+            errorRows.push(index + 1);
           }
         })
       );
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Los campos ID-PARTIDA, ITEM Y PARTIDA son obligatorios"
+          `Error al leer el archivo.Existen espacios vacios.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
       //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel) => {
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          index++;
           const codigo = parseInt(item["ID-PARTIDA"], 10);
 
           if (!validator.isNumeric(item["ID-PARTIDA"])) {
@@ -121,9 +127,8 @@ class DepartureService {
 
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
-              errorMessages.push(
-                "El campo ID-PARTIDA deben ser menor del siguiente que le procede."
-              );
+              // errorMessages.push(index + 1);
+              errorRows.push(index);
             }
 
             previousCodigo = codigo;
@@ -133,9 +138,9 @@ class DepartureService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+          `Error al leer el archivo.Hay letras en códigos, ni ser menor o igual al siguiente.Verificar las filas: ${errorRows.join(
             ", "
-          )}`
+          )}.`
         );
       }
 
@@ -146,14 +151,11 @@ class DepartureService {
 
       if (sortedCodesArray[0] != "001") {
         errorNumber++;
-        errorMessages.push("El primer campo ID-PARTIDA debe comenzar con 001.");
       }
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-            ", "
-          )}`
+          "El primer código del archivo debe ser 001"
         );
       }
       //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
@@ -163,25 +165,21 @@ class DepartureService {
 
         if (currentCode !== previousCode + 1) {
           errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-          errorMessages.push(
-            "La diferencia entre campos ID-PARTIDA solo puede ser 1."
-          );
-          break; // Puedes detener el ciclo en el primer error
+          errorRows.push(i);
         }
       }
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-            ", "
-          )}`
+          `Error al leer el archivo.Existen uno o varios códigos donde la diferencia es mayor a 1`
         );
       }
 
       //[SUCCESS] VERIFICAR SI LAS UNIDADES QUE VIENEN EXISTEN EN LA BASE DE DATOS
       let unit: T_HttpResponse;
       await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel) => {
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          index++;
           if (item.UNI) {
             unit = await unitValidation.findBySymbol(
               String(item.UNI),
@@ -189,18 +187,16 @@ class DepartureService {
             );
             if (!unit.success) {
               errorNumber++;
-              errorMessages.push(
-                "Una Unidad ingresada no está guardada en la base de datos."
-              );
+              errorRows.push(index + 1);
             }
           }
         })
       );
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
+          `Error al leer el archivo.Ha ingresado Unidades que no existen en la base de datos.Verificar las filas: ${errorRows.join(
             ", "
-          )}`
+          )}.`
         );
       }
 
