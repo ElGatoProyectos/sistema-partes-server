@@ -1,5 +1,4 @@
 import prisma from "@/config/prisma.config";
-import { T_FindAll } from "@/common/models/pagination.types";
 import {
   I_CreateUnitBody,
   I_UnitExcel,
@@ -15,6 +14,7 @@ import { jwtService } from "@/auth/jwt.service";
 import * as xlsx from "xlsx";
 import { projectValidation } from "@/project/project.validation";
 import validator from "validator";
+import { T_FindAllUnit } from "./models/unit.types";
 
 class UnitService {
   async createUnit(
@@ -92,7 +92,7 @@ class UnitService {
 
   async updateUnit(
     data: I_UpdateUnitBody,
-    idUnit: number,
+    unit_id: number,
     tokenWithBearer: string,
     project_id: number
   ): Promise<T_HttpResponse> {
@@ -103,7 +103,7 @@ class UnitService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
 
-      const resultIdUnit = await unitValidation.findById(idUnit);
+      const resultIdUnit = await unitValidation.findById(unit_id);
       if (!resultIdUnit.success) {
         return resultIdUnit;
       }
@@ -111,9 +111,7 @@ class UnitService {
 
       const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el Tren con el id del Proyecto proporcionado"
-        );
+        return resultIdProject;
       }
 
       if (resultUnitFind.nombre != data.nombre) {
@@ -127,7 +125,7 @@ class UnitService {
       }
 
       if (data.simbolo && resultUnitFind.simbolo != data.simbolo) {
-        const resultSymbol = await unitValidation.findBySymbol(
+        const resultSymbol = await unitValidation.findBySymbolForCreate(
           data.simbolo,
           project_id
         );
@@ -152,7 +150,7 @@ class UnitService {
 
       const responseUnit = await prismaUnitRepository.updateUnit(
         unitFormat,
-        idUnit
+        unit_id
       );
       const unitMapper = new ResponseUnitMapper(responseUnit);
       return httpResponse.SuccessResponse(
@@ -218,14 +216,10 @@ class UnitService {
     }
   }
 
-  async findAll(data: T_FindAll, project_id: number) {
+  async findAll(data: T_FindAllUnit, project_id: number) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaUnitRepository.findAll(
-        skip,
-        data.queryParams.limit,
-        project_id
-      );
+      const result = await prismaUnitRepository.findAll(skip, data, project_id);
       const { units, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {

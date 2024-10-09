@@ -6,6 +6,7 @@ import {
 } from "./models/unit.interface";
 import { E_Estado_BD, Unidad } from "@prisma/client";
 import { UnitRepository } from "./unit.repository";
+import { T_FindAllUnit } from "./models/unit.types";
 
 class PrismaUnitRepository implements UnitRepository {
   async findByCode(code: string, project_id: number): Promise<Unidad | null> {
@@ -55,26 +56,44 @@ class PrismaUnitRepository implements UnitRepository {
 
   async findAll(
     skip: number,
-    limit: number,
+    data: T_FindAllUnit,
     project_id: number
   ): Promise<{
     units: I_Unit[];
     total: number;
   }> {
+    let filters: any = {};
+
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.nombre = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.codigo = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
     const [units, total]: [I_Unit[], number] = await prisma.$transaction([
       prisma.unidad.findMany({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },
         skip,
-        take: limit,
+        take: +data.queryParams.limit,
         omit: {
           eliminado: true,
+        },
+        orderBy: {
+          codigo: "asc",
         },
       }),
       prisma.unidad.count({
         where: {
+          ...filters,
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
         },

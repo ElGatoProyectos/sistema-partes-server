@@ -9,6 +9,7 @@ import { T_FindAll } from "@/common/models/pagination.types";
 import multer from "multer";
 import { httpResponse } from "@/common/http.response";
 import { authService } from "@/auth/auth.service";
+import { T_FindAllUnit } from "./models/unit.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -40,11 +41,11 @@ class UnitController {
     const data = request.body as I_UpdateUnitBody;
     const tokenWithBearer = request.headers.authorization;
     const project_id = request.get("project-id") as string;
-    const idUnit = Number(request.params.id);
+    const unit_id = Number(request.params.id);
     if (tokenWithBearer) {
       const result = await unitService.updateUnit(
         data,
-        idUnit,
+        unit_id,
         tokenWithBearer,
         +project_id
       );
@@ -79,11 +80,13 @@ class UnitController {
   ) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const search = request.query.search as string;
     const project_id = request.get("project-id") as string;
-    let paginationOptions: T_FindAll = {
+    let paginationOptions: T_FindAllUnit = {
       queryParams: {
         page: page,
         limit: limit,
+        search: search,
       },
     };
     const result = await unitService.findAll(paginationOptions, +project_id);

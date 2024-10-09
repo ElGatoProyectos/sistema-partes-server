@@ -1,7 +1,8 @@
 import { I_CreateUnitBD, I_UpdateUnitBody } from "./models/unit.interface";
+import { T_FindAllUnit } from "./models/unit.types";
 
 export abstract class UnitRepository {
-  findAll(skip: number, limit: number, project_id: number): void {}
+  findAll(skip: number, data: T_FindAllUnit, project_id: number): void {}
 
   findByCode(code: string, project_id: number): void {}
 
