@@ -175,6 +175,9 @@ class PrismaJobRepository implements JobRepository {
         omit: {
           eliminado: true,
         },
+        orderBy: {
+          codigo: "asc",
+        },
       }),
       prisma.trabajo.count({
         where: {
