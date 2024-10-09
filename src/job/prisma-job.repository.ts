@@ -34,6 +34,13 @@ class PrismaJobRepository implements JobRepository {
     });
     return job;
   }
+  // async updateJobCost(cost:number, job_id: number): Promise<Trabajo> {
+  //   const job = await prisma.trabajo.update({
+  //     where: { id: job_id },
+  //     costo: data,
+  //   });
+  //   return job;
+  // }
   async updateStatusJob(job_id: number): Promise<Trabajo | null> {
     const job = await prisma.trabajo.findFirst({
       where: {

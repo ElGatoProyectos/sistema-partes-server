@@ -1,11 +1,13 @@
 import * as xlsx from "xlsx";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
-import { jwtService } from "@/auth/jwt.service";
 import { I_DepartureJobExcel } from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
 import { projectValidation } from "@/project/project.validation";
 import { Proyecto } from "@prisma/client";
+import { jobValidation } from "@/job/job.validation";
+import { unitValidation } from "@/unit/unit.validation";
+import { departureJobValidation } from "./departureJob.validation";
 
 class DepartureJobService {
   async updateDepartureJobMasive(file: any, project_id: number) {
@@ -78,9 +80,33 @@ class DepartureJobService {
         );
       }
 
-      //[success] separar la unidad y buscar si existe
+      //[success] buscar si existe el id del trabajo
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+          index++;
+
+          const jobResponse = await jobValidation.findByCodeValidation(
+            item["ID-TRABAJO"],
+            project.id
+          );
+          if (!jobResponse.success) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+      //[success] separar el id de la Partida y buscar si existe
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+          index++;
           const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
 
           const codeDeparture = departureWithComa[0];
@@ -90,169 +116,65 @@ class DepartureJobService {
               codeDeparture,
               project.id
             );
+          if (!departureResponse.success) {
+            error++;
+            errorRows.push(index + 1);
+          }
         })
       );
 
-      //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureExcel) => {
-      //     const codigo = parseInt(item["ID-PARTIDA"], 10);
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+      //[success] buscar si existe el id de la Unidad
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+          index++;
 
-      //     if (!validator.isNumeric(item["ID-PARTIDA"])) {
-      //       errorNumber++;
-      //       errorMessages.push("El ID-PARTIDA no puede contener letras.");
-      //     } else {
-      //       if (!seenCodes.has(item["ID-PARTIDA"])) {
-      //         seenCodes.add(item["ID-PARTIDA"]);
-      //       }
+          const jobResponse = await unitValidation.findBySymbol(
+            item.UNIDAD,
+            project.id
+          );
+          if (!jobResponse.success) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
 
-      //       if (previousCodigo !== null && codigo <= previousCodigo) {
-      //         errorNumber++;
-      //         errorMessages.push(
-      //           "El campo ID-PARTIDA deben ser menor del siguiente que le procede."
-      //         );
-      //       }
-
-      //       previousCodigo = codigo;
-      //     }
-      //   })
-      // );
-
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-      //       ", "
-      //     )}`
-      //   );
-      // }
-
-      //[NOTE] Acá verifico si el primer elemento es 001
-      // const sortedCodesArray = Array.from(seenCodes)
-      //   .map((item) => item.padStart(3, "0"))
-      //   .sort((a, b) => parseInt(a) - parseInt(b));
-
-      // if (sortedCodesArray[0] != "001") {
-      //   errorNumber++;
-      //   errorMessages.push("El primer campo ID-PARTIDA debe comenzar con 001.");
-      // }
-
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-      //       ", "
-      //     )}`
-      //   );
-      // }
-      //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
-      // for (let i = 1; i < sortedCodesArray.length; i++) {
-      //   const currentCode = parseInt(sortedCodesArray[i]);
-      //   const previousCode = parseInt(sortedCodesArray[i - 1]);
-
-      //   if (currentCode !== previousCode + 1) {
-      //     errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-      //     errorMessages.push(
-      //       "La diferencia entre campos ID-PARTIDA solo puede ser 1."
-      //     );
-      //     break; // Puedes detener el ciclo en el primer error
-      //   }
-      // }
-
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-      //       ", "
-      //     )}`
-      //   );
-      // }
-
-      //[SUCCESS] VERIFICAR SI LAS UNIDADES QUE VIENEN EXISTEN EN LA BASE DE DATOS
-      // let unit: T_HttpResponse;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureExcel) => {
-      //     if (item.UNI) {
-      //       unit = await unitValidation.findBySymbol(
-      //         String(item.UNI),
-      //         project_id
-      //       );
-      //       if (!unit.success) {
-      //         errorNumber++;
-      //         errorMessages.push(
-      //           "Una Unidad ingresada no está guardada en la base de datos."
-      //         );
-      //       }
-      //     }
-      //   })
-      // );
-      // if (errorNumber > 0) {
-      //   return httpResponse.BadRequestException(
-      //     `Error al leer el archivo. Verificar los siguientes errores: ${errorMessages.join(
-      //       ", "
-      //     )}`
-      //   );
-      // }
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes lineas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      // let code;
-      // let departure;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureExcel) => {
-      //     code = await departureValidation.findByCodeValidation(
-      //       String(item["ID-PARTIDA"]),
-      //       project_id
-      //     );
-      //     if (code.success) {
-      //       departure = code.payload as Partida;
-      //       departure = code.payload as Partida;
-      //       await departureValidation.updateDeparture(
-      //         departure.id,
-      //         item,
-      //         userResponse.id,
-      //         responseProject.id
-      //       );
-      //     } else {
-      //       const unitResponse = await unitValidation.findBySymbol(
-      //         String(item.UNI),
-      //         project_id
-      //       );
-      //       const unit = unitResponse.payload as Unidad;
-      //       const data = {
-      //         id_interno: String(item["ID-PARTIDA"]),
-      //         item: item.ITEM,
-      //         partida: item.PARTIDA,
-      //         metrado_inicial: item.METRADO ? +item.METRADO : 0,
-      //         metrado_total: item.METRADO ? +item.METRADO : 0,
-      //         precio: +item.PRECIO ? +item.PRECIO : 0,
-      //         parcial: item.PARCIAL ? +item.PARCIAL : 0,
-      //         mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
-      //           ? +item["MANO DE OBRA UNITARIO"]
-      //           : 0,
-      //         material_unitario: item["MATERIAL UNITARIO"]
-      //           ? +item["MATERIAL UNITARIO"]
-      //           : 0,
-      //         equipo_unitario: item["EQUIPO UNITARIO"]
-      //           ? +item["EQUIPO UNITARIO"]
-      //           : 0,
-      //         subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
-      //           ? +item["SUBCONTRATA - VARIOS UNITARIO"]
-      //           : 0,
-      //         usuario_id: userResponse.id,
-      //         unidad_id: item.UNI ? unit.id : null,
-      //         proyecto_id: project_id,
-      //       };
-      //       await prisma.partida.create({
-      //         data: data,
-      //       });
-      //     }
-      //   })
-      // );
+      let code;
+      let departure;
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel) => {
+          code = await departureJobValidation.updateDepartureJob(
+            item,
+            project_id
+          );
+        })
+      );
 
       await prisma.$disconnect();
 
-      return httpResponse.SuccessResponse("Partidas creadas correctamente!");
+      return httpResponse.SuccessResponse(
+        "Partidas y Trabajos actualizados correctamente!"
+      );
     } catch (error) {
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
-        "Error al leer las Partidas",
+        "Error al leer las Partidas con sus Trabajos",
         error
       );
     }
