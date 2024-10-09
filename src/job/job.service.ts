@@ -401,7 +401,7 @@ class JobService {
           );
           if (!code.success) {
             job = code.payload as Trabajo;
-            await jobValidation.updateJob(
+            await jobValidation.updateJobForExcel(
               item,
               job.id,
               responseProject.id,

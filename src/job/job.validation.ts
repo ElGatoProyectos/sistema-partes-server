@@ -6,7 +6,7 @@ import { Tren, UnidadProduccion } from "@prisma/client";
 import { trainValidation } from "@/train/train.validation";
 
 class JobValidation {
-  async updateJob(
+  async updateJobForExcel(
     data: I_JobExcel,
     job_id: number,
     project_id: number,
@@ -66,6 +66,26 @@ class JobValidation {
     try {
       const job = await prismaJobRepository.findByCode(code, project_id);
       if (job) {
+        return httpResponse.NotFoundException(
+          "Codigo del Trabajo encontrado",
+          job
+        );
+      }
+      return httpResponse.SuccessResponse("Trabajo encontrado", job);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código del Trabajo",
+        error
+      );
+    }
+  }
+  async findByCodeValidation(
+    code: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const job = await prismaJobRepository.findByCode(code, project_id);
+      if (!job) {
         return httpResponse.NotFoundException(
           "Codigo del Trabajo encontrado",
           job
