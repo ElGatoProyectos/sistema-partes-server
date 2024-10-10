@@ -86,7 +86,7 @@ class DepartureJobService {
           index++;
 
           const jobResponse = await jobValidation.findByCodeValidation(
-            item["ID-TRABAJO"],
+            item["ID-TRABAJO"].trim(),
             project.id
           );
           if (!jobResponse.success) {
@@ -136,7 +136,7 @@ class DepartureJobService {
           index++;
 
           const jobResponse = await unitValidation.findBySymbol(
-            item.UNIDAD,
+            item.UNIDAD.trim(),
             project.id
           );
           if (!jobResponse.success) {

@@ -134,10 +134,12 @@ class DepartureService {
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
           index++;
+          //[NOTE] hago esto xq sino me rompe todo ya q si uno tiene espacio no puede con
+          const codigoSinEspacios = item["ID-PARTIDA"].trim();
           // indicas que la cadena debe ser interpretada como un número decimal (base 10)
-          const codigo = parseInt(item["ID-PARTIDA"], 10);
+          const codigo = parseInt(codigoSinEspacios, 10);
 
-          if (!validator.isNumeric(item["ID-PARTIDA"])) {
+          if (!validator.isNumeric(codigoSinEspacios)) {
             errorNumber++;
             errorMessages.push("El ID-PARTIDA no puede contener letras.");
           } else {
@@ -202,7 +204,7 @@ class DepartureService {
           index++;
           if (item.UNI) {
             unit = await unitValidation.findBySymbol(
-              String(item.UNI),
+              String(item.UNI).trim(),
               project_id
             );
             if (!unit.success) {
@@ -221,61 +223,60 @@ class DepartureService {
       }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      // let code;
-      // let departure;
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureExcel) => {
-      //     code = await departureValidation.findByCodeValidation(
-      //       String(item["ID-PARTIDA"]),
-      //       project_id
-      //     );
-      //     if (code.success) {
-      //       departure = code.payload as Partida;
-      //       departure = code.payload as Partida;
-      //       await departureValidation.updateDeparture(
-      //         departure.id,
-      //         item,
-      //         userResponse.id,
-      //         responseProject.id
-      //       );
-      //     } else {
-      //       const unitResponse = await unitValidation.findBySymbol(
-      //         String(item.UNI),
-      //         project_id
-      //       );
-      //       const unit = unitResponse.payload as Unidad;
-      //       const data = {
-      //         id_interno: String(item["ID-PARTIDA"]),
-      //         item: item.ITEM,
-      //         partida: item.PARTIDA,
-      //         metrado_inicial: item.METRADO ? +item.METRADO : 0,
-      //         metrado_total: item.METRADO ? +item.METRADO : 0,
-      //         precio: +item.PRECIO ? +item.PRECIO : 0,
-      //         parcial: item.PARCIAL ? +item.PARCIAL : 0,
-      //         mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
-      //           ? +item["MANO DE OBRA UNITARIO"]
-      //           : 0,
-      //         material_unitario: item["MATERIAL UNITARIO"]
-      //           ? +item["MATERIAL UNITARIO"]
-      //           : 0,
-      //         equipo_unitario: item["EQUIPO UNITARIO"]
-      //           ? +item["EQUIPO UNITARIO"]
-      //           : 0,
-      //         subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
-      //           ? +item["SUBCONTRATA - VARIOS UNITARIO"]
-      //           : 0,
-      //         usuario_id: userResponse.id,
-      //         unidad_id: item.UNI ? unit.id : null,
-      //         proyecto_id: project_id,
-      //       };
-      //       await prisma.partida.create({
-      //         data: data,
-      //       });
-      //     }
-      //   })
-      // );
+      let code;
+      let departure;
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureExcel) => {
+          code = await departureValidation.findByCodeValidation(
+            String(item["ID-PARTIDA"].trim()),
+            project_id
+          );
+          if (code.success) {
+            departure = code.payload as Partida;
+            await departureValidation.updateDeparture(
+              departure.id,
+              item,
+              userResponse.id,
+              responseProject.id
+            );
+          } else {
+            const unitResponse = await unitValidation.findBySymbol(
+              String(item.UNI),
+              project_id
+            );
+            const unit = unitResponse.payload as Unidad;
+            const data = {
+              id_interno: String(item["ID-PARTIDA"].trim()),
+              item: item.ITEM,
+              partida: item.PARTIDA,
+              metrado_inicial: item.METRADO ? +item.METRADO : 0,
+              metrado_total: item.METRADO ? +item.METRADO : 0,
+              precio: +item.PRECIO ? +item.PRECIO : 0,
+              parcial: item.PARCIAL ? +item.PARCIAL : 0,
+              mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
+                ? +item["MANO DE OBRA UNITARIO"]
+                : 0,
+              material_unitario: item["MATERIAL UNITARIO"]
+                ? +item["MATERIAL UNITARIO"]
+                : 0,
+              equipo_unitario: item["EQUIPO UNITARIO"]
+                ? +item["EQUIPO UNITARIO"]
+                : 0,
+              subcontrata_varios: item["SUBCONTRATA - VARIOS UNITARIO"]
+                ? +item["SUBCONTRATA - VARIOS UNITARIO"]
+                : 0,
+              usuario_id: userResponse.id,
+              unidad_id: item.UNI ? unit.id : null,
+              proyecto_id: project_id,
+            };
+            await prisma.partida.create({
+              data: data,
+            });
+          }
+        })
+      );
 
-      // await prisma.$disconnect();
+      await prisma.$disconnect();
 
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {

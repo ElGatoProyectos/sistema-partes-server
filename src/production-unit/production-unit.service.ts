@@ -408,10 +408,12 @@ class ProductionUnitService {
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+          const codigoSinEspacios = item.CODIGO.trim();
+          //verificamos si tenemos el codigo
           //verificamos si tenemos el codigo
           const codigo = parseInt(item.CODIGO, 10); // Intenta convertir el string a número
 
-          if (!validator.isNumeric(item.CODIGO)) {
+          if (!validator.isNumeric(codigoSinEspacios)) {
             errorNumber++; // Aumenta si el código no es un número válido
           } else {
             // Verifica si el código ya ha sido procesado
@@ -473,7 +475,7 @@ class ProductionUnitService {
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel) => {
           code = await productionUnitValidation.findByCode(
-            String(item.CODIGO),
+            String(item.CODIGO.trim()),
             responseProject.id
           );
           if (!code.success) {
@@ -486,7 +488,7 @@ class ProductionUnitService {
           } else {
             await prisma.unidadProduccion.create({
               data: {
-                codigo: String(item.CODIGO),
+                codigo: String(item.CODIGO.trim()),
                 nombre: item.NOMBRE,
                 nota: item.NOTA,
                 proyecto_id: responseProject.id,
