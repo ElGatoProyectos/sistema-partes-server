@@ -165,7 +165,6 @@ class ResourceService {
           project_id
         );
         if (resourceResponse.success) {
-          console.log("entro a actualizar");
           resource = resourceResponse.payload as Recurso;
           await resourceValidation.updateResource(
             item,
@@ -173,7 +172,6 @@ class ResourceService {
             responseProject.id
           );
         } else {
-          console.log("entro a crear");
           const resourceCategoryResponse =
             await resourseCategoryValidation.existsName(
               item["NOMBRE CATEGORIA RECURSO"].trim(),
@@ -218,7 +216,6 @@ class ResourceService {
 
       return httpResponse.SuccessResponse("Recursos creados correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer los Recursos",
