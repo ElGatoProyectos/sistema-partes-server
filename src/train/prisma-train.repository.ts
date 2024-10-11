@@ -29,24 +29,6 @@ class PrismaTrainRepository implements TrainRepository {
     });
     return train;
   }
-  async updateCuadrillaByIdTrain(
-    idTrain: number,
-    workers: number,
-    official: number,
-    pawns: number
-  ): Promise<Tren> {
-    const updateTrain = await prisma.tren.update({
-      where: {
-        id: idTrain,
-      },
-      data: {
-        operario: workers,
-        oficial: official,
-        peon: pawns,
-      },
-    });
-    return updateTrain;
-  }
 
   async codeMoreHigh(project_id: number): Promise<Tren | null> {
     const lastTrain = await prisma.tren.findFirst({
@@ -73,40 +55,6 @@ class PrismaTrainRepository implements TrainRepository {
       data: data,
     });
     return train;
-  }
-
-  async searchNameTrain(
-    name: string,
-    skip: number,
-    limit: number,
-    project_id: number
-  ): Promise<{ trains: I_Train[]; total: number }> {
-    const [trains, total]: [I_Train[], number] = await prisma.$transaction([
-      prisma.tren.findMany({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-        skip,
-        take: limit,
-        omit: {
-          eliminado: true,
-        },
-      }),
-      prisma.tren.count({
-        where: {
-          nombre: {
-            contains: name,
-          },
-          eliminado: E_Estado_BD.n,
-          proyecto_id: project_id,
-        },
-      }),
-    ]);
-    return { trains, total };
   }
 
   async findAll(

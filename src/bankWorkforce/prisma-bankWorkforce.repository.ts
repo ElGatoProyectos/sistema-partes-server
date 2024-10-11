@@ -15,10 +15,13 @@ class PrismaBankWorkforceRepository implements BankWorkforceRepository {
     });
     return bank;
   }
-  async findByName(name: string): Promise<Banco | null> {
+  async findByName(name: string, project_id: number): Promise<Banco | null> {
     const bank = await prisma.banco.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });

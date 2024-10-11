@@ -6,8 +6,28 @@ import {
   I_UpdateResourseCategoryBody,
 } from "./models/resourseCategory.interface";
 import { CategoriaRecurso, E_Estado_BD } from "@prisma/client";
+import { I_CreateResourcesBD } from "@/resources/models/resources.interface";
 
 class PrismaResourseCategoryRepository implements ResourseCategoryRepository {
+  async createResourcesCategoryMasive(
+    data: I_CreateResourcesBD[]
+  ): Promise<{ count: number }> {
+    const units = await prisma.categoriaRecurso.createMany({
+      data,
+    });
+    return units;
+  }
+  async codeMoreHigh(project_id: number): Promise<CategoriaRecurso | null> {
+    const lastResourceCategory = await prisma.categoriaRecurso.findFirst({
+      where: {
+        proyecto_id: project_id,
+        eliminado: E_Estado_BD.n,
+      },
+      orderBy: { codigo: "desc" },
+    });
+    return lastResourceCategory;
+  }
+
   async searchNameResourseCategory(
     name: string,
     skip: number,
@@ -44,7 +64,8 @@ class PrismaResourseCategoryRepository implements ResourseCategoryRepository {
   }
   async findAll(
     skip: number,
-    limit: number
+    limit: number,
+    project_id: number
   ): Promise<{
     categoriesResources: I_ResourseCategory[];
     total: number;
@@ -54,6 +75,7 @@ class PrismaResourseCategoryRepository implements ResourseCategoryRepository {
         prisma.categoriaRecurso.findMany({
           where: {
             eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
           },
           skip,
           take: limit,
@@ -85,10 +107,27 @@ class PrismaResourseCategoryRepository implements ResourseCategoryRepository {
     return resourseCategory;
   }
 
-  async existsName(name: string): Promise<CategoriaRecurso | null> {
+  async existsName(
+    name: string,
+    project_id: number
+  ): Promise<CategoriaRecurso | null> {
     const resourseCategory = await prisma.categoriaRecurso.findFirst({
       where: {
         nombre: name,
+        proyecto_id: project_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return resourseCategory;
+  }
+  async findByName(
+    name: string,
+    project_id: number
+  ): Promise<CategoriaRecurso | null> {
+    const resourseCategory = await prisma.categoriaRecurso.findFirst({
+      where: {
+        nombre: name,
+        proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });

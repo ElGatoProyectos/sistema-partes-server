@@ -5,7 +5,7 @@ export abstract class BankWorkforceRepository {
 
   findById(bank_id: number): void {}
 
-  findByName(name: string): void {}
+  findByName(name: string, project_id: number): void {}
 
   createBankWorkforce(data: I_CreateBankWorkforceBD): void {}
 

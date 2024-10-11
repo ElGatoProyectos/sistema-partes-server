@@ -4,6 +4,7 @@ import { I_JobExcel } from "./models/job.interface";
 import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
 import { Tren, UnidadProduccion } from "@prisma/client";
 import { trainValidation } from "@/train/train.validation";
+import { jobService } from "./job.service";
 
 class JobValidation {
   async updateJobForExcel(
@@ -31,6 +32,8 @@ class JobValidation {
         project_id
       );
       const train = trainResponse.payload as Tren;
+      const duration = jobService.calcularDiasEntreFechas(inicioDate, endDate);
+      const durationFix = duration === 0 ? 1 : duration;
       const jobFormat = {
         codigo: data["ID-TRABAJO"].trim(),
         nombre: data.TRABAJOS,
@@ -38,22 +41,22 @@ class JobValidation {
         up_id: up.id,
         fecha_inicio: inicioDate,
         fecha_finalizacion: endDate,
-        duracion: +formattedDuracion,
         costo_partida: 0,
         costo_mano_obra: 0,
         costo_material: 0,
         costo_equipo: 0,
         costo_varios: 0,
         proyecto_id: project_id,
+        duracion: durationFix,
         usuario_id: usuario_id,
       };
-      const responseTrain = await prismaJobRepository.updateJobFromExcel(
+      const responseJob = await prismaJobRepository.updateJobFromExcel(
         jobFormat,
         job_id
       );
       return httpResponse.SuccessResponse(
         "Trabajo modificado correctamente",
-        responseTrain
+        responseJob
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

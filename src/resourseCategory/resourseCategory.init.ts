@@ -11,6 +11,7 @@ const prefix = "/resourseCategory";
 resourseCategoryRouter.get(
   `${prefix}`,
   authRoleMiddleware.authAdminUser,
+  resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
   resourseCategoryController.allResoursesCategories
 );
 
@@ -30,6 +31,7 @@ resourseCategoryRouter.get(
 resourseCategoryRouter.post(
   `${prefix}`,
   resourseCategoryMiddleware.verifyFieldsRegistry,
+  resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   resourseCategoryController.create
 );
@@ -38,6 +40,7 @@ resourseCategoryRouter.put(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
   resourseCategoryMiddleware.verifyFieldsUpdate,
+  resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   resourseCategoryController.update
 );

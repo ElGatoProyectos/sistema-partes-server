@@ -80,8 +80,7 @@ class DepartureService {
         (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
       ) {
         return httpResponse.BadRequestException(
-          // "Error al leer el archivo. El archivo no puede tener más de 2 filas en blanco "
-          "hola blanco "
+          "Error al leer el archivo. El archivo no puede tener más de 2 filas en blanco "
         );
       }
 
@@ -105,7 +104,7 @@ class DepartureService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.Existen espacios vacios.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.Los campos ID-PARTIDA, ITEM Y PARTIDA son obligatorios.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );
@@ -115,7 +114,7 @@ class DepartureService {
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
           index++;
           const codigoSinEspacios = item["ID-PARTIDA"].trim();
-          if (codigoSinEspacios.length != 4) {
+          if (codigoSinEspacios.length < 4) {
             error++;
             errorRows.push(index + 1);
           }
@@ -160,7 +159,7 @@ class DepartureService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.Hay letras en códigos o que sea menor o igual al siguiente.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.Hay letras en códigos o el mismo puede que sea mayor o igual al siguiente.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );

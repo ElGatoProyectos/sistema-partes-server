@@ -19,4 +19,6 @@ export abstract class UnitRepository {
   updateUnit(data: I_UpdateUnitBody, idUnit: number): void {}
 
   updateStatusUnit(idResourseCategory: number): void {}
+
+  createUnitMasive(data: I_CreateUnitBD[]): void {}
 }

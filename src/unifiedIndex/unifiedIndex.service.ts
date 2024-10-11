@@ -15,11 +15,13 @@ import * as xlsx from "xlsx";
 import validator from "validator";
 import { jwtService } from "@/auth/jwt.service";
 import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
+import { projectValidation } from "@/project/project.validation";
 
 class UnifiedIndexService {
   async createUnifiedIndex(
     data: I_CreateUnifiedIndexBody,
-    tokenWithBearer: string
+    tokenWithBearer: string,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(
@@ -28,16 +30,26 @@ class UnifiedIndexService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
 
-      const resultIdProject = await unifiedIndexValidation.findByName(
-        data.nombre
-      );
+      const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
-        return resultIdProject;
+        return httpResponse.BadRequestException(
+          "No se puede crear el Tren con el id del Proyecto proporcionado"
+        );
+      }
+
+      const resultUnifiedIndex =
+        await unifiedIndexValidation.findByNameValidation(
+          data.nombre,
+          project_id
+        );
+      if (!resultUnifiedIndex.success) {
+        return resultUnifiedIndex;
       }
 
       if (data.simbolo) {
         const resultIdUnifiedIndex = await unifiedIndexValidation.findBySymbol(
-          data.simbolo
+          data.simbolo,
+          project_id
         );
         if (!resultIdUnifiedIndex.success) {
           return resultIdUnifiedIndex;
@@ -51,7 +63,9 @@ class UnifiedIndexService {
         return resultIdCompany;
       }
       const company = resultIdCompany.payload as Empresa;
-      const lastUnifiedIndex = await unifiedIndexValidation.codeMoreHigh();
+      const lastUnifiedIndex = await unifiedIndexValidation.codeMoreHigh(
+        project_id
+      );
       const lastUnifiedIndexResponse =
         lastUnifiedIndex.payload as IndiceUnificado;
 
@@ -65,6 +79,7 @@ class UnifiedIndexService {
         empresa_id: company.id,
         codigo: formattedCodigo,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
+        proyect_id: project_id,
       };
       const responseUnifiedIndex =
         await prismaUnifiedIndexRepository.createUnifiedIndex(
@@ -90,7 +105,8 @@ class UnifiedIndexService {
   async updateUnifiedIndex(
     data: I_UpdateUnifiedIndexBody,
     idUnifiedIndex: number,
-    tokenWithBearer: string
+    tokenWithBearer: string,
+    proyect_id: number
   ): Promise<T_HttpResponse> {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(
@@ -98,6 +114,12 @@ class UnifiedIndexService {
       );
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
+      const resultIdProject = await projectValidation.findById(proyect_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Indice Unificado con el id del Proyecto proporcionado"
+        );
+      }
       const resultIdResourseCategory = await unifiedIndexValidation.findById(
         idUnifiedIndex
       );
@@ -110,9 +132,11 @@ class UnifiedIndexService {
       }
 
       if (unifiedIndexFind.nombre != data.nombre) {
-        const resultIdUnifiedIndex = await unifiedIndexValidation.findByName(
-          data.nombre
-        );
+        const resultIdUnifiedIndex =
+          await unifiedIndexValidation.findByNameValidation(
+            data.nombre,
+            proyect_id
+          );
         if (!resultIdUnifiedIndex.success) {
           return resultIdUnifiedIndex;
         }
@@ -120,7 +144,8 @@ class UnifiedIndexService {
 
       if (data.simbolo && unifiedIndexFind.simbolo != data.simbolo) {
         const resultIdUnifiedIndex = await unifiedIndexValidation.findBySymbol(
-          data.simbolo
+          data.simbolo,
+          proyect_id
         );
         if (!resultIdUnifiedIndex.success) {
           return resultIdUnifiedIndex;
@@ -134,6 +159,7 @@ class UnifiedIndexService {
         ...data,
         empresa_id: company.id,
         simbolo: data.simbolo ? data.simbolo.toUpperCase() : "",
+        proyect_id: proyect_id,
       };
       const responseUnifiedIndex =
         await prismaUnifiedIndexRepository.updateUnifiedIndex(
@@ -181,10 +207,20 @@ class UnifiedIndexService {
     }
   }
 
-  async findAll(data: T_FindAllUnifiedIndex) {
+  async findAll(data: T_FindAllUnifiedIndex, proyect_id: number) {
     try {
+      const resultIdProject = await projectValidation.findById(proyect_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede traer todos los Indice Unificado con el id del Proyecto proporcionado"
+        );
+      }
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaUnifiedIndexRepository.findAll(skip, data);
+      const result = await prismaUnifiedIndexRepository.findAll(
+        skip,
+        data,
+        proyect_id
+      );
 
       const { unifiedIndex, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
@@ -239,7 +275,11 @@ class UnifiedIndexService {
       await prisma.$disconnect();
     }
   }
-  async registerUnifiedIndexMasive(file: any, idCompany: number) {
+  async registerUnifiedIndexMasive(
+    file: any,
+    idCompany: number,
+    project_id: number
+  ) {
     try {
       const buffer = file.buffer;
 
@@ -249,7 +289,12 @@ class UnifiedIndexService {
       const sheetToJson = xlsx.utils.sheet_to_json(
         sheet
       ) as I_UnifiedIndexExcel[];
-
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Tren con el id del Proyecto proporcionado"
+        );
+      }
       let error = 0;
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
@@ -373,7 +418,8 @@ class UnifiedIndexService {
             await unifiedIndexValidation.updateUnifiedIndex(
               item,
               unifiedIndexIdResponse.id,
-              responseCompany.id
+              responseCompany.id,
+              project_id
             );
           } else {
             await prisma.indiceUnificado.create({
@@ -383,6 +429,7 @@ class UnifiedIndexService {
                 simbolo: item.Simbolo,
                 comentario: item.Comentario,
                 empresa_id: idCompany,
+                proyect_id: project_id,
               },
             });
           }
@@ -395,10 +442,625 @@ class UnifiedIndexService {
         "Indices Unificados creados correctamente!"
       );
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer el Indice Unificado",
+        error
+      );
+    }
+  }
+  async createMasive(
+    company_id: number,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const data: any = [
+        {
+          codigo: "001",
+          nombre: "Aceite A1 - C",
+          simbolo: "LU",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "002",
+          nombre: "Acero De Construcción Liso",
+          simbolo: "Ac",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "003",
+          nombre: "Acero De Construccion Corrugado",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "004",
+          nombre: "Agregado Fino",
+          simbolo: "AF",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "005",
+          nombre: "Agregado Grueso",
+          simbolo: "AG",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "006",
+          nombre: "Alambre Y Cable De Cobre Desnudo Nn",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "007",
+          nombre: "Alambre Y Cable Tipo Tw Y Thw",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "008",
+          nombre: "Alambre Y Cable Tipo Wp",
+          simbolo: "an",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "009",
+          nombre: "Alcantarilla Metálica",
+          simbolo: "AM",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "010",
+          nombre: "Aparato Sanitario Con grifería",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "011",
+          nombre: "Artefacto De Alumbrado Exterior",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "012",
+          nombre: "Artefacto De Alumbrado Interior",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "013",
+          nombre: "Asfalto  (MOD)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "014",
+          nombre: "Baldosa Acustica",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "015",
+          nombre: "Baldosa Asfaltica",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "016",
+          nombre: "Baldosa Vinilica",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "017",
+          nombre: "Bloque Y Ladrillo",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "018",
+          nombre: "Cable Telefonico",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "019",
+          nombre: "Cable Nyy Y Nky",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "020",
+          nombre: "Cemento Asfaltico",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "021",
+          nombre: "Cemento Portland Tipo I",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "022",
+          nombre: "Cemento Portland Tipo Ii",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "023",
+          nombre: "Cemento Portland Tipo V",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "024",
+          nombre: "Ceramica Esmaltada Y Sin Esmaltar",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "025",
+          nombre: "Cerrajeria Importada (reagrupado En El 30)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "026",
+          nombre: "Cerrajeria Nacional",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "027",
+          nombre: "Detonante",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "028",
+          nombre: "Dinamita",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "029",
+          nombre: "Dolar",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "030",
+          nombre: "Dolar (general Ponderado)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "031",
+          nombre: "Dolar Mas Inflacion Usa Y Ducto De Concreto",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "032",
+          nombre: "Flete terrestre",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "033",
+          nombre: "Flete áereo",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "034",
+          nombre: "Gasolina",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "035",
+          nombre: "Gelatina (ind. 028)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "036",
+          nombre: "Gelignita (ind. 028)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "037",
+          nombre: "Herramienta Manual",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "038",
+          nombre: "Hormigon",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "039",
+          nombre: "Indice General De Precios Al Consumidor",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "040",
+          nombre: "Loseta",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "041",
+          nombre: "Madera En Tiras Para Piso",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "042",
+          nombre: "Madera Importada Para Encof. Y Carpinteria",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "043",
+          nombre: "Madera Nacional Para Encof. Y Carpint.",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "044",
+          nombre: "Madera Terciada Para Carpinteria",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "045",
+          nombre: "Madera Terciada Para Encofrado",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "046",
+          nombre: "Malla De Acero",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "047",
+          nombre: "Mano De Obra Inc. Leyes Sociales",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "048",
+          nombre: "Maquinaria Y Equipo Nacional",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "049",
+          nombre: "Maquinaria Y Equipo Importado",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "050",
+          nombre: "Marco Y Tapa De Fierro Fundido",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "051",
+          nombre: "Perfil De Acero Liviano",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "052",
+          nombre: "Perfil De Aluminio",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "053",
+          nombre: "Petroleo Diessel",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "054",
+          nombre: "Pintura Latex",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "055",
+          nombre: "Pintura Temple",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "056",
+          nombre: "Plancha De Acero Laf",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "057",
+          nombre: "Plancha De Acero Mediana Lac (ind. 056)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "058",
+          nombre: "Plancha De Asbesto-cemento",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "059",
+          nombre: "Plancha De Poliuretano",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "060",
+          nombre: "Plancha Galvanizada",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "061",
+          nombre: "Poste De Concreto",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "062",
+          nombre: "Poste De Fierro (reagrupado En El 65)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "063",
+          nombre: "Terrazo",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "064",
+          nombre: "Tuberia De Acero Negro Y/o Galvanizado",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "065",
+          nombre: "Tuberia De Asbesto-cemento",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "066",
+          nombre: "Tubería De Asbesto-cemento (ind. 056)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "067",
+          nombre: "Tuberia De Cobre",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "068",
+          nombre: "Tuberia De Concreto Simple",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "069",
+          nombre: "Tuberia De Concreto Reforzado",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "070",
+          nombre: "Tuberia De Fierro Fundido",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "071",
+          nombre: "Tuberia De Pvc Para Agua",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "072",
+          nombre: "Tuberia Cpvc",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "073",
+          nombre: "Tuberia De Pvc Para Electricidad (sap)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "074",
+          nombre: "Tuberia De Pvc Para Electricidad (sel)(reag.74)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "075",
+          nombre: "Valvula De Bronce Importada (reagrupado 30)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "076",
+          nombre: "Valvula De Bronce Nacional",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "077",
+          nombre: "Valvula De Fierro Fundido Nacional",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "078",
+          nombre: "Vidrio Incoloro Nacional",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "079",
+          nombre: "Subcontratos",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "080",
+          nombre: "Materiales global",
+          simbolo: "MAT",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "081",
+          nombre: "Restricciones",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "082",
+          nombre: "Insumos ()",
+          simbolo: "DUM",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "083",
+          nombre: "Recursos - GA",
+          simbolo: "GN",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+        {
+          codigo: "084",
+          nombre: "Insumos Compuestos (*)",
+          simbolo: "",
+          empresa_id: company_id,
+          proyect_id: project_id,
+        },
+      ];
+
+      const units = await prismaUnifiedIndexRepository.createUnifiedIndexMasive(
+        data
+      );
+
+      if (units.count === 0) {
+        return httpResponse.SuccessResponse(
+          "Hubo problemas para crear los Indices Unificados de la Mano de Obra"
+        );
+      }
+
+      return httpResponse.SuccessResponse(
+        "Éxito al crear de forma masiva los Indices Unificados de la Mano de Obra"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear forma masiva los Indices Unificados de la Mano de Obra",
         error
       );
     }

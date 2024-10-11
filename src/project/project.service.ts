@@ -32,6 +32,9 @@ import { bankWorkforceService } from "@/bankWorkforce/bankWorkforce.service";
 import { originWorkforceService } from "@/originWorkforce/originWorkforce.service";
 import { specialtyWorkforceService } from "@/specialtyWorkforce/specialtyWorkforce.service";
 import { typeWorkforceService } from "@/typeWorkforce/typeWorkforce.service";
+import { unitService } from "@/unit/unit.service";
+import { unifiedIndexService } from "@/unifiedIndex/unifiedIndex.service";
+import { resourseCategoryService } from "@/resourseCategory/resourseCategory.service";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -123,10 +126,33 @@ class ProjectService {
       );
 
       //[SUCCESS] Si estuvo todo ok se crea lo siguiente
+      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
+      if (!typeWorkforce.success) {
+        return typeWorkforce;
+      }
+      const responseOriginWorkforce = await originWorkforceService.createMasive(
+        project.id
+      );
+      if (!responseOriginWorkforce.success) {
+        return responseOriginWorkforce;
+      }
       const responseCategoryWorkforce =
         await categoryWorkforceService.createMasive(project.id);
       if (!responseCategoryWorkforce.success) {
         return responseCategoryWorkforce;
+      }
+      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+        project.id
+      );
+      if (!specialtyWorkforce.success) {
+        return specialtyWorkforce;
+      }
+      const unitReponse = await unitService.createMasive(
+        company.id,
+        project.id
+      );
+      if (!unitReponse.success) {
+        return unitReponse;
       }
       const responseBankWorkforce = await bankWorkforceService.createMasive(
         project.id
@@ -134,21 +160,18 @@ class ProjectService {
       if (!responseBankWorkforce.success) {
         return responseBankWorkforce;
       }
-      const responseOriginWorkforce = await originWorkforceService.createMasive(
+      const responseUnifiedIndex = await unifiedIndexService.createMasive(
+        company.id,
         project.id
       );
-      if (!responseOriginWorkforce.success) {
-        return responseBankWorkforce;
+      if (!responseUnifiedIndex.success) {
+        return responseUnifiedIndex;
       }
-      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+      const resourcesCategory = await resourseCategoryService.createMasive(
         project.id
       );
-      if (!specialtyWorkforce.success) {
-        return responseBankWorkforce;
-      }
-      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
-      if (!typeWorkforce.success) {
-        return typeWorkforce;
+      if (!resourcesCategory.success) {
+        return resourcesCategory;
       }
 
       const projectMapper = new ProjectResponseMapper(project);

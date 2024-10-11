@@ -19,6 +19,7 @@ class PrismaJobRepository implements JobRepository {
       where: { id: job_id },
       data: data,
     });
+
     return job;
   }
   async createJob(data: I_CreateJobBD): Promise<Trabajo> {

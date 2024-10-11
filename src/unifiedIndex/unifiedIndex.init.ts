@@ -10,10 +10,11 @@ const prefix = "/unified-index";
 unifiedIndexRouter.post(
   `${prefix}`,
   unifiedIndexMiddleware.verifyFieldsRegistry,
+  unifiedIndexMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   unifiedIndexController.create
 );
-
+//te va a dar error xq le falta lo de project-id
 unifiedIndexRouter.post(
   `${prefix}/upload-excel/company/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
@@ -24,6 +25,7 @@ unifiedIndexRouter.post(
 unifiedIndexRouter.get(
   `${prefix}`,
   authRoleMiddleware.authAdminUser,
+  unifiedIndexMiddleware.verifyHeadersFieldsIdProject,
   unifiedIndexController.allUnifiedIndex
 );
 
@@ -38,6 +40,7 @@ unifiedIndexRouter.put(
   `${prefix}/:id`,
   unifiedIndexMiddleware.verifyHeadersFields,
   unifiedIndexMiddleware.verifyFieldsUpdate,
+  unifiedIndexMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   unifiedIndexController.update
 );

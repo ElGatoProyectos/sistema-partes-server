@@ -10,6 +10,7 @@ export class UnifiedIndexResponseMapper
   comentario: string;
   empresa_id: number;
   fecha_creacion: Date;
+  proyect_id: number;
 
   constructor(unifiedIndex: IndiceUnificado) {
     this.id = unifiedIndex.id;
@@ -19,5 +20,6 @@ export class UnifiedIndexResponseMapper
     this.comentario = unifiedIndex.comentario ? unifiedIndex.comentario : "";
     this.empresa_id = unifiedIndex.empresa_id;
     this.fecha_creacion = unifiedIndex.fecha_creacion;
+    this.proyect_id = unifiedIndex.proyect_id;
   }
 }

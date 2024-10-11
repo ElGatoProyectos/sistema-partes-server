@@ -21,7 +21,9 @@ class PrismaOriginWorkforceRepository implements OriginWorkforceRepository {
   ): Promise<OrigenObrero | null> {
     const originWorkforce = await prisma.origenObrero.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },

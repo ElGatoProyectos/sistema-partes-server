@@ -26,7 +26,6 @@ class DepartureJobValidation {
       const departure = departureResponse.payload as Partida;
 
       if (departure.precio) {
-        console.log("----entro a precio--");
         let suma = 0;
         const resultado = data.METRADO * departure.precio;
         // console.log(

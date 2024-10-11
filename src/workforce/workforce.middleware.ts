@@ -1,41 +1,39 @@
-import express from "@/config/express.config";
-import { trainDto } from "./dto/train.dto";
 import { httpResponse } from "@/common/http.response";
-import { trainUpdateDto } from "./dto/update.dto";
+import express from "@/config/express.config";
 import validator from "validator";
 
-class TrainMiddleware {
-  verifyFields(
-    request: express.Request,
-    response: express.Response,
-    nextFunction: express.NextFunction
-  ) {
-    try {
-      trainDto.parse(request.body);
-      nextFunction();
-    } catch (error) {
-      const result = httpResponse.BadRequestException(
-        "Error al validar campos "
-      );
-      response.status(result.statusCode).send(result);
-    }
-  }
+class WorkforceMiddleware {
+  // verifyFields(
+  //   request: express.Request,
+  //   response: express.Response,
+  //   nextFunction: express.NextFunction
+  // ) {
+  //   try {
+  //     trainDto.parse(request.body);
+  //     nextFunction();
+  //   } catch (error) {
+  //     const result = httpResponse.BadRequestException(
+  //       "Error al validar campos "
+  //     );
+  //     response.status(result.statusCode).send(result);
+  //   }
+  // }
 
-  verifyFieldsUpdate(
-    request: express.Request,
-    response: express.Response,
-    nextFunction: express.NextFunction
-  ) {
-    try {
-      trainUpdateDto.parse(request.body);
-      nextFunction();
-    } catch {
-      const result = httpResponse.BadRequestException(
-        "Error al validar campos para actualizar el Tren"
-      );
-      response.status(result.statusCode).send(result);
-    }
-  }
+  // verifyFieldsUpdate(
+  //   request: express.Request,
+  //   response: express.Response,
+  //   nextFunction: express.NextFunction
+  // ) {
+  //   try {
+  //     trainUpdateDto.parse(request.body);
+  //     nextFunction();
+  //   } catch {
+  //     const result = httpResponse.BadRequestException(
+  //       "Error al validar campos para actualizar el Tren"
+  //     );
+  //     response.status(result.statusCode).send(result);
+  //   }
+  // }
 
   verifyHeadersFieldsId(
     request: express.Request,
@@ -75,4 +73,4 @@ class TrainMiddleware {
   }
 }
 
-export const trainMiddleware = new TrainMiddleware();
+export const workforceMiddleware = new WorkforceMiddleware();

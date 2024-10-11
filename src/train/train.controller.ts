@@ -37,17 +37,6 @@ class TrainController {
     }
   }
 
-  async updateCuadrilla(request: express.Request, response: express.Response) {
-    const train_id = Number(request.params.id);
-    const data = request.body as I_Cuadrilla_Train;
-    const result = await trainService.updateCuadrillaTrain(data, train_id);
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
-    } else {
-      response.status(result.statusCode).json(result);
-    }
-  }
-
   async updateStatus(request: express.Request, response: express.Response) {
     const idTrain = Number(request.params.id);
     const result = await trainService.updateStatusTrain(idTrain);
@@ -57,26 +46,6 @@ class TrainController {
   async findByIdTrain(request: express.Request, response: express.Response) {
     const idTrain = Number(request.params.id);
     const result = await trainService.findById(idTrain);
-    response.status(result.statusCode).json(result);
-  }
-
-  async findByName(request: express.Request, response: express.Response) {
-    const page = parseInt(request.query.page as string) || 1;
-    const limit = parseInt(request.query.limit as string) || 20;
-    const project_id = request.get("project-id") as string;
-    let paginationOptions: T_FindAll = {
-      queryParams: {
-        page: page,
-        limit: limit,
-      },
-    };
-    //si buscaba como request.body no me llegaba bien para luego buscar
-    const name = request.query.name as string;
-    const result = await trainService.findByName(
-      name,
-      paginationOptions,
-      +project_id
-    );
     response.status(result.statusCode).json(result);
   }
 

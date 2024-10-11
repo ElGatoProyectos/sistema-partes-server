@@ -1,4 +1,4 @@
-import { I_Train, I_TrainExcel } from "./models/production-unit.interface";
+import { I_TrainExcel } from "./models/production-unit.interface";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaTrainRepository } from "./prisma-train.repository";
 

@@ -9,20 +9,44 @@ import { ResourseCategoryMapper } from "./mapper/resourseCategory.mapper";
 import prisma from "@/config/prisma.config";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { CategoriaRecurso } from "@prisma/client";
+import { projectValidation } from "@/project/project.validation";
 
 class ResourseCategoryService {
   async createResourseCategory(
-    data: I_CreateResourseCategoryBody
+    data: I_CreateResourseCategoryBody,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear la Categoria del Recurso con el id del Proyecto proporcionado"
+        );
+      }
+      const lastCategory = await resourseCategoryValidation.codeMoreHigh(
+        project_id
+      );
+      const lastCategoryResponse = lastCategory.payload as CategoriaRecurso;
+
+      // Incrementar el código en 1
+      const nextCodigo = (parseInt(lastCategoryResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
       const resultIdResourseCategory =
-        await resourseCategoryValidation.findByName(data.nombre);
+        await resourseCategoryValidation.findByName(data.nombre, project_id);
       if (!resultIdResourseCategory.success) {
         return resultIdResourseCategory;
       }
+      const resourceFormat = {
+        ...data,
+        codigo: formattedCodigo,
+        proyecto_id: project_id,
+      };
 
       const responseResourseCategory =
-        await prismaResourseCategoryRepository.createResourseCategory(data);
+        await prismaResourseCategoryRepository.createResourseCategory(
+          resourceFormat
+        );
       const prouducResourseCategoryMapper = new ResourseCategoryMapper(
         responseResourseCategory
       );
@@ -40,9 +64,62 @@ class ResourseCategoryService {
     }
   }
 
+  async createMasive(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const data: any = [
+        {
+          codigo: "001",
+          nombre: "Mano de Obra",
+          proyecto_id: project_id,
+        },
+        {
+          codigo: "002",
+          nombre: "Materiales",
+          proyecto_id: project_id,
+        },
+        {
+          codigo: "003",
+          nombre: "Equipos",
+          proyecto_id: project_id,
+        },
+        {
+          codigo: "004",
+          nombre: "Sub-contratas",
+          proyecto_id: project_id,
+        },
+        {
+          codigo: "005",
+          nombre: "Varios",
+          proyecto_id: project_id,
+        },
+      ];
+
+      const units =
+        await prismaResourseCategoryRepository.createResourcesCategoryMasive(
+          data
+        );
+
+      if (units.count === 0) {
+        return httpResponse.SuccessResponse(
+          "Hubo problemas para crear las Categorias de los Recursos"
+        );
+      }
+
+      return httpResponse.SuccessResponse(
+        "Éxito al crear de forma masiva las Categorias de los Recursos"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear forma masiva las Categorias de los Recursos",
+        error
+      );
+    }
+  }
+
   async updateResourseCategory(
     data: I_UpdateResourseCategoryBody,
-    idResourseCategory: number
+    idResourseCategory: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const resultIdResourseCategory =
@@ -54,18 +131,27 @@ class ResourseCategoryService {
       }
       const resourceCategoryFind =
         resultIdResourseCategory.payload as CategoriaRecurso;
-
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede actualizar la Categoria del Recurso con el id del Proyecto proporcionado"
+        );
+      }
       if (resourceCategoryFind.nombre != data.nombre) {
         const resultIdResourseCategory =
-          await resourseCategoryValidation.findByName(data.nombre);
+          await resourseCategoryValidation.findByName(data.nombre, project_id);
         if (!resultIdResourseCategory.success) {
           return resultIdResourseCategory;
         }
       }
+      const resourceFormat = {
+        ...data,
+        proyecto_id: project_id,
+      };
 
       const responseProductionUnit =
         await prismaResourseCategoryRepository.updateResourseCategory(
-          data,
+          resourceFormat,
           idResourseCategory
         );
       const resourseCategoryMapper = new ResourseCategoryMapper(
@@ -143,12 +229,19 @@ class ResourseCategoryService {
     }
   }
 
-  async findAll(data: T_FindAll) {
+  async findAll(data: T_FindAll, project_id: number) {
     try {
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede traer todas las categorias del recurso con el id del proyecto proporcionado"
+        );
+      }
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const result = await prismaResourseCategoryRepository.findAll(
         skip,
-        data.queryParams.limit
+        data.queryParams.limit,
+        project_id
       );
 
       const { categoriesResources, total } = result;
