@@ -10,10 +10,9 @@ class TrainValidation {
   ): Promise<T_HttpResponse> {
     try {
       const train = {
-        codigo: String(data["ID-TREN"]),
+        codigo: String(data["ID-TREN"].trim()),
         nombre: data.TREN,
         nota: data.NOTA,
-        cuadrilla: data.TREN + "-" + data["ID-TREN"],
         proyecto_id: Number(idProjectID),
       };
       const responseTrain = await prismaTrainRepository.updateTrain(

@@ -378,7 +378,7 @@ class UnifiedIndexService {
           } else {
             await prisma.indiceUnificado.create({
               data: {
-                codigo: String(item.ID),
+                codigo: String(item.ID).trim(),
                 nombre: item.Nombre,
                 simbolo: item.Simbolo,
                 comentario: item.Comentario,

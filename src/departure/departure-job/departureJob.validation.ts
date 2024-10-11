@@ -26,6 +26,7 @@ class DepartureJobValidation {
       const departure = departureResponse.payload as Partida;
 
       if (departure.precio) {
+        console.log("----entro a precio--");
         let suma = 0;
         const resultado = data.METRADO * departure.precio;
         // console.log(
@@ -45,89 +46,107 @@ class DepartureJobValidation {
         //     job.id
         // );
         suma = resultado + job.costo_partida;
-        console.log("el resultado de la suma da  " + suma);
+        // console.log("el resultado de la suma da  " + suma);
         await prismaJobRepository.updateJobCost(suma, job.id);
       }
       if (departure.mano_de_obra_unitaria) {
         let suma = 0;
         const resultado = data.METRADO * departure.mano_de_obra_unitaria;
+        // console.log(
+        //   "la partida " +
+        //     data.PARTIDA +
+        //     " viene con valor de la base de datos el trabajo " +
+        //     job.costo_mano_obra +
+        //     " esto da del codigo de la partida " +
+        //     departure.id +
+        //     " de multiplicar el metrado " +
+        //     data.METRADO +
+        //     " por la mano de obra de bbdd " +
+        //     departure.mano_de_obra_unitaria +
+        //     " el siguiente resultado " +
+        //     resultado +
+        //     " para el id del trabajo " +
+        //     job.id
+        // );
         suma = resultado + job.costo_partida;
         await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
       }
       if (departure.material_unitario) {
         let suma = 0;
         const resultado = data.METRADO * departure.material_unitario;
+        // console.log(
+        //   "la partida " +
+        //     data.PARTIDA +
+        //     " viene con valor de la base de datos el trabajo " +
+        //     job.costo_material +
+        //     " esto da del codigo de la partida " +
+        //     departure.id +
+        //     " de multiplicar el metrado " +
+        //     data.METRADO +
+        //     " por la material de bbdd " +
+        //     departure.material_unitario +
+        //     " el siguiente resultado " +
+        //     resultado +
+        //     " para el id del trabajo " +
+        //     job.id
+        // );
         suma = resultado + job.costo_partida;
         await prismaJobRepository.updateJobMaterialCost(suma, job.id);
       }
       if (departure.equipo_unitario) {
         let suma = 0;
         const resultado = data.METRADO * departure.equipo_unitario;
+        // console.log(
+        //   "la partida " +
+        //     data.PARTIDA +
+        //     " viene con valor de la base de datos el trabajo " +
+        //     job.costo_equipo +
+        //     " esto da del codigo de la partida " +
+        //     departure.id +
+        //     " de multiplicar el metrado " +
+        //     data.METRADO +
+        //     " por la costo equipo de bbdd " +
+        //     departure.equipo_unitario +
+        //     " el siguiente resultado " +
+        //     resultado +
+        //     " para el id del trabajo " +
+        //     job.id
+        // );
         suma = resultado + job.costo_partida;
         await prismaJobRepository.updateJobEquipment(suma, job.id);
       }
       if (departure.subcontrata_varios) {
         let suma = 0;
         const resultado = data.METRADO * departure.subcontrata_varios;
+        // console.log(
+        //   "la partida " +
+        //     data.PARTIDA +
+        //     " viene con valor de la base de datos el costo varios " +
+        //     job.costo_varios +
+        //     " esto da del codigo de la partida " +
+        //     departure.id +
+        //     " de multiplicar el metrado " +
+        //     data.METRADO +
+        //     " por la mano de obra de bb " +
+        //     departure.subcontrata_varios +
+        //     " el siguiente resultado " +
+        //     resultado +
+        //     " para el id del trabajo " +
+        //     job.id
+        // );
         suma = resultado + job.costo_partida;
         await prismaJobRepository.updateJobSeveral(suma, job.id);
       }
       return httpResponse.SuccessResponse(
-        "Partida-Trabajo modificada correctamente"
+        "Los Trabajos de las Partidas modificada correctamente"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al modificar la Partida y el Trabajo",
+        "Error al modificar los Trabajos de las Partidas",
         error
       );
     }
   }
-  // async updateDeparture(
-  //   departure_id: number,
-  //   data: I_DepartureExcel,
-  //   usuario_id: number,
-  //   project_id: number
-  // ): Promise<T_HttpResponse> {
-  //   try {
-  //     let departureFormat: any = {
-  //       id_interno: String(data["ID-PARTIDA"]) || "",
-  //       item: data.ITEM || "",
-  //       partida: data.PARTIDA || "",
-  //       metrado_inicial: data.METRADO,
-  //       metrado_total: data.METRADO,
-  //       precio: +data.PRECIO,
-  //       parcial: data.PARCIAL,
-  //       mano_de_obra_unitaria: 0,
-  //       material_unitario: 0,
-  //       equipo_unitario: 0,
-  //       subcontrata_varios: 0,
-  //       usuario_id: usuario_id,
-  //       proyecto_id: project_id,
-  //     };
-  //     if (data.UNI) {
-  //       const unitResponse = await unitValidation.findBySymbol(
-  //         data.UNI,
-  //         project_id
-  //       );
-  //       const unit = unitResponse.payload as Unidad;
-  //       departureFormat.unidad_id = unit.id;
-  //     }
-  //     const responseUnifiedIndex =
-  //       await prismaDepartureRepository.updateDeparture(
-  //         departureFormat,
-  //         departure_id
-  //       );
-  //     return httpResponse.SuccessResponse(
-  //       "Unidad modificada correctamente",
-  //       responseUnifiedIndex
-  //     );
-  //   } catch (error) {
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error al modificar la Unidad",
-  //       error
-  //     );
-  //   }
-  // }
 }
 
 export const departureJobValidation = new DepartureJobValidation();

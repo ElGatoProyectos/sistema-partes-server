@@ -401,7 +401,7 @@ class TrainService {
       await Promise.all(
         sheetToJson.map(async (item: I_TrainExcel) => {
           code = await trainValidation.findByCode(
-            String(item["ID-TREN"]),
+            String(item["ID-TREN"].trim()),
             project_id
           );
           if (!code.success) {
@@ -414,7 +414,7 @@ class TrainService {
           } else {
             await prisma.tren.create({
               data: {
-                codigo: String(item["ID-TREN"]),
+                codigo: String(item["ID-TREN"].trim()),
                 nombre: item.TREN,
                 nota: item.NOTA,
                 operario: 1,

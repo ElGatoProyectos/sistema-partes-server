@@ -312,9 +312,12 @@ model EspecialidadObrero {
 }
 
 model Banco {
-  id       Int        @id @default(autoincrement())
-  nombre   String
-  ManoObra ManoObra[]
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  eliminado   E_Estado_BD @default(n)
+  proyecto_id Int
+  Proyecto    Proyecto    @relation(fields: [proyecto_id], references: [id])
+  ManoObra    ManoObra[]
 }
 
 //[note] modulo futuro
@@ -503,6 +506,7 @@ model Proyecto {
   ParteDiarioRecurso     ParteDiarioRecurso[]
   DetalleUsuarioProyecto DetalleUsuarioProyecto[]
   DetalleSemanaProyecto  DetalleSemanaProyecto[]
+  Banco                  Banco[]
 }
 
 model Combo {

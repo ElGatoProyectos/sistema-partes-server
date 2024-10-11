@@ -16,7 +16,7 @@ class DepartureValidation {
   ): Promise<T_HttpResponse> {
     try {
       let departureFormat: any = {
-        id_interno: String(data["ID-PARTIDA"]) || "",
+        id_interno: data["ID-PARTIDA"] ? String(data["ID-PARTIDA"].trim()) : "",
         item: data.ITEM || "",
         partida: data.PARTIDA || "",
         metrado_inicial: data.METRADO,
@@ -32,7 +32,7 @@ class DepartureValidation {
       };
       if (data.UNI) {
         const unitResponse = await unitValidation.findBySymbol(
-          data.UNI,
+          data.UNI.trim(),
           project_id
         );
         const unit = unitResponse.payload as Unidad;

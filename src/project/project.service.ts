@@ -25,6 +25,13 @@ import {
 import { T_FindAllProject } from "./dto/project.type";
 import { rolValidation } from "@/rol/rol.validation";
 import { weekService } from "@/week/week.service";
+import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
+import { I_CreateCategoryWorkforceBody } from "@/categoryWorkforce/models/categoryWorkforce.interface";
+import { categoryWorkforceService } from "@/categoryWorkforce/categoryWorkforce.service";
+import { bankWorkforceService } from "@/bankWorkforce/bankWorkforce.service";
+import { originWorkforceService } from "@/originWorkforce/originWorkforce.service";
+import { specialtyWorkforceService } from "@/specialtyWorkforce/specialtyWorkforce.service";
+import { typeWorkforceService } from "@/typeWorkforce/typeWorkforce.service";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -114,6 +121,36 @@ class ProjectService {
       const project = await prismaProyectoRepository.createProject(
         proyectFormat
       );
+
+      //[SUCCESS] Si estuvo todo ok se crea lo siguiente
+      const responseCategoryWorkforce =
+        await categoryWorkforceService.createMasive(project.id);
+      if (!responseCategoryWorkforce.success) {
+        return responseCategoryWorkforce;
+      }
+      const responseBankWorkforce = await bankWorkforceService.createMasive(
+        project.id
+      );
+      if (!responseBankWorkforce.success) {
+        return responseBankWorkforce;
+      }
+      const responseOriginWorkforce = await originWorkforceService.createMasive(
+        project.id
+      );
+      if (!responseOriginWorkforce.success) {
+        return responseBankWorkforce;
+      }
+      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+        project.id
+      );
+      if (!specialtyWorkforce.success) {
+        return responseBankWorkforce;
+      }
+      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
+      if (!typeWorkforce.success) {
+        return typeWorkforce;
+      }
+
       const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",

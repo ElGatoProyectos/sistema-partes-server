@@ -303,10 +303,11 @@ class JobService {
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_JobExcel) => {
+          const codigoSinEspacios = item["ID-TRABAJO"].trim();
           //verificamos si tenemos el codigo
           const codigo = parseInt(item["ID-TRABAJO"], 10); // Intenta convertir el string a número
 
-          if (!validator.isNumeric(item["ID-TRABAJO"])) {
+          if (!validator.isNumeric(codigoSinEspacios)) {
             errorNumber++; // Aumenta si el código no es un número válido
           } else {
             // Verifica si el código ya ha sido procesado
@@ -367,7 +368,7 @@ class JobService {
         sheetToJson.map(async (item: I_JobExcel, index: number) => {
           index++;
           const trainResponse = await trainValidation.findByCodeValidation(
-            item.TREN,
+            item.TREN.trim(),
             projectId
           );
           if (!trainResponse.success) {
@@ -375,7 +376,7 @@ class JobService {
           }
           const upResponse =
             await productionUnitValidation.findByCodeValidation(
-              item["UNIDAD DE PRODUCCION"],
+              item["UNIDAD DE PRODUCCION"].trim(),
               projectId
             );
           if (!upResponse.success) {
@@ -396,7 +397,7 @@ class JobService {
       await Promise.all(
         sheetToJson.map(async (item: I_JobExcel) => {
           code = await jobValidation.findByCode(
-            String(item["ID-TRABAJO"]),
+            String(item["ID-TRABAJO"].trim()),
             responseProject.id
           );
           if (!code.success) {
@@ -420,18 +421,18 @@ class JobService {
             const formattedDuracion = parseFloat(item.DURA).toFixed(1);
             const upResponse =
               await productionUnitValidation.findByCodeValidation(
-                item["UNIDAD DE PRODUCCION"],
+                item["UNIDAD DE PRODUCCION"].trim(),
                 projectId
               );
             const up = upResponse.payload as UnidadProduccion;
             const trainResponse = await trainValidation.findByCodeValidation(
-              item.TREN,
+              item.TREN.trim(),
               projectId
             );
             const train = trainResponse.payload as Tren;
             await prisma.trabajo.create({
               data: {
-                codigo: String(item["ID-TRABAJO"]),
+                codigo: String(item["ID-TRABAJO"].trim()),
                 nombre: item.TRABAJOS,
                 duracion: +formattedDuracion,
                 fecha_inicio: inicioDate,

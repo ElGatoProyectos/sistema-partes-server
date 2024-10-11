@@ -22,17 +22,17 @@ class JobValidation {
       endDate.setUTCHours(0, 0, 0, 0);
       const formattedDuracion = parseFloat(data.DURA).toFixed(1);
       const upResponse = await productionUnitValidation.findByCodeValidation(
-        data["UNIDAD DE PRODUCCION"],
+        data["UNIDAD DE PRODUCCION"].trim(),
         project_id
       );
       const up = upResponse.payload as UnidadProduccion;
       const trainResponse = await trainValidation.findByCodeValidation(
-        data.TREN,
+        data.TREN.trim(),
         project_id
       );
       const train = trainResponse.payload as Tren;
       const jobFormat = {
-        codigo: data["ID-TRABAJO"],
+        codigo: data["ID-TRABAJO"].trim(),
         nombre: data.TRABAJOS,
         tren_id: train.id,
         up_id: up.id,

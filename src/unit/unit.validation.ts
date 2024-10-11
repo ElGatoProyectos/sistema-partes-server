@@ -11,7 +11,7 @@ class UnitValidation {
   ): Promise<T_HttpResponse> {
     try {
       const unitFormat = {
-        codigo: String(data["ID-UNIDAD"]),
+        codigo: String(data["ID-UNIDAD"].trim()),
         simbolo: data.SIMBOLO,
         nombre: data.DESCRIPCION,
         empresa_id: company_id,
