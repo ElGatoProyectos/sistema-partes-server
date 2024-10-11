@@ -1023,7 +1023,6 @@ class UnitService {
         "Éxito al crear de forma masiva las Unidades de la Mano de Obra"
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear de forma masiva las Unidades de la Mano de Obra",
         error

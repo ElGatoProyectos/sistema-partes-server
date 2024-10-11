@@ -21,6 +21,7 @@ import departureRouter from "./departure/departure.init";
 import departureJobRouter from "./departure/departure-job/departure-job.init";
 import workforceRouter from "./workforce/workforce.init";
 import resourceRouter from "./resources/resources.init";
+import weekRouter from "./week/week.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -49,6 +50,7 @@ app.use(globalPrefix, departureRouter);
 app.use(globalPrefix, departureJobRouter);
 app.use(globalPrefix, workforceRouter);
 app.use(globalPrefix, resourceRouter);
+app.use(globalPrefix, weekRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

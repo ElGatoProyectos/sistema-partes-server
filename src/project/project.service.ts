@@ -59,125 +59,132 @@ class ProjectService {
       const date = new Date();
 
       // const weekResponse = await weekService.findByYear(date.getFullYear());
-      // console.log("da como respuesta");
-      // console.log(weekResponse);
       // if (!weekResponse.success) {
-      //   console.log("ENTRO AL IF :0");
-      //   return weekResponse;
+      //   console.log("ENTRO AL IF :0 xq no hay nada");
+      //   await weekService.createWeek(date.getFullYear());
       // }
-      // await weekService.createWeek(date.getFullYear());
 
-      const resultCompany = await companyValidation.findByIdUser(
-        userResponse.id
-      );
-      if (!resultCompany.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el proyecto con el id de la empresa proporcionado"
-        );
-      }
+      const week = await weekService.createWeek(2026);
 
-      const company = resultCompany.payload as Empresa;
+      // const resultCompany = await companyValidation.findByIdUser(
+      //   userResponse.id
+      // );
+      // if (!resultCompany.success) {
+      //   return httpResponse.BadRequestException(
+      //     "No se puede crear el proyecto con el id de la empresa proporcionado"
+      //   );
+      // }
 
-      const totalProjects = await projectValidation.totalProjectsByCompany(
-        company.id
-      );
+      // const company = resultCompany.payload as Empresa;
 
-      if (!totalProjects.success) {
-        return totalProjects;
-      }
+      // const totalProjects = await projectValidation.totalProjectsByCompany(
+      //   company.id
+      // );
 
-      const total = totalProjects.payload as Number;
+      // if (!totalProjects.success) {
+      //   return totalProjects;
+      // }
 
-      const rolResponse = await rolValidation.findByName("ADMIN");
-      const rol = rolResponse.payload as Rol;
+      // const total = totalProjects.payload as Number;
 
-      if (
-        userResponse.rol_id != rol.id &&
-        total === userResponse.limite_proyecto
-      ) {
-        return httpResponse.BadRequestException(
-          "Alcanzó el límite de proyectos la empresa"
-        );
-      }
+      // const rolResponse = await rolValidation.findByName("ADMIN");
+      // const rol = rolResponse.payload as Rol;
 
-      const lastProject = await projectValidation.codeMoreHigh(company.id);
-      const lastProjectResponse = lastProject.payload as Proyecto;
+      // if (
+      //   userResponse.rol_id != rol.id &&
+      //   total === userResponse.limite_proyecto
+      // ) {
+      //   return httpResponse.BadRequestException(
+      //     "Alcanzó el límite de proyectos la empresa"
+      //   );
+      // }
 
-      // Incrementar el código en 1
-      const nextCodigo =
-        (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
+      // const lastProject = await projectValidation.codeMoreHigh(company.id);
+      // const lastProjectResponse = lastProject.payload as Proyecto;
 
-      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+      // // Incrementar el código en 1
+      // const nextCodigo =
+      //   (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
 
-      const fecha_creacion = converToDate(data.fecha_inicio);
-      const fecha_fin = converToDate(data.fecha_fin);
-      let proyectFormat: any = {};
-      proyectFormat = {
-        ...data,
-        codigo_proyecto: formattedCodigo,
-        estado: E_Proyecto_Estado.CREADO,
-        costo_proyecto: Number(data.costo_proyecto),
-        fecha_inicio: fecha_creacion,
-        fecha_fin,
-        empresa_id: company.id,
-      };
-      const project = await prismaProyectoRepository.createProject(
-        proyectFormat
-      );
+      // const formattedCodigo = nextCodigo.toString().padStart(3, "0");
 
-      //[SUCCESS] Si estuvo todo ok se crea lo siguiente
-      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
-      if (!typeWorkforce.success) {
-        return typeWorkforce;
-      }
-      const responseOriginWorkforce = await originWorkforceService.createMasive(
-        project.id
-      );
-      if (!responseOriginWorkforce.success) {
-        return responseOriginWorkforce;
-      }
-      const responseCategoryWorkforce =
-        await categoryWorkforceService.createMasive(project.id);
-      if (!responseCategoryWorkforce.success) {
-        return responseCategoryWorkforce;
-      }
-      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
-        project.id
-      );
-      if (!specialtyWorkforce.success) {
-        return specialtyWorkforce;
-      }
-      const unitReponse = await unitService.createMasive(
-        company.id,
-        project.id
-      );
-      if (!unitReponse.success) {
-        return unitReponse;
-      }
-      const responseBankWorkforce = await bankWorkforceService.createMasive(
-        project.id
-      );
-      if (!responseBankWorkforce.success) {
-        return responseBankWorkforce;
-      }
-      const responseUnifiedIndex = await unifiedIndexService.createMasive(
-        company.id,
-        project.id
-      );
-      if (!responseUnifiedIndex.success) {
-        return responseUnifiedIndex;
-      }
-      const resourcesCategory = await resourseCategoryService.createMasive(
-        project.id
-      );
-      if (!resourcesCategory.success) {
-        return resourcesCategory;
-      }
+      // const fecha_creacion = converToDate(data.fecha_inicio);
+      // const fecha_fin = converToDate(data.fecha_fin);
+      // let proyectFormat: any = {};
+      // proyectFormat = {
+      //   ...data,
+      //   codigo_proyecto: formattedCodigo,
+      //   estado: E_Proyecto_Estado.CREADO,
+      //   costo_proyecto: Number(data.costo_proyecto),
+      //   fecha_inicio: fecha_creacion,
+      //   fecha_fin,
+      //   empresa_id: company.id,
+      // };
+      // const project = await prismaProyectoRepository.createProject(
+      //   proyectFormat
+      // );
 
-      const projectMapper = new ProjectResponseMapper(project);
+      // //[SUCCESS] Si estuvo todo ok se crea lo siguiente
+      // //[NOTE]:  TIPO DE MANO DE OBRA
+      // const typeWorkforce = await typeWorkforceService.createMasive(project.id);
+      // if (!typeWorkforce.success) {
+      //   return typeWorkforce;
+      // }
+      // //[NOTE]:  ORIGEN DE MANO DE OBRA
+      // const responseOriginWorkforce = await originWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!responseOriginWorkforce.success) {
+      //   return responseOriginWorkforce;
+      // }
+      // //[NOTE]:  CATEGORIA DE MANO DE OBRA
+      // const responseCategoryWorkforce =
+      //   await categoryWorkforceService.createMasive(project.id);
+      // if (!responseCategoryWorkforce.success) {
+      //   return responseCategoryWorkforce;
+      // }
+      // //[NOTE]:  ESPECIALIDAD DE MANO DE OBRA
+      // const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!specialtyWorkforce.success) {
+      //   return specialtyWorkforce;
+      // }
+      // //[NOTE]:  UNIDAD QUE LUEGO PUEDE SER USADO POR RECURSOS O MANO DE OBRA
+      // const unitReponse = await unitService.createMasive(
+      //   company.id,
+      //   project.id
+      // );
+      // if (!unitReponse.success) {
+      //   return unitReponse;
+      // }
+      // //[NOTE]:  TIPOS DE BANCO PARA MANO DE OBRA
+      // const responseBankWorkforce = await bankWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!responseBankWorkforce.success) {
+      //   return responseBankWorkforce;
+      // }
+      // //[NOTE]:  INDICE UNIFICADO DE RECURSOS
+      // const responseUnifiedIndex = await unifiedIndexService.createMasive(
+      //   company.id,
+      //   project.id
+      // );
+      // if (!responseUnifiedIndex.success) {
+      //   return responseUnifiedIndex;
+      // }
+      // //[NOTE]:  CATEGORIA DE LOS RECURSOS
+      // const resourcesCategory = await resourseCategoryService.createMasive(
+      //   project.id
+      // );
+      // if (!resourcesCategory.success) {
+      //   return resourcesCategory;
+      // }
+
+      // const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",
-        projectMapper
+        "ja"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

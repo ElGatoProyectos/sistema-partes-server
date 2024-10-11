@@ -74,7 +74,6 @@ class TrainController {
     // Usando multer para manejar la subida de archivos en memoria
     upload.single("train-file")(request, response, async (err: any) => {
       if (err) {
-        console.log(err);
         return response.status(500).json({ error: "Error al leer el archivo" });
       }
       // const project_id = Number(request.params.project_id);
