@@ -17,11 +17,13 @@ const upload: any = multer({ storage: storage });
 class UnifiedIndexController {
   async create(request: express.Request, response: express.Response) {
     const data = request.body as I_CreateUnifiedIndexBody;
+    const project_id = request.get("project-id") as string;
     const tokenWithBearer = request.headers.authorization;
     if (tokenWithBearer) {
       const result = await unifiedIndexService.createUnifiedIndex(
         data,
-        tokenWithBearer
+        tokenWithBearer,
+        +project_id
       );
       if (!result.success) {
         response.status(result.statusCode).json(result);
@@ -39,12 +41,14 @@ class UnifiedIndexController {
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateUnifiedIndexBody;
     const idResourseCategory = Number(request.params.id);
+    const project_id = request.get("project-id") as string;
     const tokenWithBearer = request.headers.authorization;
     if (tokenWithBearer) {
       const result = await unifiedIndexService.updateUnifiedIndex(
         data,
         idResourseCategory,
-        tokenWithBearer
+        tokenWithBearer,
+        +project_id
       );
       if (!result.success) {
         response.status(result.statusCode).json(result);
@@ -80,6 +84,7 @@ class UnifiedIndexController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const search = request.query.search as string;
+    const project_id = request.get("project-id") as string;
     let paginationOptions: T_FindAllUnifiedIndex = {
       queryParams: {
         page: page,
@@ -87,7 +92,10 @@ class UnifiedIndexController {
         search: search,
       },
     };
-    const result = await unifiedIndexService.findAll(paginationOptions);
+    const result = await unifiedIndexService.findAll(
+      paginationOptions,
+      +project_id
+    );
     response.status(result.statusCode).json(result);
   }
 
@@ -107,10 +115,12 @@ class UnifiedIndexController {
 
       try {
         const company_id = Number(request.params.id);
+        const project_id = request.get("project-id") as string;
         const serviceResponse =
           await unifiedIndexService.registerUnifiedIndexMasive(
             file,
-            +company_id
+            +company_id,
+            +project_id
           );
 
         response.status(serviceResponse.statusCode).json(serviceResponse);

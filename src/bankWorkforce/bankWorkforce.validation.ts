@@ -18,9 +18,12 @@ class BankWorkforceValidation {
       );
     }
   }
-  async findByName(name: string): Promise<T_HttpResponse> {
+  async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const bank = await prismaBankWorkforceRepository.findByName(name);
+      const bank = await prismaBankWorkforceRepository.findByName(
+        name,
+        project_id
+      );
       if (!bank)
         return httpResponse.NotFoundException(
           "No se encontró el Banco con el nombre que desea buscar"

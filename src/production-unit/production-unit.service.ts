@@ -352,6 +352,8 @@ class ProductionUnitService {
         sheet
       ) as I_ProductionUnitExcel[];
       let error = 0;
+      let errorMessages: string[] = [];
+      let errorRows: number[] = [];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -389,25 +391,25 @@ class ProductionUnitService {
       await Promise.all(
         sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
           index++;
-          if (
-            item.CODIGO == undefined ||
-            item.NOMBRE == undefined ||
-            item.NOTA == undefined
-          ) {
+          if (item.CODIGO == undefined || item.NOMBRE == undefined) {
             error++;
+            errorRows.push(index + 1);
           }
         })
       );
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Los campos CODIGO, NOMBRE Y NOTA son obligatorios.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
-        sheetToJson.map(async (item: I_ProductionUnitExcel) => {
+        sheetToJson.map(async (item: I_ProductionUnitExcel, index: number) => {
+          index++;
           const codigoSinEspacios = item.CODIGO.trim();
           //verificamos si tenemos el codigo
           //verificamos si tenemos el codigo
@@ -425,6 +427,7 @@ class ProductionUnitService {
             // Verifica si el código actual no es mayor que el anterior
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
+              errorRows.push(index);
             }
 
             previousCodigo = codigo;
@@ -434,7 +437,9 @@ class ProductionUnitService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Hay letras en códigos o el mismo puede que sea mayor o igual al siguiente.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
@@ -449,7 +454,7 @@ class ProductionUnitService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          "El primer código del archivo debe ser 001"
         );
       }
       //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
@@ -459,13 +464,13 @@ class ProductionUnitService {
 
         if (currentCode !== previousCode + 1) {
           errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-          break; // Puedes detener el ciclo en el primer error
+          errorRows.push(i);
         }
       }
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Existen uno o varios códigos donde la diferencia es mayor a 1`
         );
       }
 
@@ -490,7 +495,7 @@ class ProductionUnitService {
               data: {
                 codigo: String(item.CODIGO.trim()),
                 nombre: item.NOMBRE,
-                nota: item.NOTA,
+                nota: item.NOTA ? item.NOTA : null,
                 proyecto_id: responseProject.id,
               },
             });

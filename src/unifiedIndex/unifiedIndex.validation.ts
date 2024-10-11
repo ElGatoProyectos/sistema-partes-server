@@ -6,7 +6,8 @@ class UnifiedIndexValidation {
   async updateUnifiedIndex(
     data: I_UnifiedIndexExcel,
     idUnit: number,
-    idCompany: number
+    idCompany: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
       const unifiedIndexFormat = {
@@ -15,6 +16,7 @@ class UnifiedIndexValidation {
         simbolo: data.Simbolo,
         comentario: data.Comentario,
         empresa_id: idCompany,
+        proyect_id: project_id,
       };
 
       const responseUnifiedIndex =
@@ -33,9 +35,11 @@ class UnifiedIndexValidation {
       );
     }
   }
-  async codeMoreHigh(): Promise<T_HttpResponse> {
+  async codeMoreHigh(project_id: number): Promise<T_HttpResponse> {
     try {
-      const unifiedIndex = await prismaUnifiedIndexRepository.codeMoreHigh();
+      const unifiedIndex = await prismaUnifiedIndexRepository.codeMoreHigh(
+        project_id
+      );
       if (!unifiedIndex) {
         return httpResponse.SuccessResponse("No se encontraron resultados", []);
       }
@@ -92,12 +96,40 @@ class UnifiedIndexValidation {
     }
   }
 
-  async findByName(name: string): Promise<T_HttpResponse> {
+  async findByName(name: string, project_id_: number): Promise<T_HttpResponse> {
     try {
-      const nameExists = await prismaUnifiedIndexRepository.existsName(name);
+      const unifiedIndex = await prismaUnifiedIndexRepository.existsName(
+        name,
+        project_id_
+      );
+      if (!unifiedIndex) {
+        return httpResponse.NotFoundException(
+          "El nombre ingresado del Indice Unificado no existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El nombre del Indice Unificado existe, puede proceguir",
+        unifiedIndex
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Indice Unificado en la base de datos",
+        error
+      );
+    }
+  }
+  async findByNameValidation(
+    name: string,
+    project_id_: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const nameExists = await prismaUnifiedIndexRepository.existsName(
+        name,
+        project_id_
+      );
       if (nameExists) {
         return httpResponse.NotFoundException(
-          "El nombre ingresado del Indice Unificado ya existe en la base de datos"
+          "El nombre ingresado del Indice Unificado existe en la base de datos"
         );
       }
       return httpResponse.SuccessResponse(
@@ -110,10 +142,14 @@ class UnifiedIndexValidation {
       );
     }
   }
-  async findBySymbol(symbol: string): Promise<T_HttpResponse> {
+  async findBySymbol(
+    symbol: string,
+    project_id: number
+  ): Promise<T_HttpResponse> {
     try {
       const symbolExists = await prismaUnifiedIndexRepository.existSymbol(
-        symbol
+        symbol,
+        project_id
       );
       if (symbolExists) {
         return httpResponse.NotFoundException(

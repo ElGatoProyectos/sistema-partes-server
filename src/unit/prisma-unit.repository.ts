@@ -1,6 +1,7 @@
 import prisma from "@/config/prisma.config";
 import {
   I_CreateUnitBD,
+  I_CreateUnitBody,
   I_Unit,
   I_UpdateUnitBodyValidation,
 } from "./models/unit.interface";
@@ -9,6 +10,12 @@ import { UnitRepository } from "./unit.repository";
 import { T_FindAllUnit } from "./models/unit.types";
 
 class PrismaUnitRepository implements UnitRepository {
+  async createUnitMasive(data: I_CreateUnitBody[]): Promise<{ count: number }> {
+    const units = await prisma.unidad.createMany({
+      data,
+    });
+    return units;
+  }
   async findByCode(code: string, project_id: number): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {
@@ -118,7 +125,9 @@ class PrismaUnitRepository implements UnitRepository {
   async existsName(name: string, project_id: number): Promise<Unidad | null> {
     const unit = await prisma.unidad.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },

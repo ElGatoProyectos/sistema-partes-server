@@ -10,9 +10,18 @@ import { UnifiedIndexRepository } from "./unifiedIndex.repository";
 import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
-  async codeMoreHigh(): Promise<IndiceUnificado | null> {
+  async createUnifiedIndexMasive(
+    data: I_CreateUnifiedIndexBD[]
+  ): Promise<{ count: number }> {
+    const unifiedIndex = await prisma.indiceUnificado.createMany({
+      data,
+    });
+    return unifiedIndex;
+  }
+  async codeMoreHigh(project_id: number): Promise<IndiceUnificado | null> {
     const lastUnifiedIndex = await prisma.indiceUnificado.findFirst({
       where: {
+        proyect_id: project_id,
         eliminado: E_Estado_BD.n,
       },
       orderBy: { codigo: "desc" },
@@ -28,10 +37,14 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
     });
     return unifiedIndex;
   }
-  async existSymbol(symbol: string): Promise<IndiceUnificado | null> {
+  async existSymbol(
+    symbol: string,
+    project_id: number
+  ): Promise<IndiceUnificado | null> {
     const unifiedIndex = await prisma.indiceUnificado.findFirst({
       where: {
         simbolo: symbol,
+        proyect_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });
@@ -40,7 +53,8 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
 
   async findAll(
     skip: number,
-    data: T_FindAllUnifiedIndex
+    data: T_FindAllUnifiedIndex,
+    project_id: number
   ): Promise<{
     unifiedIndex: I_UnifiedIndex[];
     total: number;
@@ -62,6 +76,7 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
         prisma.indiceUnificado.findMany({
           where: {
             ...filters,
+            project_id: project_id,
             eliminado: E_Estado_BD.n,
           },
           skip,
@@ -93,10 +108,14 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
     return unifiedIndex;
   }
 
-  async existsName(name: string): Promise<IndiceUnificado | null> {
+  async existsName(
+    name: string,
+    project_id: number
+  ): Promise<IndiceUnificado | null> {
     const unifiedIndex = await prisma.indiceUnificado.findFirst({
       where: {
         nombre: name,
+        proyect_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });

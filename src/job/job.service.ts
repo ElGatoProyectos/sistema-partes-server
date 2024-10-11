@@ -229,6 +229,18 @@ class JobService {
       await prisma.$disconnect();
     }
   }
+  calcularDiasEntreFechas(fechaInicio: Date, fechaFin: Date): number {
+    // Convertir las fechas a milisegundos
+    const milisegundosPorDia = 1000 * 60 * 60 * 24;
+
+    // Restar las fechas y dividir por los milisegundos en un día
+    const diferenciaEnMilisegundos = fechaFin.getTime() - fechaInicio.getTime();
+    const diferenciaEnDias = Math.floor(
+      diferenciaEnMilisegundos / milisegundosPorDia
+    );
+
+    return diferenciaEnDias;
+  }
   async registerJobMasive(file: any, projectId: number, token: string) {
     try {
       const buffer = file.buffer;
@@ -243,6 +255,8 @@ class JobService {
       const userResponse = userTokenResponse.payload as Usuario;
 
       let error = 0;
+      let errorMessages: string[] = [];
+      let errorRows: number[] = [];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -286,23 +300,26 @@ class JobService {
             item.TREN == undefined ||
             item["UNIDAD DE PRODUCCION"] == undefined ||
             item.INICIO == undefined ||
-            item.DURA == undefined ||
             item.FINALIZA == undefined
           ) {
             error++;
+            errorRows.push(index + 1);
           }
         })
       );
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Los campos ID-TRABAJO, TRABAJOS, TREN, UNIDAD DE PRODUCCION, INICIO, FINALIZA son obligatorios.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
       //[note] Acá verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
-        sheetToJson.map(async (item: I_JobExcel) => {
+        sheetToJson.map(async (item: I_JobExcel, index: number) => {
+          index++;
           const codigoSinEspacios = item["ID-TRABAJO"].trim();
           //verificamos si tenemos el codigo
           const codigo = parseInt(item["ID-TRABAJO"], 10); // Intenta convertir el string a número
@@ -319,6 +336,7 @@ class JobService {
             // Verifica si el código actual no es mayor que el anterior
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
+              errorRows.push(index);
             }
 
             previousCodigo = codigo;
@@ -328,7 +346,9 @@ class JobService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Hay letras en códigos o el mismo puede que sea mayor o igual al siguiente.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
@@ -343,7 +363,7 @@ class JobService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          "El primer código del archivo debe ser 001"
         );
       }
       // //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
@@ -353,45 +373,63 @@ class JobService {
 
         if (currentCode !== previousCode + 1) {
           errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-          break; // Puedes detener el ciclo en el primer error
+          errorRows.push(i);
         }
       }
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Existen uno o varios códigos donde la diferencia es mayor a 1`
         );
       }
 
-      //[NOTE] ACÁ VERIFICAMOS SI LOS TRENES Y LAS UNIDADES DE PRODUCCIÓN EXISTEN
+      //[NOTE] ACÁ VERIFICAMOS SI LOS TRENES EXISTEN
       await Promise.all(
         sheetToJson.map(async (item: I_JobExcel, index: number) => {
           index++;
+
           const trainResponse = await trainValidation.findByCodeValidation(
             item.TREN.trim(),
             projectId
           );
+
           if (!trainResponse.success) {
-            error++;
-          }
-          const upResponse =
-            await productionUnitValidation.findByCodeValidation(
-              item["UNIDAD DE PRODUCCION"].trim(),
-              projectId
-            );
-          if (!upResponse.success) {
-            error++;
+            errorNumber++;
+            errorRows.push(index + 1);
           }
         })
       );
-
-      if (error > 0) {
+      if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Ha ingresado Trenes que no existen en la base de datos.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+      //[NOTE] ACÁ VERIFICAMOS SI LAS UNIDADES DE PRODUCCIÓN EXISTEN
+      await Promise.all(
+        sheetToJson.map(async (item: I_JobExcel, index: number) => {
+          index++;
+          const upResponse =
+            await productionUnitValidation.findByCodeValidation(
+              item["UNIDAD DE PRODUCCION"],
+              projectId
+            );
+          if (!upResponse.success) {
+            errorNumber++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.Ha ingresado Unidad de Producción que no existen en la base de datos.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
-      // //[SUCCESS] Guardo o actualizo la Unidad de Producción
+      //[SUCCESS] Guardo o actualizo el Trabajo
       let code;
       let job;
       await Promise.all(
@@ -429,12 +467,17 @@ class JobService {
               item.TREN.trim(),
               projectId
             );
+
             const train = trainResponse.payload as Tren;
+
+            const duration = this.calcularDiasEntreFechas(inicioDate, endDate);
+            const durationFix = duration === 0 ? 1 : duration;
+
             await prisma.trabajo.create({
               data: {
                 codigo: String(item["ID-TRABAJO"].trim()),
                 nombre: item.TRABAJOS,
-                duracion: +formattedDuracion,
+                duracion: +durationFix,
                 fecha_inicio: inicioDate,
                 fecha_finalizacion: endDate,
                 nota: "",
@@ -458,6 +501,7 @@ class JobService {
 
       return httpResponse.SuccessResponse("Trabajos creados correctamente!");
     } catch (error) {
+      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer los Trabajos",

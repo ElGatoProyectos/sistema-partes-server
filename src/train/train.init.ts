@@ -14,25 +14,10 @@ trainRouter.get(
 );
 
 trainRouter.get(
-  `${prefix}/search`,
-  trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
-  trainController.findByName
-);
-
-trainRouter.get(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminUser,
   trainController.findByIdTrain
-);
-
-trainRouter.put(
-  `${prefix}/cuadrilla/:id`,
-  trainMiddleware.verifyHeadersFieldsId,
-  trainMiddleware.verifyFieldsUpdateCuadrilla,
-  authRoleMiddleware.authAdminUser,
-  trainController.updateCuadrilla
 );
 
 trainRouter.post(

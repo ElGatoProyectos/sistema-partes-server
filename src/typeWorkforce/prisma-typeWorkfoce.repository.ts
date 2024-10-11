@@ -21,7 +21,9 @@ class PrismaTypeWorkforceRepository implements TypeWorkforceRepository {
   ): Promise<TipoObrero | null> {
     const typeWorkforce = await prisma.tipoObrero.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },

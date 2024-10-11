@@ -21,7 +21,9 @@ class PrismaCategoryWorkforceRepository implements BankCategoryforceRepository {
   ): Promise<CategoriaObrero | null> {
     const categoryWorkforce = await prisma.categoriaObrero.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
         proyecto_id: project_id,
       },
     });

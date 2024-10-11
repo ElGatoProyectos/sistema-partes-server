@@ -23,7 +23,9 @@ class PrismaSpecialtyWorkforceRepository
   ): Promise<EspecialidadObrero | null> {
     const specialtyWorkforce = await prisma.especialidadObrero.findFirst({
       where: {
-        nombre: name,
+        nombre: {
+          contains: name,
+        },
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },

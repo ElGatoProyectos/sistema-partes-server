@@ -56,6 +56,11 @@ enum E_Estado_BD {
   n
 }
 
+enum E_Estado_MO_BD {
+  ACTIVO
+  INACTIVO
+}
+
 enum E_TIPO_PARENTESCO_BD {
   PADRE
   MADRE
@@ -197,60 +202,62 @@ model DetalleSemanaProyecto {
 
 //[success] actual
 model ManoObra {
-  id                          Int                           @id @default(autoincrement())
-  //datos básicos
-  email_personal              String                        @unique
-  nombres                     String
-  apellido_materno            String
-  apellido_paterno            String
-  turno                       String?
-  sede_local                  String?
-  fecha_inicio                DateTime                      @db.Date //año más dia
-  fecha_cese                  DateTime                      @db.Date //año más dia
-  //hay un estado para esto 
-  estado                      E_Estado_BD?                  @default(y)
-  eliminado                   E_Estado_BD                   @default(n)
-  telefono                    String
-  usuario_marcacion           String?                       @default("")
-  domicilio                   String?
-  lugar_nacimiento            String?
-  genero                      String?
-  tipo_documento              String?
-  documento_identidad         String
-  contrasena                  String
-  profesion                   String?
-  estado_civil                String?
-  n_libreta_militar           String?
-  n_pasaporte                 String?
-  email_corporativo           String?
-  brevete                     String?
-  grado_instruccion           String?
-  ruc                         String?
-  tipo_cese                   String?
-  carnet_extranjeria          String?
-  condicion                   String? //por ejemplo inválido 
-  pais_origen                 String?
-  observacion                 String?                       @db.Text()
-  hora_ingreso                String?
-  hora_salida                 String?
-  tolerancia_ingreso          String?
-  tiempo_refrigerio           String?
-  fecha_creacion              DateTime                      @default(now())
-  //termina básico
-  cuenta                      String                        @db.Text()
-  fecha_nacimiento            DateTime                      @db.Date //año más dia
-  escolaridad                 String
-  usuario_id                  Int
-  tipo_obrero_id              Int
-  origen_obrero_id            Int
-  especialidad_obrero_id      Int
-  categoria_obrero_id         Int
-  unidad_id                   Int
-  banco_id                    Int
+  id                     Int             @id @default(autoincrement())
+  //[Note] Estos datos serán los de la primera etapa
+  codigo                 String
+  documento_identidad    String
+  nombre_completo        String
+  tipo_obrero_id         Int
+  origen_obrero_id       Int
+  categoria_obrero_id    Int
+  especialidad_obrero_id Int
+  unidad_id              Int
+  fecha_inicio           DateTime?       @db.Date //año más dia
+  fecha_cese             DateTime?       @db.Date //año más dia
+  estado                 E_Estado_MO_BD? @default(ACTIVO)
+  banco_id               Int?
+  cuenta                 String?         @db.Text()
+  fecha_nacimiento       DateTime?       @db.Date //año más dia
+  escolaridad            String?
+  telefono               String?
+  email_personal         String?
+  observacion            String?         @db.Text()
+  eliminado              E_Estado_BD     @default(n)
+  fecha_creacion         DateTime        @default(now())
+
+  //[Note] Los de abajo son para otra etapa
+  apellido_materno   String?
+  apellido_paterno   String?
+  turno              String?
+  sede_local         String?
+  usuario_marcacion  String? @default("")
+  domicilio          String?
+  lugar_nacimiento   String?
+  genero             String?
+  tipo_documento     String?
+  contrasena         String?
+  profesion          String?
+  estado_civil       String?
+  n_libreta_militar  String?
+  n_pasaporte        String?
+  email_corporativo  String?
+  brevete            String?
+  grado_instruccion  String?
+  ruc                String?
+  tipo_cese          String?
+  carnet_extranjeria String?
+  condicion          String? //por ejemplo inválido 
+  pais_origen        String?
+  hora_ingreso       String?
+  hora_salida        String?
+  tolerancia_ingreso String?
+  tiempo_refrigerio  String?
+  usuario_id         Int?
+
   proyecto_id                 Int
   Proyecto                    Proyecto                      @relation(fields: [proyecto_id], references: [id])
-  Usuario                     Usuario                       @relation(fields: [usuario_id], references: [id])
-  Banco                       Banco                         @relation(fields: [banco_id], references: [id])
+  Usuario                     Usuario?                      @relation(fields: [usuario_id], references: [id])
+  Banco                       Banco?                        @relation(fields: [banco_id], references: [id])
   Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id])
   Asistencia                  Asistencia[]
   CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id])
@@ -507,6 +514,8 @@ model Proyecto {
   DetalleUsuarioProyecto DetalleUsuarioProyecto[]
   DetalleSemanaProyecto  DetalleSemanaProyecto[]
   Banco                  Banco[]
+  IndiceUnificado        IndiceUnificado[]
+  CategoriaRecurso       CategoriaRecurso[]
 }
 
 model Combo {
@@ -623,21 +632,21 @@ model DetalleTrabajoPartida {
 
 //[success] actual
 model Recurso {
-  id                 Int                  @id @default(autoincrement())
-  codigo             String
-  nombre             String
-  eliminado          E_Estado_BD          @default(n)
-  precio             Float
-  fecha_creacion     DateTime             @default(now())
-  unidad_id          Int
-  id_unificado       Int
-  proyecto_id        Int
-  Proyecto           Proyecto             @relation(fields: [proyecto_id], references: [id])
-  Unidad             Unidad               @relation(fields: [unidad_id], references: [id])
-  IndiceUnificado    IndiceUnificado      @relation(fields: [id_unificado], references: [id])
-  categoria_recurso  Int                  @unique
-  CategoriaRecurso   CategoriaRecurso     @relation(fields: [categoria_recurso], references: [id])
-  ParteDiarioRecurso ParteDiarioRecurso[]
+  id                   Int                  @id @default(autoincrement())
+  codigo               String
+  nombre               String
+  eliminado            E_Estado_BD          @default(n)
+  precio               Float?
+  fecha_creacion       DateTime             @default(now())
+  unidad_id            Int
+  id_unificado         Int
+  proyecto_id          Int
+  Proyecto             Proyecto             @relation(fields: [proyecto_id], references: [id])
+  Unidad               Unidad               @relation(fields: [unidad_id], references: [id])
+  IndiceUnificado      IndiceUnificado      @relation(fields: [id_unificado], references: [id])
+  categoria_recurso_id Int
+  CategoriaRecurso     CategoriaRecurso     @relation(fields: [categoria_recurso_id], references: [id])
+  ParteDiarioRecurso   ParteDiarioRecurso[]
 }
 
 model Unidad {
@@ -663,7 +672,9 @@ model IndiceUnificado {
   simbolo        String?
   comentario     String?
   empresa_id     Int
+  proyect_id     Int
   fecha_creacion DateTime    @default(now())
+  Proyecto       Proyecto    @relation(fields: [proyect_id], references: [id])
   Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
   Recurso        Recurso[]
   eliminado      E_Estado_BD @default(n)
@@ -672,8 +683,11 @@ model IndiceUnificado {
 //[success] actual
 model CategoriaRecurso {
   id             Int         @id @default(autoincrement())
+  codigo         String
   nombre         String
   fecha_creacion DateTime    @default(now())
+  proyecto_id    Int
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
   eliminado      E_Estado_BD @default(n)
   Recurso        Recurso[]
 }

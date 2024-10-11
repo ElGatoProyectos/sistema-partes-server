@@ -17,7 +17,7 @@ class SpecialtyWorkforceService {
       data.push({ nombre: "Fierrero", proyecto_id: project_id });
       data.push({ nombre: "Gasfitero", proyecto_id: project_id });
       data.push({
-        nombre: "Ingeniera de Planificación Control",
+        nombre: "Ingeniera de Planificación y Control",
         proyecto_id: project_id,
       });
       data.push({
@@ -31,7 +31,7 @@ class SpecialtyWorkforceService {
       data.push({ nombre: "Producción", proyecto_id: project_id });
       data.push({ nombre: "Representante Legal", proyecto_id: project_id });
       data.push({ nombre: "Residencia de Obra", proyecto_id: project_id });
-      data.push({ nombre: "Topógrado", proyecto_id: project_id });
+      data.push({ nombre: "Topografo", proyecto_id: project_id });
       data.push({ nombre: "Vigilancia", proyecto_id: project_id });
 
       const specialtyWorkforce =

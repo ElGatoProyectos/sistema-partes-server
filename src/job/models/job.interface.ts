@@ -56,9 +56,6 @@ export interface I_JobExcel {
   EQ: string;
   HE: string;
 }
-export interface I_ImportExcelRequestTrain {
-  idProject: string;
-}
 
 // export interface I_CreateJobBody2
 //   extends Omit<

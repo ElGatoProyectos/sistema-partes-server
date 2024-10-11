@@ -132,35 +132,6 @@ class TrainService {
     }
   }
 
-  async updateCuadrillaTrain(data: I_Cuadrilla_Train, train_id: number) {
-    try {
-      const resultIdTrain = await trainValidation.findById(train_id);
-      if (!resultIdTrain.success) {
-        return httpResponse.BadRequestException(
-          "No se pudo encontrar el id del Tren que se quiere editar"
-        );
-      }
-      const trainUpdate = await prismaTrainRepository.updateCuadrillaByIdTrain(
-        train_id,
-        data.official,
-        data.pawns,
-        data.workers
-      );
-      const trainMapper = new TrainResponseMapper(trainUpdate);
-      return httpResponse.SuccessResponse(
-        "Cuadrilla del Tren modificada con éxito",
-        trainMapper
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al editar la cuadrilla del Tren",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
   async findById(idTrain: number): Promise<T_HttpResponse> {
     try {
       const trainResponse = await prismaTrainRepository.findById(idTrain);
@@ -173,42 +144,6 @@ class TrainService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar el Tren",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
-  async findByName(
-    name: string,
-    data: T_FindAll,
-    project_id: number
-  ): Promise<T_HttpResponse> {
-    try {
-      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaTrainRepository.searchNameTrain(
-        name,
-        skip,
-        data.queryParams.limit,
-        +project_id
-      );
-
-      const { trains, total } = result;
-      const pageCount = Math.ceil(total / data.queryParams.limit);
-      const formData = {
-        total,
-        page: data.queryParams.page,
-        // x ejemplo 20
-        limit: data.queryParams.limit,
-        //cantidad de paginas que hay
-        pageCount,
-        data: trains,
-      };
-      return httpResponse.SuccessResponse("Éxito al buscar el Tren", formData);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar Trenes",
         error
       );
     } finally {
@@ -286,6 +221,7 @@ class TrainService {
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_TrainExcel[];
       let error = 0;
       let errorNumber = 0;
+      let errorRows: number[] = [];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -323,19 +259,23 @@ class TrainService {
           index++;
           if (item["ID-TREN"] == undefined || item.TREN == undefined) {
             error++;
+            errorRows.push(index + 1);
           }
         })
       );
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.El campo ID-TREN, TREN son obligatorios.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
-      //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
+      //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anteriorr
       await Promise.all(
-        sheetToJson.map(async (item: I_TrainExcel) => {
+        sheetToJson.map(async (item: I_TrainExcel, index: number) => {
+          index++;
           //verificamos si tenemos el codigo
           const codigo = parseInt(item["ID-TREN"], 10); // Intenta convertir el string a número
 
@@ -351,6 +291,7 @@ class TrainService {
             // Verifica si el código actual no es mayor que el anterior
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
+              errorRows.push(index);
             }
 
             previousCodigo = codigo;
@@ -360,7 +301,9 @@ class TrainService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Hay letras en códigos o el mismo puede que sea mayor o igual al siguiente.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
         );
       }
 
@@ -375,7 +318,7 @@ class TrainService {
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          "El primer código del archivo debe ser 001"
         );
       }
       //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
@@ -385,13 +328,13 @@ class TrainService {
 
         if (currentCode !== previousCode + 1) {
           errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-          break; // Puedes detener el ciclo en el primer error
+          errorRows.push(i);
         }
       }
 
       if (errorNumber > 0) {
         return httpResponse.BadRequestException(
-          "Error al leer el archivo. Verificar los campos"
+          `Error al leer el archivo.Existen uno o varios códigos donde la diferencia es mayor a 1`
         );
       }
 
