@@ -177,11 +177,12 @@ class UserController {
             const data = request.body;
             const user_id = Number(request.params.id);
             const rol_id = Number(request.params.rol_id);
-            const project_id = Number(request.params.project_id);
+            // const project_id = Number(request.params.project_id);
+            const project_id = request.get("project-id");
             let permissions = {
                 user_id: user_id,
                 rol_id: rol_id,
-                project_id: project_id,
+                project_id: +project_id,
                 section: data.section,
                 actions: data.actions,
             };
@@ -197,7 +198,7 @@ class UserController {
     update(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
-            const idUser = Number(request.params.project_id);
+            const idUser = Number(request.params.id);
             const result = yield user_service_1.userService.updateUser(data, idUser);
             if (!result.success) {
                 response.status(result.statusCode).json(result);
@@ -214,10 +215,11 @@ class UserController {
             response.status(result.statusCode).json(result);
         });
     }
-    updateRol(request, response) {
+    createDetailUserProjectandChangeRol(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
-            const result = yield user_service_1.userService.updateRolUser(data.idUser, data.idRol);
+            const project_id = request.get("project-id");
+            const result = yield user_service_1.userService.updateRolUserAndCreateProyect(data.usuario_id, data.rol_id, +project_id, data.action);
             if (!result.success) {
                 response.status(result.statusCode).json(result);
             }
@@ -254,11 +256,13 @@ class UserController {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
             const name = request.query.name;
+            const state = request.query.state;
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
                     name,
+                    estado: state,
                 },
             };
             const tokenWithBearer = request.headers.authorization;
@@ -277,15 +281,19 @@ class UserController {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
             const name = request.query.name;
-            const user_id = Number(request.params.id);
+            const state = request.query.state;
+            const rol = request.query.rol;
+            const company_id = Number(request.params.id);
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
                     name,
+                    estado: state,
+                    rol: rol,
                 },
             };
-            const result = yield user_service_1.userService.findAllUserCompany(paginationOptions, user_id);
+            const result = yield user_service_1.userService.findAllUserCompany(paginationOptions, company_id);
             response.status(result.statusCode).json(result);
         });
     }

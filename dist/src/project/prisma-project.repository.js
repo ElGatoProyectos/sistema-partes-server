@@ -29,6 +29,16 @@ class PrismaProjectRepository {
             return project;
         });
     }
+    totalProjectsByCompany(company_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const usersCompany = yield prisma_config_1.default.proyecto.count({
+                where: {
+                    empresa_id: company_id,
+                },
+            });
+            return usersCompany;
+        });
+    }
     codeMoreHigh(company_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const lastProject = yield prisma_config_1.default.proyecto.findFirst({
@@ -82,7 +92,11 @@ class PrismaProjectRepository {
     allProjectsuser(company_id, data, skip) {
         return __awaiter(this, void 0, void 0, function* () {
             let filters = {};
-            if (data.queryParams.state) {
+            // if (data.queryParams.state) {
+            //   filters.estado = data.queryParams.state.toUpperCase();
+            // }
+            if (data.queryParams.state &&
+                data.queryParams.state.toUpperCase() !== "TODOS") {
                 filters.estado = data.queryParams.state.toUpperCase();
             }
             if (data.queryParams.name) {
@@ -123,9 +137,9 @@ class PrismaProjectRepository {
             return projectUpdate;
         });
     }
-    updateProject(dataa, idProject) {
+    updateProject(dataProject, idProject) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updatedData = Object.assign(Object.assign({}, dataa), { costo_proyecto: Number(dataa.costo_proyecto) });
+            const updatedData = Object.assign(Object.assign({}, dataProject), { costo_proyecto: Number(dataProject.costo_proyecto) });
             const project = yield prisma_config_1.default.proyecto.update({
                 where: { id: idProject },
                 data: updatedData,
@@ -136,6 +150,17 @@ class PrismaProjectRepository {
     createProject(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const project = yield prisma_config_1.default.proyecto.create({
+                data: data,
+            });
+            return project;
+        });
+    }
+    updateColorsProject(project_id, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const project = yield prisma_config_1.default.proyecto.update({
+                where: {
+                    id: project_id,
+                },
                 data: data,
             });
             return project;

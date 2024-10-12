@@ -13,7 +13,7 @@ exports.unifiedIndexValidation = void 0;
 const http_response_1 = require("@/common/http.response");
 const prisma_unified_index_1 = require("./prisma-unified-index");
 class UnifiedIndexValidation {
-    updateUnifiedIndex(data, idUnit, idCompany) {
+    updateUnifiedIndex(data, idUnit, idCompany, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const unifiedIndexFormat = {
@@ -22,6 +22,7 @@ class UnifiedIndexValidation {
                     simbolo: data.Simbolo,
                     comentario: data.Comentario,
                     empresa_id: idCompany,
+                    proyect_id: project_id,
                 };
                 const responseUnifiedIndex = yield prisma_unified_index_1.prismaUnifiedIndexRepository.updateUnifiedIndex(unifiedIndexFormat, idUnit);
                 return http_response_1.httpResponse.SuccessResponse("Indice Unificado modificado correctamente", responseUnifiedIndex);
@@ -31,10 +32,10 @@ class UnifiedIndexValidation {
             }
         });
     }
-    codeMoreHigh() {
+    codeMoreHigh(project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const unifiedIndex = yield prisma_unified_index_1.prismaUnifiedIndexRepository.codeMoreHigh();
+                const unifiedIndex = yield prisma_unified_index_1.prismaUnifiedIndexRepository.codeMoreHigh(project_id);
                 if (!unifiedIndex) {
                     return http_response_1.httpResponse.SuccessResponse("No se encontraron resultados", []);
                 }
@@ -73,12 +74,26 @@ class UnifiedIndexValidation {
             }
         });
     }
-    findByName(name) {
+    findByName(name, project_id_) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const nameExists = yield prisma_unified_index_1.prismaUnifiedIndexRepository.existsName(name);
+                const unifiedIndex = yield prisma_unified_index_1.prismaUnifiedIndexRepository.existsName(name, project_id_);
+                if (!unifiedIndex) {
+                    return http_response_1.httpResponse.NotFoundException("El nombre ingresado del Indice Unificado no existe en la base de datos");
+                }
+                return http_response_1.httpResponse.SuccessResponse("El nombre del Indice Unificado existe, puede proceguir", unifiedIndex);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar el Indice Unificado en la base de datos", error);
+            }
+        });
+    }
+    findByNameValidation(name, project_id_) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const nameExists = yield prisma_unified_index_1.prismaUnifiedIndexRepository.existsName(name, project_id_);
                 if (nameExists) {
-                    return http_response_1.httpResponse.NotFoundException("El nombre ingresado del Indice Unificado ya existe en la base de datos");
+                    return http_response_1.httpResponse.NotFoundException("El nombre ingresado del Indice Unificado existe en la base de datos");
                 }
                 return http_response_1.httpResponse.SuccessResponse("El nombre no existe, puede proceguir");
             }
@@ -87,10 +102,10 @@ class UnifiedIndexValidation {
             }
         });
     }
-    findBySymbol(symbol) {
+    findBySymbol(symbol, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const symbolExists = yield prisma_unified_index_1.prismaUnifiedIndexRepository.existSymbol(symbol);
+                const symbolExists = yield prisma_unified_index_1.prismaUnifiedIndexRepository.existSymbol(symbol, project_id);
                 if (symbolExists) {
                     return http_response_1.httpResponse.NotFoundException("El Simbolo ingresado del Indice Unificado ya existe en la base de datos");
                 }

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
+const detail_user_company_validation_1 = require("@/detailsUserCompany/detail-user-company.validation");
 const http_response_1 = require("@/common/http.response");
 const jwt_service_1 = require("./jwt.service");
 const bcrypt_service_1 = require("@/auth/bcrypt.service");
@@ -21,6 +22,8 @@ const login_mapper_1 = __importDefault(require("./mappers/login.mapper"));
 const rol_service_1 = require("@/rol/rol.service");
 const client_1 = require("@prisma/client");
 const auth_validation_1 = require("./auth.validation");
+const company_validation_1 = require("@/company/company.validation");
+const rol_validation_1 = require("@/rol/rol.validation");
 class AuthService {
     login(body) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -62,13 +65,25 @@ class AuthService {
             }
         });
     }
-    verifyRolProject(authorization) {
+    verifyRolProjectAdminUser(authorization) {
         try {
             const [bearer, token] = authorization.split(" ");
             const tokenDecrypted = jwt_service_1.jwtService.verify(token);
             // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
             if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "GERENTE_PROYECTO") {
+                tokenDecrypted.role === "GERENTE_PROYECTO" ||
+                tokenDecrypted.role === "USER" ||
+                tokenDecrypted.role === "CONTROL_COSTOS" ||
+                tokenDecrypted.role === "ASISTENTE_CONTROL_COSTOS" ||
+                tokenDecrypted.role === "INGENIERO_PRODUCCION" ||
+                tokenDecrypted.role === "ASISTENTE_PRODUCCION" ||
+                tokenDecrypted.role === "MAESTRO_OBRA" ||
+                tokenDecrypted.role === "CAPATAZ" ||
+                tokenDecrypted.role === "ADMINISTRACION_OBRA" ||
+                tokenDecrypted.role === "INGENIERO_SSOMMA" ||
+                tokenDecrypted.role === "ASISTENTE_SSOMMA" ||
+                tokenDecrypted.role === "LOGISTICA" ||
+                tokenDecrypted.role === "ASISTENTE_ALMACEN") {
                 return http_response_1.httpResponse.SuccessResponse("Éxito en la autenticación");
             }
         }
@@ -77,15 +92,12 @@ class AuthService {
             return http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
         }
     }
-    verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(authorization) {
+    verifyRolProject(authorization) {
         try {
             const [bearer, token] = authorization.split(" ");
             const tokenDecrypted = jwt_service_1.jwtService.verify(token);
             // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-            if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "GERENTE_PROYECTO" ||
-                tokenDecrypted.role === "CONTROL_COSTOS" ||
-                tokenDecrypted.role === "USER") {
+            if (tokenDecrypted.role === "ADMIN") {
                 return http_response_1.httpResponse.SuccessResponse("Éxito en la autenticación");
             }
         }
@@ -102,14 +114,43 @@ class AuthService {
                     return userTokenResponse;
                 const userResponse = userTokenResponse.payload;
                 const permisos = yield auth_validation_1.authValidation.findRolPermisssion(userResponse.rol_id);
-                let formatUser = {
+                const rolResponseUser = yield rol_validation_1.rolValidation.findByName("USER");
+                const rolResponseAdmin = yield rol_validation_1.rolValidation.findByName("ADMIN");
+                if (!rolResponseUser.success) {
+                    return rolResponseUser;
+                }
+                if (!rolResponseAdmin.success) {
+                    return rolResponseAdmin;
+                }
+                let companyResponse = {};
+                let formatUser = {};
+                formatUser = {
                     usuario: userResponse,
                     permisos: permisos.payload,
                 };
+                const rolUser = rolResponseUser.payload;
+                const rolAdmin = rolResponseAdmin.payload;
+                if (userResponse.rol_id === rolUser.id ||
+                    userResponse.rol_id === rolAdmin.id) {
+                    companyResponse = yield company_validation_1.companyValidation.findByIdUser(userResponse.id);
+                    if (!companyResponse.success) {
+                        return companyResponse;
+                    }
+                    formatUser.empresa = companyResponse.payload;
+                }
+                else {
+                    companyResponse = yield detail_user_company_validation_1.detailUserCompanyValidation.findByIdUser(userResponse.id);
+                    if (!companyResponse.success) {
+                        return companyResponse;
+                    }
+                    const detail = companyResponse.payload;
+                    const companyFind = yield company_validation_1.companyValidation.findById(detail.empresa_id);
+                    formatUser.empresa = companyFind.payload;
+                }
                 return http_response_1.httpResponse.SuccessResponse("Éxito en la autenticación", formatUser);
             }
             catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al crear el usuario", error);
+                return http_response_1.httpResponse.InternalServerErrorException("Error en la autenticación del usuario", error);
             }
             finally {
                 yield prisma_config_1.default.$disconnect();

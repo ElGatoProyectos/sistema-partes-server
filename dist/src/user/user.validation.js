@@ -13,6 +13,9 @@ exports.userValidation = void 0;
 const prisma_rol_repository_1 = require("../rol/prisma-rol.repository");
 const http_response_1 = require("../common/http.response");
 const prisma_user_repository_1 = require("./prisma-user.repository");
+const rol_validation_1 = require("@/rol/rol.validation");
+const project_validation_1 = require("@/project/project.validation");
+const user_mapper_1 = require("./mappers/user.mapper");
 class UserValidation {
     findByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -86,6 +89,27 @@ class UserValidation {
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException("Error al buscar usuario", error);
+            }
+        });
+    }
+    updateRolUser(usuario_id, rol_id, projecto_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userResponse = yield exports.userValidation.findById(usuario_id);
+                if (!userResponse.success)
+                    return userResponse;
+                const rolResponse = yield rol_validation_1.rolValidation.findById(rol_id);
+                if (!rolResponse.success)
+                    return rolResponse;
+                const projectResponse = yield project_validation_1.projectValidation.findById(projecto_id);
+                if (!projectResponse.success)
+                    return projectResponse;
+                const result = yield prisma_user_repository_1.prismaUserRepository.updateRolUser(usuario_id, rol_id);
+                const resultMapper = new user_mapper_1.UserResponseMapper(result);
+                return http_response_1.httpResponse.SuccessResponse("Se ha cambiado de rol correctamente", resultMapper);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al cambiar de rol", error);
             }
         });
     }

@@ -8,4 +8,7 @@ exports.trainUpdateDto = zod_1.z.object({
     operario: zod_1.z.number().optional(),
     oficial: zod_1.z.number().optional(),
     peon: zod_1.z.number().optional(),
+    // "workers": 22,
+    // "official": 33,
+    // "pawns": 31
 });

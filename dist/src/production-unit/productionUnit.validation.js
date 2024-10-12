@@ -14,28 +14,31 @@ const http_response_1 = require("@/common/http.response");
 const prisma_production_unit_repository_1 = require("./prisma-production-unit.repository");
 const production_unit_mapper_1 = require("./mappers/production-unit.mapper");
 class ProductionUnitValidation {
-    findAll() {
+    findByCode(code, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const projects = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.findAll();
-                return http_response_1.httpResponse.SuccessResponse("Proyectos encontrados", projects);
+                const productionUnit = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.findByCode(code, project_id);
+                if (productionUnit) {
+                    return http_response_1.httpResponse.NotFoundException("Codigo de la Unidad de Producción encontrado", productionUnit);
+                }
+                return http_response_1.httpResponse.SuccessResponse("Unidad de Producción encontrado", productionUnit);
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException("Error al buscar proyecto", error);
             }
         });
     }
-    findByCode(code) {
+    findByCodeValidation(code, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const productionUnit = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.findByCode(code);
-                if (productionUnit) {
-                    return http_response_1.httpResponse.NotFoundException("Codigo de la Unidad de Producción encontrado", productionUnit);
+                const productionUnit = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.findByCode(code, project_id);
+                if (!productionUnit) {
+                    return http_response_1.httpResponse.NotFoundException("Codigo de la Unidad de Producción no encontrado", productionUnit);
                 }
-                return http_response_1.httpResponse.SuccessResponse("Proyecto encontrado", productionUnit);
+                return http_response_1.httpResponse.SuccessResponse("Unidad de Producción encontrado", productionUnit);
             }
             catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar proyecto", error);
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Unidad de Producción", error);
             }
         });
     }
@@ -49,7 +52,7 @@ class ProductionUnitValidation {
                 return http_response_1.httpResponse.SuccessResponse("Unidad de Producción encontrada", project);
             }
             catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar proyecto", error);
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Unidad de Producción", error);
             }
         });
     }
@@ -67,17 +70,17 @@ class ProductionUnitValidation {
             }
         });
     }
-    codeMoreHigh() {
+    codeMoreHigh(project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const productionUnit = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.codeMoreHigh();
+                const productionUnit = yield prisma_production_unit_repository_1.prismaProductionUnitRepository.codeMoreHigh(project_id);
                 if (!productionUnit) {
                     return http_response_1.httpResponse.SuccessResponse("No se encontraron resultados", []);
                 }
-                return http_response_1.httpResponse.SuccessResponse("Proyecto encontrado", productionUnit);
+                return http_response_1.httpResponse.SuccessResponse("Unidad de Producción encontrado", productionUnit);
             }
             catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar proyecto", error);
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Unidad de Producción", error);
             }
         });
     }

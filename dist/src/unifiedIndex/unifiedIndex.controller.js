@@ -32,7 +32,8 @@ class UnifiedIndexController {
                 }
                 try {
                     const company_id = Number(request.params.id);
-                    const serviceResponse = yield unifiedIndex_service_1.unifiedIndexService.registerUnifiedIndexMasive(file, +company_id);
+                    const project_id = request.get("project-id");
+                    const serviceResponse = yield unifiedIndex_service_1.unifiedIndexService.registerUnifiedIndexMasive(file, +company_id, +project_id);
                     response.status(serviceResponse.statusCode).json(serviceResponse);
                 }
                 catch (error) {
@@ -44,9 +45,10 @@ class UnifiedIndexController {
     create(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
+            const project_id = request.get("project-id");
             const tokenWithBearer = request.headers.authorization;
             if (tokenWithBearer) {
-                const result = yield unifiedIndex_service_1.unifiedIndexService.createUnifiedIndex(data, tokenWithBearer);
+                const result = yield unifiedIndex_service_1.unifiedIndexService.createUnifiedIndex(data, tokenWithBearer, +project_id);
                 if (!result.success) {
                     response.status(result.statusCode).json(result);
                 }
@@ -64,9 +66,10 @@ class UnifiedIndexController {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
             const idResourseCategory = Number(request.params.id);
+            const project_id = request.get("project-id");
             const tokenWithBearer = request.headers.authorization;
             if (tokenWithBearer) {
-                const result = yield unifiedIndex_service_1.unifiedIndexService.updateUnifiedIndex(data, idResourseCategory, tokenWithBearer);
+                const result = yield unifiedIndex_service_1.unifiedIndexService.updateUnifiedIndex(data, idResourseCategory, tokenWithBearer, +project_id);
                 if (!result.success) {
                     response.status(result.statusCode).json(result);
                 }
@@ -94,32 +97,20 @@ class UnifiedIndexController {
             response.status(result.statusCode).json(result);
         });
     }
-    findByName(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = parseInt(request.query.page) || 1;
-            const limit = parseInt(request.query.limit) || 20;
-            let paginationOptions = {
-                queryParams: {
-                    page: page,
-                    limit: limit,
-                },
-            };
-            const name = request.query.name;
-            const result = yield unifiedIndex_service_1.unifiedIndexService.findByName(name, paginationOptions);
-            response.status(result.statusCode).json(result);
-        });
-    }
     allUnifiedIndex(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
+            const search = request.query.search;
+            const project_id = request.get("project-id");
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
+                    search: search,
                 },
             };
-            const result = yield unifiedIndex_service_1.unifiedIndexService.findAll(paginationOptions);
+            const result = yield unifiedIndex_service_1.unifiedIndexService.findAll(paginationOptions, +project_id);
             response.status(result.statusCode).json(result);
         });
     }

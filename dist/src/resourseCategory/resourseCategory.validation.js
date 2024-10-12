@@ -27,17 +27,45 @@ class ResourseCategoryValidation {
             }
         });
     }
-    findByName(name) {
+    findByName(name, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const nameExists = yield prisma_resourse_category_repository_1.prismaResourseCategoryRepository.existsName(name);
+                const nameExists = yield prisma_resourse_category_repository_1.prismaResourseCategoryRepository.existsName(name, project_id);
                 if (nameExists) {
                     return http_response_1.httpResponse.NotFoundException("El nombre ingresado de la Categoria del recurso ya existe en la base de datos");
                 }
-                return http_response_1.httpResponse.SuccessResponse("El nombre no existe, puede proceguir");
+                return http_response_1.httpResponse.SuccessResponse("El nombre no existe de la Categoria del Recurso, puede proceguir", nameExists);
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar la Categoria del recurso en la base de datos", error);
+            }
+        });
+    }
+    existsName(name, project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resourceCategory = yield prisma_resourse_category_repository_1.prismaResourseCategoryRepository.findByName(name, project_id);
+                if (!resourceCategory) {
+                    return http_response_1.httpResponse.NotFoundException("El nombre ingresado de la Categoria del recurso no existe");
+                }
+                return http_response_1.httpResponse.SuccessResponse("El nombre de la Categoria del Recurso existe, puede proceguir", resourceCategory);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar la Categoria del Recurso en la Base de Datos", error);
+            }
+        });
+    }
+    codeMoreHigh(project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const unifiedIndex = yield prisma_resourse_category_repository_1.prismaResourseCategoryRepository.codeMoreHigh(project_id);
+                if (!unifiedIndex) {
+                    return http_response_1.httpResponse.SuccessResponse("No se encontraron resultados", []);
+                }
+                return http_response_1.httpResponse.SuccessResponse("Indice Unificado encontrado", unifiedIndex);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Indice Unificado", error);
             }
         });
     }

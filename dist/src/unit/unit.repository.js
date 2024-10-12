@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnitRepository = void 0;
 class UnitRepository {
-    findAll(skip, limit, project_id) { }
+    findAll(skip, data, project_id) { }
     findByCode(code, project_id) { }
     findById(idUnit) { }
     codeMoreHigh(project_id) { }
@@ -11,6 +11,6 @@ class UnitRepository {
     createUnit(data) { }
     updateUnit(data, idUnit) { }
     updateStatusUnit(idResourseCategory) { }
-    searchNameUnit(name, skip, limit, project_id) { }
+    createUnitMasive(data) { }
 }
 exports.UnitRepository = UnitRepository;

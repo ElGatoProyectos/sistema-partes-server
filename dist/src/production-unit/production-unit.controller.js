@@ -25,6 +25,7 @@ const production_unit_dto_1 = require("./dto/production-unit.dto");
 const production_unit_service_1 = require("./production-unit.service");
 const update_production_unit_dto_1 = require("./dto/update-production-unit.dto");
 const validator_1 = __importDefault(require("validator"));
+const project_validation_1 = require("@/project/project.validation");
 const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage: storage });
 class ProductionUnitController {
@@ -37,7 +38,7 @@ class ProductionUnitController {
                 }
                 else {
                     try {
-                        const responseValidate = auth_service_1.authService.verifyRolProject(request.get("Authorization"));
+                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminUser(request.get("Authorization"));
                         const project_id = request.get("project-id");
                         if (!(responseValidate === null || responseValidate === void 0 ? void 0 : responseValidate.success)) {
                             return response.status(401).json(responseValidate);
@@ -99,7 +100,7 @@ class ProductionUnitController {
                 }
                 else {
                     try {
-                        const responseValidate = auth_service_1.authService.verifyRolProject(request.get("Authorization"));
+                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminUser(request.get("Authorization"));
                         if (!(responseValidate === null || responseValidate === void 0 ? void 0 : responseValidate.success)) {
                             return response.status(401).json(responseValidate);
                         }
@@ -155,9 +156,83 @@ class ProductionUnitController {
                 }
             }));
         });
+        this.uploadImageForProject = (request, response) => __awaiter(this, void 0, void 0, function* () {
+            upload.single(production_unit_constant_1.ProductionUnitMulterFileProject.field)(request, response, (error) => __awaiter(this, void 0, void 0, function* () {
+                if (error) {
+                    const customError = http_response_1.httpResponse.BadRequestException("Error al procesar la imagen de la Unidad de Producción", error);
+                    response.status(customError.statusCode).json(customError);
+                }
+                else {
+                    try {
+                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminUser(request.get("Authorization"));
+                        const project_id = request.get("project-id");
+                        if (!(responseValidate === null || responseValidate === void 0 ? void 0 : responseValidate.success)) {
+                            return response.status(401).json(responseValidate);
+                        }
+                        else {
+                            if (!validator_1.default.isNumeric(project_id)) {
+                                const customError = http_response_1.httpResponse.BadRequestException("El id del projecto debe ser numérico", error);
+                                response.status(customError.statusCode).json(customError);
+                            }
+                            else {
+                                const result = yield project_validation_1.projectValidation.findById(+project_id);
+                                if (!result.success) {
+                                    response.status(result.statusCode).json(result);
+                                }
+                                else {
+                                    const project = result.payload;
+                                    if (request.file) {
+                                        const id = project.id;
+                                        const direction = path_1.default.join(app_root_path_1.default.path, "static", production_unit_constant_1.ProductionUnitMulterFileProject.folder);
+                                        const ext = ".png";
+                                        const fileName = `${"Project"}_${id}${ext}`;
+                                        const filePath = path_1.default.join(direction, fileName);
+                                        (0, sharp_1.default)(request.file.buffer)
+                                            .resize({ width: 800 })
+                                            .toFormat("png")
+                                            .toFile(filePath, (err) => {
+                                            if (err) {
+                                                const customError = http_response_1.httpResponse.BadRequestException("Error al guardar la imagen de la Sectorización del proyecto", err);
+                                                response
+                                                    .status(customError.statusCode)
+                                                    .json(customError);
+                                            }
+                                            else {
+                                                const customError = http_response_1.httpResponse.SuccessResponse("Imagen de la sectorización guardada correctamente", err);
+                                                response
+                                                    .status(customError.statusCode)
+                                                    .json(customError);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.status(result.statusCode).json(result);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (error) {
+                        const customError = http_response_1.httpResponse.BadRequestException("Error al validar los campos para guardar la imagen de la Sectorización del Proyecto", error);
+                        response.status(customError.statusCode).json(customError);
+                    }
+                }
+            }));
+        });
         this.findImage = (request, response) => __awaiter(this, void 0, void 0, function* () {
-            const idProject = Number(request.params.id);
-            const result = yield production_unit_service_1.productionUnitService.findIdImage(idProject);
+            const productionUnit_id = Number(request.params.id);
+            const result = yield production_unit_service_1.productionUnitService.findIdImage(productionUnit_id);
+            if (typeof result.payload === "string") {
+                promises_1.default.readFile(result.payload);
+                response.sendFile(result.payload);
+            }
+            else {
+                response.status(result.statusCode).json(result);
+            }
+        });
+        this.findImageSectorizacionProject = (request, response) => __awaiter(this, void 0, void 0, function* () {
+            const project_id = request.get("project-id");
+            const result = yield production_unit_service_1.productionUnitService.findIdImageSectorizacion(+project_id);
             if (typeof result.payload === "string") {
                 promises_1.default.readFile(result.payload);
                 response.sendFile(result.payload);
@@ -192,14 +267,17 @@ class ProductionUnitController {
         this.findAll = (request, response) => __awaiter(this, void 0, void 0, function* () {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
+            const search = request.query.search;
+            const project_id = request.get("project-id");
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
+                    search: search,
                 },
             };
             const idCompany = request.params.id;
-            const result = yield production_unit_service_1.productionUnitService.findAll(paginationOptions);
+            const result = yield production_unit_service_1.productionUnitService.findAll(paginationOptions, +project_id);
             if (!result.success) {
                 response.status(result.statusCode).json(result);
             }

@@ -15,7 +15,8 @@ class ResourceCategoryController {
     create(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
-            const result = yield resourseCategory_service_1.resourseCategoryService.createResourseCategory(data);
+            const project_id = request.get("project-id");
+            const result = yield resourseCategory_service_1.resourseCategoryService.createResourseCategory(data, +project_id);
             if (!result.success) {
                 response.status(result.statusCode).json(result);
             }
@@ -27,8 +28,9 @@ class ResourceCategoryController {
     update(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = request.body;
+            const project_id = request.get("project-id");
             const idResourseCategory = Number(request.params.id);
-            const result = yield resourseCategory_service_1.resourseCategoryService.updateResourseCategory(data, idResourseCategory);
+            const result = yield resourseCategory_service_1.resourseCategoryService.updateResourseCategory(data, idResourseCategory, +project_id);
             if (!result.success) {
                 response.status(result.statusCode).json(result);
             }
@@ -70,13 +72,14 @@ class ResourceCategoryController {
         return __awaiter(this, void 0, void 0, function* () {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
+            const project_id = request.get("project-id");
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
                 },
             };
-            const result = yield resourseCategory_service_1.resourseCategoryService.findAll(paginationOptions);
+            const result = yield resourseCategory_service_1.resourseCategoryService.findAll(paginationOptions, +project_id);
             response.status(result.statusCode).json(result);
         });
     }

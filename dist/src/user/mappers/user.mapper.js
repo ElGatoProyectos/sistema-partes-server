@@ -14,6 +14,8 @@ class UserResponseMapper {
         this.fecha_creacion = user.fecha_creacion;
         this.rol_id = user.rol_id;
         this.limite_usuarios = user.limite_usuarios;
+        this.estado = user.estado;
+        this.contrasena = user.contrasena;
     }
 }
 exports.UserResponseMapper = UserResponseMapper;

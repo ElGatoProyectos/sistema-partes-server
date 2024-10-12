@@ -23,7 +23,6 @@ class TrainController {
             // Usando multer para manejar la subida de archivos en memoria
             upload.single("train-file")(request, response, (err) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
-                    console.log(err);
                     return response.status(500).json({ error: "Error al leer el archivo" });
                 }
                 // const project_id = Number(request.params.project_id);
@@ -69,19 +68,6 @@ class TrainController {
             }
         });
     }
-    updateCuadrilla(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const train_id = Number(request.params.id);
-            const data = request.body;
-            const result = yield train_service_1.trainService.updateCuadrillaTrain(data, train_id);
-            if (!result.success) {
-                response.status(result.statusCode).json(result);
-            }
-            else {
-                response.status(result.statusCode).json(result);
-            }
-        });
-    }
     updateStatus(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const idTrain = Number(request.params.id);
@@ -96,35 +82,19 @@ class TrainController {
             response.status(result.statusCode).json(result);
         });
     }
-    findByName(request, response) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const page = parseInt(request.query.page) || 1;
-            const limit = parseInt(request.query.limit) || 20;
-            const project_id = request.get("project-id");
-            let paginationOptions = {
-                queryParams: {
-                    page: page,
-                    limit: limit,
-                },
-            };
-            //si buscaba como request.body no me llegaba bien para luego buscar
-            const name = request.query.name;
-            const result = yield train_service_1.trainService.findByName(name, paginationOptions, +project_id);
-            response.status(result.statusCode).json(result);
-        });
-    }
     allTrains(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const page = parseInt(request.query.page) || 1;
             const limit = parseInt(request.query.limit) || 20;
             const project_id = request.get("project-id");
             // const project_id = Number(request.params.project_id);
-            const name = request.query.name;
+            const search = request.query.search;
+            const codigo = request.query.codigo;
             let paginationOptions = {
                 queryParams: {
                     page: page,
                     limit: limit,
-                    name: name,
+                    search: search,
                 },
             };
             const result = yield train_service_1.trainService.findAll(paginationOptions, project_id);

@@ -16,21 +16,16 @@ exports.prismaProductionUnitRepository = void 0;
 const client_1 = require("@prisma/client");
 const prisma_config_1 = __importDefault(require("@/config/prisma.config"));
 class PrimsaProductionUnitRepository {
-    findByCode(code) {
+    findByCode(code, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const productionUnit = yield prisma_config_1.default.unidadProduccion.findFirst({
                 where: {
                     codigo: code,
+                    proyecto_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
             });
             return productionUnit;
-        });
-    }
-    findAll() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const productionUnits = yield prisma_config_1.default.unidadProduccion.findMany();
-            return productionUnits;
         });
     }
     existsName(name) {
@@ -44,11 +39,12 @@ class PrimsaProductionUnitRepository {
             return productionUnit;
         });
     }
-    codeMoreHigh() {
+    codeMoreHigh(project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const lastProductionUnit = yield prisma_config_1.default.unidadProduccion.findFirst({
                 where: {
-                    eliminado: client_1.E_Estado_BD.n,
+                    proyecto_id: project_id,
+                    // eliminado: E_Estado_BD.n,
                 },
                 orderBy: { codigo: "desc" },
             });
@@ -100,23 +96,35 @@ class PrimsaProductionUnitRepository {
             return { productionUnits, total };
         });
     }
-    findAllPagination(skip, limit) {
+    findAllPagination(skip, data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
+            let filters = {};
+            if (data.queryParams.search) {
+                if (isNaN(data.queryParams.search)) {
+                    filters.nombre = {
+                        contains: data.queryParams.search,
+                    };
+                }
+                else {
+                    filters.codigo = {
+                        contains: data.queryParams.search,
+                    };
+                }
+            }
             const [productionUnits, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.unidadProduccion.findMany({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { proyecto_id: project_id, eliminado: client_1.E_Estado_BD.n }),
                     skip,
-                    take: limit,
+                    take: data.queryParams.limit,
                     omit: {
                         eliminado: true,
                     },
+                    orderBy: {
+                        codigo: "asc",
+                    },
                 }),
                 prisma_config_1.default.unidadProduccion.count({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { eliminado: client_1.E_Estado_BD.n }),
                 }),
             ]);
             return { productionUnits, total };

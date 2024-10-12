@@ -10,5 +10,7 @@ class ProjectRepository {
     searchNameProject(data, skip) { }
     updateStateProject(idProject, stateProject) { }
     codeMoreHigh(company_id) { }
+    updateColorsProject(project_id, data) { }
+    totalProjectsByCompany(company_id) { }
 }
 exports.ProjectRepository = ProjectRepository;

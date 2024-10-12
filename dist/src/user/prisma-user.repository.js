@@ -29,15 +29,26 @@ const prisma_config_1 = __importDefault(require("../config/prisma.config"));
 const client_1 = require("@prisma/client");
 const company_validation_1 = require("@/company/company.validation");
 class PrismaUserRepository {
-    getUsersForCompany(skip, limit, name, company_id) {
+    getUsersForCompany(skip, data, rol, company_id) {
         return __awaiter(this, void 0, void 0, function* () {
             let filters = {};
             let users = [];
             let total;
-            if (name) {
+            if (data.queryParams.name) {
                 filters.nombre_completo = {
-                    contains: name,
+                    contains: data.queryParams.name,
                 };
+            }
+            if (data.queryParams.estado) {
+                if (data.queryParams.estado === "y") {
+                    filters.estado = client_1.E_Estado_BD.y;
+                }
+                else {
+                    filters.estado = client_1.E_Estado_BD.n;
+                }
+            }
+            if (rol) {
+                filters.rol_id = rol.id;
             }
             [users, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.detalleUsuarioEmpresa.findMany({
@@ -54,19 +65,21 @@ class PrismaUserRepository {
                         Empresa: true,
                     },
                     skip,
-                    take: limit,
+                    take: data.queryParams.limit,
                 }),
                 prisma_config_1.default.detalleUsuarioEmpresa.count({
                     where: {
                         empresa_id: company_id,
+                        Usuario: Object.assign({}, filters),
                     },
                 }),
             ]);
             const userAll = users.map((item) => {
                 const { Usuario } = item, company = __rest(item, ["Usuario"]);
+                const { Empresa } = item;
                 const { Rol } = Usuario, user = __rest(Usuario, ["Rol"]);
                 return {
-                    empresa: company,
+                    empresa: Empresa,
                     usuario: user,
                     rol: Rol,
                 };
@@ -99,7 +112,7 @@ class PrismaUserRepository {
             };
         });
     }
-    updaterRolUser(idUser, idRol) {
+    updateRolUser(idUser, idRol) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield prisma_config_1.default.usuario.update({
                 where: {

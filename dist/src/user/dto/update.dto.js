@@ -8,8 +8,5 @@ exports.userUpdateDto = zod_1.z.object({
     nombre_completo: zod_1.z.string().optional(),
     telefono: zod_1.z.string().optional(),
     contrasena: zod_1.z.string().optional(),
-    eliminado: zod_1.z.enum(["y", "n"]),
-    limite_proyecto: zod_1.z.number().optional(),
-    limite_usuarios: zod_1.z.number().optional(),
-    rol_id: zod_1.z.number(),
+    estado: zod_1.z.enum(["y", "n"]),
 });

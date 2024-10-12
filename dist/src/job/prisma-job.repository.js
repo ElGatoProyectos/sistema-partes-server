@@ -15,7 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.prismaJobRepository = void 0;
 const client_1 = require("@prisma/client");
 const prisma_config_1 = __importDefault(require("@/config/prisma.config"));
+const date_1 = require("@/common/utils/date");
 class PrismaJobRepository {
+    updateJobFromExcel(data, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: data,
+            });
+            return job;
+        });
+    }
     createJob(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const job = yield prisma_config_1.default.trabajo.create({
@@ -29,6 +39,61 @@ class PrismaJobRepository {
             const job = yield prisma_config_1.default.trabajo.update({
                 where: { id: job_id },
                 data: data,
+            });
+            return job;
+        });
+    }
+    updateJobCost(cost, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: {
+                    costo_partida: cost,
+                },
+            });
+            return job;
+        });
+    }
+    updateJobCostOfLabor(labor, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: {
+                    costo_mano_obra: labor,
+                },
+            });
+            return job;
+        });
+    }
+    updateJobMaterialCost(material, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: {
+                    costo_material: material,
+                },
+            });
+            return job;
+        });
+    }
+    updateJobEquipment(equipment, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: {
+                    costo_equipo: equipment,
+                },
+            });
+            return job;
+        });
+    }
+    updateJobSeveral(several, job_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const job = yield prisma_config_1.default.trabajo.update({
+                where: { id: job_id },
+                data: {
+                    costo_varios: several,
+                },
             });
             return job;
         });
@@ -74,25 +139,55 @@ class PrismaJobRepository {
             return job;
         });
     }
-    findAll(skip, limit, project_id) {
+    findAll(skip, data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
+            let filters = {};
+            let filtersTrain = {};
+            let fecha_inicio;
+            let fecha_finalizacion;
+            if (data.queryParams.search) {
+                if (isNaN(data.queryParams.search)) {
+                    filters.nombre = {
+                        contains: data.queryParams.search,
+                    };
+                }
+                else {
+                    filters.codigo = {
+                        contains: data.queryParams.search,
+                    };
+                }
+            }
+            if (data.queryParams.fecha_inicio) {
+                fecha_inicio = (0, date_1.converToDate)(data.queryParams.fecha_inicio);
+                filters.fecha_inicio = {
+                    gte: fecha_inicio,
+                };
+            }
+            if (data.queryParams.fecha_finalizacion) {
+                fecha_finalizacion = (0, date_1.converToDate)(data.queryParams.fecha_finalizacion);
+                filters.fecha_finalizacion = {
+                    gte: fecha_finalizacion,
+                };
+            }
+            if (data.queryParams.nameTrain) {
+                filtersTrain.nombre = {
+                    contains: data.queryParams.nameTrain,
+                };
+            }
             const [jobs, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.trabajo.findMany({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { Tren: Object.assign({}, filtersTrain), eliminado: client_1.E_Estado_BD.n, proyecto_id: project_id }),
                     skip,
-                    take: limit,
+                    take: data.queryParams.limit,
                     omit: {
                         eliminado: true,
                     },
+                    orderBy: {
+                        codigo: "asc",
+                    },
                 }),
                 prisma_config_1.default.trabajo.count({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { Tren: Object.assign({}, filtersTrain), eliminado: client_1.E_Estado_BD.n, proyecto_id: project_id }),
                 }),
             ]);
             return { jobs, total };
@@ -122,36 +217,6 @@ class PrismaJobRepository {
                 orderBy: { codigo: "desc" },
             });
             return lastJob;
-        });
-    }
-    searchNameJob(name, skip, limit, project_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [jobs, total] = yield prisma_config_1.default.$transaction([
-                prisma_config_1.default.trabajo.findMany({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                    skip,
-                    take: limit,
-                    omit: {
-                        eliminado: true,
-                    },
-                }),
-                prisma_config_1.default.trabajo.count({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                }),
-            ]);
-            return { jobs, total };
         });
     }
 }

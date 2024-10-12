@@ -90,35 +90,24 @@ class TrainService {
                 }
                 const resultIdProject = yield project_validation_1.projectValidation.findById(+project_id);
                 if (!resultIdProject.success) {
-                    return http_response_1.httpResponse.BadRequestException("No se puede crear el Tren con el id del proyecto proporcionado");
+                    return http_response_1.httpResponse.BadRequestException("No se puede actualizar el Tren con el id del proyecto proporcionado");
                 }
-                const trainResponse = resultIdTrain.payload;
-                const trainFormat = Object.assign(Object.assign({}, data), { operario: data.operario, oficial: data.oficial, peon: data.peon, proyecto_id: +project_id });
+                const trainFormat = Object.assign(Object.assign({}, data), { proyecto_id: +project_id });
+                if (data.operario != resultTrainFind.operario) {
+                    trainFormat.operario = data.operario;
+                }
+                if (data.oficial != resultTrainFind.oficial) {
+                    trainFormat.oficial = data.oficial;
+                }
+                if (data.peon != resultTrainFind.peon) {
+                    trainFormat.peon = data.peon;
+                }
                 const responseTrain = yield prisma_train_repository_1.prismaTrainRepository.updateTrain(trainFormat, idTrain);
                 const trainMapper = new train_mapper_1.TrainResponseMapper(responseTrain);
                 return http_response_1.httpResponse.SuccessResponse("Tren modificado correctamente", trainMapper);
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException("Error al modificar el Tren", error);
-            }
-            finally {
-                yield prisma_config_1.default.$disconnect();
-            }
-        });
-    }
-    updateCuadrillaTrain(data, train_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const resultIdTrain = yield train_validation_1.trainValidation.findById(train_id);
-                if (!resultIdTrain.success) {
-                    return http_response_1.httpResponse.BadRequestException("No se pudo encontrar el id del Tren que se quiere editar");
-                }
-                const trainUpdate = yield prisma_train_repository_1.prismaTrainRepository.updateCuadrillaByIdTrain(train_id, data.official, data.pawns, data.workers);
-                const trainMapper = new train_mapper_1.TrainResponseMapper(trainUpdate);
-                return http_response_1.httpResponse.SuccessResponse("Cuadrilla del Tren modificada con éxito", trainMapper);
-            }
-            catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al editar la cuadrilla del Tren", error);
             }
             finally {
                 yield prisma_config_1.default.$disconnect();
@@ -142,36 +131,14 @@ class TrainService {
             }
         });
     }
-    findByName(name, data, project_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-                const result = yield prisma_train_repository_1.prismaTrainRepository.searchNameTrain(name, skip, data.queryParams.limit, +project_id);
-                const { trains, total } = result;
-                const pageCount = Math.ceil(total / data.queryParams.limit);
-                const formData = {
-                    total,
-                    page: data.queryParams.page,
-                    // x ejemplo 20
-                    limit: data.queryParams.limit,
-                    //cantidad de paginas que hay
-                    pageCount,
-                    data: trains,
-                };
-                return http_response_1.httpResponse.SuccessResponse("Éxito al buscar el Tren", formData);
-            }
-            catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Trenes", error);
-            }
-            finally {
-                yield prisma_config_1.default.$disconnect();
-            }
-        });
-    }
     findAll(data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+                const projectResponse = yield project_validation_1.projectValidation.findById(+project_id);
+                if (!projectResponse.success) {
+                    return projectResponse;
+                }
                 const result = yield prisma_train_repository_1.prismaTrainRepository.findAll(skip, data, +project_id);
                 const { trains, total } = result;
                 const pageCount = Math.ceil(total / data.queryParams.limit);
@@ -224,6 +191,7 @@ class TrainService {
                 const sheetToJson = xlsx.utils.sheet_to_json(sheet);
                 let error = 0;
                 let errorNumber = 0;
+                let errorRows = [];
                 //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
                 //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
                 //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -254,13 +222,15 @@ class TrainService {
                     index++;
                     if (item["ID-TREN"] == undefined || item.TREN == undefined) {
                         error++;
+                        errorRows.push(index + 1);
                     }
                 })));
                 if (error > 0) {
-                    return http_response_1.httpResponse.BadRequestException("Error al leer el archivo. Verificar los campos");
+                    return http_response_1.httpResponse.BadRequestException(`Error al leer el archivo.El campo ID-TREN, TREN son obligatorios.Verificar las filas: ${errorRows.join(", ")}.`);
                 }
-                //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
-                yield Promise.all(sheetToJson.map((item) => __awaiter(this, void 0, void 0, function* () {
+                //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anteriorr
+                yield Promise.all(sheetToJson.map((item, index) => __awaiter(this, void 0, void 0, function* () {
+                    index++;
                     //verificamos si tenemos el codigo
                     const codigo = parseInt(item["ID-TREN"], 10); // Intenta convertir el string a número
                     if (!validator_1.default.isNumeric(item["ID-TREN"])) {
@@ -275,12 +245,13 @@ class TrainService {
                         // Verifica si el código actual no es mayor que el anterior
                         if (previousCodigo !== null && codigo <= previousCodigo) {
                             errorNumber++;
+                            errorRows.push(index);
                         }
                         previousCodigo = codigo;
                     }
                 })));
                 if (errorNumber > 0) {
-                    return http_response_1.httpResponse.BadRequestException("Error al leer el archivo. Verificar los campos");
+                    return http_response_1.httpResponse.BadRequestException(`Error al leer el archivo.Hay letras en códigos o el mismo puede que sea mayor o igual al siguiente.Verificar las filas: ${errorRows.join(", ")}.`);
                 }
                 //[NOTE] Acá verifico si el primer elemento es 001
                 const sortedCodesArray = Array.from(seenCodes)
@@ -290,7 +261,7 @@ class TrainService {
                     errorNumber++;
                 }
                 if (errorNumber > 0) {
-                    return http_response_1.httpResponse.BadRequestException("Error al leer el archivo. Verificar los campos");
+                    return http_response_1.httpResponse.BadRequestException("El primer código del archivo debe ser 001");
                 }
                 //[NOTE] ACÁ DE QUE LA DIFERENCIA SEA SÓLO 1
                 for (let i = 1; i < sortedCodesArray.length; i++) {
@@ -298,17 +269,17 @@ class TrainService {
                     const previousCode = parseInt(sortedCodesArray[i - 1]);
                     if (currentCode !== previousCode + 1) {
                         errorNumber++; // Aumenta si el código actual no es 1 número mayor que el anterior
-                        break; // Puedes detener el ciclo en el primer error
+                        errorRows.push(i);
                     }
                 }
                 if (errorNumber > 0) {
-                    return http_response_1.httpResponse.BadRequestException("Error al leer el archivo. Verificar los campos");
+                    return http_response_1.httpResponse.BadRequestException(`Error al leer el archivo.Existen uno o varios códigos donde la diferencia es mayor a 1`);
                 }
                 //[SUCCESS] Guardo o actualizo la Unidad de Producción
                 let code;
                 let productionUnit;
                 yield Promise.all(sheetToJson.map((item) => __awaiter(this, void 0, void 0, function* () {
-                    code = yield train_validation_1.trainValidation.findByCode(String(item["ID-TREN"]), project_id);
+                    code = yield train_validation_1.trainValidation.findByCode(String(item["ID-TREN"].trim()), project_id);
                     if (!code.success) {
                         productionUnit = code.payload;
                         yield train_validation_1.trainValidation.updateTrain(item, +productionUnit.id, responseProject.id);
@@ -316,7 +287,7 @@ class TrainService {
                     else {
                         yield prisma_config_1.default.tren.create({
                             data: {
-                                codigo: String(item["ID-TREN"]),
+                                codigo: String(item["ID-TREN"].trim()),
                                 nombre: item.TREN,
                                 nota: item.NOTA,
                                 operario: 1,
@@ -331,7 +302,6 @@ class TrainService {
                 return http_response_1.httpResponse.SuccessResponse("Trenes creados correctamente!");
             }
             catch (error) {
-                console.log(error);
                 yield prisma_config_1.default.$disconnect();
                 return http_response_1.httpResponse.InternalServerErrorException("Error al leer el Tren", error);
             }

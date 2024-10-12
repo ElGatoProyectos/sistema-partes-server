@@ -60,131 +60,131 @@ class ProjectService {
 
       // const weekResponse = await weekService.findByYear(date.getFullYear());
       // if (!weekResponse.success) {
-      //   console.log("ENTRO AL IF :0 xq no hay nada");
+      //   // console.log("ENTRO AL IF :0 xq no hay nada");
       //   await weekService.createWeek(date.getFullYear());
       // }
 
-      const week = await weekService.createWeek(2026);
+      //const week = await weekService.createWeek(2026);
 
-      // const resultCompany = await companyValidation.findByIdUser(
-      //   userResponse.id
-      // );
-      // if (!resultCompany.success) {
-      //   return httpResponse.BadRequestException(
-      //     "No se puede crear el proyecto con el id de la empresa proporcionado"
-      //   );
-      // }
+      const resultCompany = await companyValidation.findByIdUser(
+        userResponse.id
+      );
+      if (!resultCompany.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el proyecto con el id de la empresa proporcionado"
+        );
+      }
 
-      // const company = resultCompany.payload as Empresa;
+      const company = resultCompany.payload as Empresa;
 
-      // const totalProjects = await projectValidation.totalProjectsByCompany(
-      //   company.id
-      // );
+      const totalProjects = await projectValidation.totalProjectsByCompany(
+        company.id
+      );
 
-      // if (!totalProjects.success) {
-      //   return totalProjects;
-      // }
+      if (!totalProjects.success) {
+        return totalProjects;
+      }
 
-      // const total = totalProjects.payload as Number;
+      const total = totalProjects.payload as Number;
 
-      // const rolResponse = await rolValidation.findByName("ADMIN");
-      // const rol = rolResponse.payload as Rol;
+      const rolResponse = await rolValidation.findByName("ADMIN");
+      const rol = rolResponse.payload as Rol;
 
-      // if (
-      //   userResponse.rol_id != rol.id &&
-      //   total === userResponse.limite_proyecto
-      // ) {
-      //   return httpResponse.BadRequestException(
-      //     "Alcanzó el límite de proyectos la empresa"
-      //   );
-      // }
+      if (
+        userResponse.rol_id != rol.id &&
+        total === userResponse.limite_proyecto
+      ) {
+        return httpResponse.BadRequestException(
+          "Alcanzó el límite de proyectos la empresa"
+        );
+      }
 
-      // const lastProject = await projectValidation.codeMoreHigh(company.id);
-      // const lastProjectResponse = lastProject.payload as Proyecto;
+      const lastProject = await projectValidation.codeMoreHigh(company.id);
+      const lastProjectResponse = lastProject.payload as Proyecto;
 
-      // // Incrementar el código en 1
-      // const nextCodigo =
-      //   (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
+      // Incrementar el código en 1
+      const nextCodigo =
+        (parseInt(lastProjectResponse?.codigo_proyecto) || 0) + 1;
 
-      // const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
 
-      // const fecha_creacion = converToDate(data.fecha_inicio);
-      // const fecha_fin = converToDate(data.fecha_fin);
-      // let proyectFormat: any = {};
-      // proyectFormat = {
-      //   ...data,
-      //   codigo_proyecto: formattedCodigo,
-      //   estado: E_Proyecto_Estado.CREADO,
-      //   costo_proyecto: Number(data.costo_proyecto),
-      //   fecha_inicio: fecha_creacion,
-      //   fecha_fin,
-      //   empresa_id: company.id,
-      // };
-      // const project = await prismaProyectoRepository.createProject(
-      //   proyectFormat
-      // );
+      const fecha_creacion = converToDate(data.fecha_inicio);
+      const fecha_fin = converToDate(data.fecha_fin);
+      let proyectFormat: any = {};
+      proyectFormat = {
+        ...data,
+        codigo_proyecto: formattedCodigo,
+        estado: E_Proyecto_Estado.CREADO,
+        costo_proyecto: Number(data.costo_proyecto),
+        fecha_inicio: fecha_creacion,
+        fecha_fin,
+        empresa_id: company.id,
+      };
+      const project = await prismaProyectoRepository.createProject(
+        proyectFormat
+      );
 
-      // //[SUCCESS] Si estuvo todo ok se crea lo siguiente
-      // //[NOTE]:  TIPO DE MANO DE OBRA
-      // const typeWorkforce = await typeWorkforceService.createMasive(project.id);
-      // if (!typeWorkforce.success) {
-      //   return typeWorkforce;
-      // }
-      // //[NOTE]:  ORIGEN DE MANO DE OBRA
-      // const responseOriginWorkforce = await originWorkforceService.createMasive(
-      //   project.id
-      // );
-      // if (!responseOriginWorkforce.success) {
-      //   return responseOriginWorkforce;
-      // }
-      // //[NOTE]:  CATEGORIA DE MANO DE OBRA
-      // const responseCategoryWorkforce =
-      //   await categoryWorkforceService.createMasive(project.id);
-      // if (!responseCategoryWorkforce.success) {
-      //   return responseCategoryWorkforce;
-      // }
-      // //[NOTE]:  ESPECIALIDAD DE MANO DE OBRA
-      // const specialtyWorkforce = await specialtyWorkforceService.createMasive(
-      //   project.id
-      // );
-      // if (!specialtyWorkforce.success) {
-      //   return specialtyWorkforce;
-      // }
-      // //[NOTE]:  UNIDAD QUE LUEGO PUEDE SER USADO POR RECURSOS O MANO DE OBRA
-      // const unitReponse = await unitService.createMasive(
-      //   company.id,
-      //   project.id
-      // );
-      // if (!unitReponse.success) {
-      //   return unitReponse;
-      // }
-      // //[NOTE]:  TIPOS DE BANCO PARA MANO DE OBRA
-      // const responseBankWorkforce = await bankWorkforceService.createMasive(
-      //   project.id
-      // );
-      // if (!responseBankWorkforce.success) {
-      //   return responseBankWorkforce;
-      // }
-      // //[NOTE]:  INDICE UNIFICADO DE RECURSOS
-      // const responseUnifiedIndex = await unifiedIndexService.createMasive(
-      //   company.id,
-      //   project.id
-      // );
-      // if (!responseUnifiedIndex.success) {
-      //   return responseUnifiedIndex;
-      // }
-      // //[NOTE]:  CATEGORIA DE LOS RECURSOS
-      // const resourcesCategory = await resourseCategoryService.createMasive(
-      //   project.id
-      // );
-      // if (!resourcesCategory.success) {
-      //   return resourcesCategory;
-      // }
+      //[SUCCESS] Si estuvo todo ok se crea lo siguiente
+      //[NOTE]:  TIPO DE MANO DE OBRA
+      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
+      if (!typeWorkforce.success) {
+        return typeWorkforce;
+      }
+      //[NOTE]:  ORIGEN DE MANO DE OBRA
+      const responseOriginWorkforce = await originWorkforceService.createMasive(
+        project.id
+      );
+      if (!responseOriginWorkforce.success) {
+        return responseOriginWorkforce;
+      }
+      //[NOTE]:  CATEGORIA DE MANO DE OBRA
+      const responseCategoryWorkforce =
+        await categoryWorkforceService.createMasive(project.id);
+      if (!responseCategoryWorkforce.success) {
+        return responseCategoryWorkforce;
+      }
+      //[NOTE]:  ESPECIALIDAD DE MANO DE OBRA
+      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+        project.id
+      );
+      if (!specialtyWorkforce.success) {
+        return specialtyWorkforce;
+      }
+      //[NOTE]:  UNIDAD QUE LUEGO PUEDE SER USADO POR RECURSOS O MANO DE OBRA
+      const unitReponse = await unitService.createMasive(
+        company.id,
+        project.id
+      );
+      if (!unitReponse.success) {
+        return unitReponse;
+      }
+      //[NOTE]:  TIPOS DE BANCO PARA MANO DE OBRA
+      const responseBankWorkforce = await bankWorkforceService.createMasive(
+        project.id
+      );
+      if (!responseBankWorkforce.success) {
+        return responseBankWorkforce;
+      }
+      //[NOTE]:  INDICE UNIFICADO DE RECURSOS
+      const responseUnifiedIndex = await unifiedIndexService.createMasive(
+        company.id,
+        project.id
+      );
+      if (!responseUnifiedIndex.success) {
+        return responseUnifiedIndex;
+      }
+      //[NOTE]:  CATEGORIA DE LOS RECURSOS
+      const resourcesCategory = await resourseCategoryService.createMasive(
+        project.id
+      );
+      if (!resourcesCategory.success) {
+        return resourcesCategory;
+      }
 
-      // const projectMapper = new ProjectResponseMapper(project);
+      const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
         "Proyecto creado correctamente",
-        "ja"
+        projectMapper
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

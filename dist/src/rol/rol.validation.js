@@ -26,6 +26,19 @@ class RolValidation {
             }
         });
     }
+    findByName(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const rol = yield prisma_rol_repository_1.prismaRolRepository.findByName(name);
+                if (!rol)
+                    return http_response_1.httpResponse.NotFoundException("No se encontró el rol con el nombre que desea buscar");
+                return http_response_1.httpResponse.SuccessResponse("Rol encontrado con éxito", rol);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar rol", error);
+            }
+        });
+    }
     createRol(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
