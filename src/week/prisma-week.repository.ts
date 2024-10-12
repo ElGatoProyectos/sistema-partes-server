@@ -3,6 +3,27 @@ import { WeekRepository } from "./week.repository";
 import { Semana } from "@prisma/client";
 
 class PrismaWeekRepository implements WeekRepository {
+  async findForDate(date: Date): Promise<Semana | null> {
+    const week = await prisma.semana.findFirst({
+      where: {
+        fecha_inicio: {
+          lte: date, // Menor o igual a la fecha de búsqueda
+        },
+        fecha_fin: {
+          gte: date, // Mayor o igual a la fecha de búsqueda
+        },
+      },
+    });
+    return week;
+  }
+  async findLastWeek(): Promise<Semana | null> {
+    const week = await prisma.semana.findFirst({
+      orderBy: {
+        id: "desc", // Ordena por ID de forma descendente
+      },
+    });
+    return week;
+  }
   async findByDate(year: number): Promise<Semana | null> {
     const week = await prisma.semana.findFirst({
       where: {

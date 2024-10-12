@@ -501,7 +501,6 @@ class JobService {
 
       return httpResponse.SuccessResponse("Trabajos creados correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer los Trabajos",

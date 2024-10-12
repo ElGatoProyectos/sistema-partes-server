@@ -14,7 +14,6 @@ class WorkforceController {
     // Usando multer para manejar la subida de archivos en memoria
     upload.single("workforce-file")(request, response, async (err: any) => {
       if (err) {
-        console.log(err);
         return response.status(500).json({ error: "Error al leer el archivo" });
       }
       // const project_id = Number(request.params.project_id);

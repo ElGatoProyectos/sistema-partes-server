@@ -3,6 +3,7 @@ import express from "@/config/express.config";
 
 import multer from "multer";
 import { departureService } from "./departure.service";
+import { T_FindAllDeparture } from "./models/departure.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -43,6 +44,25 @@ class DepartureController {
       }
     });
   };
+
+  async allDepartures(request: express.Request, response: express.Response) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const search = request.query.search as string;
+    const project_id = request.get("project-id") as string;
+    let paginationOptions: T_FindAllDeparture = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+      },
+    };
+    const result = await departureService.findAll(
+      paginationOptions,
+      +project_id
+    );
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const departureController = new DepartureController();

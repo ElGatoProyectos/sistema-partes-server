@@ -10,6 +10,7 @@ import { prismaDepartureRepository } from "./prisma-departure.repository";
 import validator from "validator";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureValidation } from "./departure.validation";
+import { T_FindAllDeparture } from "./models/departure.types";
 
 class DepartureService {
   async findById(departure_id: number): Promise<T_HttpResponse> {
@@ -29,6 +30,45 @@ class DepartureService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findAll(data: T_FindAllDeparture, project_id: number) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaDepartureRepository.findAll(
+        skip,
+        data,
+        +project_id
+      );
+
+      const { departures, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: departures,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todas las Partidas",
+        formData
+      );
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todas los Partidas",
         error
       );
     } finally {

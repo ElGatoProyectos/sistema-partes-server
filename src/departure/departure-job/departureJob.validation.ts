@@ -4,6 +4,7 @@ import { I_DepartureJobExcel } from "./models/departureJob.interface";
 import { Partida, Trabajo } from "@prisma/client";
 import { departureValidation } from "../departure.validation";
 import { prismaJobRepository } from "@/job/prisma-job.repository";
+import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 
 class DepartureJobValidation {
   async updateDepartureJob(
@@ -138,6 +139,41 @@ class DepartureJobValidation {
       }
       return httpResponse.SuccessResponse(
         "Los Trabajos de las Partidas modificada correctamente"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar los Trabajos de las Partidas",
+        error
+      );
+    }
+  }
+  async createDetailDepartureJob(
+    data: I_DepartureJobExcel,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const jobResponse = await jobValidation.findByCodeValidation(
+        data["ID-TRABAJO"],
+        project_id
+      );
+      const job = jobResponse.payload as Trabajo;
+      const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
+
+      const codeDeparture = departureWithComa[0];
+      const departureResponse = await departureValidation.findByCodeValidation(
+        String(codeDeparture),
+        project_id
+      );
+      const departure = departureResponse.payload as Partida;
+      const detail =
+        await prismaDepartureJobRepository.createDetailDepartureJob(
+          job.id,
+          departure.id,
+          +data.METRADO
+        );
+      return httpResponse.SuccessResponse(
+        "El Detalle Trabajo-Partida fue creado correctamente",
+        detail
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

@@ -26,8 +26,50 @@ class PrismaDepartureRepository implements DepartureRepository {
     return departure;
   }
 
-  findAll(skip: number, data: T_FindAllDeparture, project_id: number): void {
-    throw new Error("Method not implemented.");
+  async findAll(
+    skip: number,
+    data: T_FindAllDeparture,
+    project_id: number
+  ): Promise<{ departures: I_Departure[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.partida = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.id_interno = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
+
+    const [departures, total]: [I_Departure[], number] =
+      await prisma.$transaction([
+        prisma.partida.findMany({
+          where: {
+            ...filters,
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+          skip,
+          take: data.queryParams.limit,
+          omit: {
+            eliminado: true,
+          },
+          orderBy: {
+            id_interno: "asc",
+          },
+        }),
+        prisma.partida.count({
+          where: {
+            ...filters,
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+        }),
+      ]);
+    return { departures, total };
   }
   async findById(departure_id: number): Promise<I_Departure | null> {
     const departure = await prisma.partida.findFirst({
