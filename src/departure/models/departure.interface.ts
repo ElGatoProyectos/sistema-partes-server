@@ -10,8 +10,7 @@ export interface I_UpdateDepartureBD
 
 export interface I_UpdateDepartureBDValidationExcel
   extends Omit<Partida, "id" | "eliminado" | "fecha_creacion"> {}
-export interface I_UpdateDeaprtureBodyValidation
-  extends Omit<Partida, "id" | "eliminado" | "fecha_creacion"> {}
+
 export interface I_CreateDepartureBody
   extends Omit<
     Partida,

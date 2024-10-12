@@ -7,7 +7,6 @@ import { userValidation } from "../src/user/user.validation";
 import { companyValidation } from "../src/company/company.validation";
 import { rolValidation } from "../src/rol/rol.validation";
 import { actionService } from "@/action/actionservice.service";
-import { I_CreateAccionBD } from "@/action/models/action.repository";
 import { sectionService } from "@/section/section.service";
 
 async function main() {

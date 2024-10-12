@@ -45,6 +45,12 @@ class DepartureController {
     });
   };
 
+  async findById(request: express.Request, response: express.Response) {
+    const departure_id = Number(request.params.id);
+    const result = await departureService.findById(departure_id);
+    response.status(result.statusCode).json(result);
+  }
+
   async allDepartures(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;

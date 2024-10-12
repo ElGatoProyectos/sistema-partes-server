@@ -21,4 +21,11 @@ departureRouter.get(
   departureController.allDepartures
 );
 
+departureRouter.get(
+  `${prefix}/:id`,
+  departureMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  departureController.findById
+);
+
 export default departureRouter;

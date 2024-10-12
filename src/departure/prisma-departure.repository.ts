@@ -52,6 +52,9 @@ class PrismaDepartureRepository implements DepartureRepository {
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
           },
+          include: {
+            Unidad: true,
+          },
           skip,
           take: data.queryParams.limit,
           omit: {
