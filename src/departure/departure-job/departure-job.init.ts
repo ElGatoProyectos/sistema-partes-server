@@ -6,7 +6,7 @@ const departureJobRouter = express.Router();
 
 const prefix = "/departure-job";
 
-departureJobRouter.put(
+departureJobRouter.post(
   `${prefix}/upload-excel`,
   authRoleMiddleware.authAdminUser,
   departureJobController.departureJobReadExcel
