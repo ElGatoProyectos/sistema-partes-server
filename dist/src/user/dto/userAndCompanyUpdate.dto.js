@@ -10,7 +10,6 @@ exports.userAndCompanyUpdateDto = zod_1.z.object({
     contrasena: zod_1.z.string().optional(),
     limite_proyecto: zod_1.z.string(),
     limite_usuarios: zod_1.z.string(),
-    eliminado: zod_1.z.enum(["y", "n"]),
     nombre_empresa: zod_1.z.string(),
     descripcion_empresa: zod_1.z.string(),
     ruc: zod_1.z.string(),

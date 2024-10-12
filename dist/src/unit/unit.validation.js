@@ -13,18 +13,17 @@ exports.unitValidation = void 0;
 const http_response_1 = require("@/common/http.response");
 const prisma_unit_repository_1 = require("./prisma-unit.repository");
 class UnitValidation {
-    updateUnifiedIndex(data, unit_id, company_id, project_id) {
+    updateUnit(data, unit_id, company_id, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const unifiedIndexFormat = {
-                    codigo: String(data["ID-UNIT"]),
-                    nombre: data.NOMBRE,
+                const unitFormat = {
+                    codigo: String(data["ID-UNIDAD"].trim()),
                     simbolo: data.SIMBOLO,
-                    descripcion: data.DESCRIPCION,
+                    nombre: data.DESCRIPCION,
                     empresa_id: company_id,
                     proyecto_id: project_id,
                 };
-                const responseUnifiedIndex = yield prisma_unit_repository_1.prismaUnitRepository.updateUnit(unifiedIndexFormat, unit_id);
+                const responseUnifiedIndex = yield prisma_unit_repository_1.prismaUnitRepository.updateUnit(unitFormat, unit_id);
                 return http_response_1.httpResponse.SuccessResponse("Unidad modificada correctamente", responseUnifiedIndex);
             }
             catch (error) {
@@ -46,12 +45,12 @@ class UnitValidation {
             }
         });
     }
-    findByCode(code, project_id) {
+    findByCodeValidation(code, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const unit = yield prisma_unit_repository_1.prismaUnitRepository.findByCode(code, project_id);
-                if (unit) {
-                    return http_response_1.httpResponse.NotFoundException("Unidad fue encontrada");
+                if (!unit) {
+                    return http_response_1.httpResponse.NotFoundException("Unidad no fue encontrada");
                 }
                 return http_response_1.httpResponse.SuccessResponse("La Unidad fue encontrada", unit);
             }
@@ -84,7 +83,7 @@ class UnitValidation {
                 return http_response_1.httpResponse.SuccessResponse("El nombre no existe, puede proceguir");
             }
             catch (error) {
-                return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar la Categoria del recurso en la base de datos", error);
+                return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar el nombre de la Partida en la base de datos", error);
             }
         });
     }
@@ -92,10 +91,24 @@ class UnitValidation {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const symbolExists = yield prisma_unit_repository_1.prismaUnitRepository.existsSymbol(symbol, project_id);
-                if (symbolExists) {
-                    return http_response_1.httpResponse.NotFoundException("El simbolo ingresado de la Unidad ya existe en la base de datos");
+                if (!symbolExists) {
+                    return http_response_1.httpResponse.NotFoundException("El simbolo ingresado de la Unidad no existe en la base de datos");
                 }
-                return http_response_1.httpResponse.SuccessResponse("El simbolo no existe, puede proceguir");
+                return http_response_1.httpResponse.SuccessResponse("El simbolo de la Unidad existe, puede proceguir", symbolExists);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar el simbolo de la Unidad en la base de datos", error);
+            }
+        });
+    }
+    findBySymbolForCreate(symbol, project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const symbolExists = yield prisma_unit_repository_1.prismaUnitRepository.existsSymbol(symbol, project_id);
+                if (symbolExists) {
+                    return http_response_1.httpResponse.NotFoundException("El simbolo ingresado de la Unidad existe en la base de datos");
+                }
+                return http_response_1.httpResponse.SuccessResponse("El simbolo de la Unidad no existe, puede proceguir", symbolExists);
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException(" Error al buscar el simbolo de la Unidad en la base de datos", error);

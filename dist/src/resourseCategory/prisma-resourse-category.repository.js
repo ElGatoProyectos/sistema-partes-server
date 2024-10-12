@@ -16,6 +16,26 @@ exports.prismaResourseCategoryRepository = void 0;
 const prisma_config_1 = __importDefault(require("@/config/prisma.config"));
 const client_1 = require("@prisma/client");
 class PrismaResourseCategoryRepository {
+    createResourcesCategoryMasive(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const units = yield prisma_config_1.default.categoriaRecurso.createMany({
+                data,
+            });
+            return units;
+        });
+    }
+    codeMoreHigh(project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const lastResourceCategory = yield prisma_config_1.default.categoriaRecurso.findFirst({
+                where: {
+                    proyecto_id: project_id,
+                    eliminado: client_1.E_Estado_BD.n,
+                },
+                orderBy: { codigo: "desc" },
+            });
+            return lastResourceCategory;
+        });
+    }
     searchNameResourseCategory(name, skip, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             const [resoursesCategories, total] = yield prisma_config_1.default.$transaction([
@@ -44,12 +64,13 @@ class PrismaResourseCategoryRepository {
             return { resoursesCategories, total };
         });
     }
-    findAll(skip, limit) {
+    findAll(skip, limit, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const [categoriesResources, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.categoriaRecurso.findMany({
                     where: {
                         eliminado: client_1.E_Estado_BD.n,
+                        proyecto_id: project_id,
                     },
                     skip,
                     take: limit,
@@ -80,11 +101,24 @@ class PrismaResourseCategoryRepository {
             return resourseCategory;
         });
     }
-    existsName(name) {
+    existsName(name, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const resourseCategory = yield prisma_config_1.default.categoriaRecurso.findFirst({
                 where: {
                     nombre: name,
+                    proyecto_id: project_id,
+                    eliminado: client_1.E_Estado_BD.n,
+                },
+            });
+            return resourseCategory;
+        });
+    }
+    findByName(name, project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resourseCategory = yield prisma_config_1.default.categoriaRecurso.findFirst({
+                where: {
+                    nombre: name,
+                    proyecto_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
             });

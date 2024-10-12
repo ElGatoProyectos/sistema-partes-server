@@ -16,6 +16,17 @@ exports.prismaRolRepository = void 0;
 const prisma_config_1 = __importDefault(require("../config/prisma.config"));
 const client_1 = require("@prisma/client");
 class PrismaRolRepository {
+    findByName(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const rol = yield prisma_config_1.default.rol.findFirst({
+                where: {
+                    rol: name,
+                    eliminado: client_1.E_Estado_BD.n,
+                },
+            });
+            return rol;
+        });
+    }
     existsName(name) {
         return __awaiter(this, void 0, void 0, function* () {
             const rolResponse = yield prisma_config_1.default.rol.findFirst({

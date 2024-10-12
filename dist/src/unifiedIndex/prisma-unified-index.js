@@ -16,10 +16,19 @@ exports.prismaUnifiedIndexRepository = void 0;
 const client_1 = require("@prisma/client");
 const prisma_config_1 = __importDefault(require("@/config/prisma.config"));
 class PrismaUnifiedIndexRepository {
-    codeMoreHigh() {
+    createUnifiedIndexMasive(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const unifiedIndex = yield prisma_config_1.default.indiceUnificado.createMany({
+                data,
+            });
+            return unifiedIndex;
+        });
+    }
+    codeMoreHigh(project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const lastUnifiedIndex = yield prisma_config_1.default.indiceUnificado.findFirst({
                 where: {
+                    proyect_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
                 orderBy: { codigo: "desc" },
@@ -38,62 +47,44 @@ class PrismaUnifiedIndexRepository {
             return unifiedIndex;
         });
     }
-    existSymbol(symbol) {
+    existSymbol(symbol, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const unifiedIndex = yield prisma_config_1.default.indiceUnificado.findFirst({
                 where: {
                     simbolo: symbol,
+                    proyect_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
             });
             return unifiedIndex;
         });
     }
-    searchNameUnifiedIndex(name, skip, limit) {
+    findAll(skip, data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
+            let filters = {};
+            if (data.queryParams.search) {
+                if (isNaN(data.queryParams.search)) {
+                    filters.nombre = {
+                        contains: data.queryParams.search,
+                    };
+                }
+                else {
+                    filters.codigo = {
+                        contains: data.queryParams.search,
+                    };
+                }
+            }
             const [unifiedIndex, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.indiceUnificado.findMany({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { project_id: project_id, eliminado: client_1.E_Estado_BD.n }),
                     skip,
-                    take: limit,
+                    take: data.queryParams.limit,
                     omit: {
                         eliminado: true,
                     },
                 }),
                 prisma_config_1.default.indiceUnificado.count({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
-                }),
-            ]);
-            return { unifiedIndex, total };
-        });
-    }
-    findAll(skip, limit) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [unifiedIndex, total] = yield prisma_config_1.default.$transaction([
-                prisma_config_1.default.indiceUnificado.findMany({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
-                    skip,
-                    take: limit,
-                    omit: {
-                        eliminado: true,
-                    },
-                }),
-                prisma_config_1.default.indiceUnificado.count({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { eliminado: client_1.E_Estado_BD.n }),
                 }),
             ]);
             return { unifiedIndex, total };
@@ -113,11 +104,12 @@ class PrismaUnifiedIndexRepository {
             return unifiedIndex;
         });
     }
-    existsName(name) {
+    existsName(name, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const unifiedIndex = yield prisma_config_1.default.indiceUnificado.findFirst({
                 where: {
                     nombre: name,
+                    proyect_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
             });

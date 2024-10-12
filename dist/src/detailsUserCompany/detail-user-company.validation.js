@@ -27,5 +27,33 @@ class DetailUserCompanyValidation {
             }
         });
     }
+    findByIdUser(user_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const detail = yield prismaUserDetailCompany_respository_1.prismaDetailUserCompanyRepository.findByIdUser(user_id);
+                if (!detail) {
+                    return http_response_1.httpResponse.NotFoundException("Detalle Usuario-Empresa de la empresa proporcionada no encontrado");
+                }
+                return http_response_1.httpResponse.SuccessResponse("Detalle Usuario-Empresa encontrado de la empresa proporcionada", detail);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar Detalle Usuario-Empresa ", error);
+            }
+        });
+    }
+    totalUserByCompany(company_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const countUsersByCompany = yield prismaUserDetailCompany_respository_1.prismaDetailUserCompanyRepository.countUsersForCompany(company_id);
+                if (!countUsersByCompany) {
+                    return http_response_1.httpResponse.NotFoundException("La empresa proporcionada para buscar sus usuarios no fue encontrado");
+                }
+                return http_response_1.httpResponse.SuccessResponse("Se encontró la cantidad de usuarios de la empresa", countUsersByCompany);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar la cantidad de usuarios de la empresa", error);
+            }
+        });
+    }
 }
 exports.detailUserCompanyValidation = new DetailUserCompanyValidation();

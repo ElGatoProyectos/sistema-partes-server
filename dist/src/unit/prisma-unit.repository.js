@@ -16,6 +16,14 @@ exports.prismaUnitRepository = void 0;
 const prisma_config_1 = __importDefault(require("@/config/prisma.config"));
 const client_1 = require("@prisma/client");
 class PrismaUnitRepository {
+    createUnitMasive(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const units = yield prisma_config_1.default.unidad.createMany({
+                data,
+            });
+            return units;
+        });
+    }
     findByCode(code, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const unit = yield prisma_config_1.default.unidad.findFirst({
@@ -44,7 +52,9 @@ class PrismaUnitRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const unit = yield prisma_config_1.default.unidad.findFirst({
                 where: {
-                    simbolo: symbol,
+                    simbolo: {
+                        contains: symbol,
+                    },
                     proyecto_id: project_id,
                     eliminado: client_1.E_Estado_BD.n,
                 },
@@ -61,55 +71,35 @@ class PrismaUnitRepository {
     //   });
     //   return resourseCategory;
     // }
-    searchNameUnit(name, skip, limit, project_id) {
+    findAll(skip, data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
+            let filters = {};
+            if (data.queryParams.search) {
+                if (isNaN(data.queryParams.search)) {
+                    filters.nombre = {
+                        contains: data.queryParams.search,
+                    };
+                }
+                else {
+                    filters.codigo = {
+                        contains: data.queryParams.search,
+                    };
+                }
+            }
             const [units, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.unidad.findMany({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { eliminado: client_1.E_Estado_BD.n, proyecto_id: project_id }),
                     skip,
-                    take: limit,
+                    take: +data.queryParams.limit,
                     omit: {
                         eliminado: true,
                     },
-                }),
-                prisma_config_1.default.unidad.count({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                }),
-            ]);
-            return { units, total };
-        });
-    }
-    findAll(skip, limit, project_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [units, total] = yield prisma_config_1.default.$transaction([
-                prisma_config_1.default.unidad.findMany({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                    skip,
-                    take: limit,
-                    omit: {
-                        eliminado: true,
+                    orderBy: {
+                        codigo: "asc",
                     },
                 }),
                 prisma_config_1.default.unidad.count({
-                    where: {
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
+                    where: Object.assign(Object.assign({}, filters), { eliminado: client_1.E_Estado_BD.n, proyecto_id: project_id }),
                 }),
             ]);
             return { units, total };
@@ -131,14 +121,16 @@ class PrismaUnitRepository {
     }
     existsName(name, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resourseCategory = yield prisma_config_1.default.unidad.findFirst({
+            const unit = yield prisma_config_1.default.unidad.findFirst({
                 where: {
-                    nombre: name,
+                    nombre: {
+                        contains: name,
+                    },
                     eliminado: client_1.E_Estado_BD.n,
                     proyecto_id: project_id,
                 },
             });
-            return resourseCategory;
+            return unit;
         });
     }
     createUnit(data) {

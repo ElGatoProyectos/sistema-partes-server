@@ -32,6 +32,8 @@ const email_1 = require("../common/utils/email");
 const prisma_rol_repository_1 = require("../rol/prisma-rol.repository");
 const action_validation_1 = require("@/action/action.validation");
 const detail_user_company_validation_1 = require("@/detailsUserCompany/detail-user-company.validation");
+const project_validation_1 = require("@/project/project.validation");
+const detailUserProject_validation_1 = require("./detailUserProject/detailUserProject.validation");
 class UserService {
     findAll(data, token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -67,25 +69,34 @@ class UserService {
             }
         });
     }
-    findAllUserCompany(data, user_id) {
+    findAllUserCompany(data, company_id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-                const userResponse = yield user_validation_1.userValidation.findById(user_id);
-                if (!userResponse.success) {
-                    return userResponse;
-                }
-                const user = userResponse.payload;
-                const companyResponse = yield company_validation_1.companyValidation.findByIdUser(user.id);
+                let rol = null;
+                const companyResponse = yield company_validation_1.companyValidation.findById(company_id);
                 if (!companyResponse.success) {
                     return companyResponse;
                 }
                 const company = companyResponse.payload;
                 const detailResponse = yield detail_user_company_validation_1.detailUserCompanyValidation.findByIdCompany(company.id);
                 if (!detailResponse.success) {
-                    return http_response_1.httpResponse.SuccessResponse("No se encontraron resultados", []);
+                    const formData = {
+                        total: 0,
+                        page: 1,
+                        limit: data.queryParams.limit,
+                        pageCount: 0,
+                        data: [],
+                    };
+                    return http_response_1.httpResponse.SuccessResponse("No se encontraron resultados", formData);
                 }
-                const result = yield prisma_user_repository_1.prismaUserRepository.getUsersForCompany(skip, data.queryParams.limit, data.queryParams.name, company.id);
+                if (data.queryParams.rol) {
+                    const rolResponse = yield rol_validation_1.rolValidation.findByName(data.queryParams.rol);
+                    if (!rolResponse.success)
+                        return rolResponse;
+                    rol = rolResponse.payload;
+                }
+                const result = yield prisma_user_repository_1.prismaUserRepository.getUsersForCompany(skip, data, rol, company.id);
                 const { userAll, total } = result;
                 const pageCount = Math.ceil(total / data.queryParams.limit);
                 const formData = {
@@ -98,7 +109,6 @@ class UserService {
                 return http_response_1.httpResponse.SuccessResponse("Éxito al traer todos los Usuarios de la empresa", formData);
             }
             catch (error) {
-                console.log(error);
                 return http_response_1.httpResponse.InternalServerErrorException("Error al traer los Usuarios de la empresa", error);
             }
             finally {
@@ -366,13 +376,31 @@ class UserService {
     usersToCompany(data, tokenWithBearer) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const userTokenResponse = yield jwt_service_1.jwtService.getUserFromToken(tokenWithBearer);
+                if (!userTokenResponse)
+                    return userTokenResponse;
+                const userResponse = userTokenResponse.payload;
+                const resultCompanyFindByUser = yield company_validation_1.companyValidation.findByUserForCompany(userResponse.id);
+                if (!resultCompanyFindByUser.success) {
+                    return http_response_1.httpResponse.UnauthorizedException("No tiene acceso para crear usuarios");
+                }
+                const company = resultCompanyFindByUser.payload;
+                const usersToCompany = yield detail_user_company_validation_1.detailUserCompanyValidation.totalUserByCompany(company.id);
+                //[NOTE] COMENTE ESTO XQ SI NO TENES EMPRESA EN DETALLE TE LARGA ERROR X EJEMPLO SI LO CREABA EL ADMIN TE LARGARIA ERROR
+                // if (!usersToCompany.success) {
+                //   return usersToCompany;
+                // }
+                const totalUsersCompany = usersToCompany.payload;
+                if (totalUsersCompany === userResponse.limite_usuarios) {
+                    return http_response_1.httpResponse.BadRequestException("Haz alcanzado el limite usuarios que puedes ingresar");
+                }
                 const responseEmail = yield user_validation_1.userValidation.findByEmail(data.email);
                 if (!responseEmail.success)
                     return http_response_1.httpResponse.BadRequestException(`El email ingresado ya existe`);
                 const responseByDni = yield user_validation_1.userValidation.findByDni(data.dni);
                 if (responseByDni.success)
                     return http_response_1.httpResponse.BadRequestException(`El usuario con el dni ${data.dni} ya existe`);
-                const rolResponse = yield rol_validation_1.rolValidation.findById(data.rol_id);
+                const rolResponse = yield rol_validation_1.rolValidation.findByName("NO_ASIGNADO");
                 if (!rolResponse.success) {
                     return rolResponse;
                 }
@@ -385,27 +413,28 @@ class UserService {
                 if (resultPhone) {
                     return http_response_1.httpResponse.BadRequestException("El campo telefono debe contener solo números");
                 }
-                const userTokenResponse = yield jwt_service_1.jwtService.getUserFromToken(tokenWithBearer);
-                if (!userTokenResponse)
-                    return userTokenResponse;
-                const userResponse = userTokenResponse.payload;
                 const hashContrasena = bcrypt_service_1.bcryptService.hashPassword(data.contrasena);
-                // const role = await prismaRolRepository.existsName("USER");
-                // if (!role) {
+                const userFormat = Object.assign(Object.assign({}, data), { contrasena: hashContrasena, limite_proyecto: Number(0), limite_usuarios: Number(0), rol_id: rol.id });
+                const resultUser = yield prisma_user_repository_1.prismaUserRepository.createUser(userFormat);
+                const detailUserCompany = yield detailuserservice_service_1.detailUserCompanyService.createDetail(resultUser.id, company === null || company === void 0 ? void 0 : company.id);
+                return http_response_1.httpResponse.CreatedResponse("El detalle usuario-empresa fue creado correctamente", detailUserCompany.payload);
+                // const resultCompanyFindByUser =
+                //   await prismaCompanyRepository.findCompanyByUser(userResponse.id);
+                // if (resultCompanyFindByUser) {
+                //   const detailUserCompany = await detailUserCompanyService.createDetail(
+                //     resultUser.id,
+                //     resultCompanyFindByUser?.id
+                //   );
+                //   return httpResponse.CreatedResponse(
+                //     "El detalle usuario-empresa fue creado correctamente",
+                //     detailUserCompany.payload
+                //   );
+                // } else {
                 //   return httpResponse.BadRequestException(
-                //     "El Rol que deseas buscar no existe"
+                //     "No se encontró el id de la empresa del usuario logueado",
+                //     null
                 //   );
                 // }
-                const userFormat = Object.assign(Object.assign({}, data), { contrasena: hashContrasena, limite_proyecto: Number(data.limite_proyecto), limite_usuarios: Number(data.limite_usuarios), rol_id: rol.id });
-                const resultUser = yield prisma_user_repository_1.prismaUserRepository.createUser(userFormat);
-                const resultCompanyFindByUser = yield prisma_company_repository_1.prismaCompanyRepository.findCompanyByUser(userResponse.id);
-                if (resultCompanyFindByUser) {
-                    const detailUserCompany = yield detailuserservice_service_1.detailUserCompanyService.createDetail(resultUser.id, resultCompanyFindByUser === null || resultCompanyFindByUser === void 0 ? void 0 : resultCompanyFindByUser.id);
-                    return http_response_1.httpResponse.CreatedResponse("El detalle usuario-empresa fue creado correctamente", detailUserCompany.payload);
-                }
-                else {
-                    return http_response_1.httpResponse.BadRequestException("No se encontró el id de la empresa del usuario logueado", null);
-                }
             }
             catch (error) {
                 return http_response_1.httpResponse.InternalServerErrorException("Error al crear el usuario", error);
@@ -426,6 +455,9 @@ class UserService {
                 if (!responseRol) {
                     return responseUser;
                 }
+                const responseProject = yield project_validation_1.projectValidation.findById(data.project_id);
+                if (!responseProject.success)
+                    return responseProject;
                 // const action = await actionValidation.findByName("LECTURA");
                 const responseSection = yield section_validation_1.sectionValidation.findById(+data.section.id);
                 if (!responseSection) {
@@ -506,8 +538,9 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const userResponse = yield user_validation_1.userValidation.findById(idUser);
-                if (!userResponse.success)
+                if (!userResponse.success) {
                     return userResponse;
+                }
                 const userFind = userResponse.payload;
                 if (userFind.email != data.email) {
                     const responseEmail = yield user_validation_1.userValidation.findByEmail(data.email);
@@ -534,14 +567,13 @@ class UserService {
                     return roleResponse;
                 const resultRole = roleResponse.payload;
                 let hashContrasena;
-                let userFormat = Object.assign(Object.assign({}, data), { limite_proyecto: data.limite_proyecto
-                        ? Number(data.limite_proyecto)
-                        : userFind.limite_proyecto, limite_usuarios: data.limite_usuarios
-                        ? Number(data.limite_usuarios)
-                        : userFind.limite_usuarios, rol_id: resultRole.id });
+                let userFormat = Object.assign({}, data);
                 if (data.contrasena && data.contrasena !== "") {
                     hashContrasena = bcrypt_service_1.bcryptService.hashPassword(data.contrasena);
                     userFormat.contrasena = hashContrasena;
+                }
+                else {
+                    userFormat.contrasena = userFind.contrasena;
                 }
                 const result = yield prisma_user_repository_1.prismaUserRepository.updateUser(userFormat, idUser);
                 const resultMapper = new user_mapper_1.UserResponseMapper(result);
@@ -573,16 +605,43 @@ class UserService {
             }
         });
     }
-    updateRolUser(idUser, idRol) {
+    updateRolUserAndCreateProyect(usuario_id, rol_id, projecto_id, action) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const userResponse = yield user_validation_1.userValidation.findById(idUser);
+                const userResponse = yield user_validation_1.userValidation.findById(usuario_id);
                 if (!userResponse.success)
                     return userResponse;
-                const rolResponse = yield rol_validation_1.rolValidation.findById(idRol);
+                const user = userResponse.payload;
+                const projectResponse = yield project_validation_1.projectValidation.findById(projecto_id);
+                if (!projectResponse.success)
+                    return projectResponse;
+                const project = projectResponse.payload;
+                const rolResponse = yield rol_validation_1.rolValidation.findById(rol_id);
                 if (!rolResponse.success)
                     return rolResponse;
-                const result = yield prisma_user_repository_1.prismaUserRepository.updaterRolUser(idUser, idRol);
+                const result = yield prisma_user_repository_1.prismaUserRepository.updateRolUser(usuario_id, rol_id);
+                if (action === "CREACION") {
+                    const userExistInDetailProject = yield detailUserProject_validation_1.detailProjectValidation.findByIdUser(user.id, project.id);
+                    if (userExistInDetailProject.success) {
+                        return http_response_1.httpResponse.BadRequestException("El usuario ya tiene asignado un proyecto");
+                    }
+                    const detailFormat = {
+                        usuario_id: usuario_id,
+                        projecto_id: projecto_id,
+                    };
+                    const detailUserProject = yield detailUserProject_validation_1.detailProjectValidation.createDetailUserProject(detailFormat);
+                    if (!detailUserProject.success)
+                        return detailUserProject;
+                    const resultMapper = new user_mapper_1.UserResponseMapper(result);
+                    return http_response_1.httpResponse.SuccessResponse("Se ha cambiado de rol y se le ha asignado un Proyecto correctamente", resultMapper);
+                }
+                // const detailFormat = {
+                //   usuario_id: usuario_id,
+                //   projecto_id: projecto_id,
+                // };
+                // const detailUserProject =
+                //   await detailProjectValidation.createDetailUserProject(detailFormat);
+                // if (!detailUserProject.success) return detailUserProject;
                 const resultMapper = new user_mapper_1.UserResponseMapper(result);
                 return http_response_1.httpResponse.SuccessResponse("Se ha cambiado de rol correctamente", resultMapper);
             }

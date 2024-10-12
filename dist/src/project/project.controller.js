@@ -47,7 +47,7 @@ class ProjectController {
                     try {
                         // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
                         //despues los valores
-                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(request.get("Authorization"));
+                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminUser(request.get("Authorization"));
                         if (!(responseValidate === null || responseValidate === void 0 ? void 0 : responseValidate.success)) {
                             return response.status(401).json(responseValidate);
                         }
@@ -115,7 +115,7 @@ class ProjectController {
                     try {
                         // se hace asi y no desde la clase del middleware xq sino pierdo los valores del request cuando verifico
                         //despues los valores
-                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminAndCostControlAndProjectManagerAndUser(request.get("Authorization"));
+                        const responseValidate = auth_service_1.authService.verifyRolProjectAdminUser(request.get("Authorization"));
                         if (!(responseValidate === null || responseValidate === void 0 ? void 0 : responseValidate.success)) {
                             return response.status(401).json(responseValidate);
                         }
@@ -257,6 +257,14 @@ class ProjectController {
                 const result = http_response_1.httpResponse.BadRequestException("Falta el campo estado para poder hacerse la acción");
                 response.status(result.statusCode).json(result);
             }
+        });
+    }
+    updateColors(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const project_id = Number(request.params.project_id);
+            const data = request.body;
+            const result = yield project_service_1.projectService.updateColorsProject(project_id, data);
+            response.status(result.statusCode).json(result);
         });
     }
 }

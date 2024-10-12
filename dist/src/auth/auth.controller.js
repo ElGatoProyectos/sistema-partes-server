@@ -33,7 +33,7 @@ class AuthController {
                 }
             }
             else {
-                const result = http_response_1.httpResponse.UnauthorizedException("Error en la autenticacion al crear el usuario");
+                const result = http_response_1.httpResponse.UnauthorizedException("Error en la autenticacion");
                 response.status(result.statusCode).json(result);
             }
         });

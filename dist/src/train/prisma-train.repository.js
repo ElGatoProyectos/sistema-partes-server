@@ -39,21 +39,6 @@ class PrismaTrainRepository {
             return train;
         });
     }
-    updateCuadrillaByIdTrain(idTrain, workers, official, pawns) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const updateTrain = yield prisma_config_1.default.tren.update({
-                where: {
-                    id: idTrain,
-                },
-                data: {
-                    operario: workers,
-                    oficial: official,
-                    peon: pawns,
-                },
-            });
-            return updateTrain;
-        });
-    }
     codeMoreHigh(project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const lastTrain = yield prisma_config_1.default.tren.findFirst({
@@ -83,43 +68,20 @@ class PrismaTrainRepository {
             return train;
         });
     }
-    searchNameTrain(name, skip, limit, project_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [trains, total] = yield prisma_config_1.default.$transaction([
-                prisma_config_1.default.tren.findMany({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                    skip,
-                    take: limit,
-                    omit: {
-                        eliminado: true,
-                    },
-                }),
-                prisma_config_1.default.tren.count({
-                    where: {
-                        nombre: {
-                            contains: name,
-                        },
-                        eliminado: client_1.E_Estado_BD.n,
-                        proyecto_id: project_id,
-                    },
-                }),
-            ]);
-            return { trains, total };
-        });
-    }
     findAll(skip, data, project_id) {
         return __awaiter(this, void 0, void 0, function* () {
             let filters = {};
-            if (data.queryParams.name) {
-                filters.nombre = {
-                    contains: data.queryParams.name,
-                };
+            if (data.queryParams.search) {
+                if (isNaN(data.queryParams.search)) {
+                    filters.nombre = {
+                        contains: data.queryParams.search,
+                    };
+                }
+                else {
+                    filters.codigo = {
+                        contains: data.queryParams.search,
+                    };
+                }
             }
             const [trains, total] = yield prisma_config_1.default.$transaction([
                 prisma_config_1.default.tren.findMany({
@@ -128,6 +90,9 @@ class PrismaTrainRepository {
                     take: data.queryParams.limit,
                     omit: {
                         eliminado: true,
+                    },
+                    orderBy: {
+                        codigo: "asc",
                     },
                 }),
                 prisma_config_1.default.tren.count({

@@ -8,7 +8,6 @@ const train_dto_1 = require("./dto/train.dto");
 const http_response_1 = require("@/common/http.response");
 const update_dto_1 = require("./dto/update.dto");
 const validator_1 = __importDefault(require("validator"));
-const cuadrilla_dto_1 = require("./dto/cuadrilla.dto");
 class TrainMiddleware {
     verifyFields(request, response, nextFunction) {
         try {
@@ -23,16 +22,6 @@ class TrainMiddleware {
     verifyFieldsUpdate(request, response, nextFunction) {
         try {
             update_dto_1.trainUpdateDto.parse(request.body);
-            nextFunction();
-        }
-        catch (_a) {
-            const result = http_response_1.httpResponse.BadRequestException("Error al validar campos para actualizar el Tren");
-            response.status(result.statusCode).send(result);
-        }
-    }
-    verifyFieldsUpdateCuadrilla(request, response, nextFunction) {
-        try {
-            cuadrilla_dto_1.cuadrillaDto.parse(request.body);
             nextFunction();
         }
         catch (_a) {

@@ -7,8 +7,8 @@ class UserRepository {
     createUser(data) { }
     updateUser(data, user_id) { }
     updateStatusUser(user_id) { }
-    updaterRolUser(user_id, rol_id) { }
-    getUsersForCompany(skip, limit, name, user_id) { }
+    updateRolUser(user_id, rol_id) { }
+    getUsersForCompany(skip, data, rol, user_id) { }
     findByDni(dni) { }
     existsEmail(dni) { }
     searchNameUser(name, skip, limit) { }

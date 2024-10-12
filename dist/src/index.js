@@ -19,6 +19,13 @@ const unifiedIndex_init_1 = __importDefault(require("./unifiedIndex/unifiedIndex
 const cors_1 = __importDefault(require("cors"));
 const seed_init_1 = __importDefault(require("./seed/seed.init"));
 const job_init_1 = __importDefault(require("./job/job.init"));
+const detailUserProject_init_1 = __importDefault(require("./user/detailUserProject/detailUserProject.init"));
+const detailUserCompany_init_1 = __importDefault(require("./detailsUserCompany/detailUserCompany.init"));
+const departure_init_1 = __importDefault(require("./departure/departure.init"));
+const departure_job_init_1 = __importDefault(require("./departure/departure-job/departure-job.init"));
+const workforce_init_1 = __importDefault(require("./workforce/workforce.init"));
+const resources_init_1 = __importDefault(require("./resources/resources.init"));
+const week_init_1 = __importDefault(require("./week/week.init"));
 const globalPrefix = "/api";
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -38,6 +45,13 @@ app.use(globalPrefix, unit_init_1.default);
 app.use(globalPrefix, unifiedIndex_init_1.default);
 app.use(globalPrefix, seed_init_1.default);
 app.use(globalPrefix, job_init_1.default);
+app.use(globalPrefix, detailUserProject_init_1.default);
+app.use(globalPrefix, detailUserCompany_init_1.default);
+app.use(globalPrefix, departure_init_1.default);
+app.use(globalPrefix, departure_job_init_1.default);
+app.use(globalPrefix, workforce_init_1.default);
+app.use(globalPrefix, resources_init_1.default);
+app.use(globalPrefix, week_init_1.default);
 app.listen(env_config_1.envConfig.port, () => {
     console.log(`listening on port ${env_config_1.envConfig.port}`);
 });

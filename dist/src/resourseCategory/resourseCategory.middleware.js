@@ -41,5 +41,18 @@ class ResourseCategoryMiddleware {
             response.status(result.statusCode).send(result);
         }
     }
+    verifyHeadersFieldsIdProject(request, response, nextFunction) {
+        try {
+            const project_id = request.get("project-id");
+            if (!validator_1.default.isNumeric(project_id)) {
+                throw new Error("El id del proyecto debe ser numérico");
+            }
+            nextFunction();
+        }
+        catch (_a) {
+            const result = http_response_1.httpResponse.BadRequestException("Error al validar el header");
+            response.status(result.statusCode).send(result);
+        }
+    }
 }
 exports.resourseCategoryMiddleware = new ResourseCategoryMiddleware();

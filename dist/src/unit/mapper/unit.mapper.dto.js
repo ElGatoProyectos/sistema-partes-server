@@ -7,7 +7,6 @@ class ResponseUnitMapper {
         this.codigo = unit.codigo;
         this.nombre = unit.nombre;
         this.simbolo = unit.simbolo ? unit.simbolo : "";
-        this.descripcion = unit.descripcion ? unit.descripcion : "";
         this.empresa_id = unit.empresa_id;
         this.fecha_creacion = unit.fecha_creacion;
         this.proyecto_id = unit.proyecto_id;

@@ -21,74 +21,7 @@ class AuthRoleMiddleware {
             response.status(customError.statusCode).send(customError);
         }
     }
-    authAdminAndProjectManager(request, response, nextFunction) {
-        const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
-        try {
-            const authorization = request.get("Authorization");
-            if (!authorization) {
-                return response.status(customError.statusCode).send(customError);
-            }
-            const [bearer, token] = authorization.split(" ");
-            const tokenDecrypted = jwt_service_1.jwtService.verify(token);
-            // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-            if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "GERENTE_PROYECTO") {
-                nextFunction();
-            }
-            else {
-                response.status(customError.statusCode).send(customError);
-            }
-        }
-        catch (error) {
-            response.status(customError.statusCode).send(customError);
-        }
-    }
-    authAdminAndCostControl(request, response, nextFunction) {
-        const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
-        try {
-            const authorization = request.get("Authorization");
-            if (!authorization) {
-                return response.status(customError.statusCode).send(customError);
-            }
-            const [bearer, token] = authorization.split(" ");
-            const tokenDecrypted = jwt_service_1.jwtService.verify(token);
-            // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-            if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "CONTROL_COSTOS") {
-                nextFunction();
-            }
-            else {
-                response.status(customError.statusCode).send(customError);
-            }
-        }
-        catch (error) {
-            response.status(customError.statusCode).send(customError);
-        }
-    }
-    authAdminAndGeneralProjectAndCostControlAndUser(request, response, nextFunction) {
-        const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
-        try {
-            const authorization = request.get("Authorization");
-            if (!authorization) {
-                return response.status(customError.statusCode).send(customError);
-            }
-            const [bearer, token] = authorization.split(" ");
-            const tokenDecrypted = jwt_service_1.jwtService.verify(token);
-            // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-            if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "CONTROL_COSTOS" ||
-                tokenDecrypted.role === "USER") {
-                nextFunction();
-            }
-            else {
-                response.status(customError.statusCode).send(customError);
-            }
-        }
-        catch (error) {
-            response.status(customError.statusCode).send(customError);
-        }
-    }
-    authAdminAndProjectManagerAndUser(request, response, nextFunction) {
+    authAdminUser(request, response, nextFunction) {
         const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
         try {
             const authorization = request.get("Authorization");
@@ -122,29 +55,5 @@ class AuthRoleMiddleware {
             response.status(customError.statusCode).send(customError);
         }
     }
-    authViewAll(request, response, nextFunction) {
-        const customError = http_response_1.httpResponse.UnauthorizedException("Error en la autenticación");
-        try {
-            const authorization = request.get("Authorization");
-            if (!authorization) {
-                return response.status(customError.statusCode).send(customError);
-            }
-            const [bearer, token] = authorization.split(" ");
-            const tokenDecrypted = jwt_service_1.jwtService.verify(token);
-            // Cambiamos la lógica para permitir "ADMIN" o "GERENTE_PROYECTO"
-            if (tokenDecrypted.role === "ADMIN" ||
-                tokenDecrypted.role === "GERENTE_PROYECTO" ||
-                tokenDecrypted.role === "USER") {
-                nextFunction();
-            }
-            else {
-                response.status(customError.statusCode).send(customError);
-            }
-        }
-        catch (error) {
-            response.status(customError.statusCode).send(customError);
-        }
-    }
-    authUser() { }
 }
 exports.authRoleMiddleware = new AuthRoleMiddleware();

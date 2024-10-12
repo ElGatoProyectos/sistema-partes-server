@@ -2,15 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProudctionUnitRepository = void 0;
 class ProudctionUnitRepository {
-    findAll() { }
-    findAllPagination(skip, limit) { }
-    findByCode(code) { }
+    findAllPagination(skip, data, project_id) { }
+    findByCode(code, project_id) { }
     findById(idUser) { }
     createProductionUnit(data) { }
     updateProductionUnit(data, idUser) { }
     existsName(name) { }
     updateStatusProductionUnit(idUser) { }
     searchNameProductionUnit(name, skip, limit) { }
-    codeMoreHigh() { }
+    codeMoreHigh(project_id) { }
 }
 exports.ProudctionUnitRepository = ProudctionUnitRepository;

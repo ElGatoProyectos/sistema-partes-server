@@ -17,10 +17,9 @@ class TrainValidation {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const train = {
-                    codigo: String(data["ID-TREN"]),
+                    codigo: String(data["ID-TREN"].trim()),
                     nombre: data.TREN,
                     nota: data.NOTA,
-                    cuadrilla: data.TREN + "-" + data["ID-TREN"],
                     proyecto_id: Number(idProjectID),
                 };
                 const responseTrain = yield prisma_train_repository_1.prismaTrainRepository.updateTrain(train, idProductionUnit);
@@ -37,6 +36,20 @@ class TrainValidation {
                 const train = yield prisma_train_repository_1.prismaTrainRepository.findByCode(code, project_id);
                 if (train) {
                     return http_response_1.httpResponse.NotFoundException("Codigo del Tren encontrado", train);
+                }
+                return http_response_1.httpResponse.SuccessResponse("Tren no encontrado", train);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar código del Tren", error);
+            }
+        });
+    }
+    findByCodeValidation(code, project_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const train = yield prisma_train_repository_1.prismaTrainRepository.findByCode(code, project_id);
+                if (!train) {
+                    return http_response_1.httpResponse.NotFoundException("Codigo del Tren no encontrado", train);
                 }
                 return http_response_1.httpResponse.SuccessResponse("Tren encontrado", train);
             }

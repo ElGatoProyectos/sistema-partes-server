@@ -5,5 +5,4 @@ const zod_1 = require("zod");
 exports.unitDto = zod_1.z.object({
     nombre: zod_1.z.string(),
     simbolo: zod_1.z.string(),
-    descripcion: zod_1.z.string(),
 });

@@ -41,5 +41,16 @@ class ProjectValidation {
             }
         });
     }
+    totalProjectsByCompany(company_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const totalResponse = yield prisma_project_repository_1.prismaProyectoRepository.totalProjectsByCompany(company_id);
+                return http_response_1.httpResponse.SuccessResponse("Empresa encontrada", totalResponse);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar por la Empresa", error);
+            }
+        });
+    }
 }
 exports.projectValidation = new ProjectValidation();

@@ -84,6 +84,19 @@ class CompanyValidation {
             }
         });
     }
+    findByUserForCompany(user_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const company = yield prisma_company_repository_1.prismaCompanyRepository.findCompanyByUser(user_id);
+                if (!company)
+                    return http_response_1.httpResponse.NotFoundException("No se encontró la empresa del Usuario");
+                return http_response_1.httpResponse.SuccessResponse("Empresa del Usuario encontrada con éxito", company);
+            }
+            catch (error) {
+                return http_response_1.httpResponse.InternalServerErrorException("Error al buscar empresa", error);
+            }
+        });
+    }
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
