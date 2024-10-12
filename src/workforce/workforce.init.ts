@@ -13,4 +13,11 @@ workforceRouter.post(
   workforceController.workforceReadExcel
 );
 
+workforceRouter.get(
+  `${prefix}`,
+  workforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  workforceController.allWorkforce
+);
+
 export default workforceRouter;

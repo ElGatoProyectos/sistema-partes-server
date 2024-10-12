@@ -3,11 +3,58 @@ import { ResourcesRepository } from "./resources.repository";
 import {
   I_CreateResourcesBD,
   I_Resources,
+  I_ResourcesExcel,
   I_UpdateResourcesBodyValidation,
 } from "./models/resources.interface";
 import { E_Estado_BD, Recurso } from "@prisma/client";
+import { T_FindAllResource } from "./models/resource.types";
 
 class PrismaResourcesRepository implements ResourcesRepository {
+  async findAll(
+    skip: number,
+    data: T_FindAllResource,
+    project_id: number
+  ): Promise<{ resources: I_Resources[]; total: number }> {
+    let filters: any = {};
+
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.nombre = {
+          contains: data.queryParams.search,
+        };
+      } else {
+        filters.codigo = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
+    const [resources, total]: [I_Resources[], number] =
+      await prisma.$transaction([
+        prisma.recurso.findMany({
+          where: {
+            ...filters,
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+          skip,
+          take: data.queryParams.limit,
+          omit: {
+            eliminado: true,
+          },
+          orderBy: {
+            codigo: "asc",
+          },
+        }),
+        prisma.recurso.count({
+          where: {
+            ...filters,
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+        }),
+      ]);
+    return { resources, total };
+  }
   async updateResource(
     data: I_UpdateResourcesBodyValidation,
     resource_id: number
@@ -54,9 +101,6 @@ class PrismaResourcesRepository implements ResourcesRepository {
     return resource;
   }
 
-  findAll(project_id: number): void {
-    throw new Error("Method not implemented.");
-  }
   async findByName(name: string, project_id: number): Promise<Recurso | null> {
     const resource = await prisma.recurso.findFirst({
       where: {

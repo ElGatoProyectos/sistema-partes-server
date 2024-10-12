@@ -1,6 +1,7 @@
 import express from "@/config/express.config";
 import multer from "multer";
 import { resourceService } from "./resources.service";
+import { T_FindAllResource } from "./models/resource.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -34,6 +35,22 @@ class ResourceController {
       }
     });
   };
+
+  async allResources(request: express.Request, response: express.Response) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = request.get("project-id") as string;
+    const search = request.query.search as string;
+    let paginationOptions: T_FindAllResource = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+      },
+    };
+    const result = await resourceService.findAll(paginationOptions, project_id);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const resourceController = new ResourceController();

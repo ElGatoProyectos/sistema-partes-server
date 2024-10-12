@@ -2,6 +2,7 @@ import express from "@/config/express.config";
 import multer from "multer";
 import { workforceService } from "./workforce.service";
 import { httpResponse } from "@/common/http.response";
+import { T_FindAllWorkforce } from "./models/workforce.types";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -43,6 +44,25 @@ class WorkforceController {
       }
     });
   };
+  async allWorkforce(request: express.Request, response: express.Response) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = request.get("project-id") as string;
+    const search = request.query.search as string;
+    const codigo = request.query.codigo as string;
+    let paginationOptions: T_FindAllWorkforce = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+      },
+    };
+    const result = await workforceService.findAll(
+      paginationOptions,
+      project_id
+    );
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const workforceController = new WorkforceController();
