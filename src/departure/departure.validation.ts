@@ -1,9 +1,6 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
-import {
-  I_DepartureExcel,
-  I_UpdateDepartureBD,
-} from "./models/departure.interface";
+import { I_DepartureExcel } from "./models/departure.interface";
 import { unitValidation } from "@/unit/unit.validation";
 import { Unidad } from "@prisma/client";
 
