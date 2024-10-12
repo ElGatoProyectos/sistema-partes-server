@@ -14,6 +14,8 @@ import prisma from "@/config/prisma.config";
 import { resourceValidation } from "./resources.validation";
 import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
 import { unitValidation } from "@/unit/unit.validation";
+import { T_FindAllResource } from "./models/resource.types";
+import { prismaResourcesRepository } from "./prisma-resources.repository";
 
 class ResourceService {
   async registerResourceMasive(file: any, project_id: number) {
@@ -221,6 +223,43 @@ class ResourceService {
         "Error al leer los Recursos",
         error
       );
+    }
+  }
+  async findAll(data: T_FindAllResource, project_id: string) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaResourcesRepository.findAll(
+        skip,
+        data,
+        +project_id
+      );
+
+      const { resources, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: resources,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Recursos",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Recursos",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }

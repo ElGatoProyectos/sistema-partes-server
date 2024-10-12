@@ -1,10 +1,11 @@
+import { T_FindAllResource } from "./models/resource.types";
 import {
   I_CreateResourcesBD,
   I_UpdateResourcesBody,
 } from "./models/resources.interface";
 
 export abstract class ResourcesRepository {
-  findAll(project_id: number): void {}
+  findAll(skip: number, data: T_FindAllResource, project_id: number): void {}
 
   findById(bank_id: number): void {}
 

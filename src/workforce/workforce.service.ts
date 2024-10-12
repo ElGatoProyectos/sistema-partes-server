@@ -23,6 +23,8 @@ import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkfor
 import { bankWorkforceValidation } from "@/bankWorkforce/bankWorkforce.validation";
 import { workforceValidation } from "./workforce.validation";
 import { jwtService } from "@/auth/jwt.service";
+import { T_FindAllWorkforce } from "./models/workforce.types";
+import { prismaWorkforceRepository } from "./prisma-workforce.repository";
 
 class WorkforceService {
   async registerWorkforceMasive(file: any, project_id: number, token: string) {
@@ -383,6 +385,43 @@ class WorkforceService {
         "Error al leer la Mano de Obra",
         error
       );
+    }
+  }
+  async findAll(data: T_FindAllWorkforce, project_id: string) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaWorkforceRepository.findAll(
+        skip,
+        data,
+        +project_id
+      );
+
+      const { workforces, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: workforces,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer toda la Mano de Obra",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer toda la Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }
