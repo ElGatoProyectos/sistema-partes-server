@@ -14,4 +14,11 @@ departureRouter.post(
   departureController.departureReadExcel
 );
 
+departureRouter.get(
+  `${prefix}`,
+  departureMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  departureController.allDepartures
+);
+
 export default departureRouter;

@@ -12,4 +12,10 @@ departureJobRouter.put(
   departureJobController.departureJobReadExcel
 );
 
+departureJobRouter.get(
+  `${prefix}`,
+  authRoleMiddleware.authAdminUser,
+  departureJobController.allDetailsDepartureJob
+);
+
 export default departureJobRouter;

@@ -8,6 +8,8 @@ import { Partida, Proyecto } from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
+import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
+import { T_FindAllDepartureJob } from "./models/departure-job.types";
 
 class DepartureJobService {
   async updateDepartureJobMasive(file: any, project_id: number) {
@@ -189,6 +191,7 @@ class DepartureJobService {
 
       for (const item of sheetToJson) {
         await departureJobValidation.updateDepartureJob(item, project_id);
+        await departureJobValidation.createDetailDepartureJob(item, project_id);
       }
       await prisma.$disconnect();
 
@@ -201,6 +204,36 @@ class DepartureJobService {
         "Error al leer las Partidas con sus Trabajos",
         error
       );
+    }
+  }
+  async findAll(data: T_FindAllDepartureJob) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+
+      const result = await prismaDepartureJobRepository.findAll(skip, data);
+
+      const { detailsDepartureJob, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: detailsDepartureJob,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Trabajos y sus Partidas",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todas los Trabajos y sus Partidas",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }
