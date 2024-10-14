@@ -4,11 +4,21 @@ import express from "@/config/express.config";
 import multer from "multer";
 import { departureJobService } from "./departure.service";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
+import { I_DepartureJob } from "./models/departureJob.interface";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class DepartureJobController {
+  async createDetails(request: express.Request, response: express.Response) {
+    const data = request.body as I_DepartureJob;
+    const result = await departureJobService.updateJobDeparture(data);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
   async allDetailsDepartureJob(
     request: express.Request,
     response: express.Response

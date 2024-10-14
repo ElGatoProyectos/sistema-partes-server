@@ -31,7 +31,6 @@ import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { actionValidation } from "@/action/action.validation";
 import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
 import { T_FindAllUser, T_FindAllUserCompany } from "./models/user.types";
-import { prismaDetailUserProjectRepository } from "./detailUserProject/prismaUserProject.repository";
 import { projectValidation } from "@/project/project.validation";
 import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
 
@@ -762,6 +761,12 @@ class UserService {
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El dni ingresado solo debe contener números"
+        );
+      }
+
+      if (data.dni.length > 8) {
+        return httpResponse.BadRequestException(
+          "El dni ingresado debe contener solo 8 números"
         );
       }
 

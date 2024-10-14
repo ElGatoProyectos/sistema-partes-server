@@ -6,6 +6,12 @@ import { workforceController } from "./workforce.controller";
 const workforceRouter = express.Router();
 const prefix = "/mano-de-obra";
 
+workforceRouter.put(
+  `${prefix}/:id`,
+  workforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  workforceController.workforceReadExcel
+);
 workforceRouter.post(
   `${prefix}/upload-excel`,
   workforceMiddleware.verifyHeadersFieldsIdProject,
@@ -18,6 +24,13 @@ workforceRouter.get(
   workforceMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   workforceController.allWorkforce
+);
+
+workforceRouter.delete(
+  `${prefix}/:id`,
+  workforceMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  workforceController.updateStatus
 );
 
 export default workforceRouter;

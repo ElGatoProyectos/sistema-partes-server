@@ -24,6 +24,7 @@ class PrismaTrainRepository implements TrainRepository {
     const train = await prisma.tren.findFirst({
       where: {
         nombre: name,
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
     });
@@ -33,7 +34,7 @@ class PrismaTrainRepository implements TrainRepository {
   async codeMoreHigh(project_id: number): Promise<Tren | null> {
     const lastTrain = await prisma.tren.findFirst({
       where: {
-        // eliminado: E_Estado_BD.n,
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
       orderBy: { codigo: "desc" },

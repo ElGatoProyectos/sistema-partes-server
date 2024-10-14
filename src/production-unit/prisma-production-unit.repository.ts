@@ -8,8 +8,6 @@ import {
 import { ProudctionUnitRepository } from "./production-unit.repository";
 import prisma from "@/config/prisma.config";
 import { T_FindAllUp } from "./models/up.types";
-import { isNumeric } from "validator";
-import { lettersInNumbers } from "@/common/utils/number";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
   async findByCode(
@@ -39,7 +37,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     const lastProductionUnit = await prisma.unidadProduccion.findFirst({
       where: {
         proyecto_id: project_id,
-        // eliminado: E_Estado_BD.n,
+        eliminado: E_Estado_BD.n,
       },
       orderBy: { codigo: "desc" },
     });
@@ -146,6 +144,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     const productionUnit = await prisma.unidadProduccion.findFirst({
       where: {
         id: idProductionUnit,
+        eliminado: E_Estado_BD.n,
       },
       omit: {
         eliminado: true,

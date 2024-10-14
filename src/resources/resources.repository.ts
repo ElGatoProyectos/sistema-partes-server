@@ -18,4 +18,6 @@ export abstract class ResourcesRepository {
   codeMoreHigh(project_id: number): void {}
 
   findByCode(code: string, project_id: number): void {}
+
+  updateStatusResource(train_id: number): void {}
 }

@@ -17,7 +17,7 @@ export abstract class TrainRepository {
 
   updateTrain(data: I_UpdateTrainBody, idUser: number): void {}
 
-  updateStatusTrain(idUser: number): void {}
+  updateStatusTrain(train_id: number): void {}
 
   codeMoreHigh(project_id: number): void {}
 }

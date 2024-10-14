@@ -1,4 +1,4 @@
-import { E_Estado_BD, ManoObra } from "@prisma/client";
+import { E_Estado_BD, E_Estado_MO_BD, ManoObra } from "@prisma/client";
 import { WorkforceRepository } from "./workforce.repository";
 import prisma from "@/config/prisma.config";
 import {
@@ -72,23 +72,58 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     project_id: number
   ): Promise<{ workforces: I_Workforce[]; total: number }> {
     let filters: any = {};
+    let filtersCategory: any = {};
+    let filtersOrigin: any = {};
 
     if (data.queryParams.search) {
       if (isNaN(data.queryParams.search as any)) {
         filters.nombre_completo = {
           contains: data.queryParams.search,
         };
+        filters.apellido_materno = {
+          contains: data.queryParams.search,
+        };
+        filters.apellido_paterno = {
+          contains: data.queryParams.search,
+        };
       } else {
-        filters.codigo = {
+        filters.documento_identidad = {
           contains: data.queryParams.search,
         };
       }
     }
+    if (data.queryParams.state) {
+      if (data.queryParams.state.toUpperCase() == E_Estado_MO_BD.ACTIVO) {
+        filters.estado = E_Estado_MO_BD.ACTIVO;
+      }
+      if (data.queryParams.state.toUpperCase() == E_Estado_MO_BD.INACTIVO) {
+        filters.estado = E_Estado_MO_BD.INACTIVO;
+      }
+    }
+    if (data.queryParams.category) {
+      filtersCategory.nombre = {
+        contains: data.queryParams.category,
+      };
+    }
+    if (data.queryParams.origin) {
+      filtersOrigin.nombre = {
+        contains: data.queryParams.origin,
+      };
+    }
+    console.log(filters);
+    console.log(filtersCategory);
+    console.log(filtersOrigin);
     const [workforces, total]: [I_Workforce[], number] =
       await prisma.$transaction([
         prisma.manoObra.findMany({
           where: {
             ...filters,
+            CategoriaObrero: {
+              ...filtersCategory,
+            },
+            TipoObrero: {
+              ...filtersOrigin,
+            },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
           },
@@ -104,6 +139,12 @@ class PrismaWorkforceRepository implements WorkforceRepository {
         prisma.manoObra.count({
           where: {
             ...filters,
+            CategoriaObrero: {
+              ...filtersCategory,
+            },
+            TipoObrero: {
+              ...filtersOrigin,
+            },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
           },

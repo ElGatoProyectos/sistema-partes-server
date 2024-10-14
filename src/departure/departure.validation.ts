@@ -12,6 +12,10 @@ class DepartureValidation {
     project_id: number
   ): Promise<T_HttpResponse> {
     try {
+      let resultado;
+      if (data.METRADO && data.PRECIO) {
+        resultado = parseInt(data.METRADO) * parseInt(data.PRECIO);
+      }
       let departureFormat: any = {
         id_interno: data["ID-PARTIDA"] ? String(data["ID-PARTIDA"].trim()) : "",
         item: data.ITEM || "",
@@ -19,7 +23,7 @@ class DepartureValidation {
         metrado_inicial: data.METRADO,
         metrado_total: data.METRADO,
         precio: +data.PRECIO,
-        parcial: data.PARCIAL,
+        parcial: data.METRADO && data.PRECIO ? resultado : 0,
         mano_de_obra_unitaria: 0,
         material_unitario: 0,
         equipo_unitario: 0,
@@ -120,7 +124,7 @@ class DepartureValidation {
       );
       if (nameExists) {
         return httpResponse.NotFoundException(
-          "El nombre ingresado de la Partida ya existe en la base de datos"
+          "El nombre ingresado de la Partida ya existe dentro del Proyecto"
         );
       }
       return httpResponse.SuccessResponse(
@@ -128,7 +132,7 @@ class DepartureValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        " Error al buscar el nombre de la Partida en la base de datos",
+        "Error al buscar el nombre de la Partida en la base de datos",
         error
       );
     }

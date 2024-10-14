@@ -60,11 +60,22 @@ class JobService {
       const formattedCodigo = nextCodigo.toString().padStart(4, "0");
       const fecha_inicio = converToDate(data.fecha_inicio);
       const fecha_finalizacion = converToDate(data.fecha_finalizacion);
+      if (fecha_finalizacion < fecha_inicio) {
+        return httpResponse.BadRequestException(
+          "La fecha de Finalización debe ser mayor o igual a la fecha de inicio"
+        );
+      }
+
+      const duration = this.calcularDiasEntreFechas(
+        fecha_inicio,
+        fecha_finalizacion
+      );
+      const durationFix = duration === 0 ? 1 : duration;
 
       const jobFormat = {
         nombre: data.nombre,
         nota: data.nota ? data.nota : "",
-        duracion: data.duracion,
+        duracion: durationFix,
         codigo: formattedCodigo,
         costo_partida: data.costo_partida != undefined ? data.costo_partida : 0,
         costo_mano_obra:
@@ -204,8 +215,21 @@ class JobService {
       if (!upResponse.success) return upResponse;
       const fecha_inicio = converToDate(data.fecha_inicio);
       const fecha_finalizacion = converToDate(data.fecha_finalizacion);
+
+      if (fecha_finalizacion < fecha_inicio) {
+        return httpResponse.BadRequestException(
+          "La fecha de Finalización debe ser mayor o igual a la fecha de inicio"
+        );
+      }
+
+      const duration = this.calcularDiasEntreFechas(
+        fecha_inicio,
+        fecha_finalizacion
+      );
+      const durationFix = duration === 0 ? 1 : duration;
       const trainFormat = {
         ...data,
+        duracion: durationFix,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
         proyecto_id: +project_id,
@@ -213,7 +237,7 @@ class JobService {
       };
       const responseJob = await prismaJobRepository.updateJob(
         trainFormat,
-        project_id
+        job_id
       );
       const jobMapper = new JobResponseMapper(responseJob);
       return httpResponse.SuccessResponse(

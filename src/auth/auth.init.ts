@@ -16,6 +16,6 @@ authRouter.post(
   //authRoleMiddleware.authAdmin
 );
 
-authRouter.post(`${prefix}/me`, authController.me);
+authRouter.get(`${prefix}/me`, authController.me);
 
 export default authRouter;

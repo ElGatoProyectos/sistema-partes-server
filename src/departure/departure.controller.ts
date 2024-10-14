@@ -4,11 +4,49 @@ import express from "@/config/express.config";
 import multer from "multer";
 import { departureService } from "./departure.service";
 import { T_FindAllDeparture } from "./models/departure.types";
+import {
+  I_CreateDepartureBody,
+  I_UpdateDepartureBody,
+} from "./models/departure.interface";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class DepartureController {
+  async create(request: express.Request, response: express.Response) {
+    const data = request.body as I_CreateDepartureBody;
+    const project_id = request.get("project-id") as string;
+    const token = request.get("Authorization") as string;
+    const result = await departureService.createDeparture(
+      data,
+      project_id,
+      token
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+
+  async update(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateDepartureBody;
+    const departure_id = Number(request.params.id);
+    const token = request.get("Authorization") as string;
+    const project_id = request.get("project-id") as string;
+    const result = await departureService.updateDeparture(
+      departure_id,
+      data,
+      project_id,
+      token
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+
   departureReadExcel = async (
     request: express.Request,
     response: express.Response

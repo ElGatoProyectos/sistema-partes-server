@@ -3,7 +3,11 @@ import { companyValidation } from "@/company/company.validation";
 import { projectValidation } from "@/project/project.validation";
 import { Empresa, Partida, Proyecto, Unidad, Usuario } from "@prisma/client";
 import * as xlsx from "xlsx";
-import { I_DepartureExcel } from "./models/departure.interface";
+import {
+  I_CreateDepartureBody,
+  I_DepartureExcel,
+  I_UpdateDepartureBody,
+} from "./models/departure.interface";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
@@ -13,6 +17,168 @@ import { departureValidation } from "./departure.validation";
 import { T_FindAllDeparture } from "./models/departure.types";
 
 class DepartureService {
+  async createDeparture(
+    data: I_CreateDepartureBody,
+    project_id: string,
+    token: string
+  ): Promise<T_HttpResponse> {
+    try {
+      if (data.unidad_id) {
+        const unitResponse = await unitValidation.findById(data.unidad_id);
+        if (!unitResponse.success) {
+          return unitResponse;
+        }
+      }
+
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+
+      const nameExists = await departureValidation.findByName(
+        data.nombre_partida,
+        +project_id
+      );
+
+      if (!nameExists.success) {
+        return nameExists;
+      }
+
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      // const up = upResponse.payload as UnidadProduccion;
+      const lastDeparture = await departureValidation.codeMoreHigh(+project_id);
+      const lastDepartureResponse = lastDeparture.payload as Partida;
+
+      // Incrementar el código en 1
+      const nextCodigo = (parseInt(lastDepartureResponse?.id_interno) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(4, "0");
+      let resultado;
+      if (data.precio && data.metrado) {
+        resultado = data.metrado * data.precio;
+      }
+
+      const departureFormat = {
+        id_interno: formattedCodigo,
+        item: data.item,
+        partida: data.nombre_partida,
+        metrado_inicial: data.metrado,
+        metrado_total: data.metrado,
+        precio: data.precio,
+        parcial: resultado ? resultado : 0,
+        mano_de_obra_unitaria: data.mano_obra_unitaria,
+        material_unitario: data.material_unitario,
+        equipo_unitario: data.equipo_unitario,
+        subcontrata_varios: data.subcontrata_varios
+          ? data.subcontrata_varios
+          : 0,
+        unidad_id: data.unidad_id,
+        usuario_id: userResponse.id,
+        proyecto_id: +project_id,
+      };
+
+      const departureJob = await prismaDepartureRepository.createDeparture(
+        departureFormat
+      );
+      return httpResponse.CreatedResponse(
+        "Partida creada correctamente",
+        departureJob
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear la Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateDeparture(
+    departure_id: number,
+    data: I_UpdateDepartureBody,
+    project_id: string,
+    token: string
+  ): Promise<T_HttpResponse> {
+    try {
+      const departureResponse = await departureValidation.findById(
+        departure_id
+      );
+      if (!departureResponse.success) {
+        return departureResponse;
+      }
+      const departure = departureResponse.payload as Partida;
+
+      if (data.unidad_id) {
+        const unitResponse = await unitValidation.findById(data.unidad_id);
+        if (!unitResponse.success) {
+          return unitResponse;
+        }
+      }
+
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+
+      if (data.nombre_partida != departure.partida) {
+        const nameExists = await departureValidation.findByName(
+          data.nombre_partida,
+          +project_id
+        );
+
+        if (!nameExists.success) {
+          return nameExists;
+        }
+      }
+
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+
+      let resultado;
+      if (data.precio && data.metrado) {
+        resultado = data.metrado * data.precio;
+      }
+
+      const departureFormat = {
+        id_interno: departure.id_interno,
+        item: data.item,
+        partida: data.nombre_partida,
+        metrado_inicial: data.metrado,
+        metrado_total: data.metrado,
+        precio: data.precio,
+        parcial: resultado ? resultado : 0,
+        mano_de_obra_unitaria: data.mano_obra_unitaria,
+        material_unitario: data.material_unitario,
+        equipo_unitario: data.equipo_unitario,
+        subcontrata_varios: data.subcontrata_varios
+          ? data.subcontrata_varios
+          : 0,
+        unidad_id: data.unidad_id,
+        usuario_id: userResponse.id,
+        proyecto_id: +project_id,
+      };
+
+      const departureJob = await prismaDepartureRepository.updateDeparture(
+        departureFormat,
+        departure_id
+      );
+      return httpResponse.CreatedResponse(
+        "Partida modificada correctamente",
+        departureJob
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al Modificar la Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async findById(departure_id: number): Promise<T_HttpResponse> {
     try {
       const responseDeparture = await prismaDepartureRepository.findById(
@@ -66,7 +232,6 @@ class DepartureService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Partidas",
         error
@@ -260,6 +425,13 @@ class DepartureService {
           )}.`
         );
       }
+      // await Promise.all(
+      //   sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+      //     if (item.METRADO && item.PRECIO) {
+      //       console.log("hay metrado y precio en  " + item["ID-PARTIDA"]);
+      //     }
+      //   })
+      // );
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
       let code;
@@ -284,6 +456,10 @@ class DepartureService {
               project_id
             );
             const unit = unitResponse.payload as Unidad;
+            let resultado;
+            if (item.METRADO && item.PRECIO) {
+              resultado = parseInt(item.METRADO) * parseInt(item.PRECIO);
+            }
             const data = {
               id_interno: String(item["ID-PARTIDA"].trim()),
               item: item.ITEM,
@@ -291,7 +467,7 @@ class DepartureService {
               metrado_inicial: item.METRADO ? +item.METRADO : 0,
               metrado_total: item.METRADO ? +item.METRADO : 0,
               precio: +item.PRECIO ? +item.PRECIO : 0,
-              parcial: item.PARCIAL ? +item.PARCIAL : 0,
+              parcial: item.PRECIO && item.METRADO ? resultado : 0,
               mano_de_obra_unitaria: item["MANO DE OBRA UNITARIO"]
                 ? +item["MANO DE OBRA UNITARIO"]
                 : 0,
@@ -315,10 +491,11 @@ class DepartureService {
         })
       );
 
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
 
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {
+      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer las Partidas",

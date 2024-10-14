@@ -3,13 +3,30 @@ import { ResourcesRepository } from "./resources.repository";
 import {
   I_CreateResourcesBD,
   I_Resources,
-  I_ResourcesExcel,
   I_UpdateResourcesBodyValidation,
 } from "./models/resources.interface";
 import { E_Estado_BD, Recurso } from "@prisma/client";
 import { T_FindAllResource } from "./models/resource.types";
 
 class PrismaResourcesRepository implements ResourcesRepository {
+  async updateStatusResource(resource_id: number): Promise<Recurso | null> {
+    const resource = await prisma.recurso.findFirst({
+      where: {
+        id: resource_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+
+    const newStateTrain =
+      resource?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
+    const trainUpdate = await prisma.recurso.update({
+      where: { id: resource_id },
+      data: {
+        eliminado: newStateTrain,
+      },
+    });
+    return trainUpdate;
+  }
   async findAll(
     skip: number,
     data: T_FindAllResource,
@@ -82,7 +99,7 @@ class PrismaResourcesRepository implements ResourcesRepository {
   async codeMoreHigh(project_id: number): Promise<Recurso | null> {
     const lastResource = await prisma.recurso.findFirst({
       where: {
-        // eliminado: E_Estado_BD.n,
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
       orderBy: { codigo: "desc" },

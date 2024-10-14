@@ -66,11 +66,9 @@ class UnitValidation {
     }
   }
 
-  async findById(idResourseCategory: number): Promise<T_HttpResponse> {
+  async findById(unit_id: number): Promise<T_HttpResponse> {
     try {
-      const unitResponse = await prismaUnitRepository.findById(
-        idResourseCategory
-      );
+      const unitResponse = await prismaUnitRepository.findById(unit_id);
       if (!unitResponse) {
         return httpResponse.NotFoundException("Unidad no fue encontrada");
       }

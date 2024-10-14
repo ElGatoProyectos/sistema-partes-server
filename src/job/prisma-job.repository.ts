@@ -119,6 +119,7 @@ class PrismaJobRepository implements JobRepository {
     const job = await prisma.trabajo.findFirst({
       where: {
         nombre: name,
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
     });
@@ -195,7 +196,7 @@ class PrismaJobRepository implements JobRepository {
   }
 
   async findById(job_id: number): Promise<I_Job | null> {
-    const train = await prisma.trabajo.findFirst({
+    const job = await prisma.trabajo.findFirst({
       where: {
         id: job_id,
         eliminado: E_Estado_BD.n,
@@ -204,12 +205,12 @@ class PrismaJobRepository implements JobRepository {
         eliminado: true,
       },
     });
-    return train;
+    return job;
   }
   async codeMoreHigh(project_id: number): Promise<Trabajo | null> {
     const lastJob = await prisma.trabajo.findFirst({
       where: {
-        // eliminado: E_Estado_BD.n,
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
       orderBy: { codigo: "desc" },
