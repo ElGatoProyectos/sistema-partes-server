@@ -3,5 +3,8 @@ export type T_FindAllWorkforce = {
     page: number;
     limit: number;
     search: string;
+    state: string;
+    category: string;
+    origin: string;
   };
 };

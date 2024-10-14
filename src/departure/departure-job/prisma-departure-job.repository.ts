@@ -2,10 +2,7 @@ import prisma from "@/config/prisma.config";
 import { DepartureJobRepository } from "./departure-job.repository";
 import { DetalleTrabajoPartida } from "@prisma/client";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
-import {
-  I_DepartureJob,
-  I_DetailDepartureJob,
-} from "./models/departureJob.interface";
+import { I_DetailDepartureJob } from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
   async findAll(

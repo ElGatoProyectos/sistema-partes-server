@@ -77,16 +77,20 @@ class WorkforceValidation {
         endDate = new Date(excelEpoch.getTime() + data.CESE * 86400000);
         endDate.setUTCHours(0, 0, 0, 0);
       }
-      let dateOfBirth;
-      if (data["FECHA DE NACIMIENTO"]) {
-        dateOfBirth = new Date(
-          excelEpoch.getTime() + data["FECHA DE NACIMIENTO"] * 86400000
-        );
-        dateOfBirth.setUTCHours(0, 0, 0, 0);
+      let estado;
+      if (data.ESTADO.toUpperCase() == E_Estado_MO_BD.ACTIVO) {
+        estado = E_Estado_MO_BD.ACTIVO;
+      } else {
+        estado = E_Estado_MO_BD.INACTIVO;
       }
+
       const workForceFormat = {
         documento_identidad: data.DNI.toString(),
-        nombre_completo: data["APELLIDO Y NOMBRE COMPLETO"],
+        nombre_completo: data.NOMBRES,
+        apellido_materno: data["APELLIDO MATERNO"],
+        apellido_paterno: data["APELLIDO PATERNO"],
+        genero: data.GENERO,
+        estado_civil: data["ESTADO CIVIL"],
         tipo_obrero_id: type.id,
         origen_obrero_id: origin.id,
         categoria_obrero_id: category.id,
@@ -95,16 +99,10 @@ class WorkforceValidation {
         banco_id: data.BANCO ? bank.id : null,
         fecha_inicio: data.INGRESO ? inicioDate : null,
         fecha_cese: data.CESE ? endDate : null,
-        fecha_nacimiento: data["FECHA DE NACIMIENTO"] ? dateOfBirth : null,
-        estado:
-          data.ESTADO == E_Estado_MO_BD.ACTIVO
-            ? E_Estado_MO_BD.ACTIVO
-            : E_Estado_MO_BD.INACTIVO,
-        escolaridad: data.ESCOLARIDAD ? String(data.ESCOLARIDAD) : null,
+        estado: estado,
         cuenta: data.CUENTA,
         telefono: data.CELULAR ? String(data.CELULAR) : null,
         email_personal: data.CORREO,
-        observacion: data.OBSERVACION,
         proyecto_id: project_id,
         usuario_id: user_id,
       };

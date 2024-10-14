@@ -355,8 +355,10 @@ class ProductionUnitController {
   };
 
   async updateStatus(request: express.Request, response: express.Response) {
-    const idProject = Number(request.params.id);
-    const result = await productionUnitService.updateStatusProject(idProject);
+    const production_unit_id = Number(request.params.id);
+    const result = await productionUnitService.updateStatusProject(
+      production_unit_id
+    );
     response.status(result.statusCode).json(result);
   }
 

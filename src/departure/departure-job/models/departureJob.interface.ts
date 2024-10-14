@@ -24,3 +24,9 @@ export interface I_DetailDepartureJob {
 
 export interface I_Departure extends Partida {}
 export interface I_Job extends Trabajo {}
+
+export interface I_DepartureJob {
+  job_id: number;
+  departure_id: number;
+  metrado: number;
+}

@@ -1,17 +1,95 @@
 import * as xlsx from "xlsx";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
-import { I_DepartureJobExcel } from "./models/departureJob.interface";
+import {
+  I_DepartureJob,
+  I_DepartureJobExcel,
+} from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
 import { projectValidation } from "@/project/project.validation";
-import { Partida, Proyecto } from "@prisma/client";
+import { Partida, Proyecto, Trabajo } from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
+import { prismaJobRepository } from "@/job/prisma-job.repository";
 
 class DepartureJobService {
+  async updateJobDeparture(data: I_DepartureJob) {
+    try {
+      const jobResponse = await jobValidation.findById(data.job_id);
+      if (!jobResponse.success) {
+        return jobResponse;
+      }
+      const job = jobResponse.payload as Trabajo;
+
+      const departureResponse = await departureValidation.findById(
+        data.departure_id
+      );
+
+      if (!departureResponse.success) {
+        return departureResponse;
+      }
+
+      const departure = departureResponse.payload as Partida;
+
+      let additionMetradoPrice = 0;
+      const resultadoMetradoPrecio = data.metrado * departure.precio;
+
+      additionMetradoPrice = resultadoMetradoPrecio + job.costo_partida;
+      await prismaJobRepository.updateJobCost(additionMetradoPrice, job.id);
+
+      let additionMetradoCostOfLabor = 0;
+      const resultMetadoCostOfLabor =
+        data.metrado * departure.mano_de_obra_unitaria;
+      additionMetradoCostOfLabor =
+        resultMetadoCostOfLabor + job.costo_mano_obra;
+      await prismaJobRepository.updateJobCostOfLabor(
+        additionMetradoCostOfLabor,
+        job.id
+      );
+
+      let addtionMetadoMaterialCost = 0;
+      const resultMetradoMaterialCost =
+        data.metrado * departure.material_unitario;
+      addtionMetadoMaterialCost =
+        resultMetradoMaterialCost + job.costo_material;
+      await prismaJobRepository.updateJobMaterialCost(
+        addtionMetadoMaterialCost,
+        job.id
+      );
+
+      let addtionMetradoJobEquipment = 0;
+      const resultMetradoJobEquipment =
+        data.metrado * departure.equipo_unitario;
+      addtionMetradoJobEquipment = resultMetradoJobEquipment + job.costo_equipo;
+      await prismaJobRepository.updateJobEquipment(
+        addtionMetradoJobEquipment,
+        job.id
+      );
+
+      let addtionMetradoJobSeveral = 0;
+      const resultMetradoJobSeveral =
+        data.metrado * departure.subcontrata_varios;
+      addtionMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
+      await prismaJobRepository.updateJobSeveral(
+        addtionMetradoJobSeveral,
+        job.id
+      );
+      return httpResponse.SuccessResponse(
+        "Éxito al leer la Partida y su Trabajo"
+      );
+    } catch (error) {
+      await prisma.$disconnect();
+      return httpResponse.InternalServerErrorException(
+        "Error al leer la Partidas con su Trabajo",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async updateDepartureJobMasive(file: any, project_id: number) {
     try {
       const buffer = file.buffer;

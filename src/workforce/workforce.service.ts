@@ -1,6 +1,9 @@
 import * as xlsx from "xlsx";
-import { I_WorkforceExcel } from "./models/workforce.interface";
-import { httpResponse } from "@/common/http.response";
+import {
+  I_UpdateWorkforceBody,
+  I_WorkforceExcel,
+} from "./models/workforce.interface";
+import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { projectValidation } from "@/project/project.validation";
 import {
   Banco,
@@ -25,8 +28,65 @@ import { workforceValidation } from "./workforce.validation";
 import { jwtService } from "@/auth/jwt.service";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { prismaWorkforceRepository } from "./prisma-workforce.repository";
+import { converToDate } from "@/common/utils/date";
+import { userValidation } from "@/user/user.validation";
 
 class WorkforceService {
+  async updateWorkforce(
+    data: I_UpdateWorkforceBody,
+    workforce_id: number,
+    project_id: number
+  ) {
+    try {
+      const resultIdWorkforce = await workforceValidation.findById(
+        workforce_id
+      );
+      if (!resultIdWorkforce.success) {
+        return resultIdWorkforce;
+      }
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return resultIdProject;
+      }
+      let user: Usuario | undefined = undefined;
+      if (data.usuario_id) {
+        const userResponse = await userValidation.findById(data.usuario_id);
+        if (!userResponse) return userResponse;
+        user = userResponse.payload as Usuario;
+      }
+
+      let fecha_inicio;
+      if (data.fecha_inicio) {
+        fecha_inicio = converToDate(data.fecha_inicio);
+      }
+      let fecha_finalizacion;
+      if (data.fecha_cese) {
+        fecha_finalizacion = converToDate(data.fecha_cese);
+      }
+      const workforceFormat = {
+        ...data,
+        fecha_inicio: fecha_inicio,
+        fecha_finalizacion: fecha_finalizacion,
+        proyecto_id: +project_id,
+        usuario_id: user ? user.id : null,
+      };
+      const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
+        workforceFormat,
+        workforce_id
+      );
+      return httpResponse.SuccessResponse(
+        "Mano de Obra modificada correctamente",
+        responseWorkforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async registerWorkforceMasive(file: any, project_id: number, token: string) {
     try {
       const buffer = file.buffer;
@@ -80,7 +140,7 @@ class WorkforceService {
           index++;
           if (
             item.DNI === undefined ||
-            item["APELLIDO Y NOMBRE COMPLETO"] === undefined ||
+            item.NOMBRES === undefined ||
             item.TIPO === undefined ||
             item.ORIGEN === undefined ||
             item.CATEGORIA === undefined ||
@@ -95,7 +155,7 @@ class WorkforceService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.El DNI,NOMBRE Y APELLIDO, TIPO, ORIGEN, CATEGORIA, ESPECIALIDAD, UNIDAD son obligatorios.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.El DNI,NOMBRE, TIPO, ORIGEN, CATEGORIA, ESPECIALIDAD, UNIDAD son obligatorios.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );
@@ -337,18 +397,22 @@ class WorkforceService {
             endDate = new Date(excelEpoch.getTime() + item.CESE * 86400000);
             endDate.setUTCHours(0, 0, 0, 0);
           }
-          let dateOfBirth;
-          if (item["FECHA DE NACIMIENTO"]) {
-            dateOfBirth = new Date(
-              excelEpoch.getTime() + item["FECHA DE NACIMIENTO"] * 86400000
-            );
-            dateOfBirth.setUTCHours(0, 0, 0, 0);
+
+          let estado;
+          if (item.ESTADO.toUpperCase() == E_Estado_MO_BD.ACTIVO) {
+            estado = E_Estado_MO_BD.ACTIVO;
+          } else {
+            estado = E_Estado_MO_BD.INACTIVO;
           }
           await prisma.manoObra.create({
             data: {
               codigo: formattedCodigo,
               documento_identidad: item.DNI.toString(),
-              nombre_completo: item["APELLIDO Y NOMBRE COMPLETO"],
+              nombre_completo: item.NOMBRES,
+              apellido_materno: item["APELLIDO MATERNO"],
+              apellido_paterno: item["APELLIDO PATERNO"],
+              genero: item.GENERO,
+              estado_civil: item["ESTADO CIVIL"],
               tipo_obrero_id: type.id,
               origen_obrero_id: origin.id,
               categoria_obrero_id: category.id,
@@ -357,18 +421,10 @@ class WorkforceService {
               banco_id: bank ? bank.id : null,
               fecha_inicio: item.INGRESO ? inicioDate : null,
               fecha_cese: item.CESE ? endDate : null,
-              fecha_nacimiento: item["FECHA DE NACIMIENTO"]
-                ? dateOfBirth
-                : null,
-              estado:
-                item.ESTADO == E_Estado_MO_BD.ACTIVO
-                  ? E_Estado_MO_BD.ACTIVO
-                  : E_Estado_MO_BD.INACTIVO,
-              escolaridad: item.ESCOLARIDAD ? String(item.ESCOLARIDAD) : null,
+              estado: estado,
               cuenta: item.CUENTA,
               telefono: String(item.CELULAR),
               email_personal: item.CORREO,
-              observacion: item.OBSERVACION,
               proyecto_id: responseProject.id,
               usuario_id: userResponse.id,
             },
@@ -418,6 +474,32 @@ class WorkforceService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer toda la Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async updateStatusWorkforce(workforce_id: number): Promise<T_HttpResponse> {
+    try {
+      const workforceResponse = await workforceValidation.findById(
+        workforce_id
+      );
+      if (!workforceResponse.success) {
+        return workforceResponse;
+      } else {
+        const result = await prismaWorkforceRepository.updateStatusWorkforce(
+          workforce_id
+        );
+        return httpResponse.SuccessResponse(
+          "Mano de Obra eliminado correctamente",
+          result
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error en eliminar la Mano de Obra",
         error
       );
     } finally {

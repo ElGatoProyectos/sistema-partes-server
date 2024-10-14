@@ -51,6 +51,12 @@ class ResourceController {
     const result = await resourceService.findAll(paginationOptions, project_id);
     response.status(result.statusCode).json(result);
   }
+
+  async updateStatus(request: express.Request, response: express.Response) {
+    const resource_id = Number(request.params.id);
+    const result = await resourceService.updateStatusResource(resource_id);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const resourceController = new ResourceController();

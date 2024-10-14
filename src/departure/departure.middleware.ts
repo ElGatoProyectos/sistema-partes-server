@@ -1,8 +1,40 @@
 import { httpResponse } from "@/common/http.response";
 import express from "@/config/express.config";
 import validator from "validator";
+import { departureDto } from "./dto/departure.dto";
+import { departureUpdateDto } from "./dto/departureUpdate.dto";
 
 class DepartureMiddleware {
+  verifyFields(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      departureDto.parse(request.body);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos para crear la Partida"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+  verifyFieldsUpdate(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      departureUpdateDto.parse(request.body);
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos para actualizar la Partida"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
   verifyHeadersFieldsId(
     request: express.Request,
     response: express.Response,

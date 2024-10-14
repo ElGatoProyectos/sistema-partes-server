@@ -1,7 +1,7 @@
 import { unifiedIndexValidation } from "./../unifiedIndex/unifiedIndex.validation";
 import * as xlsx from "xlsx";
 import { I_ResourcesExcel } from "./models/resources.interface";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import {
   CategoriaRecurso,
   IndiceUnificado,
@@ -256,6 +256,30 @@ class ResourceService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todos los Recursos",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async updateStatusResource(reource_id: number): Promise<T_HttpResponse> {
+    try {
+      const resourceResponse = await resourceValidation.findById(reource_id);
+      if (!resourceResponse.success) {
+        return resourceResponse;
+      } else {
+        const result = await prismaResourcesRepository.updateStatusResource(
+          reource_id
+        );
+        return httpResponse.SuccessResponse(
+          "Recurso eliminado correctamente",
+          result
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error en eliminar el Recurso",
         error
       );
     } finally {

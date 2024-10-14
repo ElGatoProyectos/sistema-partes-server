@@ -8,6 +8,20 @@ const departureRouter = express.Router();
 const prefix = "/departure";
 
 departureRouter.post(
+  `${prefix}`,
+  departureMiddleware.verifyFields,
+  authRoleMiddleware.authAdminUser,
+  departureController.create
+);
+
+departureRouter.put(
+  `${prefix}/:id`,
+  departureMiddleware.verifyFieldsUpdate,
+  authRoleMiddleware.authAdminUser,
+  departureController.update
+);
+
+departureRouter.post(
   `${prefix}/upload-excel`,
   departureMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
