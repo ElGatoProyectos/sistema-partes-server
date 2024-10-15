@@ -76,7 +76,7 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
         prisma.indiceUnificado.findMany({
           where: {
             ...filters,
-            project_id: project_id,
+            proyect_id: project_id,
             eliminado: E_Estado_BD.n,
           },
           skip,

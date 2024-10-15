@@ -7,37 +7,21 @@ import {
   CategoriaObrero,
   E_Estado_MO_BD,
   EspecialidadObrero,
-  ManoObra,
   OrigenObrero,
-  TipoObrero,
   Unidad,
 } from "@prisma/client";
 import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
 import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
 import { specialtyWorkforceValidation } from "@/specialtyWorkforce/specialtyWorkfoce.validation";
 import { unitValidation } from "@/unit/unit.validation";
-import { bankWorkforceValidation } from "@/bankWorkforce/bankWorkforce.validation";
-import prisma from "@/config/prisma.config";
 
 class WorkforceValidation {
   async updateWorkforce(
     data: I_WorkforceExcel,
     project_id: number,
-    workforce_id: number,
-    user_id: number
+    workforce_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const typeResponse = await typeWorkforceValidation.findByName(
-        data.TIPO.trim(),
-        project_id
-      );
-      const type = typeResponse.payload as TipoObrero;
-      const originResponse = await originWorkforceValidation.findByName(
-        data.ORIGEN.trim(),
-        project_id
-      );
-
-      const origin = originResponse.payload as OrigenObrero;
       const categoryResponse = await categoryWorkforceValidation.findByName(
         data.CATEGORIA.trim(),
         project_id
@@ -50,21 +34,8 @@ class WorkforceValidation {
       );
 
       const specialty = specialtyResponse.payload as EspecialidadObrero;
-      const unitResponse = await unitValidation.findBySymbol(
-        data.UNIDAD.trim(),
-        project_id
-      );
-
+      const unitResponse = await unitValidation.findBySymbol("HH", project_id);
       const unit = unitResponse.payload as Unidad;
-      let bank: any;
-      if (data.BANCO) {
-        const bankResponse = await bankWorkforceValidation.findByName(
-          data.BANCO.trim(),
-          project_id
-        );
-
-        bank = bankResponse.payload as Banco;
-      }
 
       const excelEpoch = new Date(1899, 11, 30);
       let inicioDate;
@@ -91,20 +62,15 @@ class WorkforceValidation {
         apellido_paterno: data["APELLIDO PATERNO"],
         genero: data.GENERO,
         estado_civil: data["ESTADO CIVIL"],
-        tipo_obrero_id: type.id,
-        origen_obrero_id: origin.id,
         categoria_obrero_id: category.id,
         especialidad_obrero_id: specialty.id,
         unidad_id: unit.id,
-        banco_id: data.BANCO ? bank.id : null,
         fecha_inicio: data.INGRESO ? inicioDate : null,
         fecha_cese: data.CESE ? endDate : null,
         estado: estado,
-        cuenta: data.CUENTA,
         telefono: data.CELULAR ? String(data.CELULAR) : null,
         email_personal: data.CORREO,
         proyecto_id: project_id,
-        usuario_id: user_id,
       };
       const workforceUpdate = await prismaWorkforceRepository.updateWorkforce(
         workForceFormat,

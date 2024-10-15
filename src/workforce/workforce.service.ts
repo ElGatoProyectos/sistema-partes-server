@@ -6,26 +6,19 @@ import {
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { projectValidation } from "@/project/project.validation";
 import {
-  Banco,
   CategoriaObrero,
   E_Estado_MO_BD,
   EspecialidadObrero,
   ManoObra,
-  OrigenObrero,
   Proyecto,
-  TipoObrero,
   Unidad,
   Usuario,
 } from "@prisma/client";
 import prisma from "@/config/prisma.config";
-import { typeWorkforceValidation } from "@/typeWorkforce/typeWorkforce.validation";
-import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
 import { specialtyWorkforceValidation } from "@/specialtyWorkforce/specialtyWorkfoce.validation";
 import { unitValidation } from "@/unit/unit.validation";
 import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
-import { bankWorkforceValidation } from "@/bankWorkforce/bankWorkforce.validation";
 import { workforceValidation } from "./workforce.validation";
-import { jwtService } from "@/auth/jwt.service";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { prismaWorkforceRepository } from "./prisma-workforce.repository";
 import { converToDate } from "@/common/utils/date";
@@ -48,6 +41,21 @@ class WorkforceService {
       if (!resultIdProject.success) {
         return resultIdProject;
       }
+
+      const categoryWorkforceResponse =
+        await categoryWorkforceValidation.findById(data.categoria_obrero_id);
+      if (!categoryWorkforceResponse.success) {
+        return categoryWorkforceResponse;
+      }
+
+      const specialityWorkforceResponse =
+        await specialtyWorkforceValidation.findById(
+          data.especialidad_obrero_id
+        );
+      if (!specialityWorkforceResponse.success) {
+        return specialityWorkforceResponse;
+      }
+
       let user: Usuario | undefined = undefined;
       if (data.usuario_id) {
         const userResponse = await userValidation.findById(data.usuario_id);
@@ -65,18 +73,21 @@ class WorkforceService {
       }
       const workforceFormat = {
         ...data,
+        categoria_obrero_id: +data.categoria_obrero_id,
+        especialidad_obrero_id: +data.especialidad_obrero_id,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
       };
-      const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
-        workforceFormat,
-        workforce_id
-      );
+      console.log(workforceFormat);
+      // const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
+      //   workforceFormat,
+      //   workforce_id
+      // );
       return httpResponse.SuccessResponse(
         "Mano de Obra modificada correctamente",
-        responseWorkforce
+        "jaj"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -87,7 +98,7 @@ class WorkforceService {
       await prisma.$disconnect();
     }
   }
-  async registerWorkforceMasive(file: any, project_id: number, token: string) {
+  async registerWorkforceMasive(file: any, project_id: number) {
     try {
       const buffer = file.buffer;
 
@@ -96,13 +107,8 @@ class WorkforceService {
       const sheet = workbook.Sheets[sheetName];
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_WorkforceExcel[];
       let error = 0;
-      let errorNumber = 0;
       let errorRows: number[] = [];
-      const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse.success) {
-        return userTokenResponse;
-      }
-      const userResponse = userTokenResponse.payload as Usuario;
+
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -131,8 +137,6 @@ class WorkforceService {
       const project = await projectValidation.findById(project_id);
       if (!project.success) return project;
       const responseProject = project.payload as Proyecto;
-      const seenCodes = new Set<string>();
-      let previousCodigo: number | null = null;
 
       //[note] aca si hay espacio en blanco.
       await Promise.all(
@@ -141,11 +145,8 @@ class WorkforceService {
           if (
             item.DNI === undefined ||
             item.NOMBRES === undefined ||
-            item.TIPO === undefined ||
-            item.ORIGEN === undefined ||
             item.CATEGORIA === undefined ||
-            item.ESPECIALIDAD === undefined ||
-            item.UNIDAD === undefined
+            item.ESPECIALIDAD === undefined
           ) {
             error++;
             errorRows.push(index + 1);
@@ -161,52 +162,6 @@ class WorkforceService {
         );
       }
 
-      //[note] buscar si existe el nombre del tipo
-      await Promise.all(
-        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
-          index++;
-
-          const typeResponse = await typeWorkforceValidation.findByName(
-            item.TIPO.trim(),
-            responseProject.id
-          );
-          if (!typeResponse.success) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El nombre del Tipo de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-      //[note] buscar si existe el nombre del Origen
-      await Promise.all(
-        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
-          index++;
-
-          const originResponse = await originWorkforceValidation.findByName(
-            item.ORIGEN.trim(),
-            responseProject.id
-          );
-          if (!originResponse.success) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El nombre del Origen de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
       //[note] buscar si existe el nombre de la Categoria
       await Promise.all(
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
@@ -254,54 +209,7 @@ class WorkforceService {
           )}`
         );
       }
-      //[note] buscar si existe el simbolo de la Unidad
-      await Promise.all(
-        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
-          index++;
 
-          const unitResponse = await unitValidation.findBySymbol(
-            item.UNIDAD.trim(),
-            responseProject.id
-          );
-          if (!unitResponse.success) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El nombre de la Unidad de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-      //[note] buscar si existe el nombre del Banco
-      await Promise.all(
-        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
-          index++;
-
-          if (item.BANCO) {
-            const bankResponse = await bankWorkforceValidation.findByName(
-              item.BANCO.trim(),
-              responseProject.id
-            );
-            if (!bankResponse.success) {
-              error++;
-              errorRows.push(index + 1);
-            }
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El nombre del Banco de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
       //[note] Verifico si el estado es uno de los que existen
       await Promise.all(
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
@@ -336,21 +244,9 @@ class WorkforceService {
           await workforceValidation.updateWorkforce(
             item,
             responseProject.id,
-            workforce.id,
-            userResponse.id
+            workforce.id
           );
         } else {
-          const typeResponse = await typeWorkforceValidation.findByName(
-            item.TIPO,
-            responseProject.id
-          );
-
-          const type = typeResponse.payload as TipoObrero;
-          const originResponse = await originWorkforceValidation.findByName(
-            item.ORIGEN,
-            responseProject.id
-          );
-          const origin = originResponse.payload as OrigenObrero;
           const categoryResponse = await categoryWorkforceValidation.findByName(
             item.CATEGORIA,
             responseProject.id
@@ -363,18 +259,11 @@ class WorkforceService {
             );
           const specialty = specialtyResponse.payload as EspecialidadObrero;
           const unitResponse = await unitValidation.findBySymbol(
-            item.UNIDAD,
+            "HH",
             responseProject.id
           );
           const unit = unitResponse.payload as Unidad;
-          let bank;
-          if (item.BANCO) {
-            const bankResponse = await bankWorkforceValidation.findByName(
-              item.BANCO,
-              responseProject.id
-            );
-            bank = bankResponse.payload as Banco;
-          }
+
           const lastWorkforce = await workforceValidation.codeMoreHigh(
             project_id
           );
@@ -413,20 +302,15 @@ class WorkforceService {
               apellido_paterno: item["APELLIDO PATERNO"],
               genero: item.GENERO,
               estado_civil: item["ESTADO CIVIL"],
-              tipo_obrero_id: type.id,
-              origen_obrero_id: origin.id,
               categoria_obrero_id: category.id,
               especialidad_obrero_id: specialty.id,
               unidad_id: unit.id,
-              banco_id: bank ? bank.id : null,
               fecha_inicio: item.INGRESO ? inicioDate : null,
               fecha_cese: item.CESE ? endDate : null,
               estado: estado,
-              cuenta: item.CUENTA,
               telefono: String(item.CELULAR),
               email_personal: item.CORREO,
               proyecto_id: responseProject.id,
-              usuario_id: userResponse.id,
             },
           });
         }

@@ -5,10 +5,27 @@ import {
   I_Resources,
   I_UpdateResourcesBodyValidation,
 } from "./models/resources.interface";
-import { E_Estado_BD, Recurso } from "@prisma/client";
+import { CategoriaRecurso, E_Estado_BD, Recurso } from "@prisma/client";
 import { T_FindAllResource } from "./models/resource.types";
+import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
 
 class PrismaResourcesRepository implements ResourcesRepository {
+  async createResource(data: I_CreateResourcesBD): Promise<Recurso> {
+    const resource = await prisma.recurso.create({
+      data,
+    });
+    return resource;
+  }
+  async updateResource(
+    data: I_UpdateResourcesBodyValidation,
+    resource_id: number
+  ): Promise<Recurso> {
+    const resource = await prisma.recurso.update({
+      where: { id: resource_id },
+      data: data,
+    });
+    return resource;
+  }
   async updateStatusResource(resource_id: number): Promise<Recurso | null> {
     const resource = await prisma.recurso.findFirst({
       where: {
@@ -33,28 +50,28 @@ class PrismaResourcesRepository implements ResourcesRepository {
     project_id: number
   ): Promise<{ resources: I_Resources[]; total: number }> {
     let filters: any = {};
-
-    if (data.queryParams.search) {
-      if (isNaN(data.queryParams.search as any)) {
-        filters.nombre = {
-          contains: data.queryParams.search,
-        };
-      } else {
-        filters.codigo = {
-          contains: data.queryParams.search,
-        };
-      }
+    if (data.queryParams.category) {
+      filters.nombre = data.queryParams.category;
     }
     const [resources, total]: [I_Resources[], number] =
       await prisma.$transaction([
         prisma.recurso.findMany({
           where: {
-            ...filters,
+            CategoriaRecurso: {
+              nombre: {
+                contains: filters.nombre,
+              },
+            },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
           },
           skip,
           take: data.queryParams.limit,
+          include: {
+            CategoriaRecurso: true,
+            IndiceUnificado: true,
+            Unidad: true,
+          },
           omit: {
             eliminado: true,
           },
@@ -64,23 +81,17 @@ class PrismaResourcesRepository implements ResourcesRepository {
         }),
         prisma.recurso.count({
           where: {
-            ...filters,
+            CategoriaRecurso: {
+              nombre: {
+                contains: filters.nombre,
+              },
+            },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
           },
         }),
       ]);
     return { resources, total };
-  }
-  async updateResource(
-    data: I_UpdateResourcesBodyValidation,
-    resource_id: number
-  ): Promise<Recurso> {
-    const resource = await prisma.recurso.update({
-      where: { id: resource_id },
-      data: data,
-    });
-    return resource;
   }
 
   async findById(resource_id: number): Promise<I_Resources | null> {
@@ -127,13 +138,6 @@ class PrismaResourcesRepository implements ResourcesRepository {
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
-    });
-    return resource;
-  }
-
-  async createResource(data: I_CreateResourcesBD): Promise<Recurso> {
-    const resource = await prisma.recurso.create({
-      data,
     });
     return resource;
   }

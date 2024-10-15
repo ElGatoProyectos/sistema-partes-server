@@ -6,6 +6,29 @@ import { resourcesMiddleware } from "./resources.middleware";
 const resourceRouter = express.Router();
 const prefix = "/resource";
 
+resourceRouter.post(
+  `${prefix}/upload-excel`,
+  resourcesMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  resourceController.resourceReadExcel
+);
+
+resourceRouter.post(
+  `${prefix}`,
+  resourcesMiddleware.verifyHeadersFieldsIdProject,
+  resourcesMiddleware.verifyFields,
+  authRoleMiddleware.authAdminUser,
+  resourceController.create
+);
+
+resourceRouter.put(
+  `${prefix}/:id`,
+  resourcesMiddleware.verifyHeadersFieldsIdProject,
+  resourcesMiddleware.verifyFieldsUpdate,
+  authRoleMiddleware.authAdminUser,
+  resourceController.update
+);
+
 resourceRouter.get(
   `${prefix}`,
   resourcesMiddleware.verifyHeadersFieldsIdProject,
@@ -13,11 +36,11 @@ resourceRouter.get(
   resourceController.allResources
 );
 
-resourceRouter.post(
-  `${prefix}/upload-excel`,
-  resourcesMiddleware.verifyHeadersFieldsIdProject,
+resourceRouter.get(
+  `${prefix}/:id`,
+  resourcesMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminUser,
-  resourceController.resourceReadExcel
+  resourceController.findById
 );
 
 resourceRouter.delete(

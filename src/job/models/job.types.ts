@@ -6,5 +6,6 @@ export type T_FindAllJob = {
     nameTrain: string;
     fecha_inicio: string;
     fecha_finalizacion: string;
+    state: string;
   };
 };

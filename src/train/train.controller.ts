@@ -2,11 +2,8 @@ import express from "@/config/express.config";
 import { trainService } from "./train.service";
 import {
   I_CreateTrainUnitBody,
-  I_Cuadrilla_Train,
-  I_ImportExcelRequestTrain,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
-import { T_FindAll } from "@/common/models/pagination.types";
 import multer from "multer";
 import { T_FindAllTrain } from "./models/train.types";
 

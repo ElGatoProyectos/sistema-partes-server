@@ -1,6 +1,10 @@
 import { unifiedIndexValidation } from "./../unifiedIndex/unifiedIndex.validation";
 import * as xlsx from "xlsx";
-import { I_ResourcesExcel } from "./models/resources.interface";
+import {
+  I_CreateResourcesBody,
+  I_ResourcesExcel,
+  I_UpdateResourcesBody,
+} from "./models/resources.interface";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import {
   CategoriaRecurso,
@@ -16,8 +20,159 @@ import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.
 import { unitValidation } from "@/unit/unit.validation";
 import { T_FindAllResource } from "./models/resource.types";
 import { prismaResourcesRepository } from "./prisma-resources.repository";
+import { ResourseMapper } from "./mappers/resource.mapper";
 
 class ResourceService {
+  async createResource(
+    data: I_CreateResourcesBody,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const resultResource = await resourceValidation.findByName(
+        data.nombre,
+        project_id
+      );
+      if (!resultResource.success) {
+        return resultResource;
+      }
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Recurso con el id del Proyecto proporcionado"
+        );
+      }
+
+      const unifiedIndexResponse = await unifiedIndexValidation.findById(
+        data.id_unificado
+      );
+      if (!unifiedIndexResponse.success) {
+        return unifiedIndexResponse;
+      }
+      const unifiedIndex = unifiedIndexResponse.payload as IndiceUnificado;
+
+      const unitResponse = await unitValidation.findById(data.unidad_id);
+      if (!unitResponse.success) {
+        return unitResponse;
+      }
+
+      const unit = unitResponse.payload as Unidad;
+
+      const categoryResource = await resourseCategoryValidation.findById(
+        data.categoria_recurso_id
+      );
+
+      if (!categoryResource.success) {
+        return categoryResource;
+      }
+
+      const lastResource = await resourceValidation.codeMoreHigh(project_id);
+      const lastResourceResponse = lastResource.payload as Recurso;
+
+      // Incrementar el código en 1
+      const nextCodigo = (parseInt(lastResourceResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(4, "0");
+
+      const resourceFormat = {
+        ...data,
+        codigo: formattedCodigo,
+        unidad_id: unit.id,
+        id_unificado: unifiedIndex.id,
+        proyecto_id: project_id,
+      };
+
+      const responseResourceCreate =
+        await prismaResourcesRepository.createResource(resourceFormat);
+      const resourceMapper = new ResourseMapper(responseResourceCreate);
+      return httpResponse.CreatedResponse(
+        "Recurso creado correctamente",
+        resourceMapper
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear Recurso",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateResource(
+    data: I_UpdateResourcesBody,
+    project_id: number,
+    resource_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const resourceResponse = await resourceValidation.findById(resource_id);
+      if (!resourceResponse.success) {
+        return resourceResponse;
+      }
+      const resource = resourceResponse.payload as Recurso;
+      if (resource.nombre != data.nombre) {
+        const resultResource = await resourceValidation.findByName(
+          data.nombre,
+          project_id
+        );
+        if (!resultResource.success) {
+          return resultResource;
+        }
+      }
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede modificar el Recurso con el id del Proyecto proporcionado"
+        );
+      }
+
+      const unifiedIndexResponse = await unifiedIndexValidation.findById(
+        data.id_unificado
+      );
+      if (!unifiedIndexResponse.success) {
+        return unifiedIndexResponse;
+      }
+      const unifiedIndex = unifiedIndexResponse.payload as IndiceUnificado;
+
+      const unitResponse = await unitValidation.findById(data.unidad_id);
+      if (!unitResponse.success) {
+        return unitResponse;
+      }
+
+      const unit = unitResponse.payload as Unidad;
+
+      const categoryResource = await resourseCategoryValidation.findById(
+        data.categoria_recurso_id
+      );
+
+      if (!categoryResource.success) {
+        return categoryResource;
+      }
+
+      const resourceFormat = {
+        ...data,
+        unidad_id: unit.id,
+        id_unificado: unifiedIndex.id,
+        proyecto_id: project_id,
+      };
+
+      const responseResourceUpdate =
+        await prismaResourcesRepository.updateResource(
+          resourceFormat,
+          resource_id
+        );
+      const resourceMapper = new ResourseMapper(responseResourceUpdate);
+      return httpResponse.CreatedResponse(
+        "Recurso Modificado correctamente",
+        resourceMapper
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar el Recurso",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async registerResourceMasive(file: any, project_id: number) {
     try {
       const buffer = file.buffer;
@@ -280,6 +435,25 @@ class ResourceService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error en eliminar el Recurso",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findById(resource_id: number): Promise<T_HttpResponse> {
+    try {
+      const resourse = await prismaResourcesRepository.findById(resource_id);
+      if (!resourse) {
+        return httpResponse.NotFoundException("El Recurso no fue encontrado");
+      }
+      return httpResponse.SuccessResponse(
+        "El Recurso fue encontrada",
+        resourse
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Recurso",
         error
       );
     } finally {

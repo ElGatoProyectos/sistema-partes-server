@@ -238,6 +238,7 @@ class UnifiedIndexService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Indices Unificados",
         error
