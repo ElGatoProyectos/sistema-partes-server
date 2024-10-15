@@ -306,6 +306,7 @@ class DepartureJobService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos y sus Partidas",
         error

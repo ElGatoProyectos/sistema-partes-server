@@ -9,20 +9,71 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     skip: number,
     data: T_FindAllDepartureJob
   ): Promise<{ detailsDepartureJob: any[]; total: number }> {
-    let details: any = [];
-    let total: any;
-    [details, total] = await prisma.$transaction([
-      prisma.detalleTrabajoPartida.findMany({
-        skip,
-        take: data.queryParams.limit,
-        include: {
-          Trabajo: true,
-          Partida: true,
-        },
-      }),
-      prisma.detalleTrabajoPartida.count({}),
-    ]);
+    let details: any = {};
+    let filterDeparture: any = {};
+    let filterJob: any = {};
+    let total: any = {};
+    // const algo = await prisma.detalleTrabajoPartida.findMany({
+    //   where: {
+    //     Trabajo: {
+    //       nombre: { contains: "Contrucciones " },
+    //     },
+    //     // Partida: {
+    //     //   ...filterDeparture,
+    //     // },
+    //   },
+    //   skip,
+    //   take: data.queryParams.limit,
+    //   include: {
+    //     Trabajo: true,
+    //     Partida: true,
+    //   },
+    // });
+    // if (data.queryParams.departure) {
+    //   filterDeparture.partida = data.queryParams.departure;
+    // }
 
+    // if (data.queryParams.job) {
+    //   filterJob.nombre = data.queryParams.job;
+    // }
+    console.log(data.queryParams.job);
+    console.log(data.queryParams.departure);
+    details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        Trabajo: {
+          nombre: {
+            contains: data.queryParams.job,
+          },
+        },
+        // Partida: {
+        //   partida: {
+        //     contains: data.queryParams.departure,
+        //   },
+        // },
+      },
+      skip,
+      take: data.queryParams.limit,
+      include: {
+        Trabajo: true,
+        Partida: true,
+      },
+    });
+    total = prisma.detalleTrabajoPartida.count({
+      where: {
+        Trabajo: {
+          nombre: {
+            contains: data.queryParams.job,
+          },
+        },
+        Partida: {
+          partida: {
+            contains: data.queryParams.departure,
+          },
+        },
+      },
+    });
+
+    console.log(details);
     const detailsDepartureJob = details.map((item: I_DetailDepartureJob) => {
       const { Trabajo, ...data } = item;
       const { Partida } = item;

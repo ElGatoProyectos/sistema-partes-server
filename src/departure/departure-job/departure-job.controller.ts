@@ -25,10 +25,15 @@ class DepartureJobController {
   ) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
+    const departure = request.query.departure as string;
+    const job = request.query.job as string;
+
     let paginationOptions: T_FindAllDepartureJob = {
       queryParams: {
         page: page,
         limit: limit,
+        departure: departure,
+        job: job,
       },
     };
     const result = await departureJobService.findAll(paginationOptions);

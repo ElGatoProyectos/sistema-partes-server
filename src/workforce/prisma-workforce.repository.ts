@@ -77,21 +77,30 @@ class PrismaWorkforceRepository implements WorkforceRepository {
 
     if (data.queryParams.search) {
       if (isNaN(data.queryParams.search as any)) {
-        filters.nombre_completo = {
-          contains: data.queryParams.search,
-        };
-        filters.apellido_materno = {
-          contains: data.queryParams.search,
-        };
-        filters.apellido_paterno = {
-          contains: data.queryParams.search,
-        };
+        filters.OR = [
+          {
+            nombre_completo: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_materno: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_paterno: {
+              contains: data.queryParams.search,
+            },
+          },
+        ];
       } else {
         filters.documento_identidad = {
           contains: data.queryParams.search,
         };
       }
     }
+
     if (data.queryParams.state) {
       if (data.queryParams.state.toUpperCase() == E_Estado_MO_BD.ACTIVO) {
         filters.estado = E_Estado_MO_BD.ACTIVO;
@@ -110,9 +119,6 @@ class PrismaWorkforceRepository implements WorkforceRepository {
         contains: data.queryParams.origin,
       };
     }
-    console.log(filters);
-    console.log(filtersCategory);
-    console.log(filtersOrigin);
     const [workforces, total]: [I_Workforce[], number] =
       await prisma.$transaction([
         prisma.manoObra.findMany({

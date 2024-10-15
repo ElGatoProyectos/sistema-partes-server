@@ -29,7 +29,7 @@ class PrismaUserRepository implements UserRepository {
       };
     }
     if (data.queryParams.estado) {
-      if (data.queryParams.estado === "y") {
+      if (data.queryParams.estado === E_Estado_BD.y) {
         filters.estado = E_Estado_BD.y;
       } else {
         filters.estado = E_Estado_BD.n;
