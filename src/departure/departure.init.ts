@@ -42,4 +42,11 @@ departureRouter.get(
   departureController.findById
 );
 
+departureRouter.delete(
+  `${prefix}/:id`,
+  departureMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  departureController.updateStatus
+);
+
 export default departureRouter;

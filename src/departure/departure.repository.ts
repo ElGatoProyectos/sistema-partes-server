@@ -17,7 +17,7 @@ export abstract class DepartureRepository {
 
   updateDeparture(data: I_UpdateDepartureBD, departure_id: number): void {}
 
-  updateStatusDeparture(idUser: number): void {}
+  updateStatusDeparture(departure_id: number): void {}
 
   codeMoreHigh(project_id: number): void {}
 }

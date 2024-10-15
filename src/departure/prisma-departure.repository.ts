@@ -38,7 +38,7 @@ class PrismaDepartureRepository implements DepartureRepository {
           contains: data.queryParams.search,
         };
       } else {
-        filters.id_interno = {
+        filters.item = {
           contains: data.queryParams.search,
         };
       }
@@ -96,9 +96,26 @@ class PrismaDepartureRepository implements DepartureRepository {
     });
     return departure;
   }
-  updateStatusDeparture(idUser: number): void {
-    throw new Error("Method not implemented.");
+  async updateStatusDeparture(departure_id: number): Promise<Partida | null> {
+    const departure = await prisma.partida.findFirst({
+      where: {
+        id: departure_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+
+    const newStateDeparture =
+      departure?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
+    const departureUpdate = await prisma.partida.update({
+      where: { id: departure_id },
+      data: {
+        eliminado: newStateDeparture,
+      },
+    });
+
+    return departureUpdate;
   }
+
   async findByCode(code: string, project_id: number): Promise<Partida | null> {
     const unit = await prisma.partida.findFirst({
       where: {

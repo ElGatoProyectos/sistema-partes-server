@@ -503,6 +503,31 @@ class DepartureService {
       );
     }
   }
+  async updateStatusJob(departure_id: number): Promise<T_HttpResponse> {
+    try {
+      const departureResponse = await departureValidation.findById(
+        departure_id
+      );
+      if (!departureResponse.success) {
+        return departureResponse;
+      } else {
+        const result = await prismaDepartureRepository.updateStatusDeparture(
+          departure_id
+        );
+        return httpResponse.SuccessResponse(
+          "Partida eliminada correctamente",
+          result
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al eliminar la Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
 
 export const departureService = new DepartureService();

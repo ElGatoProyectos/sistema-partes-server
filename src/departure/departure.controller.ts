@@ -47,6 +47,12 @@ class DepartureController {
     }
   }
 
+  async updateStatus(request: express.Request, response: express.Response) {
+    const departure_id = Number(request.params.id);
+    const result = await departureService.updateStatusJob(departure_id);
+    response.status(result.statusCode).json(result);
+  }
+
   departureReadExcel = async (
     request: express.Request,
     response: express.Response
