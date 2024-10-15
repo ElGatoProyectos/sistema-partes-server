@@ -27,16 +27,9 @@ class WorkforceController {
       }
 
       try {
-        const tokenWithBearer = request.headers.authorization;
-        if (!tokenWithBearer) {
-          return httpResponse.BadRequestException(
-            "No se encontró nada en Authorization "
-          );
-        }
         const serviceResponse = await workforceService.registerWorkforceMasive(
           file,
-          +project_id,
-          tokenWithBearer
+          +project_id
         );
 
         response.status(serviceResponse.statusCode).json(serviceResponse);

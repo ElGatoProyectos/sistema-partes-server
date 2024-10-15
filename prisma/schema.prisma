@@ -207,16 +207,12 @@ model ManoObra {
   codigo                 String
   documento_identidad    String
   nombre_completo        String
-  tipo_obrero_id         Int
-  origen_obrero_id       Int
   categoria_obrero_id    Int
   especialidad_obrero_id Int
   unidad_id              Int
   fecha_inicio           DateTime?       @db.Date //año más dia
   fecha_cese             DateTime?       @db.Date //año más dia
   estado                 E_Estado_MO_BD? @default(ACTIVO)
-  banco_id               Int?
-  cuenta                 String?         @db.Text()
   fecha_nacimiento       DateTime?       @db.Date //año más dia
   escolaridad            String?
   telefono               String?
@@ -231,6 +227,10 @@ model ManoObra {
   lugar_nacimiento       String?
 
   //[Note] Los de abajo son para otra etapa
+  tipo_obrero_id     Int?
+  origen_obrero_id   Int?
+  banco_id           Int?
+  cuenta             String? @db.Text()
   turno              String?
   sede_local         String?
   usuario_marcacion  String? @default("")
@@ -262,8 +262,8 @@ model ManoObra {
   Asistencia                  Asistencia[]
   CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id])
   EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id])
-  TipoObrero                  TipoObrero                    @relation(fields: [tipo_obrero_id], references: [id])
-  OrigenObrero                OrigenObrero                  @relation(fields: [origen_obrero_id], references: [id])
+  TipoObrero                  TipoObrero?                   @relation(fields: [tipo_obrero_id], references: [id])
+  OrigenObrero                OrigenObrero?                 @relation(fields: [origen_obrero_id], references: [id])
   ParteDiarioMo               ParteDiarioMO[]
   ManoObraDatoLaboral         ManoObraDatoLaboral[]
   ManoObraSemana              ManoObraSemana[]

@@ -7,17 +7,17 @@ import {
 export abstract class ResourcesRepository {
   findAll(skip: number, data: T_FindAllResource, project_id: number): void {}
 
-  findById(bank_id: number): void {}
+  findById(resource_id: number): void {}
 
   findByName(name: string, project_id: number): void {}
 
   createResource(data: I_CreateResourcesBD): void {}
 
-  updateResource(data: I_UpdateResourcesBody, idUser: number): void {}
+  updateResource(data: I_UpdateResourcesBody, resource_id: number): void {}
 
   codeMoreHigh(project_id: number): void {}
 
   findByCode(code: string, project_id: number): void {}
 
-  updateStatusResource(train_id: number): void {}
+  updateStatusResource(resource_id: number): void {}
 }

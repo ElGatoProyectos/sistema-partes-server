@@ -51,6 +51,7 @@ class JobController {
     const fecha_inicio = request.query.fecha_inicio as string;
     const fecha_finalizacion = request.query.fecha_finalizacion as string;
     const train = request.query.tren as string;
+    const state = request.query.state as string;
     const project_id = request.get("project-id") as string;
     let paginationOptions: T_FindAllJob = {
       queryParams: {
@@ -60,6 +61,7 @@ class JobController {
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
         nameTrain: train,
+        state: state,
       },
     };
     const result = await jobService.findAll(paginationOptions, +project_id);

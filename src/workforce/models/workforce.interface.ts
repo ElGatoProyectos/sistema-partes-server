@@ -17,6 +17,7 @@ export interface I_UpdateWorkforceBody
     | "turno"
     | "sede_local"
     | "usuario_marcacion"
+    | "origen_obrero_id"
     | "domicilio"
     | "lugar_nacimiento"
     | "genero"
@@ -47,6 +48,11 @@ export interface I_UpdateWorkforceBodyValidation
   extends Omit<
     ManoObra,
     | "id"
+    | "banco_id"
+    | "usuario_id"
+    | "tipo_obrero_id"
+    | "origen_obrero_id"
+    | "cuenta"
     | "escolaridad"
     | "codigo"
     | "eliminado"
@@ -90,16 +96,11 @@ export interface I_WorkforceExcel {
   "APELLIDO PATERNO": string;
   GENERO: string;
   "ESTADO CIVIL": string;
-  TIPO: string;
-  ORIGEN: string;
   CATEGORIA: string;
   ESPECIALIDAD: string;
-  UNIDAD: string;
   INGRESO: number;
   CESE: number;
   ESTADO: string;
-  BANCO: string;
-  CUENTA: string;
   CELULAR: string;
   CORREO: string;
 }

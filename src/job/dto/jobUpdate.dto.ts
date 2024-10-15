@@ -7,5 +7,5 @@ export const jobUpdateDto = z.object({
   nota: z.string().optional(),
   fecha_inicio: z.string().optional(),
   fecha_finalizacion: z.string().optional(),
-  usuario_id: z.number(),
+  usuario_id: z.number().optional(),
 });

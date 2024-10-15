@@ -86,6 +86,7 @@ class JobService {
         costo_varios: data.costo_varios != undefined ? data.costo_varios : 0,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
+        estado_trabajo: E_Trabajo_Estado.PROGRAMADO,
         up_id: data.up_id,
         tren_id: data.tren_id,
         proyecto_id: +project_id,
@@ -151,6 +152,7 @@ class JobService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos",
         error
@@ -208,6 +210,22 @@ class JobService {
           return resultTrain;
         }
       }
+      let estado;
+      if (data.estado_trabajo.toUpperCase() == E_Trabajo_Estado.EJECUTADO) {
+        estado = E_Trabajo_Estado.EJECUTADO;
+      } else if (
+        data.estado_trabajo.toUpperCase() == E_Trabajo_Estado.PROGRAMADO
+      ) {
+        estado = E_Trabajo_Estado.PROGRAMADO;
+      } else if (
+        data.estado_trabajo.toUpperCase() == E_Trabajo_Estado.TERMINADO
+      ) {
+        estado = E_Trabajo_Estado.TERMINADO;
+      } else {
+        return httpResponse.BadRequestException(
+          "El estado ingresado no pertenece a ninguna de las opciones"
+        );
+      }
       const trainResponse = await trainValidation.findById(data.tren_id);
       if (!trainResponse.success) return trainResponse;
 
@@ -227,8 +245,11 @@ class JobService {
         fecha_finalizacion
       );
       const durationFix = duration === 0 ? 1 : duration;
-      const trainFormat = {
+      const jobFormat = {
         ...data,
+        up_id: +data.up_id,
+        tren_id: +data.tren_id,
+        estado_trabajo: estado,
         duracion: durationFix,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
@@ -236,7 +257,7 @@ class JobService {
         usuario_id: user.id,
       };
       const responseJob = await prismaJobRepository.updateJob(
-        trainFormat,
+        jobFormat,
         job_id
       );
       const jobMapper = new JobResponseMapper(responseJob);
@@ -245,6 +266,7 @@ class JobService {
         jobMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Trabajo",
         error

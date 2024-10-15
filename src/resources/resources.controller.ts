@@ -2,11 +2,42 @@ import express from "@/config/express.config";
 import multer from "multer";
 import { resourceService } from "./resources.service";
 import { T_FindAllResource } from "./models/resource.types";
+import {
+  I_CreateResourcesBody,
+  I_UpdateResourcesBody,
+} from "./models/resources.interface";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class ResourceController {
+  async create(request: express.Request, response: express.Response) {
+    const data = request.body as I_CreateResourcesBody;
+    const project_id = request.get("project-id") as string;
+    const result = await resourceService.createResource(data, +project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+
+  async update(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateResourcesBody;
+    const resource_id = Number(request.params.id);
+    const project_id = request.get("project-id") as string;
+    const result = await resourceService.updateResource(
+      data,
+      +project_id,
+      resource_id
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+
   resourceReadExcel = async (
     request: express.Request,
     response: express.Response
@@ -40,15 +71,21 @@ class ResourceController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
-    const search = request.query.search as string;
+    const category = request.query.category as string;
     let paginationOptions: T_FindAllResource = {
       queryParams: {
         page: page,
         limit: limit,
-        search: search,
+        category: category,
       },
     };
     const result = await resourceService.findAll(paginationOptions, project_id);
+    response.status(result.statusCode).json(result);
+  }
+
+  async findById(request: express.Request, response: express.Response) {
+    const resource_id = Number(request.params.id);
+    const result = await resourceService.findById(resource_id);
     response.status(result.statusCode).json(result);
   }
 
