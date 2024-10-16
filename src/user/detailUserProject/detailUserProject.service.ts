@@ -7,10 +7,18 @@ import { userValidation } from "../user.validation";
 import { rolValidation } from "@/rol/rol.validation";
 import { Proyecto, Usuario, Rol, DetalleUsuarioProyecto } from "@prisma/client";
 import { detailProjectValidation } from "./detailUserProject.validation";
+import { jwtService } from "@/auth/jwt.service";
 
 class DetailUserProjectService {
-  async findAll(data: T_FindAllDetailUserProject, project_id: string) {
+  async findAll(
+    data: T_FindAllDetailUserProject,
+    project_id: string,
+    token: string
+  ) {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const projectResponse = await projectValidation.findById(+project_id);
       if (!projectResponse.success) {
@@ -20,7 +28,8 @@ class DetailUserProjectService {
         await prismaDetailUserProjectRepository.getAllUsersOfProject(
           skip,
           data,
-          +project_id
+          +project_id,
+          userResponse
         );
 
       const { userAll, total } = result;

@@ -71,6 +71,8 @@ class WorkforceValidation {
         telefono: data.CELULAR ? String(data.CELULAR) : null,
         email_personal: data.CORREO,
         proyecto_id: project_id,
+        direccion: data.DIRECCION,
+        lugar_nacimiento: data["LUGAR DE NACIMIENTO"],
       };
       const workforceUpdate = await prismaWorkforceRepository.updateWorkforce(
         workForceFormat,

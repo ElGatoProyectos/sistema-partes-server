@@ -72,11 +72,13 @@ class ResourceController {
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
     const category = request.query.category as string;
+    const search = request.query.search as string;
     let paginationOptions: T_FindAllResource = {
       queryParams: {
         page: page,
         limit: limit,
         category: category,
+        search: search,
       },
     };
     const result = await resourceService.findAll(paginationOptions, project_id);

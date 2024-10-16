@@ -72,9 +72,12 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     project_id: number
   ): Promise<{ workforces: I_Workforce[]; total: number }> {
     let filters: any = {};
-    let filtersCategory: any = {};
-    let filtersOrigin: any = {};
-
+    let filtersCategory = this.getCategoryFilter(data.queryParams.category);
+    let filtersOrigin = this.getOriginFilter(data.queryParams.origin);
+    let filtersSpeciality = this.getSpecialityFilter(
+      data.queryParams.speciality
+    );
+    let filtersType = this.getTypeFilter(data.queryParams.type);
     if (data.queryParams.search) {
       if (isNaN(data.queryParams.search as any)) {
         filters.OR = [
@@ -109,16 +112,7 @@ class PrismaWorkforceRepository implements WorkforceRepository {
         filters.estado = E_Estado_MO_BD.INACTIVO;
       }
     }
-    if (data.queryParams.category) {
-      filtersCategory.nombre = {
-        contains: data.queryParams.category,
-      };
-    }
-    if (data.queryParams.origin) {
-      filtersOrigin.nombre = {
-        contains: data.queryParams.origin,
-      };
-    }
+
     const [workforces, total]: [I_Workforce[], number] =
       await prisma.$transaction([
         prisma.manoObra.findMany({
@@ -127,8 +121,14 @@ class PrismaWorkforceRepository implements WorkforceRepository {
             CategoriaObrero: {
               ...filtersCategory,
             },
-            TipoObrero: {
+            OrigenObrero: {
               ...filtersOrigin,
+            },
+            EspecialidadObra: {
+              ...filtersSpeciality,
+            },
+            TipoObrero: {
+              ...filtersType,
             },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
@@ -148,8 +148,14 @@ class PrismaWorkforceRepository implements WorkforceRepository {
             CategoriaObrero: {
               ...filtersCategory,
             },
-            TipoObrero: {
+            OrigenObrero: {
               ...filtersOrigin,
+            },
+            EspecialidadObra: {
+              ...filtersSpeciality,
+            },
+            TipoObrero: {
+              ...filtersType,
             },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
@@ -157,6 +163,22 @@ class PrismaWorkforceRepository implements WorkforceRepository {
         }),
       ]);
     return { workforces, total };
+  }
+  getCategoryFilter(category: string | undefined) {
+    if (!category) return {};
+    return { nombre: { contains: category } };
+  }
+  getSpecialityFilter(speciality: string | undefined) {
+    if (!speciality) return {};
+    return { nombre: { contains: speciality } };
+  }
+  getTypeFilter(type: string | undefined) {
+    if (!type) return {};
+    return { nombre: { contains: type } };
+  }
+  getOriginFilter(origin: string | undefined) {
+    if (!origin) return {};
+    return { nombre: { contains: origin } };
   }
 
   async findById(workforce_id: number): Promise<I_Workforce | null> {
