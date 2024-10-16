@@ -24,7 +24,8 @@ export abstract class UserRepository {
     skip: number,
     data: T_FindAllUser,
     rol: Rol,
-    user_id: number
+    user_id: number,
+    userResponse: Usuario
   ): void {}
 
   findByDni(dni: string): void {}

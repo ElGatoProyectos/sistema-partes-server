@@ -2,11 +2,18 @@ import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 import express from "@/config/express.config";
 import { userMiddleware } from "../user.middleware";
 import { detailUserProjectController } from "./detailUserProject.controller";
+import { detailUserProjectMiddleware } from "./detailUserProject.middleware";
 
 const detailUserProjectRouter = express.Router();
 
 const prefix = "/users_project";
 
+detailUserProjectRouter.post(
+  `${prefix}/assignment`,
+  detailUserProjectMiddleware.verifyFieldsAssignment,
+  authRoleMiddleware.authAdminUser,
+  detailUserProjectController.createDetailAssignment
+);
 detailUserProjectRouter.get(
   `${prefix}`,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,

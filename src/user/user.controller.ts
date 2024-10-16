@@ -330,6 +330,12 @@ class UserController {
     const state = request.query.state as string;
     const rol = request.query.rol as string;
     const company_id = Number(request.params.id);
+    const tokenWithBearer = request.headers.authorization;
+    if (!tokenWithBearer) {
+      return httpResponse.BadRequestException(
+        "No se encontró nada en Authorization"
+      );
+    }
     let paginationOptions: T_FindAllUserCompany = {
       queryParams: {
         page: page,
@@ -341,7 +347,8 @@ class UserController {
     };
     const result = await userService.findAllUserCompany(
       paginationOptions,
-      company_id
+      company_id,
+      tokenWithBearer
     );
 
     response.status(result.statusCode).json(result);
