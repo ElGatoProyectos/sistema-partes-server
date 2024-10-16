@@ -33,6 +33,9 @@ import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-co
 import { T_FindAllUser, T_FindAllUserCompany } from "./models/user.types";
 import { projectValidation } from "@/project/project.validation";
 import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
+import { detailDetailProductionEngineerMasterBuilderValidation } from "./detailProductionEngineerMasterBuilder/detailProductionEngineerMasterBuilder.validation";
+import { detailMasterBuilderForemanValidation } from "./detailMasterBuilderForeman/detailMasterBuilderForeman.validation";
+import { detailForemanGroupLeaderValidation } from "./detailForemanGroupLeader/detailForemanGroupLeader.validation";
 
 class UserService {
   async findAll(data: T_FindAllUser, token: string): Promise<T_HttpResponse> {
@@ -81,9 +84,13 @@ class UserService {
 
   async findAllUserCompany(
     data: T_FindAllUserCompany,
-    company_id: number
+    company_id: number,
+    token: string
   ): Promise<T_HttpResponse> {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       let rol: any = null;
 
@@ -121,7 +128,8 @@ class UserService {
         skip,
         data,
         rol,
-        company.id
+        company.id,
+        userResponse
       );
 
       const { userAll, total } = result;
@@ -845,13 +853,13 @@ class UserService {
       const rolResponse = await rolValidation.findById(rol_id);
       if (!rolResponse.success) return rolResponse;
 
-      const result = await prismaUserRepository.updateRolUser(
-        usuario_id,
-        rol_id
-      );
       if (action === "CREACION") {
         const userExistInDetailProject =
           await detailProjectValidation.findByIdUser(user.id, project.id);
+        const result = await prismaUserRepository.updateRolUser(
+          usuario_id,
+          rol_id
+        );
 
         if (userExistInDetailProject.success) {
           return httpResponse.BadRequestException(
@@ -870,6 +878,46 @@ class UserService {
           "Se ha cambiado de rol y se le ha asignado un Proyecto correctamente",
           resultMapper
         );
+      } else if (action === "MODIFICACION") {
+        const DetailProductionEngineerMasterBuilderResponse =
+          await detailDetailProductionEngineerMasterBuilderValidation.findByIdUserDetailProductionEngineerMasterBuilder(
+            usuario_id
+          );
+        if (DetailProductionEngineerMasterBuilderResponse.success) {
+          return httpResponse.SuccessResponse(
+            "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
+          );
+        }
+        const DetailMasterBuilderForeman =
+          await detailMasterBuilderForemanValidation.findByIdUserDetailMasterBuilderForeman(
+            usuario_id
+          );
+        if (DetailMasterBuilderForeman.success) {
+          return httpResponse.SuccessResponse(
+            "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
+          );
+        }
+        const DetailForemanGroupLeader =
+          await detailForemanGroupLeaderValidation.findByIdUserDetailForemanGroupLeader(
+            usuario_id
+          );
+        if (DetailForemanGroupLeader.success) {
+          return httpResponse.SuccessResponse(
+            "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
+          );
+        }
+        const result = await prismaUserRepository.updateRolUser(
+          usuario_id,
+          rol_id
+        );
+        return httpResponse.SuccessResponse(
+          "Se ha cambiado de rol correctamente",
+          result
+        );
+      } else {
+        return httpResponse.InternalServerErrorException(
+          "El action no tiene ninguna de las opciones contempladas"
+        );
       }
 
       // const detailFormat = {
@@ -879,11 +927,6 @@ class UserService {
       // const detailUserProject =
       //   await detailProjectValidation.createDetailUserProject(detailFormat);
       // if (!detailUserProject.success) return detailUserProject;
-      const resultMapper = new UserResponseMapper(result);
-      return httpResponse.SuccessResponse(
-        "Se ha cambiado de rol correctamente",
-        resultMapper
-      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al cambiar de rol",

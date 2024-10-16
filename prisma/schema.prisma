@@ -119,25 +119,64 @@ model Permisos {
 
 //[success] actual
 model Usuario {
-  id                     Int                      @id @default(autoincrement())
+  id                     Int                                     @id @default(autoincrement())
   email                  String
-  dni                    String                   @unique
+  dni                    String                                  @unique
   nombre_completo        String
   telefono               String
-  limite_proyecto        Int                      @default(1)
+  limite_proyecto        Int                                     @default(1)
   limite_usuarios        Int
-  estado                 E_Estado_BD?             @default(n)
-  eliminado              E_Estado_BD              @default(n)
+  estado                 E_Estado_BD?                            @default(n)
+  eliminado              E_Estado_BD                             @default(n)
   contrasena             String
-  fecha_creacion         DateTime                 @default(now())
+  fecha_creacion         DateTime                                @default(now())
   rol_id                 Int
-  Rol                    Rol                      @relation(fields: [rol_id], references: [id])
+  Rol                    Rol                                     @relation(fields: [rol_id], references: [id])
   Empresa                Empresa[]
   DetalleUsuarioEmpresa  DetalleUsuarioEmpresa[]
   Partida                Partida[]
   ManoObra               ManoObra[]
   DetalleUsuarioProyecto DetalleUsuarioProyecto[]
   Trabajo                Trabajo[]
+  IngenieroProduccion    DetalleIngenieroProduccionMaestroObra[] @relation("IngenieroRelation")
+  ProduccionManoObra     DetalleIngenieroProduccionMaestroObra[] @relation("ProduccionRelation")
+  ManoDeObra             DetalleMaestroObraCapataz[]             @relation("ManoDeObra")
+  Capataz                DetalleMaestroObraCapataz[]             @relation("Capataz")
+  CapatazJefe            DetalleCapatazJefeGrupo[]               @relation("CapatazJefe")
+  JefeGrupo              DetalleCapatazJefeGrupo[]               @relation("JefeGrupo")
+}
+
+model DetalleIngenieroProduccionMaestroObra {
+  id                    Int      @id @default(autoincrement())
+  usuario_ingeniero_id  Int
+  usuario_produccion_id Int
+  fecha_creacion        DateTime @default(now())
+  proyecto_id           Int
+  Proyecto              Proyecto @relation(fields: [proyecto_id], references: [id])
+  Ingeniero             Usuario  @relation("IngenieroRelation", fields: [usuario_ingeniero_id], references: [id])
+  Produccion            Usuario  @relation("ProduccionRelation", fields: [usuario_produccion_id], references: [id])
+}
+
+model DetalleMaestroObraCapataz {
+  id                 Int      @id @default(autoincrement())
+  usuario_mo_id      Int
+  usuario_capataz_id Int
+  fecha_creacion     DateTime @default(now())
+  proyecto_id        Int
+  Proyecto           Proyecto @relation(fields: [proyecto_id], references: [id])
+  ManoDeObra         Usuario  @relation("ManoDeObra", fields: [usuario_mo_id], references: [id])
+  Capataz            Usuario  @relation("Capataz", fields: [usuario_capataz_id], references: [id])
+}
+
+model DetalleCapatazJefeGrupo {
+  id                    Int      @id @default(autoincrement())
+  usuario_capataz_id    Int
+  usuario_jefe_grupo_id Int
+  fecha_creacion        DateTime @default(now())
+  proyecto_id           Int
+  Proyecto              Proyecto @relation(fields: [proyecto_id], references: [id])
+  CapatazJefe           Usuario  @relation("CapatazJefe", fields: [usuario_capataz_id], references: [id])
+  JefeGrupo             Usuario  @relation("JefeGrupo", fields: [usuario_jefe_grupo_id], references: [id])
 }
 
 //[success] actual
@@ -468,56 +507,59 @@ model AreaObrero {
 
 //[success] actual
 model Proyecto {
-  id                     Int                      @id @default(autoincrement())
-  nombre_completo        String                   @db.Text()
-  descripcion            String?                  @db.Text()
-  direccion              String
-  nombre_consorcio       String
-  nombre_corto           String
-  costo_proyecto         Float
-  estado                 E_Proyecto_Estado
-  eliminado              E_Estado_BD              @default(n)
-  fecha_inicio           DateTime                 @db.Date()
-  fecha_fin              DateTime                 @db.Date()
-  fecha_creacion         DateTime                 @default(now())
-  plazo_proyecto         String
-  color_primario         String?
-  color_personalizado    String?
-  color_linea            String?
-  color_detalle          String?
-  color_menu             String?
-  color_submenu          String?
-  codigo_proyecto        String
-  empresa_id             Int
-  Empresa                Empresa                  @relation(fields: [empresa_id], references: [id])
-  UnidadProduccion       UnidadProduccion[]
-  Tren                   Tren[]
-  Partida                Partida[]
-  SeccionObrero          SeccionObrero[]
-  DepartamentoObrero     DepartamentoObrero[]
-  AreaObrero             AreaObrero[]
-  Combo                  Combo[]
-  ParteDiario            ParteDiario[]
-  ManoObra               ManoObra[]
-  Trabajo                Trabajo[]
-  Recurso                Recurso[]
-  Unidad                 Unidad[]
-  Asistencia             Asistencia[]
-  PrecioHoraMO           PrecioHoraMO[]
-  ReporteTren            ReporteTren[]
-  ReportePartida         ReportePartida[]
-  CategoriaObrero        CategoriaObrero[]
-  TipoObrero             TipoObrero[]
-  OrigenObrero           OrigenObrero[]
-  EspecialidadObrero     EspecialidadObrero[]
-  RiesgoParteDiario      RiesgoParteDiario[]
-  ParteDiarioMO          ParteDiarioMO[]
-  ParteDiarioRecurso     ParteDiarioRecurso[]
-  DetalleUsuarioProyecto DetalleUsuarioProyecto[]
-  DetalleSemanaProyecto  DetalleSemanaProyecto[]
-  Banco                  Banco[]
-  IndiceUnificado        IndiceUnificado[]
-  CategoriaRecurso       CategoriaRecurso[]
+  id                                 Int                                     @id @default(autoincrement())
+  nombre_completo                    String                                  @db.Text()
+  descripcion                        String?                                 @db.Text()
+  direccion                          String
+  nombre_consorcio                   String
+  nombre_corto                       String
+  costo_proyecto                     Float
+  estado                             E_Proyecto_Estado
+  eliminado                          E_Estado_BD                             @default(n)
+  fecha_inicio                       DateTime                                @db.Date()
+  fecha_fin                          DateTime                                @db.Date()
+  fecha_creacion                     DateTime                                @default(now())
+  plazo_proyecto                     String
+  color_primario                     String?
+  color_personalizado                String?
+  color_linea                        String?
+  color_detalle                      String?
+  color_menu                         String?
+  color_submenu                      String?
+  codigo_proyecto                    String
+  empresa_id                         Int
+  Empresa                            Empresa                                 @relation(fields: [empresa_id], references: [id])
+  UnidadProduccion                   UnidadProduccion[]
+  Tren                               Tren[]
+  Partida                            Partida[]
+  SeccionObrero                      SeccionObrero[]
+  DepartamentoObrero                 DepartamentoObrero[]
+  AreaObrero                         AreaObrero[]
+  Combo                              Combo[]
+  ParteDiario                        ParteDiario[]
+  ManoObra                           ManoObra[]
+  Trabajo                            Trabajo[]
+  Recurso                            Recurso[]
+  Unidad                             Unidad[]
+  Asistencia                         Asistencia[]
+  PrecioHoraMO                       PrecioHoraMO[]
+  ReporteTren                        ReporteTren[]
+  ReportePartida                     ReportePartida[]
+  CategoriaObrero                    CategoriaObrero[]
+  TipoObrero                         TipoObrero[]
+  OrigenObrero                       OrigenObrero[]
+  EspecialidadObrero                 EspecialidadObrero[]
+  RiesgoParteDiario                  RiesgoParteDiario[]
+  ParteDiarioMO                      ParteDiarioMO[]
+  ParteDiarioRecurso                 ParteDiarioRecurso[]
+  DetalleUsuarioProyecto             DetalleUsuarioProyecto[]
+  DetalleSemanaProyecto              DetalleSemanaProyecto[]
+  Banco                              Banco[]
+  IndiceUnificado                    IndiceUnificado[]
+  CategoriaRecurso                   CategoriaRecurso[]
+  DetalleIngenieroProduccionManoObra DetalleIngenieroProduccionMaestroObra[]
+  DetalleManoObraCapataz             DetalleMaestroObraCapataz[]
+  DetalleCapatazJefeGrupo            DetalleCapatazJefeGrupo[]
 }
 
 model Combo {

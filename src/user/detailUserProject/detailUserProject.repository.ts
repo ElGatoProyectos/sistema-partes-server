@@ -1,4 +1,3 @@
-import { Usuario } from "@prisma/client";
 import { I_CreateDetailUserProject } from "./models/detailUserProject.interface";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 
@@ -7,8 +6,7 @@ export abstract class DetailUserProjectRepository {
   getAllUsersOfProject(
     skip: number,
     data: T_FindAllDetailUserProject,
-    project_id: number,
-    user: Usuario
+    project_id: number
   ): void {}
   getAllUsersOfProjectUnassigned(
     skip: number,
