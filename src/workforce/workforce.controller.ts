@@ -1,7 +1,6 @@
 import express from "@/config/express.config";
 import multer from "multer";
 import { workforceService } from "./workforce.service";
-import { httpResponse } from "@/common/http.response";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { I_UpdateWorkforceBody } from "./models/workforce.interface";
 
@@ -9,6 +8,33 @@ const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class WorkforceController {
+  async create(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateWorkforceBody;
+    const project_id = request.get("project-id") as string;
+    const result = await workforceService.createWorkforce(data, +project_id);
+
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+  async update(request: express.Request, response: express.Response) {
+    const data = request.body as I_UpdateWorkforceBody;
+    const workforce_id = Number(request.params.id);
+    const project_id = request.get("project-id") as string;
+    const result = await workforceService.updateWorkforce(
+      data,
+      workforce_id,
+      +project_id
+    );
+
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
   workforceReadExcel = async (
     request: express.Request,
     response: express.Response
@@ -46,6 +72,8 @@ class WorkforceController {
     const state = request.query.state as string;
     const category = request.query.category as string;
     const origin = request.query.origin as string;
+    const speciality = request.query.speciality as string;
+    const type = request.query.type as string;
     let paginationOptions: T_FindAllWorkforce = {
       queryParams: {
         page: page,
@@ -54,6 +82,8 @@ class WorkforceController {
         state: state,
         category: category,
         origin: origin,
+        speciality: speciality,
+        type: type,
       },
     };
     const result = await workforceService.findAll(
@@ -61,23 +91,6 @@ class WorkforceController {
       project_id
     );
     response.status(result.statusCode).json(result);
-  }
-
-  async update(request: express.Request, response: express.Response) {
-    const data = request.body as I_UpdateWorkforceBody;
-    const workforce_id = Number(request.params.id);
-    const project_id = request.get("project-id") as string;
-    const result = await workforceService.updateWorkforce(
-      data,
-      workforce_id,
-      +project_id
-    );
-
-    if (!result.success) {
-      response.status(result.statusCode).json(result);
-    } else {
-      response.status(result.statusCode).json(result);
-    }
   }
 
   async updateStatus(request: express.Request, response: express.Response) {

@@ -1,5 +1,6 @@
 import * as xlsx from "xlsx";
 import {
+  I_CreateWorkforceBDValidation,
   I_UpdateWorkforceBody,
   I_WorkforceExcel,
 } from "./models/workforce.interface";
@@ -23,8 +24,113 @@ import { T_FindAllWorkforce } from "./models/workforce.types";
 import { prismaWorkforceRepository } from "./prisma-workforce.repository";
 import { converToDate } from "@/common/utils/date";
 import { userValidation } from "@/user/user.validation";
+import validator from "validator";
 
 class WorkforceService {
+  async createWorkforce(
+    data: I_CreateWorkforceBDValidation,
+    project_id: number
+  ) {
+    try {
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return resultIdProject;
+      }
+
+      const categoryWorkforceResponse =
+        await categoryWorkforceValidation.findById(data.categoria_obrero_id);
+      if (!categoryWorkforceResponse.success) {
+        return categoryWorkforceResponse;
+      }
+
+      const specialityWorkforceResponse =
+        await specialtyWorkforceValidation.findById(
+          data.especialidad_obrero_id
+        );
+      if (!specialityWorkforceResponse.success) {
+        return specialityWorkforceResponse;
+      }
+
+      if (data.documento_identidad.length > 8) {
+        return httpResponse.BadRequestException(
+          "El dni ingresado debe contener solo 8 números"
+        );
+      }
+
+      if (data.email_personal) {
+        if (!validator.isEmail(data.email_personal)) {
+          return httpResponse.BadRequestException(
+            "El formato del email ingresado no es válido"
+          );
+        }
+      }
+      const lastWorkforce = await workforceValidation.codeMoreHigh(project_id);
+      const lastWorkforceResponse = lastWorkforce.payload as ManoObra;
+
+      // Incrementar el código en 1
+      const nextCodigo = (parseInt(lastWorkforceResponse?.codigo) || 0) + 1;
+
+      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+
+      let user: Usuario | undefined = undefined;
+      if (data.usuario_id) {
+        const userResponse = await userValidation.findById(data.usuario_id);
+        if (!userResponse) return userResponse;
+        user = userResponse.payload as Usuario;
+      }
+
+      let fecha_nacimiento: Date | null = null;
+      if (data.fecha_nacimiento) {
+        fecha_nacimiento = converToDate(data.fecha_inicio);
+      }
+
+      let fecha_inicio: Date | null = null;
+      if (data.fecha_inicio) {
+        fecha_inicio = converToDate(data.fecha_inicio);
+      }
+
+      let fecha_finalizacion: Date | null = null;
+      if (data.fecha_cese) {
+        fecha_finalizacion = converToDate(data.fecha_cese);
+      }
+
+      if (fecha_inicio && fecha_finalizacion) {
+        if (fecha_finalizacion < fecha_inicio) {
+          return httpResponse.BadRequestException(
+            "La fecha de Finalización debe ser mayor o igual a la fecha de inicio"
+          );
+        }
+      }
+
+      const workforceFormat = {
+        ...data,
+        codigo: formattedCodigo,
+        telefono: data.telefono,
+        categoria_obrero_id: +data.categoria_obrero_id,
+        especialidad_obrero_id: +data.especialidad_obrero_id,
+        fecha_nacimiento: fecha_nacimiento,
+        fecha_inicio: fecha_inicio,
+        fecha_cese: fecha_finalizacion,
+        proyecto_id: +project_id,
+        usuario_id: user ? user.id : null,
+      };
+      const responseWorkforce = await prismaWorkforceRepository.createWorkforce(
+        workforceFormat
+      );
+      return httpResponse.SuccessResponse(
+        "Mano de Obra creada correctamente",
+        responseWorkforce
+      );
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        "Error al crear la Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async updateWorkforce(
     data: I_UpdateWorkforceBody,
     workforce_id: number,
@@ -56,6 +162,20 @@ class WorkforceService {
         return specialityWorkforceResponse;
       }
 
+      if (data.documento_identidad.length > 8) {
+        return httpResponse.BadRequestException(
+          "El dni ingresado debe contener solo 8 números"
+        );
+      }
+
+      if (data.email_personal) {
+        if (!validator.isEmail(data.email_personal)) {
+          return httpResponse.BadRequestException(
+            "El formato del email ingresado no es válido"
+          );
+        }
+      }
+
       let user: Usuario | undefined = undefined;
       if (data.usuario_id) {
         const userResponse = await userValidation.findById(data.usuario_id);
@@ -63,31 +183,47 @@ class WorkforceService {
         user = userResponse.payload as Usuario;
       }
 
-      let fecha_inicio;
+      let fecha_nacimiento: Date | null = null;
+      if (data.fecha_nacimiento) {
+        fecha_nacimiento = converToDate(data.fecha_inicio);
+      }
+
+      let fecha_inicio: Date | null = null;
       if (data.fecha_inicio) {
         fecha_inicio = converToDate(data.fecha_inicio);
       }
-      let fecha_finalizacion;
+
+      let fecha_finalizacion: Date | null = null;
       if (data.fecha_cese) {
         fecha_finalizacion = converToDate(data.fecha_cese);
       }
+
+      if (fecha_inicio && fecha_finalizacion) {
+        if (fecha_finalizacion < fecha_inicio) {
+          return httpResponse.BadRequestException(
+            "La fecha de Finalización debe ser mayor o igual a la fecha de inicio"
+          );
+        }
+      }
+
       const workforceFormat = {
         ...data,
+        telefono: data.telefono,
         categoria_obrero_id: +data.categoria_obrero_id,
         especialidad_obrero_id: +data.especialidad_obrero_id,
+        fecha_nacimiento: fecha_nacimiento,
         fecha_inicio: fecha_inicio,
-        fecha_finalizacion: fecha_finalizacion,
+        fecha_cese: fecha_finalizacion,
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
       };
-      console.log(workforceFormat);
-      // const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
-      //   workforceFormat,
-      //   workforce_id
-      // );
+      const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
+        workforceFormat,
+        workforce_id
+      );
       return httpResponse.SuccessResponse(
         "Mano de Obra modificada correctamente",
-        "jaj"
+        responseWorkforce
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -311,6 +447,8 @@ class WorkforceService {
               telefono: String(item.CELULAR),
               email_personal: item.CORREO,
               proyecto_id: responseProject.id,
+              direccion: item.DIRECCION,
+              lugar_nacimiento: item["LUGAR DE NACIMIENTO"],
             },
           });
         }
@@ -356,6 +494,7 @@ class WorkforceService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer toda la Mano de Obra",
         error

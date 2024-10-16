@@ -224,6 +224,9 @@ model ManoObra {
   apellido_paterno       String?
   genero                 String?
   estado_civil           String?
+  //[message] POSIBLEMENTE TENGA QUE REGISTRARSE TAMBIÉN ESTE CAMPO "DIRECCIÓN " EN PLANILLA
+  direccion              String?
+  domicilio              String?
   lugar_nacimiento       String?
 
   //[Note] Los de abajo son para otra etapa
@@ -234,7 +237,6 @@ model ManoObra {
   turno              String?
   sede_local         String?
   usuario_marcacion  String? @default("")
-  domicilio          String?
   tipo_documento     String?
   contrasena         String?
   profesion          String?

@@ -8,6 +8,7 @@ import {
 import { CategoriaRecurso, E_Estado_BD, Recurso } from "@prisma/client";
 import { T_FindAllResource } from "./models/resource.types";
 import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
+import { contains } from "validator";
 
 class PrismaResourcesRepository implements ResourcesRepository {
   async createResource(data: I_CreateResourcesBD): Promise<Recurso> {
@@ -49,14 +50,22 @@ class PrismaResourcesRepository implements ResourcesRepository {
     data: T_FindAllResource,
     project_id: number
   ): Promise<{ resources: I_Resources[]; total: number }> {
+    let filtersResource: any = {};
     let filters: any = {};
+    if (data.queryParams.search) {
+      filtersResource.nombre = data.queryParams.search;
+    }
     if (data.queryParams.category) {
       filters.nombre = data.queryParams.category;
     }
+
     const [resources, total]: [I_Resources[], number] =
       await prisma.$transaction([
         prisma.recurso.findMany({
           where: {
+            nombre: {
+              contains: filtersResource.nombre,
+            },
             CategoriaRecurso: {
               nombre: {
                 contains: filters.nombre,
@@ -81,6 +90,9 @@ class PrismaResourcesRepository implements ResourcesRepository {
         }),
         prisma.recurso.count({
           where: {
+            nombre: {
+              contains: filtersResource.nombre,
+            },
             CategoriaRecurso: {
               nombre: {
                 contains: filters.nombre,

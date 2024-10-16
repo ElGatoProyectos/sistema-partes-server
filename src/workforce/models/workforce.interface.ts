@@ -1,9 +1,77 @@
 import { ManoObra } from "@prisma/client";
 
-export interface I_CreateWorkforceBD extends Omit<ManoObra, "id"> {}
-
-export interface I_CreateWorkforceBody extends Omit<ManoObra, "id"> {}
-
+export interface I_CreateWorkforceBD
+  extends Omit<
+    ManoObra,
+    | "id"
+    | "eliminado"
+    | "fecha_inicio"
+    | "fecha_cese"
+    | "fecha_creacion"
+    | "turno"
+    | "sede_local"
+    | "usuario_marcacion"
+    | "origen_obrero_id"
+    | "domicilio"
+    | "lugar_nacimiento"
+    | "genero"
+    | "tipo_documento"
+    | "contrasena"
+    | "profesion"
+    | "estado_civil"
+    | "n_libreta_militar"
+    | "n_pasaporte"
+    | "email_corporativo"
+    | "brevete"
+    | "grado_instruccion"
+    | "ruc"
+    | "tipo_cese"
+    | "carnet_extranjeria"
+    | "condicion"
+    | "pais_origen"
+    | "hora_ingreso"
+    | "hora_salida"
+    | "tolerancia_ingreso"
+    | "tiempo_refrigerio"
+  > {}
+export interface I_CreateWorkforceBDValidation
+  extends Omit<
+    ManoObra,
+    | "id"
+    | "codigo"
+    | "eliminado"
+    | "fecha_inicio"
+    | "fecha_cese"
+    | "fecha_creacion"
+    | "turno"
+    | "sede_local"
+    | "usuario_marcacion"
+    | "origen_obrero_id"
+    | "domicilio"
+    | "lugar_nacimiento"
+    | "genero"
+    | "tipo_documento"
+    | "contrasena"
+    | "profesion"
+    | "estado_civil"
+    | "n_libreta_militar"
+    | "n_pasaporte"
+    | "email_corporativo"
+    | "brevete"
+    | "grado_instruccion"
+    | "ruc"
+    | "tipo_cese"
+    | "carnet_extranjeria"
+    | "condicion"
+    | "pais_origen"
+    | "hora_ingreso"
+    | "hora_salida"
+    | "tolerancia_ingreso"
+    | "tiempo_refrigerio"
+  > {
+  fecha_inicio: string;
+  fecha_cese: string;
+}
 export interface I_UpdateWorkforceBody
   extends Omit<
     ManoObra,
@@ -13,7 +81,6 @@ export interface I_UpdateWorkforceBody
     | "fecha_inicio"
     | "fecha_cese"
     | "fecha_creacion"
-    | "fecha_nacimiento"
     | "turno"
     | "sede_local"
     | "usuario_marcacion"
@@ -103,4 +170,6 @@ export interface I_WorkforceExcel {
   ESTADO: string;
   CELULAR: string;
   CORREO: string;
+  DIRECCION: string;
+  "LUGAR DE NACIMIENTO": string;
 }

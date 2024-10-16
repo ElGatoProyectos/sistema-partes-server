@@ -6,11 +6,19 @@ import { workforceController } from "./workforce.controller";
 const workforceRouter = express.Router();
 const prefix = "/mano-de-obra";
 
+workforceRouter.post(
+  `${prefix}`,
+  workforceMiddleware.verifyHeadersFieldsIdProject,
+  workforceMiddleware.verifyFields,
+  authRoleMiddleware.authAdminUser,
+  workforceController.create
+);
 workforceRouter.put(
   `${prefix}/:id`,
   workforceMiddleware.verifyHeadersFieldsIdProject,
+  workforceMiddleware.verifyFieldsUpdate,
   authRoleMiddleware.authAdminUser,
-  workforceController.workforceReadExcel
+  workforceController.update
 );
 workforceRouter.post(
   `${prefix}/upload-excel`,

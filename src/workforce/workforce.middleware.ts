@@ -1,39 +1,41 @@
 import { httpResponse } from "@/common/http.response";
 import express from "@/config/express.config";
 import validator from "validator";
+import { workforceDto } from "./dto/workforce.dto";
+import { workforceUpdateDto } from "./dto/workforceUpdate.dto";
 
 class WorkforceMiddleware {
-  // verifyFields(
-  //   request: express.Request,
-  //   response: express.Response,
-  //   nextFunction: express.NextFunction
-  // ) {
-  //   try {
-  //     trainDto.parse(request.body);
-  //     nextFunction();
-  //   } catch (error) {
-  //     const result = httpResponse.BadRequestException(
-  //       "Error al validar campos "
-  //     );
-  //     response.status(result.statusCode).send(result);
-  //   }
-  // }
+  verifyFields(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      workforceDto.parse(request.body);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos "
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
 
-  // verifyFieldsUpdate(
-  //   request: express.Request,
-  //   response: express.Response,
-  //   nextFunction: express.NextFunction
-  // ) {
-  //   try {
-  //     trainUpdateDto.parse(request.body);
-  //     nextFunction();
-  //   } catch {
-  //     const result = httpResponse.BadRequestException(
-  //       "Error al validar campos para actualizar el Tren"
-  //     );
-  //     response.status(result.statusCode).send(result);
-  //   }
-  // }
+  verifyFieldsUpdate(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      workforceUpdateDto.parse(request.body);
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos para actualizar la Mano de Obra"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
 
   verifyHeadersFieldsId(
     request: express.Request,
