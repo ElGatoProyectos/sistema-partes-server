@@ -1,10 +1,11 @@
-import { T_FindAllDetailForemanGroupLeader } from "./models/detailForemanGroupLeader.types";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 export abstract class DetailForemanGroupLeaderRepository {
   getAllDetailForemanGroupLeader(
     skip: number,
-    data: T_FindAllDetailForemanGroupLeader,
-    project_id: number
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
   ): void {}
 
   createDetailForemanGroupLeader(

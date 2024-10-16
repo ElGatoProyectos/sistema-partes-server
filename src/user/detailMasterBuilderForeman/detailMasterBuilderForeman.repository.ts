@@ -1,9 +1,11 @@
-import { T_FindAllDetailMasterBuilderForeman } from "./models/detailMasterBuilderForeman.types";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 export abstract class DetailMasterBuilderForemanRepository {
   getAllDetailMasterBuilderForeman(
-    data: T_FindAllDetailMasterBuilderForeman,
-    project_id: number
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
   ): void {}
   createDetailMasterBuilderForeman(
     user_id: number,

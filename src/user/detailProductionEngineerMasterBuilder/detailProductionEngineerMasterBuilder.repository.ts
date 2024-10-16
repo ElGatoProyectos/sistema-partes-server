@@ -1,4 +1,4 @@
-import { T_FindAllDetailProductionEngineerMasterBuilder } from "./models/detailProductionEngineerMasterBuilder.types";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 export abstract class DetailProductionEngineerMasterBuilder {
   createDetailProductionEngineerMasterBuilder(
@@ -8,7 +8,9 @@ export abstract class DetailProductionEngineerMasterBuilder {
   ): void {}
   verifyIdDetailProductionEngineerMasterBuilder(user_id: number): void {}
   getAllDetailProductionEngineerMasterBuilder(
-    data: T_FindAllDetailProductionEngineerMasterBuilder,
-    project_id: number
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
   ): void {}
 }

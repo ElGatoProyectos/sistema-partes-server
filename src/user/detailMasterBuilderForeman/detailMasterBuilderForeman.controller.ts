@@ -1,8 +1,8 @@
 import express from "@/config/express.config";
-import { detailForemanGroupLeaderService } from "./detailForemanGroupLeader.service";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
+import { detailMasterBuilderForemanService } from "./detailMasterBuilder.service";
 
-class DetailForemanGroupLeaderController {
+class DetailMasterBuilderForemanController {
   async all(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
@@ -16,7 +16,7 @@ class DetailForemanGroupLeaderController {
         name: search,
       },
     };
-    const result = await detailForemanGroupLeaderService.findAll(
+    const result = await detailMasterBuilderForemanService.findAll(
       paginationOptions,
       project_id
     );
@@ -24,5 +24,5 @@ class DetailForemanGroupLeaderController {
   }
 }
 
-export const detailForemanGroupLeaderController =
-  new DetailForemanGroupLeaderController();
+export const detailMasterBuilderForemanController =
+  new DetailMasterBuilderForemanController();

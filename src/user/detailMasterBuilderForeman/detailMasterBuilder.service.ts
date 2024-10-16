@@ -1,10 +1,10 @@
 import { projectValidation } from "@/project/project.validation";
 import { httpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
-import { prismaDetailForemanGroupLeaderRepository } from "./prisma-detailForemanGroupLeader.respository";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
+import { prismaDetailMasterBuilderForemanRepository } from "./prismaDetailMasterBuilderForeman.repository";
 
-class DetailForemanGroupLeaderService {
+class DetailMasterBuilderForemanService {
   async findAll(data: T_FindAllDetailUserProject, project_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
@@ -13,9 +13,9 @@ class DetailForemanGroupLeaderService {
         return projectResponse;
       }
       //[message] id usuario harcodeado
-      const user_id = 5;
+      const user_id = 4;
       const result =
-        await prismaDetailForemanGroupLeaderRepository.getAllDetailForemanGroupLeader(
+        await prismaDetailMasterBuilderForemanRepository.getAllDetailMasterBuilderForeman(
           skip,
           data,
           +project_id,
@@ -34,12 +34,12 @@ class DetailForemanGroupLeaderService {
         data: userAll,
       };
       return httpResponse.SuccessResponse(
-        "Éxito al traer todos los Detalles de Capataz y Jefe Grupo",
+        "Éxito al traer todos los Detalles de Maestro de Obra y Capataz",
         formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todos los Detalles de Capataz y Jefe Grupo",
+        "Error al traer todas los Detalles de Maestro de Obra y Capataz",
         error
       );
     } finally {
@@ -48,5 +48,5 @@ class DetailForemanGroupLeaderService {
   }
 }
 
-export const detailForemanGroupLeaderService =
-  new DetailForemanGroupLeaderService();
+export const detailMasterBuilderForemanService =
+  new DetailMasterBuilderForemanService();

@@ -1,20 +1,18 @@
 import { DetalleCapatazJefeGrupo } from "@prisma/client";
 import { DetailForemanGroupLeaderRepository } from "./detailForemanGroupLeader.repository";
-import { T_FindAllDetailForemanGroupLeader } from "./models/detailForemanGroupLeader.types";
 import prisma from "@/config/prisma.config";
-import { I_DetailForemanGroupLeader } from "./models/detailForemanGroupLeader.interfaces";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 class PrismaDetailForemanGroupLeaderRepository
   implements DetailForemanGroupLeaderRepository
 {
   async getAllDetailForemanGroupLeader(
     skip: number,
-    data: T_FindAllDetailForemanGroupLeader,
-    project_id: number
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
-    let users: any = [];
-    let userAll: any = [];
     let total: any;
     if (data.queryParams.name) {
       filters.nombre_completo = {
@@ -22,16 +20,13 @@ class PrismaDetailForemanGroupLeaderRepository
       };
     }
 
-    // ===============================================================
-
-    // obtener usuario id del token
-
-    const capataz_id = 1;
-
     const userAllReplace = await prisma.detalleCapatazJefeGrupo.findMany({
       where: {
+        usuario_capataz_id: user_id,
         proyecto_id: project_id,
-        usuario_capataz_id: capataz_id,
+        JefeGrupo: {
+          ...filters,
+        },
       },
       include: {
         JefeGrupo: {
@@ -44,53 +39,25 @@ class PrismaDetailForemanGroupLeaderRepository
       take: data.queryParams.limit,
     });
 
-    const formatedData = userAllReplace.map((item) => {
+    const userAll = userAllReplace.map((item) => {
       const { JefeGrupo } = item;
       const { Rol, ...ResData } = JefeGrupo;
-
-      return { Rol, ...ResData };
+      return {
+        rol: Rol,
+        usuario: ResData,
+      };
     });
 
-    // ===============================================================
+    total = await prisma.detalleCapatazJefeGrupo.count({
+      where: {
+        usuario_capataz_id: user_id,
+        proyecto_id: project_id,
+        JefeGrupo: {
+          ...filters,
+        },
+      },
+    });
 
-    total = prisma.detalleCapatazJefeGrupo.count({});
-    // [users, total] = await prisma.$transaction([
-    //   prisma.detalleCapatazJefeGrupo.findMany({
-    //     where: {
-    //       proyecto_id: project_id,
-    //     },
-    //     include: {
-    //       // CapatazJefe: {
-    //       //   include: {
-    //       //     Rol: true,
-    //       //   },
-    //       // },
-    //       JefeGrupo: {
-    //         include: {
-    //           Rol: true,
-    //         },
-    //       },
-    //     },
-    //     skip,
-    //     take: data.queryParams.limit,
-    //   }),
-    //   prisma.detalleCapatazJefeGrupo.count({}),
-    // ]);
-    // const userAll = users.map((item: I_DetailForemanGroupLeader) => {
-    //   let user;
-    //   if (item.CapatazJefe.Rol?.rol === "CAPATAZ") {
-    //     console.log("entro al capataz");
-    //     user = item.CapatazJefe;
-    //   }
-    //   if (item.JefeGrupo.Rol?.rol === "CAPATAZ") {
-    //     console.log("entro al jefe de grupo");
-    //     user = item.JefeGrupo;
-    //   }
-    //   return {
-    //     usuario: user,
-    //     rol: Rol,
-    //   };
-    // });
     return { userAll, total };
   }
   async createDetailForemanGroupLeader(

@@ -23,6 +23,8 @@ import workforceRouter from "./workforce/workforce.init";
 import resourceRouter from "./resources/resources.init";
 import weekRouter from "./week/week.init";
 import detailForemanGroupLeaderRouter from "./user/detailForemanGroupLeader/detailForemanGroupLeader.init";
+import detailMasterBuilderForemanRouter from "./user/detailMasterBuilderForeman/detailMasterBuilderForeman.init";
+import detailProductionEngineerMasterBuilderRouter from "./user/detailProductionEngineerMasterBuilder/detailProductionEngineerMasterBuilder.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -53,6 +55,8 @@ app.use(globalPrefix, workforceRouter);
 app.use(globalPrefix, resourceRouter);
 app.use(globalPrefix, weekRouter);
 app.use(globalPrefix, detailForemanGroupLeaderRouter);
+app.use(globalPrefix, detailMasterBuilderForemanRouter);
+app.use(globalPrefix, detailProductionEngineerMasterBuilderRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

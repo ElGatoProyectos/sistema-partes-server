@@ -11,6 +11,7 @@ import { I_CreateDetailAssignment } from "./models/detail.interface";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
+import { jwtService } from "@/auth/jwt.service";
 
 class DetailUserProjectService {
   async createDetail(
@@ -48,7 +49,7 @@ class DetailUserProjectService {
           "Detalle Ingeniero Producción-Maestro Obra creado correctamente",
           detailProuductionEngineerMasterBuilder
         );
-      } else if (data.assignment === "DETALLE-MANO-OBRA-CAPATAZ") {
+      } else if (data.assignment === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
         const detailMasterBuilderForeman =
           await prismaDetailMasterBuilderForemanRepository.createDetailMasterBuilderForeman(
             data.user_id,
@@ -84,8 +85,17 @@ class DetailUserProjectService {
       await prisma.$disconnect();
     }
   }
-  async findAll(data: T_FindAllDetailUserProject, project_id: string) {
+  async findAll(
+    data: T_FindAllDetailUserProject,
+    project_id: string,
+    token: string
+  ) {
     try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const user = userTokenResponse.payload as Usuario;
+      const rolResponse = await rolValidation.findById(user.rol_id);
+      const rol = rolResponse.payload as Rol;
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const projectResponse = await projectValidation.findById(+project_id);
       if (!projectResponse.success) {
@@ -95,7 +105,9 @@ class DetailUserProjectService {
         await prismaDetailUserProjectRepository.getAllUsersOfProject(
           skip,
           data,
-          +project_id
+          +project_id,
+          user.id,
+          rol.rol
         );
 
       const { userAll, total } = result;
