@@ -21,16 +21,19 @@ class PrismaDetailForemanGroupLeaderRepository
         contains: data.queryParams.name,
       };
     }
-    userAll = prisma.detalleCapatazJefeGrupo.findMany({
+
+    // ===============================================================
+
+    // obtener usuario id del token
+
+    const capataz_id = 1;
+
+    const userAllReplace = await prisma.detalleCapatazJefeGrupo.findMany({
       where: {
         proyecto_id: project_id,
+        usuario_capataz_id: capataz_id,
       },
       include: {
-        // CapatazJefe: {
-        //   include: {
-        //     Rol: true,
-        //   },
-        // },
         JefeGrupo: {
           include: {
             Rol: true,
@@ -40,6 +43,16 @@ class PrismaDetailForemanGroupLeaderRepository
       skip,
       take: data.queryParams.limit,
     });
+
+    const formatedData = userAllReplace.map((item) => {
+      const { JefeGrupo } = item;
+      const { Rol, ...ResData } = JefeGrupo;
+
+      return { Rol, ...ResData };
+    });
+
+    // ===============================================================
+
     total = prisma.detalleCapatazJefeGrupo.count({});
     // [users, total] = await prisma.$transaction([
     //   prisma.detalleCapatazJefeGrupo.findMany({
