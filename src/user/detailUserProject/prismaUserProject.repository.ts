@@ -6,56 +6,97 @@ import {
   I_DetailUserProject,
 } from "./models/detailUserProject.interface";
 import { DetalleUsuarioProyecto } from "@prisma/client";
+import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
+import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
+import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
   async getAllUsersOfProject(
     skip: number,
     data: T_FindAllDetailUserProject,
-    project_id: number
+    project_id: number,
+    user_id: number,
+    nameRol: string
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
     let users: any = [];
+    let userAll: any = [];
     let total: any;
     if (data.queryParams.name) {
       filters.nombre_completo = {
         contains: data.queryParams.name,
       };
     }
-    [users, total] = await prisma.$transaction([
-      prisma.detalleUsuarioProyecto.findMany({
-        where: {
-          projecto_id: project_id,
-          Usuario: {
-            ...filters,
-          },
-        },
-        include: {
-          Usuario: {
-            include: {
-              Rol: true,
+    if (
+      nameRol === "ADMIN" ||
+      nameRol === "USER" ||
+      nameRol === "CONTROL_COSTOS"
+    ) {
+      [users, total] = await prisma.$transaction([
+        prisma.detalleUsuarioProyecto.findMany({
+          where: {
+            projecto_id: project_id,
+            Usuario: {
+              ...filters,
             },
           },
-        },
-        skip,
-        take: data.queryParams.limit,
-      }),
-      prisma.detalleUsuarioProyecto.count({
-        where: {
-          projecto_id: project_id,
-          Usuario: {
-            ...filters,
+          include: {
+            Usuario: {
+              include: {
+                Rol: true,
+              },
+            },
           },
-        },
-      }),
-    ]);
-    const userAll = users.map((item: I_DetailUserProject) => {
-      const { Usuario, ...company } = item;
-      const { Rol, ...user } = Usuario;
-      return {
-        usuario: user,
-        rol: Rol,
-      };
-    });
+          skip,
+          take: data.queryParams.limit,
+        }),
+        prisma.detalleUsuarioProyecto.count({
+          where: {
+            projecto_id: project_id,
+            Usuario: {
+              ...filters,
+            },
+          },
+        }),
+      ]);
+      const userAll = users.map((item: I_DetailUserProject) => {
+        const { Usuario, ...company } = item;
+        const { Rol, ...user } = Usuario;
+        return {
+          usuario: user,
+          rol: Rol,
+        };
+      });
+      return { userAll, total };
+    } else if (nameRol === "INGENIERO_PRODUCCION") {
+      const { userAll, total } =
+        await prismaDetailProductionEngineerMasterBuilderRepository.getAllDetailProductionEngineerMasterBuilder(
+          skip,
+          data,
+          project_id,
+          user_id
+        );
+      return { userAll, total };
+    } else if (nameRol === "MAESTRO_OBRA") {
+      const { userAll, total } =
+        await prismaDetailMasterBuilderForemanRepository.getAllDetailMasterBuilderForeman(
+          skip,
+          data,
+          project_id,
+          user_id
+        );
+      return { userAll, total };
+    } else if (nameRol === "CAPATAZ") {
+      const { userAll, total } =
+        await prismaDetailForemanGroupLeaderRepository.getAllDetailForemanGroupLeader(
+          skip,
+          data,
+          project_id,
+          user_id
+        );
+      return { userAll, total };
+    }
+
     return { userAll, total };
   }
   async getAllUsersOfProjectUnassigned(

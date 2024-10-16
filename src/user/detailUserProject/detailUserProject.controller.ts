@@ -2,6 +2,7 @@ import express from "@/config/express.config";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 import { detailUserProjectService } from "./detailUserProject.service";
 import { I_CreateDetailAssignment } from "./models/detail.interface";
+import { httpResponse } from "@/common/http.response";
 
 class DetailUserProjectController {
   async createDetailAssignment(
@@ -28,7 +29,12 @@ class DetailUserProjectController {
     const limit = parseInt(request.query.limit as string) || 20;
     const name = request.query.name as string;
     const project_id = request.get("project-id") as string;
-
+    const tokenWithBearer = request.headers.authorization;
+    if (!tokenWithBearer) {
+      return httpResponse.BadRequestException(
+        "No hay nada en el Authorization"
+      );
+    }
     let paginationOptions: T_FindAllDetailUserProject = {
       queryParams: {
         page: page,
@@ -38,7 +44,8 @@ class DetailUserProjectController {
     };
     const result = await detailUserProjectService.findAll(
       paginationOptions,
-      project_id
+      project_id,
+      tokenWithBearer
     );
 
     response.status(result.statusCode).json(result);

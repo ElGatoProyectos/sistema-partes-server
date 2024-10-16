@@ -1,16 +1,65 @@
 import { DetalleIngenieroProduccionMaestroObra } from "@prisma/client";
 import { DetailProductionEngineerMasterBuilder } from "./detailProductionEngineerMasterBuilder.repository";
-import { T_FindAllDetailProductionEngineerMasterBuilder } from "./models/detailProductionEngineerMasterBuilder.types";
 import prisma from "@/config/prisma.config";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 class PrismaDetailProductionEngineerMasterBuilderRepository
   implements DetailProductionEngineerMasterBuilder
 {
-  getAllDetailProductionEngineerMasterBuilder(
-    data: T_FindAllDetailProductionEngineerMasterBuilder,
-    project_id: number
-  ): void {
-    throw new Error("Method not implemented.");
+  async getAllDetailProductionEngineerMasterBuilder(
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
+  ): Promise<{ userAll: any[]; total: number }> {
+    let filters: any = {};
+    let total: any;
+    if (data.queryParams.name) {
+      filters.nombre_completo = {
+        contains: data.queryParams.name,
+      };
+    }
+
+    const userAllReplace =
+      await prisma.detalleIngenieroProduccionMaestroObra.findMany({
+        where: {
+          usuario_ingeniero_id: user_id,
+          proyecto_id: project_id,
+          Produccion: {
+            ...filters,
+          },
+        },
+        include: {
+          Produccion: {
+            include: {
+              Rol: true,
+            },
+          },
+        },
+        skip,
+        take: data.queryParams.limit,
+      });
+
+    const userAll = userAllReplace.map((item) => {
+      const { Produccion } = item;
+      const { Rol, ...ResData } = Produccion;
+      return {
+        rol: Rol,
+        usuario: ResData,
+      };
+    });
+
+    total = await prisma.detalleIngenieroProduccionMaestroObra.count({
+      where: {
+        usuario_ingeniero_id: user_id,
+        proyecto_id: project_id,
+        Produccion: {
+          ...filters,
+        },
+      },
+    });
+
+    return { userAll, total };
   }
 
   async createDetailProductionEngineerMasterBuilder(

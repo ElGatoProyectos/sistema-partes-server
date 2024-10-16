@@ -6,7 +6,9 @@ export abstract class DetailUserProjectRepository {
   getAllUsersOfProject(
     skip: number,
     data: T_FindAllDetailUserProject,
-    project_id: number
+    project_id: number,
+    user_id: number,
+    nameRol: string
   ): void {}
   getAllUsersOfProjectUnassigned(
     skip: number,

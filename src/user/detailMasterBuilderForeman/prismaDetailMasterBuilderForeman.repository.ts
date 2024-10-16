@@ -1,16 +1,64 @@
 import prisma from "@/config/prisma.config";
 import { DetalleMaestroObraCapataz } from "@prisma/client";
 import { DetailMasterBuilderForemanRepository } from "./detailMasterBuilderForeman.repository";
-import { T_FindAllDetailMasterBuilderForeman } from "./models/detailMasterBuilderForeman.types";
+import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 class PrismaDetailMasterBuilderForemanRepository
   implements DetailMasterBuilderForemanRepository
 {
-  getAllDetailMasterBuilderForeman(
-    data: T_FindAllDetailMasterBuilderForeman,
-    project_id: number
-  ): void {
-    throw new Error("Method not implemented.");
+  async getAllDetailMasterBuilderForeman(
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number
+  ): Promise<{ userAll: any[]; total: number }> {
+    let filters: any = {};
+    let total: any;
+    if (data.queryParams.name) {
+      filters.nombre_completo = {
+        contains: data.queryParams.name,
+      };
+    }
+
+    const userAllReplace = await prisma.detalleMaestroObraCapataz.findMany({
+      where: {
+        usuario_mo_id: user_id,
+        proyecto_id: project_id,
+        Capataz: {
+          ...filters,
+        },
+      },
+      include: {
+        Capataz: {
+          include: {
+            Rol: true,
+          },
+        },
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+
+    const userAll = userAllReplace.map((item) => {
+      const { Capataz } = item;
+      const { Rol, ...ResData } = Capataz;
+      return {
+        rol: Rol,
+        usuario: ResData,
+      };
+    });
+
+    total = await prisma.detalleMaestroObraCapataz.count({
+      where: {
+        usuario_mo_id: user_id,
+        proyecto_id: project_id,
+        Capataz: {
+          ...filters,
+        },
+      },
+    });
+
+    return { userAll, total };
   }
   async createDetailMasterBuilderForeman(
     user_id: number,
