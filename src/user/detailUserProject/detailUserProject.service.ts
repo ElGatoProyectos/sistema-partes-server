@@ -7,11 +7,17 @@ import { userValidation } from "../user.validation";
 import { rolValidation } from "@/rol/rol.validation";
 import { Proyecto, Usuario, Rol, DetalleUsuarioProyecto } from "@prisma/client";
 import { detailProjectValidation } from "./detailUserProject.validation";
-import { I_CreateDetailAssignment } from "./models/detail.interface";
+import {
+  I_CreateDetailAssignment,
+  I_DeleteDetail,
+} from "./models/detail.interface";
+import { jwtService } from "@/auth/jwt.service";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
-import { jwtService } from "@/auth/jwt.service";
+import { detailForemanGroupLeaderService } from "../detailForemanGroupLeader/detailForemanGroupLeader.service";
+import { detailMasterBuilderForemanService } from "../detailMasterBuilderForeman/detailMasterBuilder.service";
+import { detailProductionEngineerMasterBuilderService } from "../detailProductionEngineerMasterBuilder/detailProductionEngineerMasterBuilder.service";
 
 class DetailUserProjectService {
   async createDetail(
@@ -25,11 +31,9 @@ class DetailUserProjectService {
           `El id ${data.user_id} del usuario proporcionado no existe en la base de datos`
         );
       }
-      const userResponse2 = await userValidation.findById(data.user2_id);
-      if (!userResponse2.success) {
-        return httpResponse.BadRequestException(
-          `El id ${data.user2_id} del usuario proporcionado no existe en la base de datos`
-        );
+      const users = await userValidation.findManyId(data.user2_id);
+      if (!users.success) {
+        return users;
       }
       const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
@@ -39,37 +43,38 @@ class DetailUserProjectService {
       }
 
       if (data.assignment === "DETALLE-INGENIERO-PRODUCCION-MAESTRO-OBRA") {
-        const detailProuductionEngineerMasterBuilder =
+        for (let index = 0; index < data.user2_id.length; index++) {
           await prismaDetailProductionEngineerMasterBuilderRepository.createDetailProductionEngineerMasterBuilder(
             data.user_id,
-            data.user2_id,
+            data.user2_id[index],
             project_id
           );
+        }
         return httpResponse.SuccessResponse(
-          "Detalle Ingeniero Producción-Maestro Obra creado correctamente",
-          detailProuductionEngineerMasterBuilder
+          "Detalle Ingeniero Producción-Maestro Obra creado correctamente"
         );
       } else if (data.assignment === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
-        const detailMasterBuilderForeman =
+        for (let index = 0; index < data.user2_id.length; index++) {
           await prismaDetailMasterBuilderForemanRepository.createDetailMasterBuilderForeman(
             data.user_id,
-            data.user2_id,
+            data.user2_id[index],
             project_id
           );
+        }
         return httpResponse.SuccessResponse(
-          "Detalle Maestro Obra-Capataz creado correctamente",
-          detailMasterBuilderForeman
+          "Detalle Maestro Obra-Capataz creado correctamente"
         );
       } else if (data.assignment === "DETALLE-CAPATAZ-JEFE-GRUPO") {
-        const detailForemanGroupBuilder =
+        for (let index = 0; index < data.user2_id.length; index++) {
           await prismaDetailForemanGroupLeaderRepository.createDetailForemanGroupLeader(
             data.user_id,
-            data.user2_id,
+            data.user2_id[index],
             project_id
           );
+        }
+
         return httpResponse.SuccessResponse(
-          "Detalle Capataz-Jefe Grupo creado correctamente",
-          detailForemanGroupBuilder
+          "Detalle Capataz-Jefe Grupo creado correctamente"
         );
       } else {
         return httpResponse.BadRequestException(
@@ -217,6 +222,62 @@ class DetailUserProjectService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar el usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async deleteDetail(
+    data: I_DeleteDetail,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      if (data.assignment === "DETALLE-CAPATAZ-JEFE-GRUPO") {
+        const result = await detailForemanGroupLeaderService.deleteDetail(
+          data.user_id,
+          project_id
+        );
+        if (!result.success) {
+          return result;
+        } else {
+          return result;
+        }
+      } else if (data.assignment === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
+        const result = await detailMasterBuilderForemanService.deleteDetail(
+          data.user_id,
+          project_id
+        );
+        if (!result.success) {
+          return result;
+        } else {
+          return result;
+        }
+      } else if (
+        data.assignment === "DETALLE-INGENIERO-PRODUCCION-MAESTRO-OBRA"
+      ) {
+        const result =
+          await detailProductionEngineerMasterBuilderService.deleteDetail(
+            data.user_id,
+            project_id
+          );
+        if (!result.success) {
+          return result;
+        } else {
+          return result;
+        }
+      } else {
+        return httpResponse.BadRequestException(
+          "El tipo de Asignamiento que proporciono no se tiene contemplado "
+        );
+      }
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al eliminar el Detalle",
         error
       );
     } finally {

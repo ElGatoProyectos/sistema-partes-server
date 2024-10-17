@@ -23,11 +23,6 @@ userRouter.get(
   authRoleMiddleware.authAdminUser,
   userController.allUsersForCompany
 );
-userRouter.get(
-  `${prefix}/search`,
-  authRoleMiddleware.authAdmin,
-  userController.findByName
-);
 
 userRouter.get(
   `${prefix}/:id`,

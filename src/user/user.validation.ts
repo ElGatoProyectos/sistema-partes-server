@@ -4,10 +4,29 @@ import { prismaUserRepository } from "./prisma-user.repository";
 import { I_CreateUserBD } from "./models/user.interface";
 import { rolValidation } from "@/rol/rol.validation";
 import { projectValidation } from "@/project/project.validation";
-import { detailProjectValidation } from "./detailUserProject/detailUserProject.validation";
 import { UserResponseMapper } from "./mappers/user.mapper";
 
 class UserValidation {
+  async findManyId(ids: number[]): Promise<T_HttpResponse> {
+    try {
+      const users = await prismaUserRepository.findManyId(ids);
+
+      if (users.length < ids.length) {
+        return httpResponse.NotFoundException(
+          "Un Usuario ingresado no existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Los Usuarios ingresados existen, pueden proceguir",
+        users
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Usuarios Ingresados",
+        error
+      );
+    }
+  }
   async findByEmail(email: string): Promise<T_HttpResponse> {
     try {
       const emailExists = await prismaUserRepository.existsEmail(email);

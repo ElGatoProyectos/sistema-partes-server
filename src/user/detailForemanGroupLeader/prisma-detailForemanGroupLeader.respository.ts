@@ -6,6 +6,28 @@ import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUs
 class PrismaDetailForemanGroupLeaderRepository
   implements DetailForemanGroupLeaderRepository
 {
+  async findByIdGroupLeader(
+    groupLeader_id: number,
+    project_id: number
+  ): Promise<DetalleCapatazJefeGrupo | null> {
+    const detail = await prisma.detalleCapatazJefeGrupo.findFirst({
+      where: {
+        usuario_jefe_grupo_id: groupLeader_id,
+        proyecto_id: project_id,
+      },
+    });
+    return detail;
+  }
+  async deleteDetail(
+    detail_Id: number
+  ): Promise<DetalleCapatazJefeGrupo | null> {
+    const detail = await prisma.detalleCapatazJefeGrupo.delete({
+      where: {
+        id: detail_Id,
+      },
+    });
+    return detail;
+  }
   async getAllDetailForemanGroupLeader(
     skip: number,
     data: T_FindAllDetailUserProject,

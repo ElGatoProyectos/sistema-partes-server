@@ -16,6 +16,7 @@ import { companyValidation } from "@/company/company.validation";
 import { projectValidation } from "./project.validation";
 import { jwtService } from "@/auth/jwt.service";
 import {
+  DetalleUsuarioProyecto,
   E_Proyecto_Estado,
   Empresa,
   Proyecto,
@@ -35,6 +36,8 @@ import { typeWorkforceService } from "@/typeWorkforce/typeWorkforce.service";
 import { unitService } from "@/unit/unit.service";
 import { unifiedIndexService } from "@/unifiedIndex/unifiedIndex.service";
 import { resourseCategoryService } from "@/resourseCategory/resourseCategory.service";
+import { detailProjectValidation } from "@/user/detailUserProject/detailUserProject.validation";
+import { prismaDetailUserProjectRepository } from "@/user/detailUserProject/prismaUserProject.repository";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -336,39 +339,51 @@ class ProjectService {
       await prisma.$disconnect();
     }
   }
-
   async findAllProjectsXCompany(token: string, data: T_FindAllProject) {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse) return userTokenResponse;
+      if (!userTokenResponse.success) return userTokenResponse;
+
       const userResponse = userTokenResponse.payload as Usuario;
-
-      const companyResponse = await companyValidation.findByIdUser(
-        userResponse.id
-      );
-      const company = companyResponse.payload as Empresa;
-
+      const rolResponse = await rolValidation.findById(userResponse.rol_id);
+      const userRol = rolResponse.payload as Rol;
+      let company: any = {};
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaProyectoRepository.allProjectsuser(
-        company.id,
-        data,
-        skip
-      );
-      const { projects, total } = result;
-      const pageCount = Math.ceil(total / data.queryParams.limit);
-      const formData = {
-        total,
-        page: data.queryParams.page,
-        // x ejemplo 20
-        limit: data.queryParams.limit,
-        //cantidad de paginas que hay
-        pageCount,
-        data: projects,
-      };
-      return httpResponse.SuccessResponse(
-        "Éxito al traer todos los proyectos",
-        formData
-      );
+
+      if (userRol.rol === "ADMIN" || userRol.rol === "USER") {
+        const companyResponse = await companyValidation.findByIdUser(
+          userResponse.id
+        );
+        if (!companyResponse.success) {
+          return companyResponse;
+        }
+        company = companyResponse.payload as Empresa;
+
+        const result = await prismaProyectoRepository.allProjectsAdminUser(
+          company.id,
+          data,
+          skip
+        );
+
+        return this.constructSuccessResponse(result, data);
+      } else {
+        const detailResponse = await detailProjectValidation.existsUser(
+          userResponse.id
+        );
+        if (!detailResponse.success) {
+          return detailResponse;
+        }
+
+        const result =
+          await prismaDetailUserProjectRepository.getAllProjectsOfUser(
+            userResponse.id,
+            data,
+            skip
+          );
+
+        // Construcción de response
+        return this.constructSuccessResponse(result, data);
+      }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todos los proyectos",
@@ -377,6 +392,24 @@ class ProjectService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  private constructSuccessResponse(result: any, data: T_FindAllProject) {
+    const { projects, total } = result;
+    const pageCount = Math.ceil(total / data.queryParams.limit);
+
+    const formData = {
+      total,
+      page: data.queryParams.page,
+      limit: data.queryParams.limit,
+      pageCount,
+      data: projects,
+    };
+
+    return httpResponse.SuccessResponse(
+      "Éxito al traer todos los proyectos",
+      formData
+    );
   }
 
   async updateStatusProject(idProject: number): Promise<T_HttpResponse> {

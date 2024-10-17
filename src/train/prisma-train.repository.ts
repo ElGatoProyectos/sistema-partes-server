@@ -10,6 +10,23 @@ import {
 import { T_FindAllTrain } from "./models/train.types";
 
 class PrismaTrainRepository implements TrainRepository {
+  async createTrain(data: I_CreateTrainBD): Promise<Tren> {
+    const train = await prisma.tren.create({
+      data,
+    });
+    return train;
+  }
+  async updateTrain(
+    data: I_UpdateTrainBodyValidation,
+    idTrain: number
+  ): Promise<Tren> {
+    const train = await prisma.tren.update({
+      where: { id: idTrain },
+      data: data,
+    });
+    return train;
+  }
+
   async findByCode(code: string, project_id: number): Promise<Tren | null> {
     const train = await prisma.tren.findFirst({
       where: {
@@ -40,22 +57,6 @@ class PrismaTrainRepository implements TrainRepository {
       orderBy: { codigo: "desc" },
     });
     return lastTrain;
-  }
-  async createTrain(data: I_CreateTrainBD): Promise<Tren> {
-    const train = await prisma.tren.create({
-      data,
-    });
-    return train;
-  }
-  async updateTrain(
-    data: I_UpdateTrainBodyValidation,
-    idTrain: number
-  ): Promise<Tren> {
-    const train = await prisma.tren.update({
-      where: { id: idTrain },
-      data: data,
-    });
-    return train;
   }
 
   async findAll(
@@ -115,7 +116,17 @@ class PrismaTrainRepository implements TrainRepository {
     });
     return train;
   }
-
+  async isLastId(project_id: number): Promise<Tren | null> {
+    const train = await prisma.tren.findFirst({
+      where: {
+        proyecto_id: project_id,
+      },
+      orderBy: {
+        codigo: "desc",
+      },
+    });
+    return train;
+  }
   async updateStatusTrain(idTrain: number): Promise<Tren | null> {
     const train = await prisma.tren.findFirst({
       where: {

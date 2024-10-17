@@ -14,6 +14,16 @@ import { I_Empresa } from "@/company/models/company.interface";
 import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {
+  async findManyId(ids: number[]): Promise<Usuario[]> {
+    const users = await prisma.usuario.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+    return users;
+  }
   async getUsersForCompany(
     skip: number,
     data: T_FindAllUser,
@@ -123,31 +133,7 @@ class PrismaUserRepository implements UserRepository {
     });
     return user;
   }
-  async searchNameUser(
-    name: string,
-    skip: number,
-    limit: number
-  ): Promise<{ users: Usuario[]; total: number }> {
-    const [users, total]: [Usuario[], number] = await prisma.$transaction([
-      prisma.usuario.findMany({
-        where: {
-          nombre_completo: {
-            contains: name,
-          },
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.usuario.count({
-        where: {
-          nombre_completo: {
-            contains: name,
-          },
-        },
-      }),
-    ]);
-    return { users, total };
-  }
+  
   async findByDni(dni: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {

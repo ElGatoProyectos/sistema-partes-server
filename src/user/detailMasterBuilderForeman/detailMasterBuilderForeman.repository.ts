@@ -13,4 +13,8 @@ export abstract class DetailMasterBuilderForemanRepository {
     project_id: number
   ): void {}
   verifyIdDetailMasterBuilderForeman(user_id: number): void {}
+
+  deleteDetail(detail_id: number): void {}
+
+  findByIdForeman(foreman_id: number, project_id: number): void {}
 }

@@ -94,24 +94,7 @@ class UserMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
-  verifyHeadersFieldsProjectId(
-    request: express.Request,
-    response: express.Response,
-    nextFunction: express.NextFunction
-  ) {
-    try {
-      const id = request.params.project_id;
-      if (!validator.isNumeric(id)) {
-        throw new Error("El project_id debe ser numérico");
-      }
-      nextFunction();
-    } catch {
-      const result = httpResponse.BadRequestException(
-        "Error al validar los campos"
-      );
-      response.status(result.statusCode).send(result);
-    }
-  }
+
   verifyHeadersFieldsIdProjectHeader(
     request: express.Request,
     response: express.Response,

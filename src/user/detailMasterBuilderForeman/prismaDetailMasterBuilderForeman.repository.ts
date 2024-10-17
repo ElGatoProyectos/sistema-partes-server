@@ -6,6 +6,29 @@ import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUs
 class PrismaDetailMasterBuilderForemanRepository
   implements DetailMasterBuilderForemanRepository
 {
+  async deleteDetail(
+    detail_id: number
+  ): Promise<DetalleMaestroObraCapataz | null> {
+    const detail = await prisma.detalleMaestroObraCapataz.delete({
+      where: {
+        id: detail_id,
+      },
+    });
+    return detail;
+  }
+  async findByIdForeman(
+    foreman_id: number,
+    project_id: number
+  ): Promise<DetalleMaestroObraCapataz | null> {
+    const detail = await prisma.detalleMaestroObraCapataz.findFirst({
+      where: {
+        usuario_capataz_id: foreman_id,
+        proyecto_id: project_id,
+      },
+    });
+    return detail;
+  }
+
   async getAllDetailMasterBuilderForeman(
     skip: number,
     data: T_FindAllDetailUserProject,

@@ -13,4 +13,7 @@ export abstract class DetailProductionEngineerMasterBuilder {
     project_id: number,
     user_id: number
   ): void {}
+  deleteDetail(detail_id: number): void {}
+
+  findByIdMasterBuilder(masterBuilder_id: number, project_id: number): void {}
 }

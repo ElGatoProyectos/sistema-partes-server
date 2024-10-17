@@ -47,6 +47,23 @@ class TrainValidation {
       );
     }
   }
+  async IsLastId(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const train = await prismaTrainRepository.isLastId(project_id);
+      if (!train) {
+        return httpResponse.NotFoundException(
+          "Codigo del último Tren no fue encontrado",
+          train
+        );
+      }
+      return httpResponse.SuccessResponse("Tren encontrado", train);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código del Tren",
+        error
+      );
+    }
+  }
   async findByCodeValidation(
     code: string,
     project_id: number

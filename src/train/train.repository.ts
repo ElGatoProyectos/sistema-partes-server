@@ -20,4 +20,6 @@ export abstract class TrainRepository {
   updateStatusTrain(train_id: number): void {}
 
   codeMoreHigh(project_id: number): void {}
+
+  isLastId(project_id: number): void {}
 }

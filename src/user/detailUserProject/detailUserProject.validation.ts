@@ -40,7 +40,28 @@ class DetailProjectValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar Tren",
+        "Error al buscar Id Usuario en Empresa",
+        error
+      );
+    }
+  }
+  async existsUser(user_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDetailUserProjectRepository.existsUser(
+        user_id
+      );
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "Id del Usuario no fue encontrado en ningún proyecto"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Id Usuario fue encontrado en algún Proyecto",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar id Usuario en detalle Usuario-Proyecto",
         error
       );
     }
