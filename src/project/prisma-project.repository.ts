@@ -76,7 +76,7 @@ class PrismaProjectRepository implements ProjectRepository {
     return { projects, total };
   }
 
-  async allProjectsuser(
+  async allProjectsAdminUser(
     company_id: number,
     data: T_FindAllProject,
     skip: number

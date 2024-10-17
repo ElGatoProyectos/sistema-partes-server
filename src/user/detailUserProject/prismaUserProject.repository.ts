@@ -9,8 +9,64 @@ import { DetalleUsuarioProyecto } from "@prisma/client";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
+import { T_FindAllProject } from "@/project/dto/project.type";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
+  async getAllProjectsOfUser(
+    user_id: number,
+    data: T_FindAllProject,
+    skip: number
+  ): Promise<{ projects: any[]; total: number }> {
+    let filters: any = {};
+    if (
+      data.queryParams.state &&
+      data.queryParams.state.toUpperCase() !== "TODOS"
+    ) {
+      filters.estado = data.queryParams.state.toUpperCase();
+    }
+    if (data.queryParams.name) {
+      filters.nombre_completo = {
+        contains: data.queryParams.name,
+      };
+    }
+    const projectsAll = await prisma.detalleUsuarioProyecto.findMany({
+      where: {
+        // ...filters,
+        Proyecto: {
+          ...filters,
+        },
+        usuario_id: user_id,
+      },
+      include: {
+        Proyecto: true,
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+
+    const total = await prisma.detalleUsuarioProyecto.count({
+      where: {
+        // ...filters,
+        usuario_id: user_id,
+      },
+    });
+    const projects = projectsAll.map((item) => {
+      const { Proyecto } = item;
+      return {
+        ...Proyecto,
+      };
+    });
+    return { projects, total };
+  }
+
+  async existsUser(user_id: number): Promise<DetalleUsuarioProyecto | null> {
+    const detail = await prisma.detalleUsuarioProyecto.findFirst({
+      where: {
+        usuario_id: user_id,
+      },
+    });
+    return detail;
+  }
   async getAllUsersOfProject(
     skip: number,
     data: T_FindAllDetailUserProject,

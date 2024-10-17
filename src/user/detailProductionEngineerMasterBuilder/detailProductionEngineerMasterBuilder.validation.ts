@@ -26,6 +26,32 @@ class DetailDetailProductionEngineerMasterBuilderValidation {
       );
     }
   }
+  async findByIdMasterBuilder(
+    user_id: number,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const detail =
+        await prismaDetailProductionEngineerMasterBuilderRepository.findByIdMasterBuilder(
+          user_id,
+          project_id
+        );
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "Id del Maestro de Obra no fue encontrado en el Detalle Ingeniero Producción- Maestro Obra"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Id del Maestro de Obra fue encontrado en el Detalle Ingeniero Producción- Maestro Obra",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar en el Detalle Ingeniero Producción- Maestro Obra",
+        error
+      );
+    }
+  }
 }
 
 export const detailDetailProductionEngineerMasterBuilderValidation =

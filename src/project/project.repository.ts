@@ -12,11 +12,12 @@ export abstract class ProjectRepository {
   updateProject(data: I_UpdateProyectBody, idProject: number): void {}
   findById(idProject: number): void {}
   updateStatusProject(idProject: number): void {}
-  allProjectsuser(
+  allProjectsAdminUser(
     company_id: number,
     data: T_FindAllProject,
     skip: number
   ): void {}
+
   searchNameProject(data: T_FindAllProject, skip: number): void {}
   updateStateProject(
     idProject: number,

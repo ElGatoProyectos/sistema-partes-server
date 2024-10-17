@@ -277,21 +277,6 @@ class UserController {
     response.status(result.statusCode).json(result);
   }
 
-  async findByName(request: express.Request, response: express.Response) {
-    const page = parseInt(request.query.page as string) || 1;
-    const limit = parseInt(request.query.limit as string) || 20;
-    let paginationOptions: T_FindAll = {
-      queryParams: {
-        page: page,
-        limit: limit,
-      },
-    };
-    //si buscaba como request.body no me llegaba bien para luego buscar
-    const name = request.query.name as string;
-    const result = await userService.findByName(name, paginationOptions);
-    response.status(result.statusCode).json(result);
-  }
-
   async allUsers(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;

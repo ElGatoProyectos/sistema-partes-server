@@ -936,38 +936,5 @@ class UserService {
       await prisma.$disconnect();
     }
   }
-
-  async findByName(name: string, data: T_FindAll): Promise<T_HttpResponse> {
-    try {
-      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-      const result = await prismaUserRepository.searchNameUser(
-        name,
-        skip,
-        data.queryParams.limit
-      );
-      const { users, total } = result;
-      const usersMapped = users.map(
-        (user: Usuario) => new UserResponseMapper(user)
-      );
-      const pageCount = Math.ceil(total / data.queryParams.limit);
-      const formData = {
-        total,
-        page: data.queryParams.page,
-        // x ejemplo 20
-        limit: data.queryParams.limit,
-        //cantidad de paginas que hay
-        pageCount,
-        data: usersMapped,
-      };
-      return httpResponse.SuccessResponse("Éxito al buscar usuarios", formData);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        " Error al buscar proyecto",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
 }
 export const userService = new UserService();

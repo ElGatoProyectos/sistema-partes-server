@@ -14,4 +14,8 @@ export abstract class DetailForemanGroupLeaderRepository {
     project_id: number
   ): void {}
   verifyIdDetailForemanGroupLeader(user_id: number): void {}
+
+  deleteDetail(detail_id: number): void {}
+
+  findByIdGroupLeader(groupLeader_id: number, project_id: number): void {}
 }

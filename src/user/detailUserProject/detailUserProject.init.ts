@@ -16,19 +16,25 @@ detailUserProjectRouter.post(
 );
 detailUserProjectRouter.get(
   `${prefix}`,
-  userMiddleware.verifyHeadersFieldsIdProjectHeader,
+  detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.allUsersByProject
 );
 detailUserProjectRouter.get(
   `${prefix}/unassigned`,
-  userMiddleware.verifyHeadersFieldsIdProjectHeader,
+  detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.allUsersByProjectUnassigned
 );
 detailUserProjectRouter.delete(
+  `${prefix}/delete-assignment`,
+  detailUserProjectMiddleware.verifyFieldsForDeleteAssignment,
+  authRoleMiddleware.authAdminUser,
+  detailUserProjectController.deleteDetail
+);
+detailUserProjectRouter.delete(
   `${prefix}/:id`,
-  userMiddleware.verifyHeadersFieldsId,
+  detailUserProjectMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.deleteUserFromProject
 );

@@ -30,9 +30,9 @@ export abstract class UserRepository {
 
   findByDni(dni: string): void {}
 
-  existsEmail(dni: string): void {}
+  findManyId(ids: number[]): void {}
 
-  searchNameUser(name: string, skip: number, limit: number): void {}
+  existsEmail(dni: string): void {}
 
   assignUserPermissions(data: IAssignUserPermissions): void {}
 }

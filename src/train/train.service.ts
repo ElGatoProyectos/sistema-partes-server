@@ -1,18 +1,16 @@
 import { projectValidation } from "@/project/project.validation";
 import {
   I_CreateTrainUnitBody,
-  I_Cuadrilla_Train,
   I_TrainExcel,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { trainValidation } from "./train.validation";
-import { Proyecto, Tren } from "@prisma/client";
+import { Prisma, Proyecto, Tren } from "@prisma/client";
 import { prismaTrainRepository } from "./prisma-train.repository";
 import { TrainResponseMapper } from "./mappers/train.mapper";
 import * as xlsx from "xlsx";
 import prisma from "@/config/prisma.config";
-import { T_FindAll } from "@/common/models/pagination.types";
 import validator from "validator";
 import { T_FindAllTrain } from "./models/train.types";
 
@@ -194,18 +192,42 @@ class TrainService {
       const trainResponse = await trainValidation.findById(idTrain);
       if (!trainResponse.success) {
         return trainResponse;
-      } else {
-        const result = await prismaTrainRepository.updateStatusTrain(idTrain);
-        return httpResponse.SuccessResponse(
-          "Tren eliminado correctamente",
-          result
+      }
+      const train = trainResponse.payload as Tren;
+      const isLastId = await trainValidation.IsLastId(train.proyecto_id);
+      const lastTrain = isLastId.payload as Tren;
+      if (train.codigo != lastTrain.codigo) {
+        return httpResponse.BadRequestException(
+          "El Tren que quiere eliminar no es el último"
         );
       }
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error en eliminar el Tren",
-        error
-      );
+
+      const result = await prismaTrainRepository.updateStatusTrain(idTrain);
+      return httpResponse.SuccessResponse("Tren eliminado correctamente");
+    } catch (error: any) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === "P2003") {
+          console.error(
+            "No se puede borrar el registro porque tiene registros hijos."
+          );
+          return httpResponse.InternalServerErrorException(
+            "Error en eliminar el Tren error hijos",
+            error
+          );
+        } else {
+          console.error("Se encontró un error conocido:", error.message);
+          return httpResponse.InternalServerErrorException(
+            "Error en eliminar el Tren error conocido",
+            error
+          );
+        }
+      } else {
+        console.error("Otro tipo de error ocurrió:", error);
+        return httpResponse.InternalServerErrorException(
+          "Error en eliminar el Tren",
+          error
+        );
+      }
     } finally {
       await prisma.$disconnect();
     }

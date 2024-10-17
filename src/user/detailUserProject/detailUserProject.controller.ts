@@ -1,7 +1,10 @@
 import express from "@/config/express.config";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 import { detailUserProjectService } from "./detailUserProject.service";
-import { I_CreateDetailAssignment } from "./models/detail.interface";
+import {
+  I_CreateDetailAssignment,
+  I_DeleteDetail,
+} from "./models/detail.interface";
 import { httpResponse } from "@/common/http.response";
 
 class DetailUserProjectController {
@@ -81,6 +84,19 @@ class DetailUserProjectController {
     const user_id = Number(request.params.id);
     const result = await detailUserProjectService.deleteUserFromProject(
       user_id,
+      +project_id
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+  async deleteDetail(request: express.Request, response: express.Response) {
+    const body = request.body as I_DeleteDetail;
+    const project_id = request.get("project-id") as string;
+    const result = await detailUserProjectService.deleteDetail(
+      body,
       +project_id
     );
     if (!result.success) {
