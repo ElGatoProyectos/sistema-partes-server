@@ -11,7 +11,8 @@ export abstract class DetailProductionEngineerMasterBuilder {
     skip: number,
     data: T_FindAllDetailUserProject,
     project_id: number,
-    user_id: number
+    user_id: number,
+    ids: number[]
   ): void {}
   deleteDetail(detail_id: number): void {}
 
