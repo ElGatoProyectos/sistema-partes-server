@@ -102,6 +102,23 @@ class JobValidation {
       );
     }
   }
+  async findByJobForTrain(train_id: number): Promise<T_HttpResponse> {
+    try {
+      const job = await prismaJobRepository.findByJobForTrain(train_id);
+      if (!job) {
+        return httpResponse.NotFoundException(
+          "La Búsqueda del Trabajo por Tren no fue encontrado",
+          job
+        );
+      }
+      return httpResponse.SuccessResponse("Trabajo por Tren encontrado", job);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Trabajo por Tren",
+        error
+      );
+    }
+  }
   async findById(job_id: number): Promise<T_HttpResponse> {
     try {
       const job = await prismaJobRepository.findById(job_id);

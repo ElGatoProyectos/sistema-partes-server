@@ -19,6 +19,14 @@ class DepartureJobController {
       response.status(result.statusCode).json(result);
     }
   }
+
+  async updateStatus(request: express.Request, response: express.Response) {
+    const departure_job_id = Number(request.params.id);
+    const result = await departureJobService.updateStatusDepartureJob(
+      departure_job_id
+    );
+    response.status(result.statusCode).json(result);
+  }
   async allDetailsDepartureJob(
     request: express.Request,
     response: express.Response

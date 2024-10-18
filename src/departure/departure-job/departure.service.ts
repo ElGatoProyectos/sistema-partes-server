@@ -16,6 +16,33 @@ import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { prismaJobRepository } from "@/job/prisma-job.repository";
 
 class DepartureJobService {
+  async updateStatusDepartureJob(
+    departureJob_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const detailFind = await prismaDepartureJobRepository.findById(
+        departureJob_id
+      );
+      if (!detailFind) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Detalle Trabajo Partida que se quiere eliminar"
+        );
+      }
+      await prismaDepartureJobRepository.deleteDetailDepartureJob(
+        departureJob_id
+      );
+      return httpResponse.SuccessResponse(
+        "Detalle Trabajo Partida eliminado correctamente"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error en eliminar el Detalle Trabajo-Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async updateJobDeparture(data: I_DepartureJob) {
     try {
       const jobResponse = await jobValidation.findById(data.job_id);
@@ -306,7 +333,6 @@ class DepartureJobService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos y sus Partidas",
         error

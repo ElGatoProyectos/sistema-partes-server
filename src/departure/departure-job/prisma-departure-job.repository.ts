@@ -5,6 +5,42 @@ import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { I_DetailDepartureJob } from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
+  async findByIdJob(job_id: number): Promise<DetalleTrabajoPartida | null> {
+    const detail = await prisma.detalleTrabajoPartida.findFirst({
+      where: {
+        trabajo_id: job_id,
+      },
+    });
+    return detail;
+  }
+  async findByIdDeparture(
+    departure_id: number
+  ): Promise<DetalleTrabajoPartida | null> {
+    const detail = await prisma.detalleTrabajoPartida.findFirst({
+      where: {
+        partida_id: departure_id,
+      },
+    });
+    return detail;
+  }
+  async findById(detail_id: number): Promise<DetalleTrabajoPartida | null> {
+    const detail = await prisma.detalleTrabajoPartida.findFirst({
+      where: {
+        id: detail_id,
+      },
+    });
+    return detail;
+  }
+  async deleteDetailDepartureJob(
+    detail_id: number
+  ): Promise<DetalleTrabajoPartida> {
+    const detail = await prisma.detalleTrabajoPartida.delete({
+      where: {
+        id: detail_id,
+      },
+    });
+    return detail;
+  }
   async findAll(
     skip: number,
     data: T_FindAllDepartureJob

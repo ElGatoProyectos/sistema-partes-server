@@ -25,6 +25,8 @@ import { userValidation } from "@/user/user.validation";
 import * as xlsx from "xlsx";
 import validator from "validator";
 import { jwtService } from "@/auth/jwt.service";
+import { departureJobValidation } from "@/departure/departure-job/departureJob.validation";
+import { dailyPartReportValidation } from "@/dailyPart/dailyPart.validation";
 
 class JobService {
   async createJob(
@@ -38,7 +40,7 @@ class JobService {
       }
       // const train = trainResponse.payload as Tren;
       const upResponse = await productionUnitValidation.findById(+data.up_id);
-      if (!upResponse) {
+      if (!upResponse.success) {
         return upResponse;
       }
 
@@ -87,8 +89,8 @@ class JobService {
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
         estado_trabajo: E_Trabajo_Estado.PROGRAMADO,
-        up_id: data.up_id,
-        tren_id: data.tren_id,
+        up_id: +data.up_id,
+        tren_id: +data.tren_id,
         proyecto_id: +project_id,
         usuario_id: user.id,
       };
@@ -98,6 +100,7 @@ class JobService {
         jobResponse
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear Trabajo",
         error
@@ -111,13 +114,24 @@ class JobService {
       const jobResponse = await jobValidation.findById(job_id);
       if (!jobResponse.success) {
         return jobResponse;
-      } else {
-        const result = await prismaJobRepository.updateStatusJob(job_id);
-        return httpResponse.SuccessResponse(
-          "Trabajo eliminado correctamente",
-          result
+      }
+      const detail = await departureJobValidation.findByForJob(job_id);
+      if (detail.success) {
+        return httpResponse.BadRequestException(
+          "No se puede eliminar el Trabajo porque ya se le ha asignado a una Partida"
         );
       }
+      const dailyPart = await dailyPartReportValidation.findByIdJob(job_id);
+      if (dailyPart.success) {
+        return httpResponse.BadRequestException(
+          "No se puede eliminar el Trabajo porque ya se le ha asignado a un Parte Diario"
+        );
+      }
+      const result = await prismaJobRepository.updateStatusJob(job_id);
+      return httpResponse.SuccessResponse(
+        "Trabajo eliminado correctamente",
+        result
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar el Trabajo",
