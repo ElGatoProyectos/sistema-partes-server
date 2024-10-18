@@ -3,6 +3,6 @@ export type T_FindAllDepartureJob = {
     page: number;
     limit: number;
     departure: string;
-    job: string;
+    search: string;
   };
 };

@@ -11,7 +11,9 @@ import {
   E_Estado_MO_BD,
   EspecialidadObrero,
   ManoObra,
+  OrigenObrero,
   Proyecto,
+  TipoObrero,
   Unidad,
   Usuario,
 } from "@prisma/client";
@@ -284,7 +286,9 @@ class WorkforceService {
             item.DNI === undefined ||
             item.NOMBRES === undefined ||
             item.CATEGORIA === undefined ||
-            item.ESPECIALIDAD === undefined
+            item.ESPECIALIDAD === undefined ||
+            item.TIPO === undefined ||
+            item.ORIGEN === undefined
           ) {
             error++;
             errorRows.push(index + 1);
@@ -294,7 +298,44 @@ class WorkforceService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.El DNI,NOMBRE, TIPO, ORIGEN, CATEGORIA, ESPECIALIDAD, UNIDAD son obligatorios.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.El DNI,NOMBRE, TIPO, ORIGEN, CATEGORIA, ESPECIALIDAD son obligatorios.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+      //[note] aca si hay letras en el dni.
+      await Promise.all(
+        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
+          index++;
+          if (!/^\d+$/.test(item.DNI)) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.El DNI no puede contener letras.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+      // //[note] aca si dni es mayor a 8.
+      await Promise.all(
+        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
+          index++;
+
+          if (String(item.DNI).length > 8) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.El DNI no puede ser mayor a 8 digitos.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );
@@ -420,7 +461,7 @@ class WorkforceService {
       let workforce;
       for (const item of sheetToJson) {
         workforceResponse = await workforceValidation.findByDni(
-          item.DNI.toString(),
+          String(item.DNI).trim(),
           project_id
         );
         if (workforceResponse.success) {
@@ -431,6 +472,16 @@ class WorkforceService {
             workforce.id
           );
         } else {
+          const typeResponse = await typeWorkforceValidation.findByName(
+            item.TIPO.trim(),
+            responseProject.id
+          );
+          const type = typeResponse.payload as TipoObrero;
+          const originResponse = await originWorkforceValidation.findByName(
+            item.ORIGEN.trim(),
+            responseProject.id
+          );
+          const origin = originResponse.payload as OrigenObrero;
           const categoryResponse = await categoryWorkforceValidation.findByName(
             item.CATEGORIA,
             responseProject.id
@@ -485,6 +536,8 @@ class WorkforceService {
               nombre_completo: item.NOMBRES,
               apellido_materno: item["APELLIDO MATERNO"],
               apellido_paterno: item["APELLIDO PATERNO"],
+              tipo_obrero_id: type.id,
+              origen_obrero_id: origin.id,
               genero: item.GENERO,
               estado_civil: item["ESTADO CIVIL"],
               categoria_obrero_id: category.id,

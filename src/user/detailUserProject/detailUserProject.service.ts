@@ -281,13 +281,17 @@ class DetailUserProjectService {
     project_id: number
   ): Promise<T_HttpResponse> {
     try {
+      const userResponse = await userValidation.findById(+data.user_id);
+      if (!userResponse.success) {
+        return userResponse;
+      }
       const projectResponse = await projectValidation.findById(+project_id);
       if (!projectResponse.success) {
         return projectResponse;
       }
       if (data.assignment === "DETALLE-CAPATAZ-JEFE-GRUPO") {
         const result = await detailForemanGroupLeaderService.deleteDetail(
-          data.user_id,
+          +data.user_id,
           project_id
         );
         if (!result.success) {
@@ -297,7 +301,7 @@ class DetailUserProjectService {
         }
       } else if (data.assignment === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
         const result = await detailMasterBuilderForemanService.deleteDetail(
-          data.user_id,
+          +data.user_id,
           project_id
         );
         if (!result.success) {
@@ -310,7 +314,7 @@ class DetailUserProjectService {
       ) {
         const result =
           await detailProductionEngineerMasterBuilderService.deleteDetail(
-            data.user_id,
+            +data.user_id,
             project_id
           );
         if (!result.success) {

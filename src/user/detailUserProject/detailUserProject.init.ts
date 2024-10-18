@@ -34,7 +34,6 @@ detailUserProjectRouter.get(
 );
 detailUserProjectRouter.delete(
   `${prefix}/delete-assignment`,
-  detailUserProjectMiddleware.verifyFieldsForDeleteAssignment,
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.deleteDetail
 );
