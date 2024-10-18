@@ -13,7 +13,7 @@ import {
   ProductionUnitMulterFileProject,
   ProductionUnitMulterProperties,
 } from "./models/production-unit.constant";
-import { Proyecto, UnidadProduccion } from "@prisma/client";
+import { Proyecto, Unidad, UnidadProduccion } from "@prisma/client";
 import { T_FindAll } from "@/common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
 import { projectValidation } from "@/project/project.validation";
@@ -316,21 +316,31 @@ class ProductionUnitService {
 
   async updateStatusProject(idProductionUnit: number): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await productionUnitValidation.findById(
+      const productionUnitResponse = await productionUnitValidation.findById(
         idProductionUnit
       );
-      if (!projectResponse.success) {
-        return projectResponse;
-      } else {
-        const result =
-          await prismaProductionUnitRepository.updateStatusProductionUnit(
-            idProductionUnit
-          );
-        return httpResponse.SuccessResponse(
-          "Unidad de Producción eliminada correctamente",
-          result
+      if (!productionUnitResponse.success) {
+        return productionUnitResponse;
+      }
+      const productionUnit = productionUnitResponse.payload as UnidadProduccion;
+      const isLastId = await productionUnitValidation.IsLastId(
+        productionUnit.proyecto_id
+      );
+      const lastProductionUnit = isLastId.payload as UnidadProduccion;
+      if (productionUnit.codigo != lastProductionUnit.codigo) {
+        return httpResponse.BadRequestException(
+          "La Unidad de Producción que se quiere eliminar no es el último"
         );
       }
+
+      const result =
+        await prismaProductionUnitRepository.updateStatusProductionUnit(
+          idProductionUnit
+        );
+      return httpResponse.SuccessResponse(
+        "Unidad de Producción eliminada correctamente",
+        result
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar la Unidad de Producción",

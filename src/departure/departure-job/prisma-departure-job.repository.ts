@@ -109,7 +109,6 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       },
     });
 
-    console.log(details);
     const detailsDepartureJob = details.map((item: I_DetailDepartureJob) => {
       const { Trabajo, ...data } = item;
       const { Partida } = item;

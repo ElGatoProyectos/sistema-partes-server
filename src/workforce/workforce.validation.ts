@@ -60,6 +60,7 @@ class WorkforceValidation {
         nombre_completo: data.NOMBRES,
         apellido_materno: data["APELLIDO MATERNO"],
         apellido_paterno: data["APELLIDO PATERNO"],
+        contrasena: data.DNI.toString(),
         genero: data.GENERO,
         estado_civil: data["ESTADO CIVIL"],
         categoria_obrero_id: category.id,

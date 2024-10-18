@@ -1,5 +1,8 @@
 import { projectValidation } from "@/project/project.validation";
-import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
+import {
+  T_FindAllDetailUser,
+  T_FindAllDetailUserProject,
+} from "./models/detailUserProject.types";
 import { prismaDetailUserProjectRepository } from "./prismaUserProject.repository";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
@@ -222,6 +225,64 @@ class DetailUserProjectService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar el usuario",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async getDetailForRole(
+    data: T_FindAllDetailUser,
+    project_id: string,
+    token: string
+  ): Promise<T_HttpResponse> {
+    try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const user = userTokenResponse.payload as Usuario;
+      if (
+        data.queryParams.detail === "DETALLE-INGENIERO-PRODUCCION-MAESTRO-OBRA"
+      ) {
+        const result =
+          await detailProductionEngineerMasterBuilderService.findAll(
+            data,
+            project_id,
+            user.id
+          );
+        return httpResponse.SuccessResponse(
+          "Éxito al traer todos los Detalles de Ingeniero de Producción y Maestro de Obra",
+          result
+        );
+      } else if (data.queryParams.detail === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
+        const result = await detailMasterBuilderForemanService.findAll(
+          data,
+          project_id,
+          user.id
+        );
+        return httpResponse.SuccessResponse(
+          "Éxito al traer todos los Detalles de Maestro de Obra y Capataz",
+          result
+        );
+      } else if (data.queryParams.detail === "DETALLE-CAPATAZ-JEFE-GRUPO") {
+        const result = await detailForemanGroupLeaderService.findAll(
+          data,
+          project_id,
+          user.id
+        );
+        return httpResponse.SuccessResponse(
+          "Éxito al traer todos los Detalles de Capataz y Jefe Grupo",
+          result
+        );
+      } else {
+        return httpResponse.BadRequestException(
+          "El tipo de Asignamiento que proporciono no se tiene contemplado "
+        );
+      }
+      // if(user.)
+      return httpResponse.SuccessResponse("Usuario eliminado correctamente");
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los detalles",
         error
       );
     } finally {

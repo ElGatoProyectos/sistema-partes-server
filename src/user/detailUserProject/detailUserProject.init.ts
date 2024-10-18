@@ -1,6 +1,5 @@
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
 import express from "@/config/express.config";
-import { userMiddleware } from "../user.middleware";
 import { detailUserProjectController } from "./detailUserProject.controller";
 import { detailUserProjectMiddleware } from "./detailUserProject.middleware";
 
@@ -19,6 +18,12 @@ detailUserProjectRouter.get(
   detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   detailUserProjectController.allUsersByProject
+);
+detailUserProjectRouter.get(
+  `${prefix}/detail`,
+  detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  detailUserProjectController.allDetailAccordingToTheRole
 );
 detailUserProjectRouter.get(
   `${prefix}/unassigned`,

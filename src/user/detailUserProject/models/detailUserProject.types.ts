@@ -5,3 +5,11 @@ export type T_FindAllDetailUserProject = {
     name: string;
   };
 };
+export type T_FindAllDetailUser = {
+  queryParams: {
+    page: number;
+    limit: number;
+    name: string;
+    detail: string;
+  };
+};

@@ -164,6 +164,8 @@ export interface I_WorkforceExcel {
   GENERO: string;
   "ESTADO CIVIL": string;
   CATEGORIA: string;
+  TIPO: string;
+  ORIGEN: string;
   ESPECIALIDAD: string;
   INGRESO: number;
   CESE: number;

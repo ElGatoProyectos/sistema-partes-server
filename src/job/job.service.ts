@@ -100,7 +100,6 @@ class JobService {
         jobResponse
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear Trabajo",
         error
@@ -114,6 +113,14 @@ class JobService {
       const jobResponse = await jobValidation.findById(job_id);
       if (!jobResponse.success) {
         return jobResponse;
+      }
+      const job = jobResponse.payload as Trabajo;
+      const isLastId = await jobValidation.IsLastId(job.proyecto_id);
+      const lastJob = isLastId.payload as Tren;
+      if (job.codigo != lastJob.codigo) {
+        return httpResponse.BadRequestException(
+          "El Trabajo que quiere eliminar no es el último"
+        );
       }
       const detail = await departureJobValidation.findByForJob(job_id);
       if (detail.success) {

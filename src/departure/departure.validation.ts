@@ -137,6 +137,26 @@ class DepartureValidation {
       );
     }
   }
+  async IsLastId(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const departure = await prismaDepartureRepository.isLastId(project_id);
+      if (!departure) {
+        return httpResponse.NotFoundException(
+          "Codigo de la última Partida no fue encontrado",
+          departure
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Código de la última Partida fue encontrada",
+        departure
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código de la Partida",
+        error
+      );
+    }
+  }
 }
 
 export const departureValidation = new DepartureValidation();
