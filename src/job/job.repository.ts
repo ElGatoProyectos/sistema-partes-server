@@ -21,4 +21,6 @@ export abstract class JobRepository {
   codeMoreHigh(project_id: number): void {}
 
   findByJobForTrain(train_id: number): void {}
+
+  isLastId(project_id: number): void {}
 }

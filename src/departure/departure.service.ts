@@ -513,6 +513,16 @@ class DepartureService {
       if (!departureResponse.success) {
         return departureResponse;
       }
+      const departure = departureResponse.payload as Partida;
+      const isLastId = await departureValidation.IsLastId(
+        departure.proyecto_id
+      );
+      const lastDeparture = isLastId.payload as Partida;
+      if (departure.id_interno != lastDeparture.id_interno) {
+        return httpResponse.BadRequestException(
+          "La Partida que quiere eliminar no es el último"
+        );
+      }
       const detail = await departureJobValidation.findByForDeparture(
         departure_id
       );

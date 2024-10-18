@@ -115,6 +115,14 @@ class JobService {
       if (!jobResponse.success) {
         return jobResponse;
       }
+      const job = jobResponse.payload as Trabajo;
+      const isLastId = await jobValidation.IsLastId(job.proyecto_id);
+      const lastJob = isLastId.payload as Tren;
+      if (job.codigo != lastJob.codigo) {
+        return httpResponse.BadRequestException(
+          "El Trabajo que quiere eliminar no es el último"
+        );
+      }
       const detail = await departureJobValidation.findByForJob(job_id);
       if (detail.success) {
         return httpResponse.BadRequestException(

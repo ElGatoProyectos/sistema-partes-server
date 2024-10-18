@@ -135,6 +135,18 @@ class PrismaDepartureRepository implements DepartureRepository {
     });
     return lastUnit;
   }
+
+  async isLastId(project_id: number): Promise<Partida | null> {
+    const job = await prisma.partida.findFirst({
+      where: {
+        proyecto_id: project_id,
+      },
+      orderBy: {
+        id_interno: "desc",
+      },
+    });
+    return job;
+  }
 }
 
 export const prismaDepartureRepository = new PrismaDepartureRepository();

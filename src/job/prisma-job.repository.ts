@@ -11,6 +11,17 @@ import { T_FindAllJob } from "./models/job.types";
 import { converToDate } from "@/common/utils/date";
 
 class PrismaJobRepository implements JobRepository {
+  async isLastId(project_id: number): Promise<Trabajo | null> {
+    const job = await prisma.trabajo.findFirst({
+      where: {
+        proyecto_id: project_id,
+      },
+      orderBy: {
+        codigo: "desc",
+      },
+    });
+    return job;
+  }
   async updateJobFromExcel(
     data: I_UpdateJobBDValidationExcel,
     job_id: number

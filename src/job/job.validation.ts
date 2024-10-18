@@ -135,13 +135,13 @@ class JobValidation {
   }
   async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
-      const train = await prismaJobRepository.existsName(name, project_id);
-      if (train) {
+      const job = await prismaJobRepository.existsName(name, project_id);
+      if (job) {
         return httpResponse.NotFoundException(
           "El nombre del Trabajo ya existe en la base de datos"
         );
       }
-      return httpResponse.SuccessResponse("Trabajo encontrado", train);
+      return httpResponse.SuccessResponse("Trabajo encontrado", job);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar Trabajo",
@@ -152,14 +152,31 @@ class JobValidation {
 
   async codeMoreHigh(project_id: number): Promise<T_HttpResponse> {
     try {
-      const train = await prismaJobRepository.codeMoreHigh(project_id);
-      if (!train) {
+      const job = await prismaJobRepository.codeMoreHigh(project_id);
+      if (!job) {
         return httpResponse.SuccessResponse("No se encontraron resultados", 0);
       }
-      return httpResponse.SuccessResponse("Trabajo encontrado", train);
+      return httpResponse.SuccessResponse("Trabajo encontrado", job);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar Tren",
+        "Error al buscar Trabajo",
+        error
+      );
+    }
+  }
+  async IsLastId(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const job = await prismaJobRepository.isLastId(project_id);
+      if (!job) {
+        return httpResponse.NotFoundException(
+          "Codigo del último Trabajo no fue encontrado",
+          job
+        );
+      }
+      return httpResponse.SuccessResponse("Trabajo encontrado", job);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar código del Trabajo",
         error
       );
     }

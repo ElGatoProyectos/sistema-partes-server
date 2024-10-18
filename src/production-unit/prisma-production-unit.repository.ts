@@ -174,6 +174,18 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
     });
     return productionUnitUpdate;
   }
+
+  async isLastId(project_id: number): Promise<UnidadProduccion | null> {
+    const job = await prisma.unidadProduccion.findFirst({
+      where: {
+        proyecto_id: project_id,
+      },
+      orderBy: {
+        codigo: "desc",
+      },
+    });
+    return job;
+  }
 }
 
 export const prismaProductionUnitRepository =

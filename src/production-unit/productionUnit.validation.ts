@@ -147,6 +147,28 @@ class ProductionUnitValidation {
       );
     }
   }
+  async IsLastId(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const productionUnit = await prismaProductionUnitRepository.isLastId(
+        project_id
+      );
+      if (!productionUnit) {
+        return httpResponse.NotFoundException(
+          "Codigo de la última Unidad de Producción no fue encontrado",
+          productionUnit
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Código de la última Unidad de Producción  encontrado",
+        productionUnit
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el código de la última Unidad de Producción ",
+        error
+      );
+    }
+  }
 }
 
 export const productionUnitValidation = new ProductionUnitValidation();
