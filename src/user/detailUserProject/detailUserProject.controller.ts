@@ -56,6 +56,31 @@ class DetailUserProjectController {
 
     response.status(result.statusCode).json(result);
   }
+  async allUsersAvailableForAssignDetail(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const user_id = Number(request.params.id);
+    const name = request.query.name as string;
+    const project_id = request.get("project-id") as string;
+
+    let paginationOptions: T_FindAllDetailUserProject = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        name,
+      },
+    };
+    const result = await detailUserProjectService.findAllAvailable(
+      paginationOptions,
+      project_id,
+      user_id
+    );
+
+    response.status(result.statusCode).json(result);
+  }
   async allUsersByProjectUnassigned(
     request: express.Request,
     response: express.Response

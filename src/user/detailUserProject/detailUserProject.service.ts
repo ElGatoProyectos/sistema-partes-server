@@ -140,6 +140,62 @@ class DetailUserProjectService {
       await prisma.$disconnect();
     }
   }
+  async findAllAvailable(
+    data: T_FindAllDetailUserProject,
+    project_id: string,
+    user_id: number
+  ) {
+    try {
+      const userResponse = await userValidation.findById(user_id);
+      if (!userResponse.success) {
+        return httpResponse.BadRequestException(
+          `El id ${user_id} del usuario proporcionado no existe en la base de datos`
+        );
+      }
+      const user = userResponse.payload as I_Usuario;
+      let nameRol: any;
+
+      if (user.Rol) {
+        nameRol = user.Rol?.rol;
+      }
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result =
+        await prismaDetailUserProjectRepository.getAllUsersAvailableOfProject(
+          skip,
+          data,
+          +project_id,
+          user.id,
+          nameRol
+        );
+
+      const { userAll, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: userAll,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Usuarios del Proyecto",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Usuarios del Proyecto",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async findAllUnassigned(
     data: T_FindAllDetailUserProject,
     project_id: string

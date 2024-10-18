@@ -155,6 +155,70 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
 
     return { userAll, total };
   }
+  async getAllUsersAvailableOfProject(
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    project_id: number,
+    user_id: number,
+    nameRol: string
+  ): Promise<{ userAll: any[]; total: number }> {
+    let ids: any = [];
+    let userAll: any = [];
+    let total: any;
+
+    if (nameRol === "INGENIERO_PRODUCCION") {
+      const usersNotProductionEngineer =
+        await prisma.detalleIngenieroProduccionMaestroObra.findMany({
+          where: {
+            usuario_ingeniero_id: user_id,
+            proyecto_id: project_id,
+          },
+        });
+
+      const idsIngenieros = usersNotProductionEngineer.map(
+        (user) => user.usuario_produccion_id
+      );
+      idsIngenieros.push(user_id);
+      ids = idsIngenieros.length > 0 ? idsIngenieros : [];
+      userAll = await this.getAll(skip, data, ids, project_id);
+
+      total = await this.totalUsers(project_id, ids);
+      return { userAll, total };
+    } else if (nameRol === "MAESTRO_OBRA") {
+      const usersNotMasterBuilder =
+        await prisma.detalleMaestroObraCapataz.findMany({
+          where: {
+            usuario_mo_id: user_id,
+            proyecto_id: project_id,
+          },
+        });
+      const idsCapataz = usersNotMasterBuilder.map(
+        (user) => user.usuario_capataz_id
+      );
+      idsCapataz.push(user_id);
+      ids = idsCapataz.length > 0 ? idsCapataz : [];
+      userAll = await this.getAll(skip, data, ids, project_id);
+      total = await this.totalUsers(project_id, ids);
+      return { userAll, total };
+    } else if (nameRol === "CAPATAZ") {
+      const usersNotForeman = await prisma.detalleCapatazJefeGrupo.findMany({
+        where: {
+          usuario_capataz_id: user_id,
+          proyecto_id: project_id,
+        },
+      });
+      const idsGroupLeader = usersNotForeman.map(
+        (user) => user.usuario_jefe_grupo_id
+      );
+      idsGroupLeader.push(user_id);
+      ids = idsGroupLeader.length > 0 ? idsGroupLeader : [];
+      userAll = await this.getAll(skip, data, ids, project_id);
+      total = await this.totalUsers(project_id, ids);
+      return { userAll, total };
+    }
+
+    return { userAll, total };
+  }
   async getAllUsersOfProjectUnassigned(
     skip: number,
     data: T_FindAllDetailUserProject,
@@ -241,157 +305,47 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     });
     return detailUserProject;
   }
+
+  async getAll(
+    skip: number,
+    data: T_FindAllDetailUserProject,
+    ids: number[],
+    project_id: number
+  ) {
+    const userAll = await prisma.detalleUsuarioProyecto.findMany({
+      where: {
+        usuario_id: {
+          notIn: ids,
+        },
+        projecto_id: project_id,
+      },
+      include: {
+        Usuario: {
+          include: {
+            Rol: true,
+          },
+          omit: {
+            contrasena: true,
+          },
+        },
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+    return userAll;
+  }
+  async totalUsers(project_id: number, ids: number[]) {
+    const total = await prisma.detalleUsuarioProyecto.count({
+      where: {
+        usuario_id: {
+          notIn: ids,
+        },
+        projecto_id: project_id,
+      },
+    });
+    return total;
+  }
 }
 
 export const prismaDetailUserProjectRepository =
   new PrismaDetailUserProjectRepository();
-
-////////
-// async getAllUsersOfProject(
-//   skip: number,
-//   data: T_FindAllDetailUserProject,
-//   project_id: number,
-//   userResponse: Usuario
-// ): Promise<{ userAll: any[]; total: number }> {
-//   let filters: any = {};
-//   let users: any = [];
-//   let userAll: any = [];
-//   let total: any;
-//   if (data.queryParams.name) {
-//     filters.nombre_completo = {
-//       contains: data.queryParams.name,
-//     };
-//   }
-//   const rolResponse = await rolValidation.findById(userResponse.rol_id);
-//   const rolFind = rolResponse.payload as Rol;
-//   if (rolFind.rol === "INGENIERO_PRODUCCION") {
-//     [users, total] = await prisma.$transaction([
-//       prisma.detalleUsuarioProyecto.findMany({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//             Rol: {
-//               rol: {
-//                 in: ["MAESTRO_OBRA"],
-//               },
-//             },
-//           },
-//         },
-//         include: {
-//           Usuario: {
-//             include: {
-//               Rol: true,
-//             },
-//           },
-//         },
-//         skip,
-//         take: data.queryParams.limit,
-//       }),
-//       prisma.detalleUsuarioProyecto.count({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//             Rol: {
-//               rol: {
-//                 in: ["MAESTRO_OBRA"],
-//               },
-//             },
-//           },
-//         },
-//       }),
-//     ]);
-//     userAll = users.map((item: I_DetailUserProject) => {
-//       const { Usuario, ...company } = item;
-//       const { Rol, ...user } = Usuario;
-//       return {
-//         usuario: user,
-//         rol: Rol,
-//       };
-//     });
-//   } else if (rolFind.rol === "MAESTRO_OBRA") {
-//     [users, total] = await prisma.$transaction([
-//       prisma.detalleUsuarioProyecto.findMany({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//             Rol: {
-//               rol: {
-//                 in: ["CAPATAZ"],
-//               },
-//             },
-//           },
-//         },
-//         include: {
-//           Usuario: {
-//             include: {
-//               Rol: true,
-//             },
-//           },
-//         },
-//         skip,
-//         take: data.queryParams.limit,
-//       }),
-//       prisma.detalleUsuarioProyecto.count({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//             Rol: {
-//               rol: {
-//                 in: ["CAPATAZ"],
-//               },
-//             },
-//           },
-//         },
-//       }),
-//     ]);
-//     userAll = users.map((item: I_DetailUserProject) => {
-//       const { Usuario, ...company } = item;
-//       const { Rol, ...user } = Usuario;
-//       return {
-//         usuario: user,
-//         rol: Rol,
-//       };
-//     });
-//   } else {
-//     [users, total] = await prisma.$transaction([
-//       prisma.detalleUsuarioProyecto.findMany({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//           },
-//         },
-//         include: {
-//           Usuario: {
-//             include: {
-//               Rol: true,
-//             },
-//           },
-//         },
-//         skip,
-//         take: data.queryParams.limit,
-//       }),
-//       prisma.detalleUsuarioProyecto.count({
-//         where: {
-//           projecto_id: project_id,
-//           Usuario: {
-//             ...filters,
-//           },
-//         },
-//       }),
-//     ]);
-//     userAll = users.map((item: I_DetailUserProject) => {
-//       const { Usuario, ...company } = item;
-//       const { Rol, ...user } = Usuario;
-//       return {
-//         usuario: user,
-//         rol: Rol,
-//       };
-//     });
-//   }
-//   return { userAll, total };
-// }
