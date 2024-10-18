@@ -26,4 +26,11 @@ departureJobRouter.get(
   departureJobController.allDetailsDepartureJob
 );
 
+departureJobRouter.delete(
+  `${prefix}/:id`,
+  departureJobMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  departureJobController.updateStatus
+);
+
 export default departureJobRouter;

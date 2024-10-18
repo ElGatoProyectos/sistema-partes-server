@@ -19,4 +19,6 @@ export abstract class JobRepository {
   updateStatusJob(idUser: number): void {}
 
   codeMoreHigh(project_id: number): void {}
+
+  findByJobForTrain(train_id: number): void {}
 }

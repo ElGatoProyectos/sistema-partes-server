@@ -115,6 +115,15 @@ class PrismaJobRepository implements JobRepository {
     });
     return job;
   }
+  async findByJobForTrain(train_id: number): Promise<Trabajo | null> {
+    const job = await prisma.trabajo.findFirst({
+      where: {
+        tren_id: train_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return job;
+  }
   async existsName(name: string, project_id: number): Promise<Trabajo | null> {
     const job = await prisma.trabajo.findFirst({
       where: {

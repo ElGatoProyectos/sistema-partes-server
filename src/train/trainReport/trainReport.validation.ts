@@ -2,7 +2,7 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaTrainReportRepository } from "./prisma-trainReport.repository";
 
 class TrainReportValidation {
-  async findByCode(train_id: number): Promise<T_HttpResponse> {
+  async findById(train_id: number): Promise<T_HttpResponse> {
     try {
       const trainReport = await prismaTrainReportRepository.findById(train_id);
       if (!trainReport) {

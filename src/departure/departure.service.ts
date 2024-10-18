@@ -15,6 +15,8 @@ import validator from "validator";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureValidation } from "./departure.validation";
 import { T_FindAllDeparture } from "./models/departure.types";
+import { departureJobValidation } from "./departure-job/departureJob.validation";
+import { departureReportValidation } from "./reportDeparture/reportDeparture.validation";
 
 class DepartureService {
   async createDeparture(
@@ -510,15 +512,31 @@ class DepartureService {
       );
       if (!departureResponse.success) {
         return departureResponse;
-      } else {
-        const result = await prismaDepartureRepository.updateStatusDeparture(
-          departure_id
-        );
-        return httpResponse.SuccessResponse(
-          "Partida eliminada correctamente",
-          result
+      }
+      const detail = await departureJobValidation.findByForDeparture(
+        departure_id
+      );
+      if (detail.success) {
+        return httpResponse.BadRequestException(
+          "No se puede eliminar la Partida porque ya se le ha asignado a un Trabajo"
         );
       }
+      const reportDeparture = await departureReportValidation.findById(
+        departure_id
+      );
+      if (reportDeparture.success) {
+        return httpResponse.BadRequestException(
+          "No se puede eliminar la Partida porque ya se le ha asignado a un Reporte"
+        );
+      }
+
+      const result = await prismaDepartureRepository.updateStatusDeparture(
+        departure_id
+      );
+      return httpResponse.SuccessResponse(
+        "Partida eliminada correctamente",
+        result
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar la Partida",
