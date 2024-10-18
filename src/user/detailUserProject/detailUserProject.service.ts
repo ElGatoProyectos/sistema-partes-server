@@ -1,8 +1,5 @@
 import { projectValidation } from "@/project/project.validation";
-import {
-  T_FindAllDetailUser,
-  T_FindAllDetailUserProject,
-} from "./models/detailUserProject.types";
+import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 import { prismaDetailUserProjectRepository } from "./prismaUserProject.repository";
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
@@ -21,6 +18,7 @@ import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupL
 import { detailForemanGroupLeaderService } from "../detailForemanGroupLeader/detailForemanGroupLeader.service";
 import { detailMasterBuilderForemanService } from "../detailMasterBuilderForeman/detailMasterBuilder.service";
 import { detailProductionEngineerMasterBuilderService } from "../detailProductionEngineerMasterBuilder/detailProductionEngineerMasterBuilder.service";
+import { I_Usuario } from "../models/user.interface";
 
 class DetailUserProjectService {
   async createDetail(
@@ -232,54 +230,43 @@ class DetailUserProjectService {
     }
   }
   async getDetailForRole(
-    data: T_FindAllDetailUser,
+    data: T_FindAllDetailUserProject,
     project_id: string,
-    token: string
+    user_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse) return userTokenResponse;
-      const user = userTokenResponse.payload as Usuario;
-      if (
-        data.queryParams.detail === "DETALLE-INGENIERO-PRODUCCION-MAESTRO-OBRA"
-      ) {
+      const userResponse = await userValidation.findById(user_id);
+      if (!userResponse.success) {
+        return userResponse;
+      }
+      const user = userResponse.payload as I_Usuario;
+      if (user.Rol?.rol === "INGENIERO_PRODUCCION") {
         const result =
           await detailProductionEngineerMasterBuilderService.findAll(
             data,
             project_id,
             user.id
           );
-        return httpResponse.SuccessResponse(
-          "Éxito al traer todos los Detalles de Ingeniero de Producción y Maestro de Obra",
-          result
-        );
-      } else if (data.queryParams.detail === "DETALLE-MAESTRO-OBRA-CAPATAZ") {
+        return result;
+      } else if (user.Rol?.rol === "MAESTRO_OBRA") {
         const result = await detailMasterBuilderForemanService.findAll(
           data,
           project_id,
           user.id
         );
-        return httpResponse.SuccessResponse(
-          "Éxito al traer todos los Detalles de Maestro de Obra y Capataz",
-          result
-        );
-      } else if (data.queryParams.detail === "DETALLE-CAPATAZ-JEFE-GRUPO") {
+        return result;
+      } else if (user.Rol?.rol === "CAPATAZ") {
         const result = await detailForemanGroupLeaderService.findAll(
           data,
           project_id,
           user.id
         );
-        return httpResponse.SuccessResponse(
-          "Éxito al traer todos los Detalles de Capataz y Jefe Grupo",
-          result
-        );
+        return result;
       } else {
         return httpResponse.BadRequestException(
-          "El tipo de Asignamiento que proporciono no se tiene contemplado "
+          "Error en la autenticación al buscar el Detalle del usuario "
         );
       }
-      // if(user.)
-      return httpResponse.SuccessResponse("Usuario eliminado correctamente");
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todos los detalles",
