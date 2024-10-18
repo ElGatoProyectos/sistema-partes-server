@@ -100,7 +100,6 @@ class JobService {
         jobResponse
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear Trabajo",
         error

@@ -25,6 +25,8 @@ import { prismaWorkforceRepository } from "./prisma-workforce.repository";
 import { converToDate } from "@/common/utils/date";
 import { userValidation } from "@/user/user.validation";
 import validator from "validator";
+import { typeWorkforceValidation } from "@/typeWorkforce/typeWorkforce.validation";
+import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
 
 class WorkforceService {
   async createWorkforce(
@@ -298,6 +300,52 @@ class WorkforceService {
         );
       }
 
+      //[note] buscar si existe el TIPO de Mano de Obra
+      await Promise.all(
+        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
+          index++;
+
+          const typeResponse = await typeWorkforceValidation.findByName(
+            item.TIPO.trim(),
+            responseProject.id
+          );
+          if (!typeResponse.success) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El nombre del Tipo de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+      //[note] buscar si existe el ORIGEN de Mano de Obra
+      await Promise.all(
+        sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
+          index++;
+
+          const originResponse = await originWorkforceValidation.findByName(
+            item.ORIGEN.trim(),
+            responseProject.id
+          );
+          if (!originResponse.success) {
+            error++;
+            errorRows.push(index + 1);
+          }
+        })
+      );
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El nombre del Origen de Mano de Obra no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
       //[note] buscar si existe el nombre de la Categoria
       await Promise.all(
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
@@ -433,6 +481,7 @@ class WorkforceService {
             data: {
               codigo: formattedCodigo,
               documento_identidad: item.DNI.toString(),
+              contrasena: item.DNI.toString(),
               nombre_completo: item.NOMBRES,
               apellido_materno: item["APELLIDO MATERNO"],
               apellido_paterno: item["APELLIDO PATERNO"],

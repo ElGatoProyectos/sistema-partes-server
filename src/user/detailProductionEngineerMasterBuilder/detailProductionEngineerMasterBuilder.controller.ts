@@ -1,5 +1,5 @@
 import express from "@/config/express.config";
-import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
+import { T_FindAllDetailUser } from "../detailUserProject/models/detailUserProject.types";
 import { detailProductionEngineerMasterBuilderService } from "./detailProductionEngineerMasterBuilder.service";
 
 class DetailProductionEngineerMasterBuilderController {
@@ -9,11 +9,13 @@ class DetailProductionEngineerMasterBuilderController {
     const project_id = request.get("project-id") as string;
     const user_id = Number(request.params.id);
     const search = request.query.search as string;
-    let paginationOptions: T_FindAllDetailUserProject = {
+    const detail = request.query.detail as string;
+    let paginationOptions: T_FindAllDetailUser = {
       queryParams: {
         page: page,
         limit: limit,
         name: search,
+        detail: detail,
       },
     };
     const result = await detailProductionEngineerMasterBuilderService.findAll(
