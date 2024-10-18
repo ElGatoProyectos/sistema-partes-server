@@ -1,7 +1,6 @@
 import express from "@/config/express.config";
 import { httpResponse } from "@/common/http.response";
 import { detailAssignmentDto } from "./dto/detail.dto";
-import { deleteDetailAssignmentDto } from "./dto/detailDelete.dto";
 import validator from "validator";
 
 class DetailUserProjectMiddleware {
@@ -21,22 +20,7 @@ class DetailUserProjectMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
-  verifyFieldsForDeleteAssignment(
-    request: express.Request,
-    response: express.Response,
-    nextFunction: express.NextFunction
-  ) {
-    try {
-      deleteDetailAssignmentDto.parse(request.body);
 
-      nextFunction();
-    } catch (error) {
-      const result = httpResponse.BadRequestException(
-        "Error al validar campos"
-      );
-      response.status(result.statusCode).send(result);
-    }
-  }
   verifyHeadersFieldsIdProject(
     request: express.Request,
     response: express.Response,

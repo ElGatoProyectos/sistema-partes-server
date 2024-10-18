@@ -98,6 +98,11 @@ class WorkforceController {
     const result = await workforceService.updateStatusWorkforce(workforce_id);
     response.status(result.statusCode).json(result);
   }
+  // async exportExcel(request: express.Request, response: express.Response) {
+  //   const project_id = request.get("project-id") as string;
+  //   const result = await workforceService.updateStatusWorkforce(workforce_id);
+  //   response.status(result.statusCode).json(result);
+  // }
 }
 
 export const workforceController = new WorkforceController();

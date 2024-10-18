@@ -46,46 +46,25 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     data: T_FindAllDepartureJob
   ): Promise<{ detailsDepartureJob: any[]; total: number }> {
     let details: any = {};
-    let filterDeparture: any = {};
-    let filterJob: any = {};
-    let total: any = {};
-    // const algo = await prisma.detalleTrabajoPartida.findMany({
-    //   where: {
-    //     Trabajo: {
-    //       nombre: { contains: "Contrucciones " },
-    //     },
-    //     // Partida: {
-    //     //   ...filterDeparture,
-    //     // },
-    //   },
-    //   skip,
-    //   take: data.queryParams.limit,
-    //   include: {
-    //     Trabajo: true,
-    //     Partida: true,
-    //   },
-    // });
-    // if (data.queryParams.departure) {
-    //   filterDeparture.partida = data.queryParams.departure;
-    // }
 
-    // if (data.queryParams.job) {
-    //   filterJob.nombre = data.queryParams.job;
-    // }
-    console.log(data.queryParams.job);
-    console.log(data.queryParams.departure);
     details = await prisma.detalleTrabajoPartida.findMany({
       where: {
-        Trabajo: {
-          nombre: {
-            contains: data.queryParams.job,
+        OR: [
+          {
+            Trabajo: {
+              nombre: {
+                contains: data.queryParams.search,
+              },
+            },
           },
-        },
-        // Partida: {
-        //   partida: {
-        //     contains: data.queryParams.departure,
-        //   },
-        // },
+          {
+            Partida: {
+              partida: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+        ],
       },
       skip,
       take: data.queryParams.limit,
@@ -94,18 +73,24 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         Partida: true,
       },
     });
-    total = prisma.detalleTrabajoPartida.count({
+    const total = await prisma.detalleTrabajoPartida.count({
       where: {
-        Trabajo: {
-          nombre: {
-            contains: data.queryParams.job,
+        OR: [
+          {
+            Trabajo: {
+              nombre: {
+                contains: data.queryParams.search,
+              },
+            },
           },
-        },
-        Partida: {
-          partida: {
-            contains: data.queryParams.departure,
+          {
+            Partida: {
+              partida: {
+                contains: data.queryParams.search,
+              },
+            },
           },
-        },
+        ],
       },
     });
 

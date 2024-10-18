@@ -8,6 +8,7 @@ import {
   E_Estado_MO_BD,
   EspecialidadObrero,
   OrigenObrero,
+  TipoObrero,
   Unidad,
 } from "@prisma/client";
 import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
@@ -22,6 +23,16 @@ class WorkforceValidation {
     workforce_id: number
   ): Promise<T_HttpResponse> {
     try {
+      const typeResponse = await typeWorkforceValidation.findByName(
+        data.TIPO.trim(),
+        project_id
+      );
+      const type = typeResponse.payload as TipoObrero;
+      const originResponse = await originWorkforceValidation.findByName(
+        data.ORIGEN.trim(),
+        project_id
+      );
+      const origin = originResponse.payload as OrigenObrero;
       const categoryResponse = await categoryWorkforceValidation.findByName(
         data.CATEGORIA.trim(),
         project_id
@@ -60,6 +71,8 @@ class WorkforceValidation {
         nombre_completo: data.NOMBRES,
         apellido_materno: data["APELLIDO MATERNO"],
         apellido_paterno: data["APELLIDO PATERNO"],
+        tipo_obrero_id: type.id,
+        origen_obrero_id: origin.id,
         contrasena: data.DNI.toString(),
         genero: data.GENERO,
         estado_civil: data["ESTADO CIVIL"],

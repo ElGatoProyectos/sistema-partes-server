@@ -34,6 +34,13 @@ workforceRouter.get(
   workforceController.allWorkforce
 );
 
+workforceRouter.get(
+  `${prefix}/excel`,
+  workforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser
+  // workforceController.allWorkforce
+);
+
 workforceRouter.delete(
   `${prefix}/:id`,
   workforceMiddleware.verifyHeadersFieldsId,

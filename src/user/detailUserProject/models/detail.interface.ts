@@ -4,6 +4,6 @@ export interface I_CreateDetailAssignment {
   assignment: string;
 }
 export interface I_DeleteDetail {
-  user_id: number;
+  user_id: string;
   assignment: string;
 }

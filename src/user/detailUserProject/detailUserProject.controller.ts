@@ -123,8 +123,14 @@ class DetailUserProjectController {
   async deleteDetail(request: express.Request, response: express.Response) {
     const body = request.body as I_DeleteDetail;
     const project_id = request.get("project-id") as string;
+    const user_id = request.query.user_id as string;
+    const assignment = request.query.assignment as string;
+    const detailFormat: I_DeleteDetail = {
+      user_id: user_id,
+      assignment: assignment,
+    };
     const result = await detailUserProjectService.deleteDetail(
-      body,
+      detailFormat,
       +project_id
     );
     if (!result.success) {
