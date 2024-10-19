@@ -22,4 +22,8 @@ export abstract class WorkforceRepository {
   updateStatusWorkforce(idUser: number): void {}
 
   codeMoreHigh(project_id: number): void {}
+
+  findByIdType(type_id: number): void {}
+
+  findByIdOrigin(origin_id: number): void {}
 }

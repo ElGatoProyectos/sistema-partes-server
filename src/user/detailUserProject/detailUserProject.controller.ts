@@ -78,8 +78,11 @@ class DetailUserProjectController {
       project_id,
       user_id
     );
-
-    response.status(result.statusCode).json(result);
+    if (result?.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(400).json(result);
+    }
   }
   async allUsersByProjectUnassigned(
     request: express.Request,

@@ -126,6 +126,48 @@ class WorkforceValidation {
       );
     }
   }
+  async findByIdType(type_id: number): Promise<T_HttpResponse> {
+    try {
+      const workforce = await prismaWorkforceRepository.findByIdType(type_id);
+      if (!workforce) {
+        return httpResponse.NotFoundException(
+          "El tipo que busca en Mano de Obra no fue encontrado",
+          workforce
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El tipo que busca en Mano de Obra encontrado",
+        workforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el tipo en Mano de Obra",
+        error
+      );
+    }
+  }
+  async findByIdOrigin(origin_id: number): Promise<T_HttpResponse> {
+    try {
+      const workforce = await prismaWorkforceRepository.findByIdOrigin(
+        origin_id
+      );
+      if (!workforce) {
+        return httpResponse.NotFoundException(
+          "El Origen que busca en Mano de Obra no fue encontrado",
+          workforce
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El Origen que busca en Mano de Obra encontrado",
+        workforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Origen en Mano de Obra",
+        error
+      );
+    }
+  }
 
   async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {

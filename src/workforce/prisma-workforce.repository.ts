@@ -9,6 +9,24 @@ import {
 import { T_FindAllWorkforce } from "./models/workforce.types";
 
 class PrismaWorkforceRepository implements WorkforceRepository {
+  async findByIdOrigin(origin_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        origen_obrero_id: origin_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByIdType(type_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        tipo_obrero_id: type_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
   async findByCode(code: string, project_id: number): Promise<ManoObra | null> {
     const workforce = await prisma.manoObra.findFirst({
       where: {
