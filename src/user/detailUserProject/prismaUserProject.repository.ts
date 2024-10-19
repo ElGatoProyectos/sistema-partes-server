@@ -5,11 +5,12 @@ import {
   I_CreateDetailUserProject,
   I_DetailUserProject,
 } from "./models/detailUserProject.interface";
-import { DetalleUsuarioProyecto } from "@prisma/client";
+import { DetalleUsuarioProyecto, Rol } from "@prisma/client";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
 import { T_FindAllProject } from "@/project/dto/project.type";
+import { rolValidation } from "@/rol/rol.validation";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
   async getAllProjectsOfUser(
@@ -180,9 +181,19 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsIngenieros.push(user_id);
       ids = idsIngenieros.length > 0 ? idsIngenieros : [];
-      userAll = await this.getAll(skip, data, ids, project_id);
+      const masterBuilderResponse = await rolValidation.findByName(
+        "MAESTRO_OBRA"
+      );
+      const rolMasterBuilder = masterBuilderResponse.payload as Rol;
+      userAll = await this.getAll(
+        skip,
+        data,
+        ids,
+        project_id,
+        rolMasterBuilder.id
+      );
 
-      total = await this.totalUsers(project_id, ids);
+      total = await this.totalUsers(project_id, ids, rolMasterBuilder.id);
       return { userAll, total };
     } else if (nameRol === "MAESTRO_OBRA") {
       const usersNotMasterBuilder =
@@ -197,8 +208,10 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsCapataz.push(user_id);
       ids = idsCapataz.length > 0 ? idsCapataz : [];
-      userAll = await this.getAll(skip, data, ids, project_id);
-      total = await this.totalUsers(project_id, ids);
+      const foremanResponse = await rolValidation.findByName("CAPATAZ");
+      const rolForeman = foremanResponse.payload as Rol;
+      userAll = await this.getAll(skip, data, ids, project_id, rolForeman.id);
+      total = await this.totalUsers(project_id, ids, rolForeman.id);
       return { userAll, total };
     } else if (nameRol === "CAPATAZ") {
       const usersNotForeman = await prisma.detalleCapatazJefeGrupo.findMany({
@@ -212,8 +225,16 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsGroupLeader.push(user_id);
       ids = idsGroupLeader.length > 0 ? idsGroupLeader : [];
-      userAll = await this.getAll(skip, data, ids, project_id);
-      total = await this.totalUsers(project_id, ids);
+      const groupLeaderResponse = await rolValidation.findByName("JEFE_GRUPO");
+      const rolGroupLeader = groupLeaderResponse.payload as Rol;
+      userAll = await this.getAll(
+        skip,
+        data,
+        ids,
+        project_id,
+        rolGroupLeader.id
+      );
+      total = await this.totalUsers(project_id, ids, rolGroupLeader.id);
       return { userAll, total };
     }
 
@@ -310,10 +331,16 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     skip: number,
     data: T_FindAllDetailUserProject,
     ids: number[],
-    project_id: number
+    project_id: number,
+    rol_id: number
   ) {
     const userAll = await prisma.detalleUsuarioProyecto.findMany({
       where: {
+        Usuario: {
+          Rol: {
+            id: rol_id,
+          },
+        },
         usuario_id: {
           notIn: ids,
         },
@@ -334,9 +361,14 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     });
     return userAll;
   }
-  async totalUsers(project_id: number, ids: number[]) {
+  async totalUsers(project_id: number, ids: number[], rol_id: number) {
     const total = await prisma.detalleUsuarioProyecto.count({
       where: {
+        Usuario: {
+          Rol: {
+            id: rol_id,
+          },
+        },
         usuario_id: {
           notIn: ids,
         },

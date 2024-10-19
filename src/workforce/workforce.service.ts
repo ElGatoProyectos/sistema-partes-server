@@ -596,7 +596,6 @@ class WorkforceService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer toda la Mano de Obra",
         error

@@ -3,7 +3,9 @@ import multer from "multer";
 import { workforceService } from "./workforce.service";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { I_UpdateWorkforceBody } from "./models/workforce.interface";
-
+import * as ExcelJS from "exceljs";
+import prisma from "@/config/prisma.config";
+import { httpResponse } from "@/common/http.response";
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
@@ -98,11 +100,40 @@ class WorkforceController {
     const result = await workforceService.updateStatusWorkforce(workforce_id);
     response.status(result.statusCode).json(result);
   }
-  // async exportExcel(request: express.Request, response: express.Response) {
-  //   const project_id = request.get("project-id") as string;
-  //   const result = await workforceService.updateStatusWorkforce(workforce_id);
-  //   response.status(result.statusCode).json(result);
-  // }
+  async exportExcel(request: express.Request, response: express.Response) {
+    const project_id = request.get("project-id") as string;
+    const data = await prisma.manoObra.findMany();
+    console.log(data);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      { header: "NOMBRE", key: "name", width: 30 },
+      { header: "APELLIDO MATERNO", key: "mother", width: 30 },
+      { header: "APELLIDO PATERNO", key: "father", width: 30 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "93c5fd" },
+      };
+      cell.font = {
+        bold: true,
+      };
+    });
+    data.forEach((user) => {
+      worksheet.addRow({
+        name: user.nombre_completo,
+        mother: user.apellido_materno,
+        father: user.apellido_paterno,
+      });
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header("Content-Disposition", "attachment; filename=manoDeObra.xlsx")
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
+  }
 }
 
 export const workforceController = new WorkforceController();
