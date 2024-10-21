@@ -179,7 +179,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
         });
 
       const idsIngenieros = usersNotProductionEngineer.map(
-        (user) => user.usuario_produccion_id
+        (user) => user.usuario_maestro_obra_id
       );
       idsIngenieros.push(user_id);
       ids = idsIngenieros.length > 0 ? idsIngenieros : [];

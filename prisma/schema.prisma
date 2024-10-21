@@ -119,42 +119,43 @@ model Permisos {
 
 //[success] actual
 model Usuario {
-  id                     Int                                     @id @default(autoincrement())
-  email                  String
-  dni                    String                                  @unique
-  nombre_completo        String
-  telefono               String
-  limite_proyecto        Int                                     @default(1)
-  limite_usuarios        Int
-  estado                 E_Estado_BD?                            @default(n)
-  eliminado              E_Estado_BD                             @default(n)
-  contrasena             String
-  fecha_creacion         DateTime                                @default(now())
-  rol_id                 Int
-  Rol                    Rol                                     @relation(fields: [rol_id], references: [id])
-  Empresa                Empresa[]
-  DetalleUsuarioEmpresa  DetalleUsuarioEmpresa[]
-  Partida                Partida[]
-  ManoObra               ManoObra[]
-  DetalleUsuarioProyecto DetalleUsuarioProyecto[]
-  Trabajo                Trabajo[]
-  IngenieroProduccion    DetalleIngenieroProduccionMaestroObra[] @relation("IngenieroRelation")
-  ProduccionManoObra     DetalleIngenieroProduccionMaestroObra[] @relation("ProduccionRelation")
-  ManoDeObra             DetalleMaestroObraCapataz[]             @relation("ManoDeObra")
-  Capataz                DetalleMaestroObraCapataz[]             @relation("Capataz")
-  CapatazJefe            DetalleCapatazJefeGrupo[]               @relation("CapatazJefe")
-  JefeGrupo              DetalleCapatazJefeGrupo[]               @relation("JefeGrupo")
+  id                        Int                                     @id @default(autoincrement())
+  email                     String
+  dni                       String                                  @unique
+  nombre_completo           String
+  telefono                  String
+  limite_proyecto           Int                                     @default(1)
+  limite_usuarios           Int
+  estado                    E_Estado_BD?                            @default(n)
+  eliminado                 E_Estado_BD                             @default(n)
+  contrasena                String
+  fecha_creacion            DateTime                                @default(now())
+  rol_id                    Int
+  Rol                       Rol                                     @relation(fields: [rol_id], references: [id])
+  Empresa                   Empresa[]
+  DetalleUsuarioEmpresa     DetalleUsuarioEmpresa[]
+  Partida                   Partida[]
+  ManoObra                  ManoObra[]
+  DetalleUsuarioProyecto    DetalleUsuarioProyecto[]
+  Trabajo                   Trabajo[]
+  IngenieroMaestroObra      DetalleIngenieroProduccionMaestroObra[] @relation("IngenieroRelation")
+  MaestroObra               DetalleIngenieroProduccionMaestroObra[] @relation("MaestroObraRelation")
+  MaestroDeObra             DetalleMaestroObraCapataz[]             @relation("MaestroDeObra")
+  Capataz                   DetalleMaestroObraCapataz[]             @relation("Capataz")
+  CapatazJefe               DetalleCapatazJefeGrupo[]               @relation("CapatazJefe")
+  JefeGrupo                 DetalleCapatazJefeGrupo[]               @relation("JefeGrupo")
+  DetalleMaestroObraCapataz DetalleMaestroObraCapataz[]
 }
 
 model DetalleIngenieroProduccionMaestroObra {
-  id                    Int      @id @default(autoincrement())
-  usuario_ingeniero_id  Int
-  usuario_produccion_id Int
-  fecha_creacion        DateTime @default(now())
-  proyecto_id           Int
-  Proyecto              Proyecto @relation(fields: [proyecto_id], references: [id])
-  Ingeniero             Usuario  @relation("IngenieroRelation", fields: [usuario_ingeniero_id], references: [id])
-  Produccion            Usuario  @relation("ProduccionRelation", fields: [usuario_produccion_id], references: [id])
+  id                      Int      @id @default(autoincrement())
+  usuario_ingeniero_id    Int
+  usuario_maestro_obra_id Int
+  fecha_creacion          DateTime @default(now())
+  proyecto_id             Int
+  Proyecto                Proyecto @relation(fields: [proyecto_id], references: [id])
+  Ingeniero               Usuario  @relation("IngenieroRelation", fields: [usuario_ingeniero_id], references: [id])
+  MaestroObra             Usuario  @relation("MaestroObraRelation", fields: [usuario_maestro_obra_id], references: [id])
 }
 
 model DetalleMaestroObraCapataz {
@@ -164,8 +165,10 @@ model DetalleMaestroObraCapataz {
   fecha_creacion     DateTime @default(now())
   proyecto_id        Int
   Proyecto           Proyecto @relation(fields: [proyecto_id], references: [id])
-  ManoDeObra         Usuario  @relation("ManoDeObra", fields: [usuario_mo_id], references: [id])
+  MaestroDeObra      Usuario  @relation("MaestroDeObra", fields: [usuario_mo_id], references: [id])
   Capataz            Usuario  @relation("Capataz", fields: [usuario_capataz_id], references: [id])
+  Usuario            Usuario? @relation(fields: [usuarioId], references: [id])
+  usuarioId          Int?
 }
 
 model DetalleCapatazJefeGrupo {
@@ -847,6 +850,7 @@ model DetallePrecioHoraMO {
   hora_extra_100      Float
   categoria_obrero_id Int
   precio_hora_mo      Int
+  eliminado           E_Estado_BD     @default(n)
   PrecioHoraMO        PrecioHoraMO    @relation(fields: [precio_hora_mo], references: [id])
   CategoriaObrero     CategoriaObrero @relation(fields: [categoria_obrero_id], references: [id])
 }
