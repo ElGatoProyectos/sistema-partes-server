@@ -23,7 +23,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
     const detail = await prisma.detalleIngenieroProduccionMaestroObra.findFirst(
       {
         where: {
-          usuario_produccion_id: masterBuilder_id,
+          usuario_maestro_obra_id: masterBuilder_id,
           proyecto_id: project_id,
         },
       }
@@ -49,12 +49,12 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
         where: {
           usuario_ingeniero_id: user_id,
           proyecto_id: project_id,
-          Produccion: {
+          MaestroObra: {
             ...filters,
           },
         },
         include: {
-          Produccion: {
+          MaestroObra: {
             include: {
               Rol: true,
             },
@@ -65,8 +65,8 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
       });
 
     const userAll = userAllReplace.map((item) => {
-      const { Produccion } = item;
-      const { Rol, ...ResData } = Produccion;
+      const { MaestroObra } = item;
+      const { Rol, ...ResData } = MaestroObra;
       return {
         rol: Rol,
         usuario: ResData,
@@ -77,7 +77,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
       where: {
         usuario_ingeniero_id: user_id,
         proyecto_id: project_id,
-        Produccion: {
+        MaestroObra: {
           ...filters,
         },
       },
@@ -95,7 +95,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
       await prisma.detalleIngenieroProduccionMaestroObra.create({
         data: {
           usuario_ingeniero_id: user_id,
-          usuario_produccion_id: user2_id,
+          usuario_maestro_obra_id: user2_id,
           proyecto_id: proeject_id,
         },
       });
@@ -109,7 +109,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
         where: {
           OR: [
             { usuario_ingeniero_id: user_id },
-            { usuario_produccion_id: user_id },
+            { usuario_maestro_obra_id: user_id },
           ],
         },
       }
