@@ -208,7 +208,7 @@ class OriginWorkforceService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todas los Origenes de ",
+        "Error al traer todas los Origenes",
         error
       );
     } finally {

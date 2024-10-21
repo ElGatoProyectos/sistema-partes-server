@@ -31,22 +31,12 @@ class PrismaOriginWorkforceRepository implements OriginWorkforceRepository {
     return originWorkforce;
   }
   async updateStatusOriginWorkforce(origin_id: number): Promise<OrigenObrero> {
-    const origin = await prisma.origenObrero.findFirst({
-      where: {
-        id: origin_id,
-        eliminado: E_Estado_BD.n,
-      },
-    });
-
-    const newStateOrigin =
-      origin?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
-
     const originWorkforce = await prisma.origenObrero.update({
       where: {
         id: origin_id,
       },
       data: {
-        eliminado: newStateOrigin,
+        eliminado: E_Estado_BD.y,
       },
     });
     return originWorkforce;

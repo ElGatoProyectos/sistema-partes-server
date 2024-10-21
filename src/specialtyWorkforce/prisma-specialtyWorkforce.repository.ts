@@ -63,22 +63,13 @@ class PrismaSpecialtyWorkforceRepository
   async updateStatusSpecialtyWorkforce(
     origin_id: number
   ): Promise<EspecialidadObrero> {
-    const speciality = await prisma.especialidadObrero.findFirst({
-      where: {
-        id: origin_id,
-        eliminado: E_Estado_BD.n,
-      },
-    });
-
-    const newStateSpeciality =
-      speciality?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
 
     const specialityWorkforce = await prisma.especialidadObrero.update({
       where: {
         id: origin_id,
       },
       data: {
-        eliminado: newStateSpeciality,
+        eliminado: E_Estado_BD.y,
       },
     });
     return specialityWorkforce;

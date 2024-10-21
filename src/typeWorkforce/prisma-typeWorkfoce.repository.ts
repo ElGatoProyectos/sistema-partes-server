@@ -23,22 +23,12 @@ class PrismaTypeWorkforceRepository implements TypeWorkforceRepository {
     return typeWorkforce;
   }
   async updateStatusTypeWorkforce(type_id: number): Promise<TipoObrero> {
-    const type = await prisma.tipoObrero.findFirst({
-      where: {
-        id: type_id,
-        eliminado: E_Estado_BD.n,
-      },
-    });
-
-    const newStateType =
-      type?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
-
     const typeWorkforce = await prisma.tipoObrero.update({
       where: {
         id: type_id,
       },
       data: {
-        eliminado: newStateType,
+        eliminado: E_Estado_BD.y,
       },
     });
     return typeWorkforce;
