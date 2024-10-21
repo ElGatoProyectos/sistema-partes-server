@@ -9,46 +9,6 @@ import {
 import { T_FindAllWorkforce } from "./models/workforce.types";
 
 class PrismaWorkforceRepository implements WorkforceRepository {
-  async findByCode(code: string, project_id: number): Promise<ManoObra | null> {
-    const workforce = await prisma.manoObra.findFirst({
-      where: {
-        codigo: code,
-        proyecto_id: project_id,
-        eliminado: E_Estado_BD.n,
-      },
-    });
-    return workforce;
-  }
-  async findByDNI(dni: string, project_id: number): Promise<ManoObra | null> {
-    const workforce = await prisma.manoObra.findFirst({
-      where: {
-        documento_identidad: dni,
-        proyecto_id: project_id,
-        eliminado: E_Estado_BD.n,
-      },
-    });
-    return workforce;
-  }
-  async existsName(name: string, project_id: number): Promise<ManoObra | null> {
-    const workforce = await prisma.manoObra.findFirst({
-      where: {
-        nombre_completo: name,
-        proyecto_id: project_id,
-      },
-    });
-    return workforce;
-  }
-
-  async codeMoreHigh(project_id: number): Promise<ManoObra | null> {
-    const lastWorkforce = await prisma.manoObra.findFirst({
-      where: {
-        eliminado: E_Estado_BD.n,
-        proyecto_id: project_id,
-      },
-      orderBy: { codigo: "desc" },
-    });
-    return lastWorkforce;
-  }
   async createWorkforce(data: I_CreateWorkforceBD): Promise<ManoObra> {
     const workforce = await prisma.manoObra.create({
       data,
@@ -211,6 +171,93 @@ class PrismaWorkforceRepository implements WorkforceRepository {
       },
     });
     return trainUpdate;
+  }
+  async findByIdSpecialty(specialty_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        especialidad_obrero_id: specialty_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByIdBank(bank_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        banco_id: bank_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByIdCategoryWorkforce(
+    category_workforce_id: number
+  ): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        categoria_obrero_id: category_workforce_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByIdOrigin(origin_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        origen_obrero_id: origin_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByIdType(type_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        tipo_obrero_id: type_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByCode(code: string, project_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        codigo: code,
+        proyecto_id: project_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async findByDNI(dni: string, project_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        documento_identidad: dni,
+        proyecto_id: project_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return workforce;
+  }
+  async existsName(name: string, project_id: number): Promise<ManoObra | null> {
+    const workforce = await prisma.manoObra.findFirst({
+      where: {
+        nombre_completo: name,
+        proyecto_id: project_id,
+      },
+    });
+    return workforce;
+  }
+
+  async codeMoreHigh(project_id: number): Promise<ManoObra | null> {
+    const lastWorkforce = await prisma.manoObra.findFirst({
+      where: {
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+      },
+      orderBy: { codigo: "desc" },
+    });
+    return lastWorkforce;
   }
 }
 

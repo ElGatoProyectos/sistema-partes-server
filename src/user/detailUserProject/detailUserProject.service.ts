@@ -153,23 +153,29 @@ class DetailUserProjectService {
         );
       }
       const user = userResponse.payload as I_Usuario;
-      let nameRol: any;
+      let userNameRol: any;
 
       if (user.Rol) {
-        nameRol = user.Rol?.rol;
+        userNameRol = user.Rol?.rol;
       }
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const projectResponse = await projectValidation.findById(+project_id);
       if (!projectResponse.success) {
         return projectResponse;
       }
+      const resultRol = await this.verifyRol(userNameRol);
+      if (!resultRol?.success) {
+        return resultRol;
+      }
+      const rol = resultRol.payload as Rol;
       const result =
         await prismaDetailUserProjectRepository.getAllUsersAvailableOfProject(
           skip,
           data,
           +project_id,
           user.id,
-          nameRol
+          userNameRol,
+          rol.id
         );
 
       const { userAll, total } = result;
@@ -390,6 +396,47 @@ class DetailUserProjectService {
       );
     } finally {
       await prisma.$disconnect();
+    }
+  }
+  async verifyRol(nameRol: string) {
+    if (nameRol === "INGENIERO_PRODUCCION") {
+      const masterBuilderResponse = await rolValidation.findByName(
+        "MAESTRO_OBRA"
+      );
+      if (!masterBuilderResponse.success) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Rol del que luego quiere buscar sus Usuarios"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Se encontró el otro Rol",
+        masterBuilderResponse.payload
+      );
+    } else if (nameRol === "MAESTRO_OBRA") {
+      const foremanResponse = await rolValidation.findByName("CAPATAZ");
+      if (!foremanResponse.success) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Rol del que luego quiere buscar sus Usuarios"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Se encontró el otro Rol",
+        foremanResponse.payload
+      );
+    } else if (nameRol === "CAPATAZ") {
+      console.log("entro a jefe");
+      const groupLeaderResponse = await rolValidation.findByName("JEFE_GRUPO");
+      if (!groupLeaderResponse.success) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Rol del que luego quiere buscar sus Usuarios"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Se encontró el otro Rol",
+        groupLeaderResponse.payload
+      );
+    } else {
+      return httpResponse.BadRequestException("No puede acceder a ver esto");
     }
   }
 }

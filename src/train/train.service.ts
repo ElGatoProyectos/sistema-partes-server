@@ -137,7 +137,7 @@ class TrainService {
       const trainResponse = await prismaTrainRepository.findById(idTrain);
       if (!trainResponse) {
         return httpResponse.NotFoundException(
-          "El id del Tren no fue no encontrado"
+          "El id del Tren no fue encontrado"
         );
       }
       return httpResponse.SuccessResponse("Tren encontrado", trainResponse);

@@ -11,6 +11,7 @@ import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuild
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
 import { T_FindAllProject } from "@/project/dto/project.type";
 import { rolValidation } from "@/rol/rol.validation";
+import { httpResponse } from "@/common/http.response";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
   async getAllProjectsOfUser(
@@ -161,7 +162,8 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     data: T_FindAllDetailUserProject,
     project_id: number,
     user_id: number,
-    nameRol: string
+    nameRol: string,
+    rol_id: number
   ): Promise<{ userAll: any[]; total: number }> {
     let ids: any = [];
     let userAll: any = [];
@@ -181,19 +183,10 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsIngenieros.push(user_id);
       ids = idsIngenieros.length > 0 ? idsIngenieros : [];
-      const masterBuilderResponse = await rolValidation.findByName(
-        "MAESTRO_OBRA"
-      );
-      const rolMasterBuilder = masterBuilderResponse.payload as Rol;
-      userAll = await this.getAll(
-        skip,
-        data,
-        ids,
-        project_id,
-        rolMasterBuilder.id
-      );
 
-      total = await this.totalUsers(project_id, ids, rolMasterBuilder.id);
+      userAll = await this.getAll(skip, data, ids, project_id, rol_id);
+
+      total = await this.totalUsers(project_id, ids, rol_id);
       return { userAll, total };
     } else if (nameRol === "MAESTRO_OBRA") {
       const usersNotMasterBuilder =
@@ -208,10 +201,8 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsCapataz.push(user_id);
       ids = idsCapataz.length > 0 ? idsCapataz : [];
-      const foremanResponse = await rolValidation.findByName("CAPATAZ");
-      const rolForeman = foremanResponse.payload as Rol;
-      userAll = await this.getAll(skip, data, ids, project_id, rolForeman.id);
-      total = await this.totalUsers(project_id, ids, rolForeman.id);
+      userAll = await this.getAll(skip, data, ids, project_id, rol_id);
+      total = await this.totalUsers(project_id, ids, rol_id);
       return { userAll, total };
     } else if (nameRol === "CAPATAZ") {
       const usersNotForeman = await prisma.detalleCapatazJefeGrupo.findMany({
@@ -225,16 +216,8 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsGroupLeader.push(user_id);
       ids = idsGroupLeader.length > 0 ? idsGroupLeader : [];
-      const groupLeaderResponse = await rolValidation.findByName("JEFE_GRUPO");
-      const rolGroupLeader = groupLeaderResponse.payload as Rol;
-      userAll = await this.getAll(
-        skip,
-        data,
-        ids,
-        project_id,
-        rolGroupLeader.id
-      );
-      total = await this.totalUsers(project_id, ids, rolGroupLeader.id);
+      userAll = await this.getAll(skip, data, ids, project_id, rol_id);
+      total = await this.totalUsers(project_id, ids, rol_id);
       return { userAll, total };
     }
 
