@@ -1,5 +1,5 @@
 import { httpResponse, T_HttpResponse } from "../common/http.response";
-import { prismaSpecialtyWorkforceRepository } from "./prisma-specialtyWorkforce";
+import { prismaSpecialtyWorkforceRepository } from "./prisma-specialtyWorkforce.repository";
 
 class SpecialtyWorkforceValidation {
   async findById(bank_id: number): Promise<T_HttpResponse> {

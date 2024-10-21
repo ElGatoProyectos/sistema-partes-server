@@ -41,7 +41,7 @@ class PrismaOriginWorkforceRepository implements OriginWorkforceRepository {
     const newStateOrigin =
       origin?.eliminado == E_Estado_BD.y ? E_Estado_BD.n : E_Estado_BD.y;
 
-    const typeWorkforce = await prisma.origenObrero.update({
+    const originWorkforce = await prisma.origenObrero.update({
       where: {
         id: origin_id,
       },
@@ -49,7 +49,7 @@ class PrismaOriginWorkforceRepository implements OriginWorkforceRepository {
         eliminado: newStateOrigin,
       },
     });
-    return typeWorkforce;
+    return originWorkforce;
   }
 
   async createOriginWorkforceMasive(

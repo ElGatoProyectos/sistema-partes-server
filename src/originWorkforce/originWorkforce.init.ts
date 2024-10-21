@@ -29,8 +29,15 @@ originWorkforce.delete(
 );
 originWorkforce.get(
   `${prefix}`,
+  originWorkforceMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   originWorkforceController.all
+);
+originWorkforce.get(
+  `${prefix}/:id`,
+  originWorkforceMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  originWorkforceController.findByIdOrigin
 );
 
 export default originWorkforce;

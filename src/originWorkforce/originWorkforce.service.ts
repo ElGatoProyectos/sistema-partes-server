@@ -19,7 +19,7 @@ class OriginWorkforceService {
       );
       if (resultOrigin.success) {
         return httpResponse.BadRequestException(
-          "El nombre ingresado del Origen de Mano de Obra ya existe en la base de datos"
+          "El nombre ingresado del Origen ya existe en la base de datos"
         );
       }
       const resultIdProject = await projectValidation.findById(
@@ -27,19 +27,19 @@ class OriginWorkforceService {
       );
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear el Origen de Mano de Obra con el id del Proyecto proporcionado"
+          "No se puede crear el Origen con el id del Proyecto proporcionado"
         );
       }
 
       const responseOrigin =
         await prismaOriginWorkforceRepository.createOriginWorkforce(data);
       return httpResponse.CreatedResponse(
-        "Origen de Mano de Obra creado correctamente",
+        "Origen creado correctamente",
         responseOrigin
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear el Origen de Mano de Obra",
+        "Error al crear el Origen",
         error
       );
     } finally {
@@ -65,7 +65,7 @@ class OriginWorkforceService {
         );
         if (resultType.success) {
           return httpResponse.BadRequestException(
-            "El Origen ingresado del Tipo de Mano de Obra ya existe en la base de datos"
+            "El Origen ingresado ya existe en la base de datos"
           );
         }
       }
@@ -75,22 +75,22 @@ class OriginWorkforceService {
       );
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear el Origen de Mano de Obra con el id del Proyecto proporcionado"
+          "No se puede crear el Origen con el id del Proyecto proporcionado"
         );
       }
 
-      const responseType =
+      const responseOrigin =
         await prismaOriginWorkforceRepository.updateOriginWorkforce(
           origin_id,
           data
         );
       return httpResponse.SuccessResponse(
-        "Origen de Mano de Obra actualizada correctamente",
-        responseType
+        "Origen actualizada correctamente",
+        responseOrigin
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al actualizar el Origen de Mano de Obra",
+        "Error al actualizar el Origen",
         error
       );
     } finally {
@@ -110,7 +110,7 @@ class OriginWorkforceService {
       );
       if (resultIdWorkforce.success) {
         return httpResponse.BadRequestException(
-          "No se puede eliminar el Origen de Mano de Obra porque ya tiene una relación con una Mano de Obra"
+          "No se puede eliminar el Origen porque ya tiene una relación con una Mano de Obra"
         );
       }
       const responseOrigin =
@@ -118,12 +118,32 @@ class OriginWorkforceService {
           origin_id
         );
       return httpResponse.CreatedResponse(
-        "Origen de Mano de Obra eliminada correctamente",
+        "Origen eliminado correctamente",
         responseOrigin
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al eliminar el Origen de Mano de Obra",
+        "Error al eliminar el Origen",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findById(origin_id: number): Promise<T_HttpResponse> {
+    try {
+      const originResponse = await prismaOriginWorkforceRepository.findById(
+        origin_id
+      );
+      if (!originResponse) {
+        return httpResponse.NotFoundException(
+          "El id del Origen no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse("Origen encontrada", originResponse);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Origen",
         error
       );
     } finally {
@@ -144,16 +164,16 @@ class OriginWorkforceService {
 
       if (originWorkforce.count === 0) {
         return httpResponse.SuccessResponse(
-          "Hubo problemas para crear los Origenes de la Mano de Obra"
+          "Hubo problemas para crear los Origenes"
         );
       }
 
       return httpResponse.SuccessResponse(
-        "Éxito al crear de forma masiva los Origenes de la Mano de Obra"
+        "Éxito al crear de forma masiva los Origenes"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear forma masiva los Origenes de la Mano de Obra",
+        "Error al crear forma masiva los Origenes",
         error
       );
     }
@@ -183,12 +203,12 @@ class OriginWorkforceService {
         data: origins,
       };
       return httpResponse.SuccessResponse(
-        "Éxito al traer todos los Origenes de Maestro de Obra",
+        "Éxito al traer todos los Origenes",
         formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todas los Origenes de Maestro de Obra",
+        "Error al traer todas los Origenes de ",
         error
       );
     } finally {

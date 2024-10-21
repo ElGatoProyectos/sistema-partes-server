@@ -69,6 +69,11 @@ class OriginWorkforceController {
     );
     response.status(result.statusCode).json(result);
   }
+  async findByIdOrigin(request: express.Request, response: express.Response) {
+    const origin_id = Number(request.params.id);
+    const result = await originWorkforceService.findById(origin_id);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const originWorkforceController = new OriginWorkforceController();

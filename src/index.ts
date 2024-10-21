@@ -27,6 +27,7 @@ import detailMasterBuilderForemanRouter from "./user/detailMasterBuilderForeman/
 import detailProductionEngineerMasterBuilderRouter from "./user/detailProductionEngineerMasterBuilder/detailProductionEngineerMasterBuilder.init";
 import typeWorkforce from "./typeWorkforce/typeWorkforce.init";
 import originWorkforce from "./originWorkforce/originWorkforce.init";
+import specialtyWorkforce from "./specialtyWorkforce/specialtyWorkforce.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -61,6 +62,7 @@ app.use(globalPrefix, detailMasterBuilderForemanRouter);
 app.use(globalPrefix, detailProductionEngineerMasterBuilderRouter);
 app.use(globalPrefix, typeWorkforce);
 app.use(globalPrefix, originWorkforce);
+app.use(globalPrefix, specialtyWorkforce);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

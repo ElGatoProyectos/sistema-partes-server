@@ -29,8 +29,15 @@ typeWorkforce.delete(
 );
 typeWorkforce.get(
   `${prefix}`,
+  typeWorkforceMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authAdminUser,
   typeWorkforceController.all
+);
+typeWorkforce.get(
+  `${prefix}/:id`,
+  typeWorkforceMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  typeWorkforceController.findByIdType
 );
 
 export default typeWorkforce;

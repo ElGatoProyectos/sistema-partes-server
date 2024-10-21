@@ -119,6 +119,29 @@ class TypeWorkforceService {
       await prisma.$disconnect();
     }
   }
+  async findById(type_id: number): Promise<T_HttpResponse> {
+    try {
+      const typeResponse = await prismaTypeWorkforceRepository.findById(
+        type_id
+      );
+      if (!typeResponse) {
+        return httpResponse.NotFoundException(
+          "El id del Tipo de Mano de Obra no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Tipo de Mano de Obra encontrada",
+        typeResponse
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Tipo de Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async createMasive(project_id: number): Promise<T_HttpResponse> {
     try {
       const data: any = [];
@@ -170,12 +193,12 @@ class TypeWorkforceService {
         data: types,
       };
       return httpResponse.SuccessResponse(
-        "Éxito al traer todos los Tipos de Maestro de Obra",
+        "Éxito al traer todos los Tipos de Mano de Obra",
         formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todas los Tipos de Maestro de Obra",
+        "Error al traer todas los Tipos de Mano de Obra",
         error
       );
     } finally {

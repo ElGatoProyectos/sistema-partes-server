@@ -1,20 +1,22 @@
 import express from "@/config/express.config";
 import {
-  I_CreateTypeWorkforceBody,
-  I_TypeBody,
-} from "./models/typeWorkforce.interface";
-import { typeWorkforceService } from "./typeWorkforce.service";
-import { T_FindAllType } from "./models/typeWorkforce.types";
+  I_CreateSpecialtyWorkforceBody,
+  I_SpecialtyBody,
+} from "./models/specialtyWorkforce.interface";
+import { specialtyWorkforceService } from "./specialtyWorkforce.service";
+import { T_FindAllSpecialty } from "./models/specialtyWorkforce.types";
 
-class TypeWorkforceController {
+class SpecialtyWorkforceController {
   async create(request: express.Request, response: express.Response) {
-    const data = request.body as I_TypeBody;
+    const data = request.body as I_SpecialtyBody;
     const project_id = request.get("project-id") as string;
-    const typeFormat: I_CreateTypeWorkforceBody = {
+    const specialtyFormat: I_CreateSpecialtyWorkforceBody = {
       nombre: data.nombre,
       proyecto_id: +project_id,
     };
-    const result = await typeWorkforceService.createTypeWorkforce(typeFormat);
+    const result = await specialtyWorkforceService.createOriginWorkforce(
+      specialtyFormat
+    );
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {
@@ -23,16 +25,16 @@ class TypeWorkforceController {
   }
 
   async update(request: express.Request, response: express.Response) {
-    const data = request.body as I_TypeBody;
-    const type_id = Number(request.params.id);
+    const data = request.body as I_SpecialtyBody;
+    const specialty_id = Number(request.params.id);
     const project_id = request.get("project-id") as string;
-    const typeFormat: I_CreateTypeWorkforceBody = {
+    const originFormat: I_CreateSpecialtyWorkforceBody = {
       nombre: data.nombre,
       proyecto_id: +project_id,
     };
-    const result = await typeWorkforceService.updateTypeWorkforce(
-      type_id,
-      typeFormat
+    const result = await specialtyWorkforceService.updateOriginWorkforce(
+      specialty_id,
+      originFormat
     );
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -42,9 +44,9 @@ class TypeWorkforceController {
   }
 
   async updateStatus(request: express.Request, response: express.Response) {
-    const type_id = Number(request.params.id);
-    const result = await typeWorkforceService.updateStatusTypeWorkforce(
-      type_id
+    const specialty_id = Number(request.params.id);
+    const result = await specialtyWorkforceService.updateStatusOriginWorkforce(
+      specialty_id
     );
     response.status(result.statusCode).json(result);
   }
@@ -54,24 +56,28 @@ class TypeWorkforceController {
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
     const search = request.query.search as string;
-    let paginationOptions: T_FindAllType = {
+    let paginationOptions: T_FindAllSpecialty = {
       queryParams: {
         page: page,
         limit: limit,
         search: search,
       },
     };
-    const result = await typeWorkforceService.findAll(
+    const result = await specialtyWorkforceService.findAll(
       paginationOptions,
       project_id
     );
     response.status(result.statusCode).json(result);
   }
-  async findByIdType(request: express.Request, response: express.Response) {
-    const type_id = Number(request.params.id);
-    const result = await typeWorkforceService.findById(type_id);
+
+  async findByIdSpecialty(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const specialty_id = Number(request.params.id);
+    const result = await specialtyWorkforceService.findById(specialty_id);
     response.status(result.statusCode).json(result);
   }
 }
 
-export const typeWorkforceController = new TypeWorkforceController();
+export const specialtyWorkforceController = new SpecialtyWorkforceController();

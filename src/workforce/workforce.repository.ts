@@ -26,4 +26,7 @@ export abstract class WorkforceRepository {
   findByIdType(type_id: number): void {}
 
   findByIdOrigin(origin_id: number): void {}
+  findByIdSpecialty(specialty_id: number): void {}
+  findByIdBank(bank_id: number): void {}
+  findByIdCategoryWorkforce(category_workforce_id: number): void {}
 }

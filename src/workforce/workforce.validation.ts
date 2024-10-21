@@ -168,6 +168,48 @@ class WorkforceValidation {
       );
     }
   }
+  async findByIdSpecialty(specialty_id: number): Promise<T_HttpResponse> {
+    try {
+      const workforce = await prismaWorkforceRepository.findByIdSpecialty(
+        specialty_id
+      );
+      if (!workforce) {
+        return httpResponse.NotFoundException(
+          "La Especialidad que busca en Mano de Obra no fue encontrado",
+          workforce
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "La Especialidad que busca en Mano de Obra encontrado",
+        workforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Especialidad en Mano de Obra",
+        error
+      );
+    }
+  }
+  async findByIdBank(bank_id: number): Promise<T_HttpResponse> {
+    try {
+      const workforce = await prismaWorkforceRepository.findByIdBank(bank_id);
+      if (!workforce) {
+        return httpResponse.NotFoundException(
+          "El Banco que busca en Mano de Obra no fue encontrado",
+          workforce
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El Banco que busca en Mano de Obra encontrado",
+        workforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Banco en Mano de Obra",
+        error
+      );
+    }
+  }
 
   async findByCode(code: string, project_id: number): Promise<T_HttpResponse> {
     try {
