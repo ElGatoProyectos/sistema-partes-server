@@ -754,7 +754,8 @@ model Asistencia {
   asistencia          E_Asistencia_BD @default(F)
   horas_extras_estado E_Estado_BD     @default(n)
   fecha_creacion      DateTime        @default(now())
-  mano_obra_id        Int             @unique
+  eliminado           E_Estado_BD     @default(n)
+  mano_obra_id        Int
   proyecto_id         Int
   Proyecto            Proyecto        @relation(fields: [proyecto_id], references: [id])
   ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])

@@ -30,6 +30,7 @@ import originWorkforce from "./originWorkforce/originWorkforce.init";
 import specialtyWorkforce from "./specialtyWorkforce/specialtyWorkforce.init";
 import bankWorkforce from "./bankWorkforce/bankWorkforce.init";
 import categoryWorkforce from "./categoryWorkforce/categoryWorkforce.init";
+import assistsWorkforce from "./assists/assists.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -67,6 +68,7 @@ app.use(globalPrefix, originWorkforce);
 app.use(globalPrefix, specialtyWorkforce);
 app.use(globalPrefix, bankWorkforce);
 app.use(globalPrefix, categoryWorkforce);
+app.use(globalPrefix, assistsWorkforce);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);
