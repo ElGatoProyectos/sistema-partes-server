@@ -187,7 +187,6 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear proyecto",
         error

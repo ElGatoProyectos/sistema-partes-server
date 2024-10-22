@@ -6,7 +6,7 @@ export type T_FindAllWorkforce = {
     state: string;
     category: string;
     origin: string;
-    speciality: string;
+    specialty: string;
     type: string;
   };
 };

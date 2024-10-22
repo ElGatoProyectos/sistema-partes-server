@@ -9,9 +9,14 @@ const prefix = "/assists";
 assistsWorkforce.post(
   `${prefix}`,
   assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
-  assistsWorkforceMiddleware.verifyFields,
   authRoleMiddleware.authAdminUser,
   assistsController.create
+);
+assistsWorkforce.get(
+  `${prefix}`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  assistsController.getAll
 );
 
 assistsWorkforce.get(

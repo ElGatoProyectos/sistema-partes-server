@@ -28,11 +28,72 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     });
     return assists;
   }
+  async findByDate(date: Date): Promise<Asistencia | null> {
+    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+    const assists = await prisma.asistencia.findFirst({
+      where: {
+        fecha: {
+          gte: startOfDay, // Fecha mayor o igual al inicio del día
+          lte: endOfDay, // Fecha menor o igual al fin del día
+        },
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return assists;
+  }
   updateStatusAssists(bank_id: number): void {
     throw new Error("Method not implemented.");
   }
-  findAll(skip: number, data: T_FindAllAssists, project_id: number): void {
-    throw new Error("Method not implemented.");
+
+  async findAll(
+    skip: number,
+    data: T_FindAllAssists,
+    project_id: number,
+    responsible_id?: number
+  ): Promise<{ assistsConverter: any[]; total: number }> {
+    let filters: any = {};
+
+    if (data.queryParams.search) {
+      filters.nombre = {
+        contains: data.queryParams.search,
+      };
+    }
+    const assists = await prisma.asistencia.findMany({
+      where: {
+        ...filters,
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+        ManoObra: {
+          usuario_id: responsible_id,
+        },
+      },
+      include: {
+        ManoObra: true,
+      },
+      skip,
+      take: data.queryParams.limit,
+      omit: {
+        eliminado: true,
+      },
+    });
+    const total = await prisma.asistencia.count({
+      where: {
+        ...filters,
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+      },
+    });
+
+    const assistsConverter = assists.map((item) => {
+      const { ManoObra, ...ResData } = item;
+      return {
+        Asistencia: ResData,
+        ManoObra: ManoObra,
+      };
+    });
+    return { assistsConverter, total };
   }
   async findById(assists_id: number): Promise<I_AssistsWorkforce | null> {
     const assists = await prisma.asistencia.findFirst({

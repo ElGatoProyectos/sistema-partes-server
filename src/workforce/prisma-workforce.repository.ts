@@ -9,7 +9,6 @@ import {
 import { T_FindAllWorkforce } from "./models/workforce.types";
 
 class PrismaWorkforceRepository implements WorkforceRepository {
- 
   async createWorkforce(data: I_CreateWorkforceBD): Promise<ManoObra> {
     const workforce = await prisma.manoObra.create({
       data,
@@ -35,9 +34,7 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     let filters: any = {};
     let filtersCategory = this.getCategoryFilter(data.queryParams.category);
     let filtersOrigin = this.getOriginFilter(data.queryParams.origin);
-    let filtersSpeciality = this.getSpecialityFilter(
-      data.queryParams.speciality
-    );
+    let filtersSpecialty = this.getSpecialityFilter(data.queryParams.specialty);
     let filtersType = this.getTypeFilter(data.queryParams.type);
     if (data.queryParams.search) {
       if (isNaN(data.queryParams.search as any)) {
@@ -86,13 +83,19 @@ class PrismaWorkforceRepository implements WorkforceRepository {
               ...filtersOrigin,
             },
             EspecialidadObra: {
-              ...filtersSpeciality,
+              ...filtersSpecialty,
             },
             TipoObrero: {
               ...filtersType,
             },
             eliminado: E_Estado_BD.n,
             proyecto_id: project_id,
+          },
+          include: {
+            EspecialidadObra: true,
+            OrigenObrero: true,
+            TipoObrero: true,
+            CategoriaObrero: true,
           },
           skip,
           take: data.queryParams.limit,
@@ -113,7 +116,7 @@ class PrismaWorkforceRepository implements WorkforceRepository {
               ...filtersOrigin,
             },
             EspecialidadObra: {
-              ...filtersSpeciality,
+              ...filtersSpecialty,
             },
             TipoObrero: {
               ...filtersType,
@@ -124,6 +127,14 @@ class PrismaWorkforceRepository implements WorkforceRepository {
         }),
       ]);
     return { workforces, total };
+  }
+  async findAllWithPagination(project_id: number): Promise<ManoObra[] | null> {
+    const workforces = await prisma.manoObra.findMany({
+      where: {
+        proyecto_id: project_id,
+      },
+    });
+    return workforces;
   }
   getCategoryFilter(category: string | undefined) {
     if (!category) return {};

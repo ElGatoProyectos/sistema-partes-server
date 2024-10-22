@@ -5,9 +5,16 @@ import {
 import { T_FindAllAssists } from "./models/assists.types";
 
 export abstract class BankWorkforceRepository {
-  findAll(skip: number, data: T_FindAllAssists, project_id: number): void {}
+  findAll(
+    skip: number,
+    data: T_FindAllAssists,
+    project_id: number,
+    responsible_id?: number
+  ): void {}
 
   findById(assists_id: number): void {}
+
+  findByDate(date: Date): void {}
 
   createAssists(data: I_CreateAssistsWorkforceBD): void {}
 

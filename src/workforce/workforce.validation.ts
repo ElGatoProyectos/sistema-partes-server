@@ -7,6 +7,7 @@ import {
   CategoriaObrero,
   E_Estado_MO_BD,
   EspecialidadObrero,
+  ManoObra,
   OrigenObrero,
   TipoObrero,
   Unidad,
@@ -300,6 +301,13 @@ class WorkforceValidation {
         error
       );
     }
+  }
+  async findAllWithPagination(project_id: number): Promise<ManoObra[] | null> {
+    const workforces = await prismaWorkforceRepository.findAllWithPagination(
+      project_id
+    );
+
+    return workforces;
   }
   async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
