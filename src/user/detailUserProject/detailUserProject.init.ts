@@ -27,6 +27,12 @@ detailUserProjectRouter.get(
   detailUserProjectController.allUsersAvailableForAssignDetail
 );
 detailUserProjectRouter.get(
+  `${prefix}/responsible`,
+  detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  detailUserProjectController.allUsersResponsible
+);
+detailUserProjectRouter.get(
   `${prefix}/detail/:id`,
   detailUserProjectMiddleware.verifyHeadersFieldsId,
   detailUserProjectMiddleware.verifyHeadersFieldsIdProject,

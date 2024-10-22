@@ -11,7 +11,7 @@ export abstract class BankWorkforceRepository {
 
   createAssists(data: I_CreateAssistsWorkforceBD): void {}
 
-  updateAssists(bank_id: number, data: I_UpdateAssitsBD): void {}
+  updateAssists(assists_id: number, data: I_UpdateAssitsBD): void {}
 
-  updateStatusAssists(bank_id: number): void {}
+  updateStatusAssists(assists_id: number): void {}
 }

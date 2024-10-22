@@ -9,6 +9,7 @@ import {
 import { T_FindAllWorkforce } from "./models/workforce.types";
 
 class PrismaWorkforceRepository implements WorkforceRepository {
+ 
   async createWorkforce(data: I_CreateWorkforceBD): Promise<ManoObra> {
     const workforce = await prisma.manoObra.create({
       data,

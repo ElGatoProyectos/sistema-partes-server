@@ -119,10 +119,10 @@ class BankWorkforceService {
       await prisma.$disconnect();
     }
   }
-  async findById(origin_id: number): Promise<T_HttpResponse> {
+  async findById(bank_id: number): Promise<T_HttpResponse> {
     try {
       const bankResponse = await prismaBankWorkforceRepository.findById(
-        origin_id
+        bank_id
       );
       if (!bankResponse) {
         return httpResponse.NotFoundException(

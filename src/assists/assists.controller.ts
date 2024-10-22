@@ -15,6 +15,12 @@ class AssistsController {
     }
   }
 
+  async findById(request: express.Request, response: express.Response) {
+    const assists_id = Number(request.params.id);
+    const result = await assistsService.findById(assists_id);
+    response.status(result.statusCode).json(result);
+  }
+
   // async all(request: express.Request, response: express.Response) {
   //   const page = parseInt(request.query.page as string) || 1;
   //   const limit = parseInt(request.query.limit as string) || 20;

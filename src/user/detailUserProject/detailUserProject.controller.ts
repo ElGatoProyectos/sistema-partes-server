@@ -84,6 +84,20 @@ class DetailUserProjectController {
       response.status(400).json(result);
     }
   }
+  async allUsersResponsible(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const project_id = request.get("project-id") as string;
+    const result = await detailUserProjectService.findAllResponsible(
+      project_id
+    );
+    if (result?.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(400).json(result);
+    }
+  }
   async allUsersByProjectUnassigned(
     request: express.Request,
     response: express.Response

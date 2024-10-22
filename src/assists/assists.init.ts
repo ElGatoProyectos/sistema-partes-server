@@ -14,4 +14,11 @@ assistsWorkforce.post(
   assistsController.create
 );
 
+assistsWorkforce.get(
+  `${prefix}/:id`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  assistsController.findById
+);
+
 export default assistsWorkforce;
