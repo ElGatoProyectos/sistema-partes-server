@@ -83,6 +83,9 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         ...filters,
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
+        ManoObra: {
+          usuario_id: responsible_id,
+        },
       },
     });
 

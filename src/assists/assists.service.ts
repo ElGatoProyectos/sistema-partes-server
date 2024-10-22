@@ -37,8 +37,6 @@ class AssistsService {
           []
         );
       }
-      const date = new Date();
-      const verifyDate = await assistsWorkforceValidation.findByDate(date);
       if (
         userResponse.Rol?.rol === "ADMIN" ||
         userResponse.Rol?.rol === "USER" ||
@@ -51,41 +49,51 @@ class AssistsService {
         );
 
         return this.createSuccessResponse(result, data.queryParams);
-      }
-
-      if (verifyDate.success) {
-        console.log("existe la fecha");
+      } else if (userResponse.Rol?.rol === "INGENIERO_PRODUCCION") {
         const result = await prismaAssistsRepository.findAll(
           skip,
           data,
-          +project_id
+          +project_id,
+          userResponse.id
         );
-
         return this.createSuccessResponse(result, data.queryParams);
-      }
-      console.log("no existe la fecha");
-
-      const assistsResponse = await this.processWorkforceAssists(
-        workforcesManyResponse,
-        date,
-        +project_id
-      );
-      if (!assistsResponse.success) {
+      } else if (userResponse.Rol?.rol === "INGENIERO_SSOMMA") {
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id,
+          userResponse.id
+        );
+        return this.createSuccessResponse(result, data.queryParams);
+      } else if (userResponse.Rol?.rol === "MAESTRO_OBRA") {
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id,
+          userResponse.id
+        );
+        return this.createSuccessResponse(result, data.queryParams);
+      } else if (userResponse.Rol?.rol === "CAPATAZ") {
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id,
+          userResponse.id
+        );
+        return this.createSuccessResponse(result, data.queryParams);
+      } else if (userResponse.Rol?.rol === "JEFE_GRUPO") {
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id,
+          userResponse.id
+        );
+        return this.createSuccessResponse(result, data.queryParams);
+      } else {
         return httpResponse.BadRequestException(
-          "Hubo un problema en crear las asistencias de la Mano de Obra"
+          "No tiene acceso para ver esta sección"
         );
       }
-      const result = await prismaAssistsRepository.findAll(
-        skip,
-        data,
-        +project_id
-      );
-
-      const assists = this.createSuccessResponse(result, data.queryParams);
-      return httpResponse.CreatedResponse(
-        "Asistencias creadas correctamente",
-        assists.payload
-      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al crear la asistencia",
@@ -126,12 +134,10 @@ class AssistsService {
         }
 
         if (verifyDate.success) {
-          console.log("existe la fecha");
           return httpResponse.BadRequestException(
             "Ya se realizó la asistencia para este día"
           );
         }
-        console.log("no existe la fecha");
 
         const assistsResponse = await this.processWorkforceAssists(
           workforcesManyResponse,
