@@ -296,7 +296,7 @@ model ManoObra {
   hora_salida        String?
   tolerancia_ingreso String?
   tiempo_refrigerio  String?
-  usuario_id         Int?
+  usuario_id         Int? // aca es el responsable
 
   proyecto_id                 Int
   Proyecto                    Proyecto                      @relation(fields: [proyecto_id], references: [id])
@@ -744,21 +744,30 @@ enum E_Asistencia_BD {
   A
 }
 
+enum E_Estado_Asistencia_BD {
+  ASIGNADO
+  NO_ASIGNADO
+  FALTA
+  DOBLEMENTE_ASIGNADO
+}
+
 //[success] actual
 model Asistencia {
-  id                  Int             @id @default(autoincrement())
+  id                  Int                    @id @default(autoincrement())
   fecha               DateTime
   horas               Float
-  horas_60            Float
-  horas_100           Float
-  asistencia          E_Asistencia_BD @default(F)
-  horas_extras_estado E_Estado_BD     @default(n)
-  fecha_creacion      DateTime        @default(now())
-  eliminado           E_Estado_BD     @default(n)
+  horas_registradas   Float?                 @default(0)
+  horas_60            Float?                 @default(0)
+  horas_100           Float?                 @default(0)
+  estado_asignacion   E_Estado_Asistencia_BD @default(NO_ASIGNADO)
+  asistencia          E_Asistencia_BD        @default(F)
+  horas_extras_estado E_Estado_BD?           @default(n)
+  fecha_creacion      DateTime               @default(now())
+  eliminado           E_Estado_BD            @default(n)
   mano_obra_id        Int
   proyecto_id         Int
-  Proyecto            Proyecto        @relation(fields: [proyecto_id], references: [id])
-  ManoObra            ManoObra        @relation(fields: [mano_obra_id], references: [id])
+  Proyecto            Proyecto               @relation(fields: [proyecto_id], references: [id])
+  ManoObra            ManoObra               @relation(fields: [mano_obra_id], references: [id])
 }
 
 //[success] actual

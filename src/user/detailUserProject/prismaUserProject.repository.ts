@@ -10,10 +10,39 @@ import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detail
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
 import { T_FindAllProject } from "@/project/dto/project.type";
-import { rolValidation } from "@/rol/rol.validation";
-import { httpResponse } from "@/common/http.response";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
+  async getAllResponsible(
+    project_id: number
+  ): Promise<DetalleUsuarioProyecto[] | null> {
+    const projectsAll = await prisma.detalleUsuarioProyecto.findMany({
+      where: {
+        projecto_id: project_id,
+        Usuario: {
+          Rol: {
+            rol: {
+              in: [
+                "INGENIERO_PRODUCCION",
+                "MAESTRO_OBRA",
+                "INGENIERO_SSOMMA",
+                "CAPATAZ",
+                "JEFE_GRUPO",
+              ],
+            },
+          },
+        },
+      },
+      include: {
+        Usuario: {
+          omit: {
+            contrasena: true,
+          },
+        },
+      },
+    });
+
+    return projectsAll;
+  }
   async getAllProjectsOfUser(
     user_id: number,
     data: T_FindAllProject,

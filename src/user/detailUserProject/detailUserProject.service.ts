@@ -202,6 +202,30 @@ class DetailUserProjectService {
       await prisma.$disconnect();
     }
   }
+  async findAllResponsible(project_id: string) {
+    try {
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+
+      const result = await prismaDetailUserProjectRepository.getAllResponsible(
+        +project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Responsables del Proyecto",
+        result
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Responsables del Proyecto",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
   async findAllUnassigned(
     data: T_FindAllDetailUserProject,
     project_id: string

@@ -61,13 +61,10 @@ class ProjectService {
 
       const date = new Date();
 
-      // const weekResponse = await weekService.findByYear(date.getFullYear());
-      // if (!weekResponse.success) {
-      //   // console.log("ENTRO AL IF :0 xq no hay nada");
-      //   await weekService.createWeek(date.getFullYear());
-      // }
-
-      //const week = await weekService.createWeek(2026);
+      const weekResponse = await weekService.createWeek(date.getFullYear());
+      if (!weekResponse.success) {
+        return weekResponse;
+      }
 
       const resultCompany = await companyValidation.findByIdUser(
         userResponse.id
@@ -190,6 +187,7 @@ class ProjectService {
         projectMapper
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear proyecto",
         error

@@ -35,13 +35,18 @@ class AssistsService {
         data.asistencia === "A" ? E_Asistencia_BD.A : E_Asistencia_BD.F;
       const state_hours_extras =
         data.horas_extras_estado === "y" ? E_Estado_BD.y : E_Estado_BD.n;
+      const horas = assists === E_Asistencia_BD.F ? 0 : flag;
+      const horas_60 = assists === E_Asistencia_BD.F ? 0 : data.horas_60;
+      const horas_100 = assists === E_Asistencia_BD.F ? 0 : data.horas_100;
+      const state =
+        assists === E_Asistencia_BD.F ? E_Estado_BD.n : state_hours_extras;
       const assistsFormat = {
         fecha: date,
-        horas: flag,
-        horas_60: data.horas_60,
-        horas_100: data.horas_100,
+        horas: horas,
+        horas_60: horas_60,
+        horas_100: horas_100,
         asistencia: assists,
-        horas_extras_estado: state_hours_extras,
+        horas_extras_estado: state,
         mano_obra_id: +workforce.id,
         proyecto_id: +project_id,
       };
@@ -53,9 +58,31 @@ class AssistsService {
         assistsResponse
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear la asistencia",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findById(assists_id: number): Promise<T_HttpResponse> {
+    try {
+      const assistsResponse = await prismaAssistsRepository.findById(
+        assists_id
+      );
+      if (!assistsResponse) {
+        return httpResponse.NotFoundException(
+          "El id de la Asistencia no fue encontrado"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Asistencia encontrada",
+        assistsResponse
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia",
         error
       );
     } finally {
