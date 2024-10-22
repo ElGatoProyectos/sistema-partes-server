@@ -96,6 +96,7 @@ class PrismaWorkforceRepository implements WorkforceRepository {
             OrigenObrero: true,
             TipoObrero: true,
             CategoriaObrero: true,
+            Unidad: true,
           },
           skip,
           take: data.queryParams.limit,
