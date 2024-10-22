@@ -448,7 +448,6 @@ class DetailUserProjectService {
         foremanResponse.payload
       );
     } else if (nameRol === "CAPATAZ") {
-      console.log("entro a jefe");
       const groupLeaderResponse = await rolValidation.findByName("JEFE_GRUPO");
       if (!groupLeaderResponse.success) {
         return httpResponse.BadRequestException(

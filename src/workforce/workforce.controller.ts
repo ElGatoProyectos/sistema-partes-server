@@ -84,7 +84,7 @@ class WorkforceController {
         state: state,
         category: category,
         origin: origin,
-        speciality: speciality,
+        specialty: speciality,
         type: type,
       },
     };

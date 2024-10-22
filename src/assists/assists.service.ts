@@ -1,62 +1,157 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
-import { I_AssistsBody } from "./models/assists.interface";
-import { converToDate } from "@/common/utils/date";
 import { E_Asistencia_BD, E_Estado_BD, ManoObra } from "@prisma/client";
 import { workforceValidation } from "@/workforce/workforce.validation";
 import { projectValidation } from "@/project/project.validation";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
+import { assistsWorkforceValidation } from "./assists.validation";
+import { T_FindAllAssists } from "./models/assists.types";
+import { jwtService } from "@/auth/jwt.service";
+import { I_Usuario } from "@/user/models/user.interface";
+// import { Rol } from "@/common/enums/role.enum";
 
 class AssistsService {
-  async create(
-    data: I_AssistsBody,
-    project_id: string
+  async findAll(
+    data: T_FindAllAssists,
+    project_id: string,
+    token: string
   ): Promise<T_HttpResponse> {
     try {
-      const workforceResponse = await workforceValidation.findById(
-        data.mano_obra_id
-      );
-      if (!workforceResponse.success) {
-        return workforceResponse;
-      }
-      const workforce = workforceResponse.payload as ManoObra;
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as I_Usuario;
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
           "No se puede crear la Asistencia con el id del Proyecto proporcionado"
         );
       }
-      const date = converToDate(data.fecha);
-      let flag;
-      const valueIsBetweenWeek = 8.5;
-      const valueIsEndWeek = 5.5;
-      flag = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
-      const assists =
-        data.asistencia === "A" ? E_Asistencia_BD.A : E_Asistencia_BD.F;
-      const state_hours_extras =
-        data.horas_extras_estado === "y" ? E_Estado_BD.y : E_Estado_BD.n;
-      const horas = assists === E_Asistencia_BD.F ? 0 : flag;
-      const horas_60 = assists === E_Asistencia_BD.F ? 0 : data.horas_60;
-      const horas_100 = assists === E_Asistencia_BD.F ? 0 : data.horas_100;
-      const state =
-        assists === E_Asistencia_BD.F ? E_Estado_BD.n : state_hours_extras;
-      const assistsFormat = {
-        fecha: date,
-        horas: horas,
-        horas_60: horas_60,
-        horas_100: horas_100,
-        asistencia: assists,
-        horas_extras_estado: state,
-        mano_obra_id: +workforce.id,
-        proyecto_id: +project_id,
-      };
-      const assistsResponse = await prismaAssistsRepository.createAssists(
-        assistsFormat
+
+      const workforcesManyResponse =
+        await workforceValidation.findAllWithPagination(+project_id);
+
+      if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
+        return httpResponse.BadRequestException(
+          "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
+          []
+        );
+      }
+      const date = new Date();
+      const verifyDate = await assistsWorkforceValidation.findByDate(date);
+      if (
+        userResponse.Rol?.rol === "ADMIN" ||
+        userResponse.Rol?.rol === "USER" ||
+        userResponse.Rol?.rol === "CONTROL_COSTOS"
+      ) {
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id
+        );
+
+        return this.createSuccessResponse(result, data.queryParams);
+      }
+
+      if (verifyDate.success) {
+        console.log("existe la fecha");
+        const result = await prismaAssistsRepository.findAll(
+          skip,
+          data,
+          +project_id
+        );
+
+        return this.createSuccessResponse(result, data.queryParams);
+      }
+      console.log("no existe la fecha");
+
+      const assistsResponse = await this.processWorkforceAssists(
+        workforcesManyResponse,
+        date,
+        +project_id
       );
+      if (!assistsResponse.success) {
+        return httpResponse.BadRequestException(
+          "Hubo un problema en crear las asistencias de la Mano de Obra"
+        );
+      }
+      const result = await prismaAssistsRepository.findAll(
+        skip,
+        data,
+        +project_id
+      );
+
+      const assists = this.createSuccessResponse(result, data.queryParams);
       return httpResponse.CreatedResponse(
-        "Asistencia creada correctamente",
-        assistsResponse
+        "Asistencias creadas correctamente",
+        assists.payload
       );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear la asistencia",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async create(project_id: string, token: string): Promise<T_HttpResponse> {
+    try {
+      const userTokenResponse = await jwtService.getUserFromToken(token);
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as I_Usuario;
+
+      if (
+        userResponse.Rol?.rol === "ADMIN" ||
+        userResponse.Rol?.rol === "USER" ||
+        userResponse.Rol?.rol === "CONTROL_COSTOS"
+      ) {
+        const resultIdProject = await projectValidation.findById(+project_id);
+        if (!resultIdProject.success) {
+          return httpResponse.BadRequestException(
+            "No se puede crear la Asistencia con el id del Proyecto proporcionado"
+          );
+        }
+
+        const date = new Date();
+        const verifyDate = await assistsWorkforceValidation.findByDate(date);
+        const workforcesManyResponse =
+          await workforceValidation.findAllWithPagination(+project_id);
+
+        if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
+          return httpResponse.BadRequestException(
+            "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
+            []
+          );
+        }
+
+        if (verifyDate.success) {
+          console.log("existe la fecha");
+          return httpResponse.BadRequestException(
+            "Ya se realizó la asistencia para este día"
+          );
+        }
+        console.log("no existe la fecha");
+
+        const assistsResponse = await this.processWorkforceAssists(
+          workforcesManyResponse,
+          date,
+          +project_id
+        );
+        if (!assistsResponse.success) {
+          return httpResponse.BadRequestException(
+            "Hubo un problema en crear las asistencias de la Mano de Obra"
+          );
+        }
+
+        return httpResponse.CreatedResponse(
+          "Asistencias creadas correctamente"
+        );
+      } else {
+        return httpResponse.BadRequestException(
+          "Usted no tiene acceso para realizar esta acción"
+        );
+      }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al crear la asistencia",
@@ -88,6 +183,55 @@ class AssistsService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  async processWorkforceAssists(
+    workforcesManyResponse: any[],
+    date: Date,
+    project_id: number
+  ): Promise<{ success: boolean }> {
+    for (let index = 0; index < workforcesManyResponse.length; index++) {
+      let value;
+      const valueIsBetweenWeek = 8.5;
+      const valueIsEndWeek = 5.5;
+
+      value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
+
+      const assistsFormat = {
+        fecha: date,
+        horas: value,
+        horas_60: 0,
+        horas_100: 0,
+        asistencia: E_Asistencia_BD.F,
+        horas_extras_estado: E_Estado_BD.n,
+        mano_obra_id: workforcesManyResponse[index].id,
+        proyecto_id: project_id,
+      };
+
+      const assistsResponse = await prismaAssistsRepository.createAssists(
+        assistsFormat
+      );
+      if (!assistsResponse) {
+        return { success: false };
+      }
+    }
+
+    return { success: true };
+  }
+  createSuccessResponse(result: any, queryParams: any): T_HttpResponse {
+    const { assistsConverter, total } = result;
+    const pageCount = Math.ceil(total / queryParams.limit);
+    const formData = {
+      total,
+      page: queryParams.page,
+      limit: queryParams.limit,
+      pageCount,
+      data: assistsConverter,
+    };
+    return httpResponse.SuccessResponse(
+      "Éxito al traer todas las Asistencias ya que existen",
+      formData
+    );
   }
   isBetweenWeek(date: Date): boolean {
     const dayWeek = date.getDay(); // Obtiene el día de la semana (0 para domingo, 1 para lunes, etc.)

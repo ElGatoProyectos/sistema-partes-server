@@ -7,6 +7,8 @@ import { T_FindAllWorkforce } from "./models/workforce.types";
 export abstract class WorkforceRepository {
   findAll(skip: number, data: T_FindAllWorkforce, project_id: number): void {}
 
+  findAllWithPagination(project_id: number): void {}
+
   findByCode(code: string, project_id: number): void {}
 
   findByDNI(code: string, project_id: number): void {}
