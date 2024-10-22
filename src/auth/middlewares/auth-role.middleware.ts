@@ -62,7 +62,8 @@ class AuthRoleMiddleware {
         tokenDecrypted.role === "INGENIERO_SSOMMA" ||
         tokenDecrypted.role === "ASISTENTE_SSOMMA" ||
         tokenDecrypted.role === "LOGISTICA" ||
-        tokenDecrypted.role === "ASISTENTE_ALMACEN"
+        tokenDecrypted.role === "ASISTENTE_ALMACEN" ||
+        tokenDecrypted.role === "JEFE_GRUPO"
       ) {
         nextFunction();
       } else {
