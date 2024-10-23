@@ -5,5 +5,6 @@ export type T_FindAllAssists = {
     search: string;
     state: string;
     week: string;
+    date: string;
   };
 };
