@@ -13,6 +13,13 @@ departureJobRouter.post(
   authRoleMiddleware.authAdminUser,
   departureJobController.createDetails
 );
+departureJobRouter.put(
+  `${prefix}/:id`,
+  departureJobMiddleware.verifyHeadersFieldsId,
+  departureJobMiddleware.verifyFieldsUpdate,
+  authRoleMiddleware.authAdminUser,
+  departureJobController.updateDetails
+);
 
 departureJobRouter.post(
   `${prefix}/upload-excel`,
