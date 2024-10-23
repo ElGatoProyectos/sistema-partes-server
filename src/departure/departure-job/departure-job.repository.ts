@@ -6,6 +6,11 @@ export abstract class DepartureJobRepository {
     departure_Id: number,
     metrado: number
   ): void {}
+  updateDetailDepartureJob(
+    detail_id: number,
+    departure_Id: number,
+    metrado: number
+  ): void {}
   findAll(skip: number, data: T_FindAllDepartureJob): void {}
   deleteDetailDepartureJob(detail_id: number): void {}
   findById(detail_id: number): void {}

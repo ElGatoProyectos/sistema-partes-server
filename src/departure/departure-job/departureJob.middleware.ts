@@ -2,6 +2,7 @@ import { httpResponse } from "@/common/http.response";
 import express from "@/config/express.config";
 import validator from "validator";
 import { departureJobDto } from "./dto/departureJob.dto";
+import { departureJobUpdateDto } from "./dto/departureJobUpdate.dto";
 
 class DepartureJobMiddleware {
   verifyFields(
@@ -11,6 +12,21 @@ class DepartureJobMiddleware {
   ) {
     try {
       departureJobDto.parse(request.body);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos para crear el Detalle Trabajo-Partida"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
+  verifyFieldsUpdate(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      departureJobUpdateDto.parse(request.body);
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(

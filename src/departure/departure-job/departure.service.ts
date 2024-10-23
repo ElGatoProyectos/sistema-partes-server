@@ -3,7 +3,9 @@ import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
 import {
   I_DepartureJob,
+  I_DepartureJobBBDD,
   I_DepartureJobExcel,
+  I_DepartureJobUpdate,
 } from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
 import { projectValidation } from "@/project/project.validation";
@@ -16,34 +18,7 @@ import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { prismaJobRepository } from "@/job/prisma-job.repository";
 
 class DepartureJobService {
-  async updateStatusDepartureJob(
-    departureJob_id: number
-  ): Promise<T_HttpResponse> {
-    try {
-      const detailFind = await prismaDepartureJobRepository.findById(
-        departureJob_id
-      );
-      if (!detailFind) {
-        return httpResponse.BadRequestException(
-          "No se encontró el Detalle Trabajo Partida que se quiere eliminar"
-        );
-      }
-      await prismaDepartureJobRepository.deleteDetailDepartureJob(
-        departureJob_id
-      );
-      return httpResponse.SuccessResponse(
-        "Detalle Trabajo Partida eliminado correctamente"
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error en eliminar el Detalle Trabajo-Partida",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-  async updateJobDeparture(data: I_DepartureJob) {
+  async createDetailJobDeparture(data: I_DepartureJob) {
     try {
       const jobResponse = await jobValidation.findById(data.job_id);
       if (!jobResponse.success) {
@@ -60,6 +35,12 @@ class DepartureJobService {
       }
 
       const departure = departureResponse.payload as Partida;
+
+      if (data.metrado > departure.metrado_inicial) {
+        return httpResponse.BadRequestException(
+          "No puede colocar más métrado del que tiene la partida"
+        );
+      }
 
       let additionMetradoPrice = 0;
       const resultadoMetradoPrecio = data.metrado * departure.precio;
@@ -124,6 +105,218 @@ class DepartureJobService {
       await prisma.$disconnect();
     }
   }
+  async updateDepartureJob(
+    detail_id: number,
+    data: I_DepartureJobUpdate
+  ): Promise<T_HttpResponse> {
+    try {
+      const detailFind = await prismaDepartureJobRepository.findById(detail_id);
+      if (!detailFind) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Detalle Trabajo Partida que se quiere editar"
+        );
+      }
+
+      const departureResponse = await departureValidation.findById(
+        data.departure_id
+      );
+      if (!departureResponse.success) {
+        return httpResponse.BadRequestException(
+          "El id ingresado de la Partida no existe en la Base de datos"
+        );
+      }
+      const departure = departureResponse.payload as Partida;
+      const detail = detailFind as I_DepartureJobBBDD;
+
+      //[note] aca sacamos la resta de cuanto seria
+      const subtractMetradoPrecio =
+        detailFind.metrado_utilizado * detail.Partida.precio;
+
+      const subtractMetadoCostOfLabor =
+        detailFind.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
+
+      const subtractMetradoMaterialCost =
+        detailFind.metrado_utilizado * detail.Partida.material_unitario;
+
+      const subtractMetradoJobEquipment =
+        detailFind.metrado_utilizado * detail.Partida.equipo_unitario;
+
+      const subtractMetradoJobSeveral =
+        detailFind.metrado_utilizado * detail.Partida.subcontrata_varios;
+
+      //[note] acá sacamos el cálculo de la nueva partida para el trabajo
+      const aditionMetradoPrecio = data.metrado * departure.precio;
+
+      const aditionMetadoCostOfLabor =
+        data.metrado * departure.mano_de_obra_unitaria;
+
+      const aditionMetradoMaterialCost =
+        data.metrado * departure.material_unitario;
+
+      const aditionMetradoJobEquipment =
+        data.metrado * departure.equipo_unitario;
+
+      const aditionMetradoJobSeveral =
+        data.metrado * departure.subcontrata_varios;
+
+      //[success] acá finalmente sacamos la cuenta final para actualizarlo
+
+      const totalResultMetradoPrice =
+        detail.Trabajo.costo_partida +
+        aditionMetradoPrecio -
+        subtractMetradoPrecio;
+      const totalResultMetradoCostOfLabor =
+        detail.Trabajo.costo_mano_obra +
+        aditionMetadoCostOfLabor -
+        subtractMetadoCostOfLabor;
+      const totalResultMetradoMaterialCost =
+        detail.Trabajo.costo_material +
+        aditionMetradoMaterialCost -
+        subtractMetradoMaterialCost;
+      const totalResultMetradoJobEquipment =
+        detail.Trabajo.costo_equipo +
+        aditionMetradoJobEquipment -
+        subtractMetradoJobEquipment;
+      const totalResultMetradoJobSeveral =
+        detail.Trabajo.costo_varios +
+        aditionMetradoJobSeveral -
+        subtractMetradoJobSeveral;
+
+      await prismaJobRepository.updateJobCost(
+        totalResultMetradoPrice,
+        detail.Trabajo.id
+      );
+
+      await prismaJobRepository.updateJobCostOfLabor(
+        totalResultMetradoCostOfLabor,
+        detail.Trabajo.id
+      );
+
+      await prismaJobRepository.updateJobMaterialCost(
+        totalResultMetradoMaterialCost,
+        detail.Trabajo.id
+      );
+
+      await prismaJobRepository.updateJobEquipment(
+        totalResultMetradoJobEquipment,
+        detail.Trabajo.id
+      );
+
+      await prismaJobRepository.updateJobSeveral(
+        totalResultMetradoJobSeveral,
+        detail.Trabajo.id
+      );
+
+      const updateDetail =
+        await prismaDepartureJobRepository.updateDetailDepartureJob(
+          detail.id,
+          departure.id,
+          data.metrado
+        );
+
+      return httpResponse.SuccessResponse(
+        "Detalle Trabajo Partida editado correctamente",
+        updateDetail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error en editar el Detalle Trabajo-Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async updateStatusDepartureJob(
+    departureJob_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const detailFind = await prismaDepartureJobRepository.findById(
+        departureJob_id
+      );
+      if (!detailFind) {
+        return httpResponse.BadRequestException(
+          "No se encontró el Detalle Trabajo Partida que se quiere eliminar"
+        );
+      }
+      const jobResponse = await jobValidation.findById(detailFind.trabajo_id);
+      const job = jobResponse.payload as Trabajo;
+      const departureResponse = await departureValidation.findById(
+        detailFind.partida_id
+      );
+      const departure = departureResponse.payload as Partida;
+
+      let subtractMetradoPrice = 0;
+      const resultadoMetradoPrecio =
+        detailFind.metrado_utilizado * departure.precio;
+
+      subtractMetradoPrice = job.costo_partida - resultadoMetradoPrecio;
+
+      await prismaJobRepository.updateJobCost(subtractMetradoPrice, job.id);
+
+      let subtractMetradoCostOfLabor = 0;
+      const resultMetadoCostOfLabor =
+        detailFind.metrado_utilizado * departure.mano_de_obra_unitaria;
+
+      subtractMetradoCostOfLabor =
+        job.costo_mano_obra - resultMetadoCostOfLabor;
+
+      await prismaJobRepository.updateJobCostOfLabor(
+        subtractMetradoCostOfLabor,
+        job.id
+      );
+
+      let subtractMetadoMaterialCost = 0;
+      const resultMetradoMaterialCost =
+        detailFind.metrado_utilizado * departure.material_unitario;
+
+      subtractMetadoMaterialCost =
+        job.costo_material - resultMetradoMaterialCost;
+
+      await prismaJobRepository.updateJobMaterialCost(
+        subtractMetadoMaterialCost,
+        job.id
+      );
+
+      let subtractMetradoJobEquipment = 0;
+
+      const resultMetradoJobEquipment =
+        detailFind.metrado_utilizado * departure.equipo_unitario;
+      subtractMetradoJobEquipment =
+        job.costo_equipo - resultMetradoJobEquipment;
+
+      await prismaJobRepository.updateJobEquipment(
+        subtractMetradoJobEquipment,
+        job.id
+      );
+
+      let subtractMetradoJobSeveral = 0;
+
+      const resultMetradoJobSeveral =
+        detailFind.metrado_utilizado * departure.subcontrata_varios;
+      subtractMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
+
+      await prismaJobRepository.updateJobSeveral(
+        subtractMetradoJobSeveral,
+        job.id
+      );
+
+      await prismaDepartureJobRepository.deleteDetailDepartureJob(
+        departureJob_id
+      );
+      return httpResponse.SuccessResponse(
+        "Detalle Trabajo Partida eliminado correctamente"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error en eliminar el Detalle Trabajo-Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   async updateDepartureJobMasive(file: any, project_id: number) {
     try {
       const buffer = file.buffer;

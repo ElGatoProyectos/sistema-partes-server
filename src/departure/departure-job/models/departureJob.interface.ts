@@ -30,3 +30,15 @@ export interface I_DepartureJob {
   departure_id: number;
   metrado: number;
 }
+export interface I_DepartureJobUpdate {
+  departure_id: number;
+  metrado: number;
+}
+export interface I_DepartureJobBBDD {
+  id: number;
+  trabajo_id: number;
+  partida_id: number;
+  metrado_utilizado: number;
+  Partida: Partida;
+  Trabajo: Trabajo;
+}
