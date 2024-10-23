@@ -132,6 +132,7 @@ class PrismaWorkforceRepository implements WorkforceRepository {
   async findAllWithPagination(project_id: number): Promise<ManoObra[] | null> {
     const workforces = await prisma.manoObra.findMany({
       where: {
+        eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
       },
     });

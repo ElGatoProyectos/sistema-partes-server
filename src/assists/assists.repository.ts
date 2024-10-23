@@ -1,3 +1,4 @@
+import { E_Asistencia_BD } from "@prisma/client";
 import {
   I_CreateAssistsWorkforceBD,
   I_UpdateAssitsBD,
@@ -16,9 +17,11 @@ export abstract class BankWorkforceRepository {
 
   findByDate(date: Date): void {}
 
+  findByIdMoAndDate(date: Date, mano_obra_id: number): void {}
+
   createAssists(data: I_CreateAssistsWorkforceBD): void {}
 
-  updateAssists(assists_id: number, data: I_UpdateAssitsBD): void {}
+  updateAssists(assists_id: number, data: E_Asistencia_BD): void {}
 
   updateStatusAssists(assists_id: number): void {}
 }

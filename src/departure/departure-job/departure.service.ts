@@ -104,8 +104,15 @@ class DepartureJobService {
         addtionMetradoJobSeveral,
         job.id
       );
+      const departureJob =
+        await departureJobValidation.createDetailDepartureJob(
+          job.id,
+          departure.id,
+          data.metrado
+        );
       return httpResponse.SuccessResponse(
-        "Éxito al leer la Partida y su Trabajo"
+        "Éxito al leer la Partida y su Trabajo",
+        departureJob.payload
       );
     } catch (error) {
       await prisma.$disconnect();
@@ -296,7 +303,10 @@ class DepartureJobService {
 
       for (const item of sheetToJson) {
         await departureJobValidation.updateDepartureJob(item, project_id);
-        await departureJobValidation.createDetailDepartureJob(item, project_id);
+        await departureJobValidation.createDetailDepartureJobFromExcel(
+          item,
+          project_id
+        );
       }
       await prisma.$disconnect();
 
