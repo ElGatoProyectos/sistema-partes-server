@@ -12,6 +12,12 @@ assistsWorkforce.post(
   authRoleMiddleware.authAdminUser,
   assistsController.create
 );
+assistsWorkforce.put(
+  `${prefix}`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  assistsController.update
+);
 assistsWorkforce.get(
   `${prefix}`,
   assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
@@ -24,6 +30,12 @@ assistsWorkforce.get(
   assistsWorkforceMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminUser,
   assistsController.findById
+);
+assistsWorkforce.delete(
+  `${prefix}/:id`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authAdminUser,
+  assistsController.updateStatus
 );
 
 export default assistsWorkforce;

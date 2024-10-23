@@ -6,7 +6,13 @@ import {
   I_UpdateAssitsBD,
 } from "./models/assists.interface";
 import { T_FindAllAssists } from "./models/assists.types";
-import { Asistencia, E_Estado_BD, Semana } from "@prisma/client";
+import {
+  Asistencia,
+  E_Asistencia_BD,
+  E_Estado_Asistencia_BD,
+  E_Estado_BD,
+  Semana,
+} from "@prisma/client";
 import { weekValidation } from "@/week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
@@ -19,13 +25,15 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
 
   async updateAssists(
     assists_id: number,
-    data: I_UpdateAssitsBD
+    data: E_Asistencia_BD
   ): Promise<Asistencia> {
     const assists = await prisma.asistencia.update({
       where: {
         id: assists_id,
       },
-      data: data,
+      data: {
+        asistencia: data,
+      },
     });
     return assists;
   }
@@ -44,8 +52,35 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     });
     return assists;
   }
-  updateStatusAssists(bank_id: number): void {
-    throw new Error("Method not implemented.");
+  async findByIdMoAndDate(
+    date: Date,
+    mano_obra_id: number
+  ): Promise<Asistencia | null> {
+    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+    const assists = await prisma.asistencia.findFirst({
+      where: {
+        fecha: {
+          gte: startOfDay, // Fecha mayor o igual al inicio del día
+          lte: endOfDay, // Fecha menor o igual al fin del día
+        },
+        mano_obra_id: mano_obra_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return assists;
+  }
+  async updateStatusAssists(assists_id: number): Promise<Asistencia | null> {
+    const assists = await prisma.asistencia.update({
+      where: {
+        id: assists_id,
+      },
+      data: {
+        eliminado: E_Estado_BD.y,
+      },
+    });
+    return assists;
   }
 
   async findAll(
@@ -55,11 +90,22 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     responsible_id?: number
   ): Promise<{ assistsConverter: any[]; total: number }> {
     let filters: any = {};
+    let filtersName: any = {};
+    const valuesState: { [key: string]: string } = {
+      ASIGNADO: E_Estado_Asistencia_BD.ASIGNADO,
+      DOBLEMENTE_ASIGNADO: E_Estado_Asistencia_BD.DOBLEMENTE_ASIGNADO,
+      FALTA: E_Estado_Asistencia_BD.FALTA,
+      NO_ASIGNADO: E_Estado_Asistencia_BD.NO_ASIGNADO,
+    };
 
     if (data.queryParams.search) {
-      filters.nombre = {
+      filtersName.nombre_completo = {
         contains: data.queryParams.search,
       };
+    }
+    if (data.queryParams.state) {
+      const result = valuesState[data.queryParams.state];
+      filters.estado_asignacion = result;
     }
     if (data.queryParams.week) {
       const weekResponse = await weekValidation.findByCode(
@@ -80,7 +126,6 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       };
     }
     if (data.queryParams.week && data.queryParams.date) {
-      console.log("entro a ambos");
       const weekResponse = await weekValidation.findByCode(
         data.queryParams.week
       );
@@ -96,6 +141,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
         ManoObra: {
+          ...filtersName,
           usuario_id: responsible_id,
         },
       },
@@ -114,6 +160,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
         ManoObra: {
+          ...filtersName,
           usuario_id: responsible_id,
         },
       },
