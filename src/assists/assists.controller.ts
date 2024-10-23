@@ -26,6 +26,7 @@ class AssistsController {
     const search = request.query.search as string;
     const state = request.query.state as string;
     const week = request.query.week as string;
+    const date = request.query.date as string;
     const project_id = request.get("project-id") as string;
     const tokenWithBearer = request.headers.authorization as string;
     if (!tokenWithBearer) {
@@ -42,6 +43,7 @@ class AssistsController {
         search: search,
         state: state,
         week: week,
+        date: date,
       },
     };
     const result = await assistsService.findAll(

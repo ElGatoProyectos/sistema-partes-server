@@ -1,4 +1,3 @@
-import { date } from "zod";
 export abstract class WeekRepository {
   createUnit(
     weekNumber: string,
@@ -8,4 +7,5 @@ export abstract class WeekRepository {
   findByDate(year: number): void {}
   findLastWeek(): void {}
   findForDate(date: Date): void {}
+  findByCode(code: string): void {}
 }

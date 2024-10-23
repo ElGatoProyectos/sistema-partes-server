@@ -8,6 +8,7 @@ import { assistsWorkforceValidation } from "./assists.validation";
 import { T_FindAllAssists } from "./models/assists.types";
 import { jwtService } from "@/auth/jwt.service";
 import { I_Usuario } from "@/user/models/user.interface";
+import { weekValidation } from "@/week/week.validation";
 // import { Rol } from "@/common/enums/role.enum";
 
 class AssistsService {
@@ -27,7 +28,10 @@ class AssistsService {
           "No se puede crear la Asistencia con el id del Proyecto proporcionado"
         );
       }
-
+      const array = Array.from({ length: 52 }, (v, i) =>
+        String(i + 1).padStart(2, "0")
+      );
+      console.log(array);
       const workforcesManyResponse =
         await workforceValidation.findAllWithPagination(+project_id);
 
@@ -37,6 +41,9 @@ class AssistsService {
           []
         );
       }
+      // if(data.queryParams.week){
+      //   const week= await weekValidation.findByCode(data.queryParams.week)
+      // }
       if (
         userResponse.Rol?.rol === "ADMIN" ||
         userResponse.Rol?.rol === "USER" ||

@@ -6,7 +6,8 @@ import {
   I_UpdateAssitsBD,
 } from "./models/assists.interface";
 import { T_FindAllAssists } from "./models/assists.types";
-import { Asistencia, E_Estado_BD } from "@prisma/client";
+import { Asistencia, E_Estado_BD, Semana } from "@prisma/client";
+import { weekValidation } from "@/week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
   async createAssists(data: I_CreateAssistsWorkforceBD): Promise<Asistencia> {
@@ -58,6 +59,35 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     if (data.queryParams.search) {
       filters.nombre = {
         contains: data.queryParams.search,
+      };
+    }
+    if (data.queryParams.week) {
+      const weekResponse = await weekValidation.findByCode(
+        data.queryParams.week
+      );
+      const week = weekResponse.payload as Semana;
+      filters.fecha = {
+        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+      };
+    }
+    if (data.queryParams.date) {
+      filters.fecha = {
+        gte: new Date(new Date(data.queryParams.date).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        lte: new Date(
+          new Date(data.queryParams.date).setHours(23, 59, 59, 999)
+        ),
+      };
+    }
+    if (data.queryParams.week && data.queryParams.date) {
+      console.log("entro a ambos");
+      const weekResponse = await weekValidation.findByCode(
+        data.queryParams.week
+      );
+      const week = weekResponse.payload as Semana;
+      filters.fecha = {
+        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
       };
     }
     const assists = await prisma.asistencia.findMany({
