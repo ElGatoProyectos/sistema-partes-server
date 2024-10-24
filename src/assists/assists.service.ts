@@ -14,9 +14,8 @@ import { assistsWorkforceValidation } from "./assists.validation";
 import { T_FindAllAssists } from "./models/assists.types";
 import { jwtService } from "@/auth/jwt.service";
 import { I_Usuario } from "@/user/models/user.interface";
-import { weekValidation } from "@/week/week.validation";
 import { I_AssistsBody } from "./models/assists.interface";
-// import { Rol } from "@/common/enums/role.enum";
+import { prismaWorkforceRepository } from "@/workforce/prisma-workforce.repository";
 
 class AssistsService {
   async findAll(
@@ -127,6 +126,47 @@ class AssistsService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer las Asistencias",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findAllWorkforceWithAssists(project_id: string) {
+    try {
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const date = new Date();
+      const result = await prismaWorkforceRepository.findAllByDate(
+        date,
+        +project_id
+      );
+      if (!result || result.length === 0) {
+        return httpResponse.BadRequestException(
+          "No se entontro Mano de Obra para crear la asistencia",
+          []
+        );
+      }
+      const assistsResponse = await this.processWorkforceAssists(
+        result,
+        date,
+        +project_id
+      );
+      if (!assistsResponse.success) {
+        return httpResponse.BadRequestException(
+          "Hubo un problema en crear la sincronización y hacer las asistencias de la Mano de Obra"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Éxito al crear la sincronización de toda la Mano de Obra sin la Asistencia de Hoy",
+        result
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al crear la sincronización de toda la Mano de Obra sin la Asistencia de Hoy",
         error
       );
     } finally {

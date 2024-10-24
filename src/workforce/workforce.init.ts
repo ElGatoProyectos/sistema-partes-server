@@ -45,7 +45,14 @@ workforceRouter.delete(
   `${prefix}/:id`,
   workforceMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authAdminUser,
-  workforceController.updateStatus
+  workforceController.delete
+);
+
+workforceRouter.patch(
+  `${prefix}/:id`,
+  workforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  workforceController.changeStatus
 );
 
 export default workforceRouter;

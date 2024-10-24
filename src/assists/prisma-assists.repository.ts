@@ -3,7 +3,6 @@ import { BankWorkforceRepository } from "./assists.repository";
 import {
   I_AssistsWorkforce,
   I_CreateAssistsWorkforceBD,
-  I_UpdateAssitsBD,
 } from "./models/assists.interface";
 import { T_FindAllAssists } from "./models/assists.types";
 import {
@@ -11,6 +10,7 @@ import {
   E_Asistencia_BD,
   E_Estado_Asistencia_BD,
   E_Estado_BD,
+  ManoObra,
   Semana,
 } from "@prisma/client";
 import { weekValidation } from "@/week/week.validation";

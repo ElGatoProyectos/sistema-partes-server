@@ -94,6 +94,15 @@ class AssistsController {
       response.status(result.statusCode).json(result);
     }
   }
+  async synchronization(request: express.Request, response: express.Response) {
+    const project_id = request.get("project-id") as string;
+    const result = await assistsService.findAllWorkforceWithAssists(project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
 
   async findById(request: express.Request, response: express.Response) {
     const assists_id = Number(request.params.id);

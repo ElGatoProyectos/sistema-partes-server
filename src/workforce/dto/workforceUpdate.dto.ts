@@ -8,7 +8,7 @@ export const workforceUpdateDto = z.object({
   unidad_id: z.number().optional(),
   fecha_inicio: z.string().optional(),
   fecha_cese: z.string().optional(),
-  estado: z.string().optional(),
+  estado: z.enum(["ACTIVO", "INACTIVO"]),
   fecha_nacimiento: z.string().optional(),
   telefono: z.string().optional(),
   email_personal: z.string().optional(),
@@ -19,4 +19,5 @@ export const workforceUpdateDto = z.object({
   lugar_nacimiento: z.string().optional(),
   domicilio: z.string().optional(),
   usuario_id: z.number().optional(),
+  tipo_obrero_id: z.number().optional(),
 });

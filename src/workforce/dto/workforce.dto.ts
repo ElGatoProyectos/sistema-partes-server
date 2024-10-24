@@ -8,7 +8,7 @@ export const workforceDto = z.object({
   unidad_id: z.number(),
   fecha_inicio: z.string(),
   fecha_cese: z.string(),
-  estado: z.string(),
+  estado: z.enum(["ACTIVO", "INACTIVO"]),
   fecha_nacimiento: z.string(),
   telefono: z.string(),
   email_personal: z.string(),
@@ -19,4 +19,5 @@ export const workforceDto = z.object({
   lugar_nacimiento: z.string(),
   domicilio: z.string(),
   usuario_id: z.number(),
+  tipo_obrero_id: z.number(),
 });

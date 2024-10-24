@@ -9,6 +9,8 @@ export abstract class WorkforceRepository {
 
   findAllWithPagination(project_id: number): void {}
 
+  findAllByDate(date: Date, project_id: number): void {}
+
   findByCode(code: string, project_id: number): void {}
 
   findByDNI(code: string, project_id: number): void {}
@@ -22,6 +24,8 @@ export abstract class WorkforceRepository {
   updateWorkforce(data: I_UpdateWorkforceBody, idUser: number): void {}
 
   updateStatusWorkforce(idUser: number): void {}
+
+  changeStateWorkforce(workforce_id: number): void {}
 
   codeMoreHigh(project_id: number): void {}
 
