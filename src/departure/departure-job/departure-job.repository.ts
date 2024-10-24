@@ -16,4 +16,5 @@ export abstract class DepartureJobRepository {
   findById(detail_id: number): void {}
   findByIdJob(job_id: number): void {}
   findByIdDeparture(departure_id: number): void {}
+  findByIdDepartureAndIdJob(departure_id: number, job_id: number): void {}
 }

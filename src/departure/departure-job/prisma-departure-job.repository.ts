@@ -39,6 +39,18 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     });
     return detail;
   }
+  async findByIdDepartureAndIdJob(
+    departure_id: number,
+    job_id: number
+  ): Promise<DetalleTrabajoPartida | null> {
+    const detail = await prisma.detalleTrabajoPartida.findFirst({
+      where: {
+        trabajo_id: job_id,
+        partida_id: departure_id,
+      },
+    });
+    return detail;
+  }
   async findById(detail_id: number): Promise<DetalleTrabajoPartida | null> {
     const detail = await prisma.detalleTrabajoPartida.findFirst({
       where: {

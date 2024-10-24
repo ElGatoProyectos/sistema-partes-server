@@ -20,4 +20,5 @@ export const workforceUpdateDto = z.object({
   domicilio: z.string().optional(),
   usuario_id: z.number().optional(),
   tipo_obrero_id: z.number().optional(),
+  origen_obrero_id: z.number().optional(),
 });
