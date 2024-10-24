@@ -25,7 +25,16 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     });
     return workforce;
   }
-
+  async changeStateWorkforce(workforce_id: number): Promise<ManoObra> {
+    const workforce = await prisma.manoObra.update({
+      where: { id: workforce_id },
+      data: {
+        estado: E_Estado_MO_BD.ACTIVO,
+        fecha_cese: null,
+      },
+    });
+    return workforce;
+  }
   async findAll(
     skip: number,
     data: T_FindAllWorkforce,
@@ -133,10 +142,34 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     const workforces = await prisma.manoObra.findMany({
       where: {
         eliminado: E_Estado_BD.n,
+        estado: "ACTIVO",
         proyecto_id: project_id,
       },
     });
     return workforces;
+  }
+  async findAllByDate(
+    date: Date,
+    project_id: number
+  ): Promise<ManoObra[] | null> {
+    const fechaInicio = new Date(date.setHours(0, 0, 0, 0)); // inicio del día
+    const fechaFin = new Date(date.setHours(23, 59, 59, 999)); // fin del día
+    const empleadosSinAsistencia = await prisma.manoObra.findMany({
+      where: {
+        proyecto_id: project_id,
+        eliminado: "n", // Solo empleados que no están eliminados
+        estado: "ACTIVO", // Solo empleados activos
+        Asistencia: {
+          none: {
+            fecha: {
+              gte: fechaInicio,
+              lte: fechaFin,
+            },
+          },
+        },
+      },
+    });
+    return empleadosSinAsistencia;
   }
   getCategoryFilter(category: string | undefined) {
     if (!category) return {};

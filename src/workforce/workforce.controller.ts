@@ -95,9 +95,14 @@ class WorkforceController {
     response.status(result.statusCode).json(result);
   }
 
-  async updateStatus(request: express.Request, response: express.Response) {
+  async delete(request: express.Request, response: express.Response) {
     const workforce_id = Number(request.params.id);
     const result = await workforceService.updateStatusWorkforce(workforce_id);
+    response.status(result.statusCode).json(result);
+  }
+  async changeStatus(request: express.Request, response: express.Response) {
+    const workforce_id = Number(request.params.id);
+    const result = await workforceService.changeStateWorkforce(workforce_id);
     response.status(result.statusCode).json(result);
   }
   async exportExcel(request: express.Request, response: express.Response) {

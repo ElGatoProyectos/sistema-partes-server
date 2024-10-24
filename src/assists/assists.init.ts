@@ -12,6 +12,13 @@ assistsWorkforce.post(
   authRoleMiddleware.authAdminUser,
   assistsController.create
 );
+assistsWorkforce.post(
+  `${prefix}/synchronization`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authAdminUser,
+  assistsController.synchronization
+);
+
 assistsWorkforce.put(
   `${prefix}`,
   assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,

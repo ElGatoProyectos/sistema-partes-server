@@ -128,6 +128,16 @@ class DepartureJobService {
       const departure = departureResponse.payload as Partida;
       const detail = detailFind as I_DepartureJobBBDD;
 
+      // if(detailFind.partida_id === departure.id){
+      //   return httpResponse.BadRequestException("El id de la Partida que ")
+      // }
+
+      if (data.metrado > departure.metrado_inicial) {
+        return httpResponse.BadRequestException(
+          "El metrado que ha colocado es mayor para la nueva Partida "
+        );
+      }
+
       //[note] aca sacamos la resta de cuanto seria
       const subtractMetradoPrecio =
         detailFind.metrado_utilizado * detail.Partida.precio;

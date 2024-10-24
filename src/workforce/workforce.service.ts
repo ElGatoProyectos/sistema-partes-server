@@ -47,6 +47,17 @@ class WorkforceService {
         return categoryWorkforceResponse;
       }
 
+      let type: any;
+      if (data.tipo_obrero_id) {
+        const typeResponse = await typeWorkforceValidation.findById(
+          data.tipo_obrero_id
+        );
+        if (!typeResponse.success) {
+          return typeResponse;
+        }
+        type = typeResponse.payload as TipoObrero;
+      }
+
       const specialityWorkforceResponse =
         await specialtyWorkforceValidation.findById(
           data.especialidad_obrero_id
@@ -117,6 +128,7 @@ class WorkforceService {
         fecha_cese: fecha_finalizacion,
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
+        tipo_obrero_id: type.id,
       };
       const responseWorkforce = await prismaWorkforceRepository.createWorkforce(
         workforceFormat
@@ -126,7 +138,6 @@ class WorkforceService {
         responseWorkforce
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear la Mano de Obra",
         error
@@ -156,6 +167,17 @@ class WorkforceService {
         await categoryWorkforceValidation.findById(data.categoria_obrero_id);
       if (!categoryWorkforceResponse.success) {
         return categoryWorkforceResponse;
+      }
+
+      let type: any;
+      if (data.tipo_obrero_id) {
+        const typeResponse = await typeWorkforceValidation.findById(
+          data.tipo_obrero_id
+        );
+        if (!typeResponse.success) {
+          return typeResponse;
+        }
+        type = typeResponse.payload as TipoObrero;
       }
 
       const specialityWorkforceResponse =
@@ -220,6 +242,7 @@ class WorkforceService {
         fecha_cese: fecha_finalizacion,
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
+        tipo_obrero_id: type.id,
       };
       const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
         workforceFormat,
@@ -232,6 +255,29 @@ class WorkforceService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al modificar la Mano de Obra",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async changeStateWorkforce(workforce_id: number) {
+    try {
+      const resultIdWorkforce = await workforceValidation.findById(
+        workforce_id
+      );
+      if (!resultIdWorkforce.success) {
+        return resultIdWorkforce;
+      }
+      const responseWorkforce =
+        await prismaWorkforceRepository.changeStateWorkforce(workforce_id);
+      return httpResponse.SuccessResponse(
+        "Se cambio el estado de la Mano de Obra correctamente",
+        responseWorkforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al cambiar el estado de la Mano de Obra",
         error
       );
     } finally {
