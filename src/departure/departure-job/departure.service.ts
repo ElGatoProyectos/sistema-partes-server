@@ -9,7 +9,12 @@ import {
 } from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
 import { projectValidation } from "@/project/project.validation";
-import { Partida, Proyecto, Trabajo } from "@prisma/client";
+import {
+  DetalleTrabajoPartida,
+  Partida,
+  Proyecto,
+  Trabajo,
+} from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
@@ -41,6 +46,20 @@ class DepartureJobService {
           "No puede colocar más métrado del que tiene la partida"
         );
       }
+      const detailFind = await departureJobValidation.findByForDepartureAndJob(
+        departure.id,
+        job.id
+      );
+      const detail = detailFind.payload as DetalleTrabajoPartida;
+      // if (
+      //   data.job_id === job.id &&
+      //   data.departure_id === detail.partida_id.id &&
+      //   detail.metrado_utilizado === data.metrado
+      // ) {
+      //   return httpResponse.BadRequestException(
+      //     "Ya existe un Detalle con ese Trabajo, Partida y el mismo Metrado"
+      //   );
+      // }
 
       let additionMetradoPrice = 0;
       const resultadoMetradoPrecio = data.metrado * departure.precio;
@@ -85,6 +104,25 @@ class DepartureJobService {
         addtionMetradoJobSeveral,
         job.id
       );
+
+      if (detailFind.success) {
+        const newMetrado = detail.metrado_utilizado + data.metrado;
+        const updateDetail =
+          await prismaDepartureJobRepository.updateDetailDepartureJob(
+            detail.id,
+            departure.id,
+            newMetrado
+          );
+        if (!updateDetail) {
+          return httpResponse.BadRequestException(
+            "El el proceso de actualizar el Detalle Trabajo-Partida hubo un problema"
+          );
+        }
+        return httpResponse.SuccessResponse(
+          `Al existir un Detalle Trabajo-Partida, se ha actualizado con éxito el mismo`
+        );
+      }
+
       const departureJob =
         await departureJobValidation.createDetailDepartureJob(
           job.id,
@@ -92,13 +130,13 @@ class DepartureJobService {
           data.metrado
         );
       return httpResponse.SuccessResponse(
-        "Éxito al leer la Partida y su Trabajo",
+        "Éxito al el Detalle de la Partida con su Trabajo",
         departureJob.payload
       );
     } catch (error) {
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
-        "Error al leer la Partidas con su Trabajo",
+        "Error al leer la Partida con su Trabajo",
         error
       );
     } finally {

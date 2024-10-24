@@ -57,6 +57,16 @@ class WorkforceService {
         }
         type = typeResponse.payload as TipoObrero;
       }
+      let origin: any;
+      if (data.origen_obrero_id) {
+        const originResponse = await originWorkforceValidation.findById(
+          data.origen_obrero_id
+        );
+        if (!originResponse.success) {
+          return originResponse;
+        }
+        origin = originResponse.payload as TipoObrero;
+      }
 
       const specialityWorkforceResponse =
         await specialtyWorkforceValidation.findById(
@@ -64,6 +74,16 @@ class WorkforceService {
         );
       if (!specialityWorkforceResponse.success) {
         return specialityWorkforceResponse;
+      }
+
+      const workforceDniResponse = await workforceValidation.findByDni(
+        data.documento_identidad,
+        project_id
+      );
+      if (workforceDniResponse.success) {
+        return httpResponse.BadRequestException(
+          "Ya existe un Mano de Obra con ese DNI"
+        );
       }
 
       if (data.documento_identidad.length > 8) {
@@ -129,6 +149,7 @@ class WorkforceService {
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
         tipo_obrero_id: type.id,
+        origen_obrero_id: origin.id,
       };
       const responseWorkforce = await prismaWorkforceRepository.createWorkforce(
         workforceFormat
@@ -158,6 +179,8 @@ class WorkforceService {
       if (!resultIdWorkforce.success) {
         return resultIdWorkforce;
       }
+      const workforce = resultIdWorkforce.payload as ManoObra;
+
       const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return resultIdProject;
@@ -180,12 +203,35 @@ class WorkforceService {
         type = typeResponse.payload as TipoObrero;
       }
 
+      let origin: any;
+      if (data.origen_obrero_id) {
+        const originResponse = await originWorkforceValidation.findById(
+          data.origen_obrero_id
+        );
+        if (!originResponse.success) {
+          return originResponse;
+        }
+        origin = originResponse.payload as TipoObrero;
+      }
+
       const specialityWorkforceResponse =
         await specialtyWorkforceValidation.findById(
           data.especialidad_obrero_id
         );
       if (!specialityWorkforceResponse.success) {
         return specialityWorkforceResponse;
+      }
+
+      if (workforce.documento_identidad != data.documento_identidad) {
+        const workforceDniResponse = await workforceValidation.findByDni(
+          data.documento_identidad,
+          project_id
+        );
+        if (workforceDniResponse.success) {
+          return httpResponse.BadRequestException(
+            "Ya existe una Mano de Obra con ese DNI"
+          );
+        }
       }
 
       if (data.documento_identidad.length > 8) {
@@ -243,6 +289,7 @@ class WorkforceService {
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
         tipo_obrero_id: type.id,
+        origen_obrero_id: origin.id,
       };
       const responseWorkforce = await prismaWorkforceRepository.updateWorkforce(
         workforceFormat,
