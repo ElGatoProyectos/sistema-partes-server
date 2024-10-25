@@ -384,14 +384,12 @@ class AssistsService {
     project_id: number
   ): Promise<{ success: boolean }> {
     //[message] se formatea la fecha en la zona horaria local (en formato ISO)
-    const processedDate = new Date(date);
-    processedDate.setDate(processedDate.getDate() - 1);
+    const processedDate = new Date(date.toLocaleDateString("en-CA"));
 
     for (let index = 0; index < workforcesManyResponse.length; index++) {
       let value;
       const valueIsBetweenWeek = 8.5;
       const valueIsEndWeek = 5.5;
-      console.log("la fecha en el proceso es " + processedDate);
       value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
 
       const assistsFormat = {
@@ -404,7 +402,6 @@ class AssistsService {
         mano_obra_id: workforcesManyResponse[index].id,
         proyecto_id: project_id,
       };
-      console.log(assistsFormat);
       const assistsResponse = await prismaAssistsRepository.createAssists(
         assistsFormat
       );
