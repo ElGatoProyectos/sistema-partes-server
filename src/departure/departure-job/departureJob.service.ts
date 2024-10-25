@@ -225,66 +225,67 @@ class DepartureJobService {
         "Como se va a actualizar otro Detalle por esta Partida, la suma del metrado que envio con la ya tenia supera al metrado de la Partida"
       );
     }
-
+    //[note] aca multiplicas
     const oldMetradoPrecio =
-      detail.metrado_utilizado * detail.Partida.precio +
-      detail.Trabajo.costo_partida;
+      existsDetail.metrado_utilizado * departure.precio +
+      existsDetail.Trabajo.costo_partida;
     const oldMetadoCostOfLabor =
-      detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria +
-      detail.Trabajo.costo_mano_obra;
+      existsDetail.metrado_utilizado * departure.mano_de_obra_unitaria +
+      existsDetail.Trabajo.costo_mano_obra;
     const oldMetradoMaterialCost =
-      detail.metrado_utilizado * detail.Partida.material_unitario +
-      detail.Trabajo.costo_material;
+      existsDetail.metrado_utilizado * departure.material_unitario +
+      existsDetail.Trabajo.costo_material;
     const oldMetradoJobEquipment =
-      detail.metrado_utilizado * detail.Partida.equipo_unitario +
-      detail.Trabajo.costo_equipo;
+      existsDetail.metrado_utilizado * departure.equipo_unitario +
+      existsDetail.Trabajo.costo_equipo;
     const oldMetradoJobSeveral =
-      detail.metrado_utilizado * detail.Partida.subcontrata_varios +
-      detail.Trabajo.costo_varios;
+      existsDetail.metrado_utilizado * departure.subcontrata_varios +
+      existsDetail.Trabajo.costo_varios;
 
-    const totalMetradoPrecio =
+    const newMetradoPrecio =
       metrado * departure.precio + existsDetail.Trabajo.costo_partida;
-    if (totalMetradoPrecio < oldMetradoPrecio) {
+
+    if (newMetradoPrecio < oldMetradoPrecio) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el Costo de la Partida`
       );
     }
 
-    const totalMetadoCostOfLabor =
+    const newMetadoCostOfLabor =
       metrado * departure.mano_de_obra_unitaria +
       existsDetail.Trabajo.costo_mano_obra;
 
-    if (totalMetadoCostOfLabor < oldMetadoCostOfLabor) {
+    if (newMetadoCostOfLabor < oldMetadoCostOfLabor) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el Costo de la Mano de Obra Unitaria`
       );
     }
-    const totalMetradoMaterialCost =
+    const newMetradoMaterialCost =
       metrado * departure.material_unitario +
       existsDetail.Trabajo.costo_material;
-    if (totalMetradoMaterialCost < oldMetradoMaterialCost) {
+    if (newMetradoMaterialCost < oldMetradoMaterialCost) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el costo de Material`
       );
     }
-    const totalMetradoJobEquipment =
+    const newMetradoJobEquipment =
       metrado * departure.equipo_unitario + existsDetail.Trabajo.costo_equipo;
-    if (totalMetradoJobEquipment < oldMetradoJobEquipment) {
+    if (newMetradoJobEquipment < oldMetradoJobEquipment) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el costo de Equipo`
       );
     }
-    const totalMetradoJobSeveral =
+    const newMetradoJobSeveral =
       metrado * departure.subcontrata_varios +
       existsDetail.Trabajo.costo_varios;
-    if (totalMetradoJobSeveral < oldMetradoJobSeveral) {
+    if (newMetradoJobSeveral < oldMetradoJobSeveral) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el costo Varios`
       );
     }
 
-    const jobFormat = this.calculateJobCosts(detail, departure, metrado);
-    await jobValidation.updateJob(jobFormat, detail.Trabajo.id);
+    const jobFormat = this.calculateJobCosts(existsDetail, departure, metrado);
+    await jobValidation.updateJob(jobFormat, existsDetail.Trabajo.id);
 
     const updateDetail =
       await prismaDepartureJobRepository.updateDetailDepartureJob(
@@ -326,21 +327,10 @@ class DepartureJobService {
   }
 
   private calculateJobCosts(
-    detail: I_DepartureJobBBDD,
+    existsDetail: I_DepartureJobBBDD,
     departure: Partida,
     metrado: number
   ) {
-    const subtractMetradoPrecio =
-      detail.metrado_utilizado * detail.Partida.precio;
-    const subtractMetadoCostOfLabor =
-      detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
-    const subtractMetradoMaterialCost =
-      detail.metrado_utilizado * detail.Partida.material_unitario;
-    const subtractMetradoJobEquipment =
-      detail.metrado_utilizado * detail.Partida.equipo_unitario;
-    const subtractMetradoJobSeveral =
-      detail.metrado_utilizado * detail.Partida.subcontrata_varios;
-
     const aditionMetradoPrecio = metrado * departure.precio;
     const aditionMetadoCostOfLabor = metrado * departure.mano_de_obra_unitaria;
     const aditionMetradoMaterialCost = metrado * departure.material_unitario;
@@ -348,27 +338,16 @@ class DepartureJobService {
     const aditionMetradoJobSeveral = metrado * departure.subcontrata_varios;
 
     return {
-      ...detail.Trabajo,
-      costo_partida:
-        detail.Trabajo.costo_partida +
-        aditionMetradoPrecio -
-        subtractMetradoPrecio,
+      ...existsDetail.Trabajo,
+      costo_partida: existsDetail.Trabajo.costo_partida + aditionMetradoPrecio,
       costo_mano_obra:
-        detail.Trabajo.costo_mano_obra +
-        aditionMetadoCostOfLabor -
-        subtractMetadoCostOfLabor,
+        existsDetail.Trabajo.costo_mano_obra + aditionMetadoCostOfLabor,
       costo_material:
-        detail.Trabajo.costo_material +
-        aditionMetradoMaterialCost -
-        subtractMetradoMaterialCost,
+        existsDetail.Trabajo.costo_material + aditionMetradoMaterialCost,
       costo_equipo:
-        detail.Trabajo.costo_equipo +
-        aditionMetradoJobEquipment -
-        subtractMetradoJobEquipment,
+        existsDetail.Trabajo.costo_equipo + aditionMetradoJobEquipment,
       costo_varios:
-        detail.Trabajo.costo_varios +
-        aditionMetradoJobSeveral -
-        subtractMetradoJobSeveral,
+        existsDetail.Trabajo.costo_varios + aditionMetradoJobSeveral,
     };
   }
 
@@ -438,61 +417,45 @@ class DepartureJobService {
       );
       const departure = departureResponse.payload as Partida;
 
-      let subtractMetradoPrice = 0;
+      let totalMetradoPrice = 0;
       const resultadoMetradoPrecio =
         detailFind.metrado_utilizado * departure.precio;
 
-      subtractMetradoPrice = job.costo_partida - resultadoMetradoPrecio;
+      totalMetradoPrice = job.costo_partida - resultadoMetradoPrecio;
 
-      await prismaJobRepository.updateJobCost(subtractMetradoPrice, job.id);
-
-      let subtractMetradoCostOfLabor = 0;
+      let totalMetradoCostOfLabor = 0;
       const resultMetadoCostOfLabor =
         detailFind.metrado_utilizado * departure.mano_de_obra_unitaria;
 
-      subtractMetradoCostOfLabor =
-        job.costo_mano_obra - resultMetadoCostOfLabor;
+      totalMetradoCostOfLabor = job.costo_mano_obra - resultMetadoCostOfLabor;
 
-      await prismaJobRepository.updateJobCostOfLabor(
-        subtractMetradoCostOfLabor,
-        job.id
-      );
-
-      let subtractMetadoMaterialCost = 0;
+      let totalMetadoMaterialCost = 0;
       const resultMetradoMaterialCost =
         detailFind.metrado_utilizado * departure.material_unitario;
 
-      subtractMetadoMaterialCost =
-        job.costo_material - resultMetradoMaterialCost;
+      totalMetadoMaterialCost = job.costo_material - resultMetradoMaterialCost;
 
-      await prismaJobRepository.updateJobMaterialCost(
-        subtractMetadoMaterialCost,
-        job.id
-      );
-
-      let subtractMetradoJobEquipment = 0;
+      let totalMetradoJobEquipment = 0;
 
       const resultMetradoJobEquipment =
         detailFind.metrado_utilizado * departure.equipo_unitario;
-      subtractMetradoJobEquipment =
-        job.costo_equipo - resultMetradoJobEquipment;
+      totalMetradoJobEquipment = job.costo_equipo - resultMetradoJobEquipment;
 
-      await prismaJobRepository.updateJobEquipment(
-        subtractMetradoJobEquipment,
-        job.id
-      );
-
-      let subtractMetradoJobSeveral = 0;
+      let totalMetradoJobSeveral = 0;
 
       const resultMetradoJobSeveral =
         detailFind.metrado_utilizado * departure.subcontrata_varios;
-      subtractMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
+      totalMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
 
-      await prismaJobRepository.updateJobSeveral(
-        subtractMetradoJobSeveral,
-        job.id
-      );
-
+      const jobFormat = {
+        ...job,
+        costo_partida: totalMetradoPrice,
+        costo_mano_obra: totalMetradoCostOfLabor,
+        costo_material: totalMetadoMaterialCost,
+        costo_equipo: totalMetradoJobEquipment,
+        costo_varios: totalMetradoJobSeveral,
+      };
+      await prismaJobRepository.updateJob(jobFormat, job.id);
       await prismaDepartureJobRepository.deleteDetailDepartureJob(
         departureJob_id
       );
