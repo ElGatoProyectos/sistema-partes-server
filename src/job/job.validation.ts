@@ -1,6 +1,6 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaJobRepository } from "./prisma-job.repository";
-import { I_JobExcel } from "./models/job.interface";
+import { I_JobExcel, I_UpdateJobBD } from "./models/job.interface";
 import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
 import { Tren, UnidadProduccion } from "@prisma/client";
 import { trainValidation } from "@/train/train.validation";
@@ -54,6 +54,23 @@ class JobValidation {
         jobFormat,
         job_id
       );
+      return httpResponse.SuccessResponse(
+        "Trabajo modificado correctamente",
+        responseJob
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar el Trabajo",
+        error
+      );
+    }
+  }
+  async updateJob(
+    data: I_UpdateJobBD,
+    job_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const responseJob = await prismaJobRepository.updateJob(data, job_id);
       return httpResponse.SuccessResponse(
         "Trabajo modificado correctamente",
         responseJob

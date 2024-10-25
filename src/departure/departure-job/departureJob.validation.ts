@@ -25,7 +25,9 @@ class DepartureJobValidation {
         project_id
       );
       const departure = departureResponse.payload as Partida;
-
+      let jobFormat = {
+        ...job,
+      };
       if (departure.precio) {
         let suma = 0;
         const resultado = data.METRADO * departure.precio;
@@ -47,49 +49,48 @@ class DepartureJobValidation {
         // );
         suma = resultado + job.costo_partida;
         // console.log("el resultado de la suma da  " + suma);
-        await prismaJobRepository.updateJobCost(suma, job.id);
+        jobFormat.costo_partida = suma;
+        // await prismaJobRepository.updateJobCost(suma, job.id);
       }
       if (departure.mano_de_obra_unitaria) {
         let suma = 0;
         const resultado = data.METRADO * departure.mano_de_obra_unitaria;
-        // console.log(
-        //   "la partida " +
-        //     data.PARTIDA +
-        //     " viene con valor de la base de datos el trabajo " +
-        //     job.costo_mano_obra +
-        //     " esto da del codigo de la partida " +
-        //     departure.id +
-        //     " de multiplicar el metrado " +
-        //     data.METRADO +
-        //     " por la mano de obra de bbdd " +
-        //     departure.mano_de_obra_unitaria +
-        //     " el siguiente resultado " +
-        //     resultado +
-        //     " para el id del trabajo " +
-        //     job.id
-        // );
+
         suma = resultado + job.costo_mano_obra;
-        await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
+        // await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
+        jobFormat.costo_mano_obra = suma;
       }
       if (departure.material_unitario) {
         let suma = 0;
         const resultado = data.METRADO * departure.material_unitario;
 
         suma = resultado + job.costo_material;
-        await prismaJobRepository.updateJobMaterialCost(suma, job.id);
+        // await prismaJobRepository.updateJobMaterialCost(suma, job.id);
+        jobFormat.costo_material = suma;
       }
       if (departure.equipo_unitario) {
         let suma = 0;
         const resultado = data.METRADO * departure.equipo_unitario;
 
         suma = resultado + job.costo_equipo;
-        await prismaJobRepository.updateJobEquipment(suma, job.id);
+        // await prismaJobRepository.updateJobEquipment(suma, job.id);
+        jobFormat.costo_equipo = suma;
       }
       if (departure.subcontrata_varios) {
         let suma = 0;
         const resultado = data.METRADO * departure.subcontrata_varios;
         suma = resultado + job.costo_varios;
-        await prismaJobRepository.updateJobSeveral(suma, job.id);
+        // await prismaJobRepository.updateJobSeveral(suma, job.id);
+        jobFormat.costo_varios = suma;
+      }
+      const jobResponseUpdate = await jobValidation.updateJob(
+        jobFormat,
+        job.id
+      );
+      if (!jobResponseUpdate.success) {
+        return httpResponse.BadRequestException(
+          "Hubo un problema para actualizar el trabajo en uno de sus campos"
+        );
       }
       return httpResponse.SuccessResponse(
         "Los Trabajos de las Partidas modificada correctamente"
@@ -162,6 +163,26 @@ class DepartureJobValidation {
   async findByForJob(job_id: number): Promise<T_HttpResponse> {
     try {
       const detail = await prismaDepartureJobRepository.findByIdJob(job_id);
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "La Búsqueda del Detalle Trabajo Partida no fue encontrado",
+          detail
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Detalle Trabajo Partida encontrado",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Detalle Trabajo Partida",
+        error
+      );
+    }
+  }
+  async findById(detail_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDepartureJobRepository.findById(detail_id);
       if (!detail) {
         return httpResponse.NotFoundException(
           "La Búsqueda del Detalle Trabajo Partida no fue encontrado",
