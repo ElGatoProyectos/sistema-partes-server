@@ -154,11 +154,13 @@ class PrismaWorkforceRepository implements WorkforceRepository {
   ): Promise<ManoObra[] | null> {
     const fechaInicio = new Date(date.setHours(0, 0, 0, 0)); // inicio del día
     const fechaFin = new Date(date.setHours(23, 59, 59, 999)); // fin del día
+    console.log(fechaInicio);
+    //[note] coloque el none xq busca mano de obra donde no seaa el date que paso
     const empleadosSinAsistencia = await prisma.manoObra.findMany({
       where: {
         proyecto_id: project_id,
-        eliminado: "n", // Solo empleados que no están eliminados
-        estado: "ACTIVO", // Solo empleados activos
+        eliminado: "n",
+        estado: "ACTIVO",
         Asistencia: {
           none: {
             fecha: {
