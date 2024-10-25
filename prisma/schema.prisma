@@ -854,14 +854,13 @@ model PrecioHoraMO {
 //[success] actual
 model DetallePrecioHoraMO {
   id                  Int             @id @default(autoincrement())
-  codigo              String
   hora_normal         Float
   hora_extra_60       Float
   hora_extra_100      Float
   categoria_obrero_id Int
-  precio_hora_mo      Int
+  precio_hora_mo_id   Int
   eliminado           E_Estado_BD     @default(n)
-  PrecioHoraMO        PrecioHoraMO    @relation(fields: [precio_hora_mo], references: [id])
+  PrecioHoraMO        PrecioHoraMO    @relation(fields: [precio_hora_mo_id], references: [id])
   CategoriaObrero     CategoriaObrero @relation(fields: [categoria_obrero_id], references: [id])
 }
 
