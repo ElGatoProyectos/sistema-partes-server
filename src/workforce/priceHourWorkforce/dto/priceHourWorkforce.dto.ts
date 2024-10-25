@@ -5,7 +5,6 @@ const priceHourWorkforceBodySchema = z.object({
   hora_extra_60: z.number(),
   hora_extra_100: z.number(),
   categoria_obrero_id: z.number(),
-  precio_hora_mo_id: z.number(),
 });
 
 export const priceHourWorkforceSchema = z.object({
