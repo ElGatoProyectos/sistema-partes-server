@@ -96,7 +96,7 @@ class AssistsController {
   }
   async synchronization(request: express.Request, response: express.Response) {
     const project_id = request.get("project-id") as string;
-    const result = await assistsService.findAllWorkforceWithAssists(project_id);
+    const result = await assistsService.synchronization(project_id);
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {

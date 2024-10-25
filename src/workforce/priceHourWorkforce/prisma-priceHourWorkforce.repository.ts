@@ -34,7 +34,11 @@ class PrismaPriceHourWorkforceRepository implements PriceHourRepository {
         proyecto_id: project_id,
       },
       include: {
-        DetallePrecioHoraMO: true,
+        DetallePrecioHoraMO: {
+          include: {
+            CategoriaObrero: true,
+          },
+        },
       },
       skip,
       take: data.queryParams.limit,

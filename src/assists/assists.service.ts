@@ -133,20 +133,21 @@ class AssistsService {
     }
   }
 
-  async findAllWorkforceWithAssists(project_id: string) {
+  async synchronization(project_id: string) {
     try {
       const projectResponse = await projectValidation.findById(+project_id);
       if (!projectResponse.success) {
         return projectResponse;
       }
       const date = new Date();
+      console.log(date);
       const result = await prismaWorkforceRepository.findAllByDate(
         date,
         +project_id
       );
       if (!result || result.length === 0) {
         return httpResponse.BadRequestException(
-          "No se entontro Mano de Obra para crear la asistencia",
+          "No se encontro Mano de Obra para crear la asistencia",
           []
         );
       }
@@ -198,7 +199,7 @@ class AssistsService {
           await workforceValidation.findAllWithPagination(+project_id);
 
         if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
-          return httpResponse.BadRequestException(
+          return httpResponse.SuccessResponse(
             "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
             []
           );
@@ -382,15 +383,19 @@ class AssistsService {
     date: Date,
     project_id: number
   ): Promise<{ success: boolean }> {
+    //[message] se formatea la fecha en la zona horaria local (en formato ISO)
+    const processedDate = new Date(date);
+    processedDate.setDate(processedDate.getDate() - 1);
+
     for (let index = 0; index < workforcesManyResponse.length; index++) {
       let value;
       const valueIsBetweenWeek = 8.5;
       const valueIsEndWeek = 5.5;
-
+      console.log("la fecha en el proceso es " + processedDate);
       value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
 
       const assistsFormat = {
-        fecha: date,
+        fecha: processedDate,
         horas: value,
         horas_60: 0,
         horas_100: 0,
@@ -399,7 +404,7 @@ class AssistsService {
         mano_obra_id: workforcesManyResponse[index].id,
         proyecto_id: project_id,
       };
-
+      console.log(assistsFormat);
       const assistsResponse = await prismaAssistsRepository.createAssists(
         assistsFormat
       );
