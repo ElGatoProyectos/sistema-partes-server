@@ -146,7 +146,11 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         },
       },
       include: {
-        ManoObra: true,
+        ManoObra: {
+          include: {
+            Usuario: true, // Incluye el usuario relacionado con ManoObra
+          },
+        },
       },
       skip,
       take: data.queryParams.limit,
@@ -168,9 +172,11 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
 
     const assistsConverter = assists.map((item) => {
       const { ManoObra, ...ResData } = item;
+      const { Usuario, ...ManoObraData } = ManoObra || {}; // Desestructuramos Usuario de ManoObra
       return {
         Asistencia: ResData,
-        ManoObra: ManoObra,
+        ManoObra: ManoObraData,
+        Responsable: Usuario,
       };
     });
     return { assistsConverter, total };

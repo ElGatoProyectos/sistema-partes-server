@@ -2,7 +2,7 @@ import { authService } from "@/auth/auth.service";
 import express from "@/config/express.config";
 
 import multer from "multer";
-import { departureJobService } from "./departure.service";
+import { departureJobService } from "./departureJob.service";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import {
   I_DepartureJob,
