@@ -133,7 +133,7 @@ class PrismaUserRepository implements UserRepository {
     });
     return user;
   }
-  
+
   async findByDni(dni: string): Promise<Usuario | null> {
     const user = await prisma.usuario.findFirst({
       where: {
@@ -308,68 +308,3 @@ class PrismaUserRepository implements UserRepository {
 }
 
 export const prismaUserRepository = new PrismaUserRepository();
-
-// async getUsersForCompany(
-//   skip: number,
-//   data: T_FindAllUser,
-//   rol: Rol,
-//   company_id: number
-// ): Promise<{ userAll: any[]; total: number }> {
-//   let filters: any = {};
-//   let users: any = [];
-//   let total: any;
-//   if (data.queryParams.name) {
-//     filters.nombre_completo = {
-//       contains: data.queryParams.name,
-//     };
-//   }
-//   if (data.queryParams.estado) {
-//     if (data.queryParams.estado === E_Estado_BD.y) {
-//       filters.estado = E_Estado_BD.y;
-//     } else {
-//       filters.estado = E_Estado_BD.n;
-//     }
-//   }
-//   if (rol) {
-//     filters.rol_id = rol.id;
-//   }
-//   [users, total] = await prisma.$transaction([
-//     prisma.detalleUsuarioEmpresa.findMany({
-//       where: {
-//         empresa_id: company_id,
-//         Usuario: {
-//           ...filters,
-//         },
-//       },
-//       include: {
-//         Usuario: {
-//           include: {
-//             Rol: true,
-//           },
-//         },
-//         Empresa: true,
-//       },
-//       skip,
-//       take: data.queryParams.limit,
-//     }),
-//     prisma.detalleUsuarioEmpresa.count({
-//       where: {
-//         empresa_id: company_id,
-//         Usuario: {
-//           ...filters,
-//         },
-//       },
-//     }),
-//   ]);
-//   const userAll = users.map((item: I_Detalles) => {
-//     const { Usuario, ...company } = item;
-//     const { Empresa } = item;
-//     const { Rol, ...user } = Usuario;
-//     return {
-//       empresa: Empresa,
-//       usuario: user,
-//       rol: Rol,
-//     };
-//   });
-//   return { userAll, total };
-// }

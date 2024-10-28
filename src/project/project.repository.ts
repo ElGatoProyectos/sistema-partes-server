@@ -26,4 +26,6 @@ export abstract class ProjectRepository {
   codeMoreHigh(company_id: number): void {}
   updateColorsProject(project_id: number, data: I_UpdateColorsProject): void {}
   totalProjectsByCompany(company_id: number): void {}
+
+  deleteManyFromProyect(proyect_id:number):void{}
 }
