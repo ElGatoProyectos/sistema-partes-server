@@ -112,9 +112,9 @@ model Permisos {
   seccion_id Int
   accion_id  Int
   rol_id     Int
-  Rol        Rol     @relation(fields: [rol_id], references: [id])
-  Seccion    Seccion @relation(fields: [seccion_id], references: [id])
-  Accion     Accion  @relation(fields: [accion_id], references: [id])
+  Rol        Rol     @relation(fields: [rol_id], references: [id], onDelete: Cascade)
+  Seccion    Seccion @relation(fields: [seccion_id], references: [id], onDelete: Cascade)
+  Accion     Accion  @relation(fields: [accion_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -131,7 +131,7 @@ model Usuario {
   contrasena                String
   fecha_creacion            DateTime                                @default(now())
   rol_id                    Int
-  Rol                       Rol                                     @relation(fields: [rol_id], references: [id])
+  Rol                       Rol                                     @relation(fields: [rol_id], references: [id], onDelete: Cascade)
   Empresa                   Empresa[]
   DetalleUsuarioEmpresa     DetalleUsuarioEmpresa[]
   Partida                   Partida[]
@@ -153,9 +153,9 @@ model DetalleIngenieroProduccionMaestroObra {
   usuario_maestro_obra_id Int
   fecha_creacion          DateTime @default(now())
   proyecto_id             Int
-  Proyecto                Proyecto @relation(fields: [proyecto_id], references: [id])
-  Ingeniero               Usuario  @relation("IngenieroRelation", fields: [usuario_ingeniero_id], references: [id])
-  MaestroObra             Usuario  @relation("MaestroObraRelation", fields: [usuario_maestro_obra_id], references: [id])
+  Proyecto                Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Ingeniero               Usuario  @relation("IngenieroRelation", fields: [usuario_ingeniero_id], references: [id], onDelete: Cascade)
+  MaestroObra             Usuario  @relation("MaestroObraRelation", fields: [usuario_maestro_obra_id], references: [id], onDelete: Cascade)
 }
 
 model DetalleMaestroObraCapataz {
@@ -164,10 +164,10 @@ model DetalleMaestroObraCapataz {
   usuario_capataz_id Int
   fecha_creacion     DateTime @default(now())
   proyecto_id        Int
-  Proyecto           Proyecto @relation(fields: [proyecto_id], references: [id])
-  MaestroDeObra      Usuario  @relation("MaestroDeObra", fields: [usuario_mo_id], references: [id])
-  Capataz            Usuario  @relation("Capataz", fields: [usuario_capataz_id], references: [id])
-  Usuario            Usuario? @relation(fields: [usuarioId], references: [id])
+  Proyecto           Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  MaestroDeObra      Usuario  @relation("MaestroDeObra", fields: [usuario_mo_id], references: [id], onDelete: Cascade)
+  Capataz            Usuario  @relation("Capataz", fields: [usuario_capataz_id], references: [id], onDelete: Cascade)
+  Usuario            Usuario? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId          Int?
 }
 
@@ -177,9 +177,9 @@ model DetalleCapatazJefeGrupo {
   usuario_jefe_grupo_id Int
   fecha_creacion        DateTime @default(now())
   proyecto_id           Int
-  Proyecto              Proyecto @relation(fields: [proyecto_id], references: [id])
-  CapatazJefe           Usuario  @relation("CapatazJefe", fields: [usuario_capataz_id], references: [id])
-  JefeGrupo             Usuario  @relation("JefeGrupo", fields: [usuario_jefe_grupo_id], references: [id])
+  Proyecto              Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  CapatazJefe           Usuario  @relation("CapatazJefe", fields: [usuario_capataz_id], references: [id], onDelete: Cascade)
+  JefeGrupo             Usuario  @relation("JefeGrupo", fields: [usuario_jefe_grupo_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -187,16 +187,16 @@ model DetalleUsuarioEmpresa {
   id         Int     @id @default(autoincrement())
   usuario_id Int
   empresa_id Int
-  Usuario    Usuario @relation(fields: [usuario_id], references: [id])
-  Empresa    Empresa @relation(fields: [empresa_id], references: [id])
+  Usuario    Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  Empresa    Empresa @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
 }
 
 model DetalleUsuarioProyecto {
   id          Int      @id @default(autoincrement())
   usuario_id  Int
   projecto_id Int
-  Usuario     Usuario  @relation(fields: [usuario_id], references: [id])
-  Proyecto    Proyecto @relation(fields: [projecto_id], references: [id])
+  Usuario     Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  Proyecto    Proyecto @relation(fields: [projecto_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -215,7 +215,7 @@ model Empresa {
   fecha_creacion        DateTime                @default(now())
   eliminado             E_Estado_BD             @default(n)
   DetalleUsuarioEmpresa DetalleUsuarioEmpresa[]
-  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   Proyecto              Proyecto[]
   Unidad                Unidad[]
   IndiceUnificado       IndiceUnificado[]
@@ -237,9 +237,9 @@ model DetalleSemanaProyecto {
   empresa_id  Int
   proyecto_id Int
   cierre      Boolean
-  Semana      Semana   @relation(fields: [semana_id], references: [id])
-  Empresa     Empresa  @relation(fields: [empresa_id], references: [id])
-  Proyecto    Proyecto @relation(fields: [proyecto_id], references: [id])
+  Semana      Semana   @relation(fields: [semana_id], references: [id], onDelete: Cascade)
+  Empresa     Empresa  @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
+  Proyecto    Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -299,15 +299,15 @@ model ManoObra {
   usuario_id         Int? // aca es el responsable
 
   proyecto_id                 Int
-  Proyecto                    Proyecto                      @relation(fields: [proyecto_id], references: [id])
-  Usuario                     Usuario?                      @relation(fields: [usuario_id], references: [id])
-  Banco                       Banco?                        @relation(fields: [banco_id], references: [id])
-  Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id])
+  Proyecto                    Proyecto                      @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Usuario                     Usuario?                      @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  Banco                       Banco?                        @relation(fields: [banco_id], references: [id], onDelete: Cascade)
+  Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id], onDelete: Cascade)
   Asistencia                  Asistencia[]
-  CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id])
-  EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id])
-  TipoObrero                  TipoObrero?                   @relation(fields: [tipo_obrero_id], references: [id])
-  OrigenObrero                OrigenObrero?                 @relation(fields: [origen_obrero_id], references: [id])
+  CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id], onDelete: Cascade)
+  EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id], onDelete: Cascade)
+  TipoObrero                  TipoObrero?                   @relation(fields: [tipo_obrero_id], references: [id], onDelete: Cascade)
+  OrigenObrero                OrigenObrero?                 @relation(fields: [origen_obrero_id], references: [id], onDelete: Cascade)
   ParteDiarioMo               ParteDiarioMO[]
   ManoObraDatoLaboral         ManoObraDatoLaboral[]
   ManoObraSemana              ManoObraSemana[]
@@ -324,7 +324,7 @@ model CategoriaObrero {
   fecha_creacion      DateTime              @default(now())
   eliminado           E_Estado_BD           @default(n)
   proyecto_id         Int
-  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObra            ManoObra[]
   DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
@@ -336,7 +336,7 @@ model TipoObrero {
   fecha_creacion DateTime    @default(now())
   eliminado      E_Estado_BD @default(n)
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObra       ManoObra[]
 }
 
@@ -347,7 +347,7 @@ model OrigenObrero {
   fecha_creacion DateTime    @default(now())
   eliminado      E_Estado_BD @default(n)
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObra       ManoObra[]
 }
 
@@ -358,7 +358,7 @@ model EspecialidadObrero {
   fecha_creacion DateTime    @default(now())
   eliminado      E_Estado_BD @default(n)
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObra       ManoObra[]
 }
 
@@ -367,7 +367,7 @@ model Banco {
   nombre      String
   eliminado   E_Estado_BD @default(n)
   proyecto_id Int
-  Proyecto    Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto    Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObra    ManoObra[]
 }
 
@@ -384,7 +384,7 @@ model ManoObraSemana {
   domingo        E_Estado_BD @default(y)
   fecha_creacion DateTime    @default(now())
   mano_obra_id   Int
-  ManoObra       ManoObra    @relation(fields: [mano_obra_id], references: [id])
+  ManoObra       ManoObra    @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[note] modulo futuro
@@ -403,11 +403,11 @@ model ManoObraDatoLaboral {
   fecha_vacaciones_truncas DateTime                       @db.Date
   //afp o onp
   tipo_afiliacion          String
-  PuestoObrero             PuestoObrero                   @relation(fields: [puesto_id], references: [id])
-  DepartamentoObrero       DepartamentoObrero             @relation(fields: [departamento_mo_id], references: [id])
-  AreaObrero               AreaObrero                     @relation(fields: [area_mo_id], references: [id])
-  ManoObra                 ManoObra                       @relation(fields: [mano_obra_id], references: [id])
-  SeccionObrero            SeccionObrero                  @relation(fields: [seccion_id], references: [id])
+  PuestoObrero             PuestoObrero                   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  DepartamentoObrero       DepartamentoObrero             @relation(fields: [departamento_mo_id], references: [id], onDelete: Cascade)
+  AreaObrero               AreaObrero                     @relation(fields: [area_mo_id], references: [id], onDelete: Cascade)
+  ManoObra                 ManoObra                       @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
+  SeccionObrero            SeccionObrero                  @relation(fields: [seccion_id], references: [id], onDelete: Cascade)
 }
 
 //[note] modulo futuro
@@ -438,7 +438,7 @@ model ManoObraComposicionFamiliar {
   incapacitado          E_Estado_BD
   documento_incapacidad String
   mano_obra_id          Int
-  ManoObra              ManoObra             @relation(fields: [mano_obra_id], references: [id])
+  ManoObra              ManoObra             @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[note] modulo futuro
@@ -452,7 +452,7 @@ model ManoObraExperienciaLaboral {
   logros         String?
   fecha_creacion DateTime @default(now())
   mano_obra_id   Int
-  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id])
+  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[note] modulo futuro
@@ -468,7 +468,7 @@ model ManoObraEstudios {
   especialidad   String?
   fecha_creacion DateTime @default(now())
   mano_obra_id   Int
-  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id])
+  ManoObra       ManoObra @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[note] modulo futuro
@@ -485,7 +485,7 @@ model SeccionObrero {
   nombre              String
   fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
-  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObraDatoLaboral ManoObraDatoLaboral[]
 }
 
@@ -495,7 +495,7 @@ model DepartamentoObrero {
   nombre              String
   fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
-  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObraDatoLaboral ManoObraDatoLaboral[]
 }
 
@@ -504,7 +504,7 @@ model AreaObrero {
   id                  Int                   @id @default(autoincrement())
   fecha_creacion      DateTime              @default(now())
   proyecto_id         Int
-  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ManoObraDatoLaboral ManoObraDatoLaboral[]
 }
 
@@ -531,7 +531,7 @@ model Proyecto {
   color_submenu                      String?
   codigo_proyecto                    String
   empresa_id                         Int
-  Empresa                            Empresa                                 @relation(fields: [empresa_id], references: [id])
+  Empresa                            Empresa                                 @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
   UnidadProduccion                   UnidadProduccion[]
   Tren                               Tren[]
   Partida                            Partida[]
@@ -571,15 +571,15 @@ model Combo {
   fecha_creacion   DateTime           @default(now())
   detalle_combo_mo detalle_combo_mo[]
   proyecto_id      Int
-  Proyecto         Proyecto?          @relation(fields: [proyecto_id], references: [id])
+  Proyecto         Proyecto?          @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }
 
 model detalle_combo_mo {
   id       Int      @id @default(autoincrement())
   combo_id Int
   mo_id    Int
-  ManoObra ManoObra @relation(fields: [mo_id], references: [id])
-  Combo    Combo    @relation(fields: [combo_id], references: [id])
+  ManoObra ManoObra @relation(fields: [mo_id], references: [id], onDelete: Cascade)
+  Combo    Combo    @relation(fields: [combo_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -591,7 +591,7 @@ model UnidadProduccion {
   eliminado      E_Estado_BD @default(n)
   fecha_creacion DateTime    @default(now())
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   Trabajo        Trabajo[]
 }
 
@@ -609,7 +609,7 @@ model Tren {
   proyecto_id    Int
   ReporteTren    ReporteTren[]
   Trabajo        Trabajo[]
-  Proyecto       Proyecto      @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto      @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -631,10 +631,10 @@ model Partida {
   unidad_id             Int?
   usuario_id            Int
   proyecto_id           Int
-  Unidad                Unidad?                 @relation(fields: [unidad_id], references: [id])
-  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
+  Unidad                Unidad?                 @relation(fields: [unidad_id], references: [id], onDelete: Cascade)
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   ReportePartida        ReportePartida[]
-  Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
+  Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
 
@@ -659,10 +659,10 @@ model Trabajo {
   up_id                 Int
   proyecto_id           Int
   usuario_id            Int
-  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id])
-  Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id])
-  Tren                  Tren                    @relation(fields: [tren_id], references: [id])
-  UnidadProduccion      UnidadProduccion        @relation(fields: [up_id], references: [id])
+  Usuario               Usuario                 @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Tren                  Tren                    @relation(fields: [tren_id], references: [id], onDelete: Cascade)
+  UnidadProduccion      UnidadProduccion        @relation(fields: [up_id], references: [id], onDelete: Cascade)
   ParteDiario           ParteDiario[]
   DetalleTrabajoPartida DetalleTrabajoPartida[]
 }
@@ -673,8 +673,8 @@ model DetalleTrabajoPartida {
   trabajo_id        Int
   partida_id        Int
   metrado_utilizado Float
-  Trabajo           Trabajo @relation(fields: [trabajo_id], references: [id])
-  Partida           Partida @relation(fields: [partida_id], references: [id])
+  Trabajo           Trabajo @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
+  Partida           Partida @relation(fields: [partida_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -688,11 +688,11 @@ model Recurso {
   unidad_id            Int
   id_unificado         Int
   proyecto_id          Int
-  Proyecto             Proyecto             @relation(fields: [proyecto_id], references: [id])
-  Unidad               Unidad               @relation(fields: [unidad_id], references: [id])
-  IndiceUnificado      IndiceUnificado      @relation(fields: [id_unificado], references: [id])
+  Proyecto             Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Unidad               Unidad               @relation(fields: [unidad_id], references: [id], onDelete: Cascade)
+  IndiceUnificado      IndiceUnificado      @relation(fields: [id_unificado], references: [id], onDelete: Cascade)
   categoria_recurso_id Int
-  CategoriaRecurso     CategoriaRecurso     @relation(fields: [categoria_recurso_id], references: [id])
+  CategoriaRecurso     CategoriaRecurso     @relation(fields: [categoria_recurso_id], references: [id], onDelete: Cascade)
   ParteDiarioRecurso   ParteDiarioRecurso[]
 }
 
@@ -703,8 +703,8 @@ model Unidad {
   simbolo        String?
   empresa_id     Int
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
-  Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Empresa        Empresa     @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
   fecha_creacion DateTime    @default(now())
   eliminado      E_Estado_BD @default(n)
   Partida        Partida[]
@@ -721,8 +721,8 @@ model IndiceUnificado {
   empresa_id     Int
   proyect_id     Int
   fecha_creacion DateTime    @default(now())
-  Proyecto       Proyecto    @relation(fields: [proyect_id], references: [id])
-  Empresa        Empresa     @relation(fields: [empresa_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyect_id], references: [id], onDelete: Cascade)
+  Empresa        Empresa     @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
   Recurso        Recurso[]
   eliminado      E_Estado_BD @default(n)
 }
@@ -734,7 +734,7 @@ model CategoriaRecurso {
   nombre         String
   fecha_creacion DateTime    @default(now())
   proyecto_id    Int
-  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   eliminado      E_Estado_BD @default(n)
   Recurso        Recurso[]
 }
@@ -766,8 +766,8 @@ model Asistencia {
   eliminado           E_Estado_BD            @default(n)
   mano_obra_id        Int
   proyecto_id         Int
-  Proyecto            Proyecto               @relation(fields: [proyecto_id], references: [id])
-  ManoObra            ManoObra               @relation(fields: [mano_obra_id], references: [id])
+  Proyecto            Proyecto               @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  ManoObra            ManoObra               @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -789,9 +789,9 @@ model ParteDiario {
   riesto_parte_diario_id Int
   trabajo_id             Int                  @unique
   proyecto_id            Int
-  Proyecto               Proyecto             @relation(fields: [proyecto_id], references: [id])
-  RiesgoParteDiario      RiesgoParteDiario    @relation(fields: [riesto_parte_diario_id], references: [id])
-  Trabajo                Trabajo              @relation(fields: [trabajo_id], references: [id])
+  Proyecto               Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  RiesgoParteDiario      RiesgoParteDiario    @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
+  Trabajo                Trabajo              @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
   ParteDiarioMo          ParteDiarioMO[]
   ParteDiarioRecurso     ParteDiarioRecurso[]
 }
@@ -804,7 +804,7 @@ model RiesgoParteDiario {
   riesgo         E_Riesgo_BD
   fecha_creacion DateTime           @default(now())
   proyecto_id    Int
-  Proyecto       Proyecto           @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto           @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ParteDiario    ParteDiario[]
 }
 
@@ -821,9 +821,9 @@ model ParteDiarioMO {
   mano_obra_id    Int
   fecha_creacion  DateTime    @default(now())
   proyecto_id     Int
-  Proyecto        Proyecto    @relation(fields: [proyecto_id], references: [id])
-  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
-  ManoObra        ManoObra    @relation(fields: [mano_obra_id], references: [id])
+  Proyecto        Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
+  ManoObra        ManoObra    @relation(fields: [mano_obra_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -833,10 +833,10 @@ model ParteDiarioRecurso {
   recurso_id      Int
   cantidad        Int
   fecha_creacion  DateTime    @default(now())
-  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id])
+  ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
   proyecto_id     Int
-  Proyecto        Proyecto    @relation(fields: [proyecto_id], references: [id])
-  Recurso         Recurso     @relation(fields: [recurso_id], references: [id])
+  Proyecto        Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Recurso         Recurso     @relation(fields: [recurso_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -847,7 +847,7 @@ model PrecioHoraMO {
   fecha_creacion      DateTime              @default(now())
   nombre              String
   proyecto_id         Int
-  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id])
+  Proyecto            Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   DetallePrecioHoraMO DetallePrecioHoraMO[]
 }
 
@@ -883,9 +883,9 @@ model ReporteTren {
   fecha_fin      DateTime @db.Date()
   fecha_creacion DateTime @default(now())
   tren_id        Int
-  Tren           Tren     @relation(fields: [tren_id], references: [id])
+  Tren           Tren     @relation(fields: [tren_id], references: [id], onDelete: Cascade)
   proyecto_id    Int
-  Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual
@@ -897,7 +897,7 @@ model ReportePartida {
   costo_parcial  Float
   fecha_creacion DateTime @default(now())
   partida_id     Int
-  Partida        Partida  @relation(fields: [partida_id], references: [id])
+  Partida        Partida  @relation(fields: [partida_id], references: [id], onDelete: Cascade)
   proyecto_id    Int
-  Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id])
+  Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }

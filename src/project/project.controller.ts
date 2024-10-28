@@ -284,6 +284,14 @@ class ProjectController {
     const result = await projectService.updateStatusProject(idProject);
     response.status(result.statusCode).json(result);
   }
+  async deleteManyFromProyect(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const project_id = request.get("project-id") as string;
+    const result = await projectService.deleteManyFromProyect(+project_id);
+    response.status(result.statusCode).json(result);
+  }
   async updateState(request: express.Request, response: express.Response) {
     const idProject = Number(request.params.id);
     // const data = request.body;

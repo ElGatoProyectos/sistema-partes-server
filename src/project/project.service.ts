@@ -409,6 +409,27 @@ class ProjectService {
     );
   }
 
+  async deleteManyFromProyect(proyect_id: number): Promise<T_HttpResponse> {
+    try {
+      const projectResponse = await projectValidation.findById(proyect_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      await prismaProyectoRepository.deleteManyFromProyect(proyect_id);
+      return httpResponse.SuccessResponse(
+        "Todo relacionado al Proyecto fue eliminado correctamente"
+      );
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        "Error al eliminar todo del Proyecto",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   async updateStatusProject(idProject: number): Promise<T_HttpResponse> {
     try {
       const projectResponse = await projectValidation.findById(idProject);

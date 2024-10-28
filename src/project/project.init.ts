@@ -46,6 +46,11 @@ projectRouter.patch(
   authRoleMiddleware.authAdminUser,
   projectController.updateColors
 );
+//[note] Esto se usa para pruebas, más desde el front
+projectRouter.delete(
+  `${prefix}/remove-all`,
+  projectController.deleteManyFromProyect
+);
 projectRouter.delete(
   `${prefix}/:id`,
   authRoleMiddleware.authAdminUser,
