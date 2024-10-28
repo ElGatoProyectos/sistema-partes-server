@@ -187,18 +187,18 @@ class PrismaProjectRepository implements ProjectRepository {
 
   async deleteManyFromProyect(proyect_id: number) {
     await prisma.detalleUsuarioEmpresa.deleteMany();
-    await prisma.usuario.deleteMany({
-      where: {
-        Rol: {
-          rol: {
-            not: "ADMIN",
-          },
-        },
-      },
-    });
-    await prisma.proyecto.delete({
-      where: { id: proyect_id },
-    });
+    // await prisma.usuario.deleteMany({
+    //   where: {
+    //     Rol: {
+    //       rol: {
+    //         not: "ADMIN",
+    //       },
+    //     },
+    //   },
+    // });
+    // await prisma.proyecto.delete({
+    //   where: { id: proyect_id },
+    // });
   }
 }
 
