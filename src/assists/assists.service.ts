@@ -3,7 +3,6 @@ import prisma from "@/config/prisma.config";
 import {
   Asistencia,
   E_Asistencia_BD,
-  E_Estado_Asistencia_BD,
   E_Estado_BD,
   ManoObra,
 } from "@prisma/client";
@@ -66,58 +65,48 @@ class AssistsService {
           );
         }
       }
+
       if (
         userResponse.Rol?.rol === "ADMIN" ||
         userResponse.Rol?.rol === "USER" ||
         userResponse.Rol?.rol === "CONTROL_COSTOS"
       ) {
-        const result = await prismaAssistsRepository.findAll(
-          skip,
-          data,
-          +project_id
-        );
-
-        return this.createSuccessResponse(result, data.queryParams);
+        return this.findAndResponseWithAssists(+project_id, skip, data);
       } else if (userResponse.Rol?.rol === "INGENIERO_PRODUCCION") {
-        const result = await prismaAssistsRepository.findAll(
+        return this.findAndResponseWithAssists(
+          +project_id,
           skip,
           data,
-          +project_id,
           userResponse.id
         );
-        return this.createSuccessResponse(result, data.queryParams);
       } else if (userResponse.Rol?.rol === "INGENIERO_SSOMMA") {
-        const result = await prismaAssistsRepository.findAll(
+        return this.findAndResponseWithAssists(
+          +project_id,
           skip,
           data,
-          +project_id,
           userResponse.id
         );
-        return this.createSuccessResponse(result, data.queryParams);
       } else if (userResponse.Rol?.rol === "MAESTRO_OBRA") {
-        const result = await prismaAssistsRepository.findAll(
+        return this.findAndResponseWithAssists(
+          +project_id,
           skip,
           data,
-          +project_id,
           userResponse.id
         );
-        return this.createSuccessResponse(result, data.queryParams);
       } else if (userResponse.Rol?.rol === "CAPATAZ") {
-        const result = await prismaAssistsRepository.findAll(
+        return this.findAndResponseWithAssists(
+          +project_id,
           skip,
           data,
-          +project_id,
           userResponse.id
         );
-        return this.createSuccessResponse(result, data.queryParams);
       } else if (userResponse.Rol?.rol === "JEFE_GRUPO") {
-        const result = await prismaAssistsRepository.findAll(
+        return this.findAndResponseWithAssists(
+          +project_id,
           skip,
           data,
-          +project_id,
           userResponse.id
         );
-        return this.createSuccessResponse(result, data.queryParams);
       } else {
         return httpResponse.BadRequestException(
           "No tiene acceso para ver esta sección"
@@ -125,12 +114,59 @@ class AssistsService {
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer las Asistencias",
+        "Error al crear y traer las Asistencias",
         error
       );
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  private async findAndResponseWithAssists(
+    project_id: number,
+    skip: number,
+    data: T_FindAllAssists,
+    user_id?: number
+  ): Promise<T_HttpResponse> {
+    const date = new Date();
+    const peruOffset = -5 * 60;
+
+    const peruDate = new Date(
+      date.getTime() + (date.getTimezoneOffset() + peruOffset) * 60000
+    );
+    peruDate.setUTCHours(0, 0, 0, 0);
+
+    const result = await prismaWorkforceRepository.findAllByDate(
+      peruDate,
+      +project_id
+    );
+
+    if (!result || result.length === 0) {
+      const resultAllAssists = await prismaAssistsRepository.findAll(
+        skip,
+        data,
+        +project_id,
+        user_id
+      );
+      return this.createSuccessResponse(resultAllAssists, data.queryParams);
+    }
+    const assistsResponse = await this.processWorkforceAssists(
+      result,
+      date,
+      +project_id
+    );
+    if (!assistsResponse.success) {
+      return httpResponse.BadRequestException(
+        "Hubo un problema en Crear las asistencias de la Mano de Obra"
+      );
+    }
+    const resultAllAssists = await prismaAssistsRepository.findAll(
+      skip,
+      data,
+      +project_id,
+      user_id
+    );
+    return this.createSuccessResponse(resultAllAssists, data.queryParams);
   }
 
   async synchronization(project_id: string) {
@@ -140,7 +176,6 @@ class AssistsService {
         return projectResponse;
       }
       const date = new Date();
-      console.log(date);
       const result = await prismaWorkforceRepository.findAllByDate(
         date,
         +project_id
@@ -383,15 +418,14 @@ class AssistsService {
     date: Date,
     project_id: number
   ): Promise<{ success: boolean }> {
-    //[message] se formatea la fecha en la zona horaria local (en formato ISO)
     const processedDate = new Date(date.toLocaleDateString("en-CA"));
+    const valueIsBetweenWeek = 8.5;
+    const valueIsEndWeek = 5.5;
+    const value = this.isBetweenWeek(date)
+      ? valueIsBetweenWeek
+      : valueIsEndWeek;
 
-    for (let index = 0; index < workforcesManyResponse.length; index++) {
-      let value;
-      const valueIsBetweenWeek = 8.5;
-      const valueIsEndWeek = 5.5;
-      value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
-
+    const assistsPromises = workforcesManyResponse.map((workforce) => {
       const assistsFormat = {
         fecha: processedDate,
         horas: value,
@@ -399,19 +433,54 @@ class AssistsService {
         horas_100: 0,
         asistencia: E_Asistencia_BD.F,
         horas_extras_estado: E_Estado_BD.n,
-        mano_obra_id: workforcesManyResponse[index].id,
+        mano_obra_id: workforce.id,
         proyecto_id: project_id,
       };
-      const assistsResponse = await prismaAssistsRepository.createAssists(
-        assistsFormat
-      );
-      if (!assistsResponse) {
-        return { success: false };
-      }
-    }
 
-    return { success: true };
+      return prismaAssistsRepository.createAssists(assistsFormat);
+    });
+
+    const assistsResponses = await Promise.all(assistsPromises);
+
+    const success = assistsResponses.every((response) => response !== null);
+
+    return { success };
   }
+
+  // async processWorkforceAssists(
+  //   workforcesManyResponse: any[],
+  //   date: Date,
+  //   project_id: number
+  // ): Promise<{ success: boolean }> {
+  //   //[message] se formatea la fecha en la zona horaria local (en formato ISO)
+  //   const processedDate = new Date(date.toLocaleDateString("en-CA"));
+
+  //   for (let index = 0; index < workforcesManyResponse.length; index++) {
+  //     let value;
+  //     const valueIsBetweenWeek = 8.5;
+  //     const valueIsEndWeek = 5.5;
+  //     value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
+
+  //     const assistsFormat = {
+  //       fecha: processedDate,
+  //       horas: value,
+  //       horas_60: 0,
+  //       horas_100: 0,
+  //       asistencia: E_Asistencia_BD.F,
+  //       horas_extras_estado: E_Estado_BD.n,
+  //       mano_obra_id: workforcesManyResponse[index].id,
+  //       proyecto_id: project_id,
+  //     };
+  //     const assistsResponse = await prismaAssistsRepository.createAssists(
+  //       assistsFormat
+  //     );
+  //     if (!assistsResponse) {
+  //       return { success: false };
+  //     }
+  //   }
+
+  //   return { success: true };
+  // }
   createSuccessResponse(result: any, queryParams: any): T_HttpResponse {
     const { assistsConverter, total } = result;
     const pageCount = Math.ceil(total / queryParams.limit);
@@ -427,7 +496,7 @@ class AssistsService {
       formData
     );
   }
-  verifyState(state: string): Boolean {
+  private verifyState(state: string): Boolean {
     const valoresPosibles = [
       "ASIGNADO",
       "DOBLEMENTE_ASIGNADO",
@@ -436,7 +505,7 @@ class AssistsService {
     ];
     return valoresPosibles.includes(state);
   }
-  isBetweenWeek(date: Date): boolean {
+  private isBetweenWeek(date: Date): boolean {
     const dayWeek = date.getDay(); // Obtiene el día de la semana (0 para domingo, 1 para lunes, etc.)
     return dayWeek >= 1 && dayWeek <= 5; // Lunes (1) a viernes (5)
   }
@@ -448,3 +517,119 @@ class AssistsService {
 }
 
 export const assistsService = new AssistsService();
+
+//[note] este es el viejo codigo que traia las asistencias pero toda la mano de obra dependiendo el rol
+// async findAll(
+//   data: T_FindAllAssists,
+//   project_id: string,
+//   token: string
+// ): Promise<T_HttpResponse> {
+//   try {
+//     const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+//     const userTokenResponse = await jwtService.getUserFromToken(token);
+//     if (!userTokenResponse) return userTokenResponse;
+//     const userResponse = userTokenResponse.payload as I_Usuario;
+//     const resultIdProject = await projectValidation.findById(+project_id);
+//     if (!resultIdProject.success) {
+//       return httpResponse.BadRequestException(
+//         "No se puede crear la Asistencia con el id del Proyecto proporcionado"
+//       );
+//     }
+
+//     const workforcesManyResponse =
+//       await workforceValidation.findAllWithPagination(+project_id);
+
+//     if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
+//       return httpResponse.BadRequestException(
+//         "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
+//         []
+//       );
+//     }
+//     const weekOfTheYear = Array.from({ length: 52 }, (v, i) =>
+//       String(i + 1).padStart(2, "0")
+//     );
+//     if (data.queryParams.week) {
+//       const week = data.queryParams.week as string;
+//       const result = week.split(".");
+//       const dayWeek = result[1];
+//       if (!weekOfTheYear.includes(dayWeek)) {
+//         return httpResponse.BadRequestException(
+//           "No existe la semana que ha pasado"
+//         );
+//       }
+//     }
+
+//     if (data.queryParams.state) {
+//       const valueState = this.verifyState(data.queryParams.state);
+//       if (!valueState) {
+//         return httpResponse.BadRequestException(
+//           "El Estado ingresado de la Asistencia no existe"
+//         );
+//       }
+//     }
+//     if (
+//       userResponse.Rol?.rol === "ADMIN" ||
+//       userResponse.Rol?.rol === "USER" ||
+//       userResponse.Rol?.rol === "CONTROL_COSTOS"
+//     ) {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id
+//       );
+
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else if (userResponse.Rol?.rol === "INGENIERO_PRODUCCION") {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id,
+//         userResponse.id
+//       );
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else if (userResponse.Rol?.rol === "INGENIERO_SSOMMA") {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id,
+//         userResponse.id
+//       );
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else if (userResponse.Rol?.rol === "MAESTRO_OBRA") {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id,
+//         userResponse.id
+//       );
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else if (userResponse.Rol?.rol === "CAPATAZ") {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id,
+//         userResponse.id
+//       );
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else if (userResponse.Rol?.rol === "JEFE_GRUPO") {
+//       const result = await prismaAssistsRepository.findAll(
+//         skip,
+//         data,
+//         +project_id,
+//         userResponse.id
+//       );
+//       return this.createSuccessResponse(result, data.queryParams);
+//     } else {
+//       return httpResponse.BadRequestException(
+//         "No tiene acceso para ver esta sección"
+//       );
+//     }
+//   } catch (error) {
+//     return httpResponse.InternalServerErrorException(
+//       "Error al traer las Asistencias",
+//       error
+//     );
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }

@@ -41,10 +41,12 @@ class WorkforceService {
         return resultIdProject;
       }
 
-      const categoryWorkforceResponse =
-        await categoryWorkforceValidation.findById(data.categoria_obrero_id);
-      if (!categoryWorkforceResponse.success) {
-        return categoryWorkforceResponse;
+      if (data.categoria_obrero_id) {
+        const categoryWorkforceResponse =
+          await categoryWorkforceValidation.findById(data.categoria_obrero_id);
+        if (!categoryWorkforceResponse.success) {
+          return categoryWorkforceResponse;
+        }
       }
 
       let type: any;
@@ -68,12 +70,14 @@ class WorkforceService {
         origin = originResponse.payload as TipoObrero;
       }
 
-      const specialityWorkforceResponse =
-        await specialtyWorkforceValidation.findById(
-          data.especialidad_obrero_id
-        );
-      if (!specialityWorkforceResponse.success) {
-        return specialityWorkforceResponse;
+      if (data.especialidad_obrero_id) {
+        const specialityWorkforceResponse =
+          await specialtyWorkforceValidation.findById(
+            data.especialidad_obrero_id
+          );
+        if (!specialityWorkforceResponse.success) {
+          return specialityWorkforceResponse;
+        }
       }
 
       const workforceDniResponse = await workforceValidation.findByDni(
@@ -141,8 +145,12 @@ class WorkforceService {
         ...data,
         codigo: formattedCodigo,
         telefono: data.telefono,
-        categoria_obrero_id: +data.categoria_obrero_id,
-        especialidad_obrero_id: +data.especialidad_obrero_id,
+        categoria_obrero_id: data.categoria_obrero_id
+          ? +data.categoria_obrero_id
+          : null,
+        especialidad_obrero_id: data.especialidad_obrero_id
+          ? +data.especialidad_obrero_id
+          : null,
         fecha_nacimiento: fecha_nacimiento,
         fecha_inicio: fecha_inicio,
         fecha_cese: fecha_finalizacion,
@@ -186,10 +194,12 @@ class WorkforceService {
         return resultIdProject;
       }
 
-      const categoryWorkforceResponse =
-        await categoryWorkforceValidation.findById(data.categoria_obrero_id);
-      if (!categoryWorkforceResponse.success) {
-        return categoryWorkforceResponse;
+      if (data.categoria_obrero_id) {
+        const categoryWorkforceResponse =
+          await categoryWorkforceValidation.findById(data.categoria_obrero_id);
+        if (!categoryWorkforceResponse.success) {
+          return categoryWorkforceResponse;
+        }
       }
 
       let type: any;
@@ -214,12 +224,14 @@ class WorkforceService {
         origin = originResponse.payload as TipoObrero;
       }
 
-      const specialityWorkforceResponse =
-        await specialtyWorkforceValidation.findById(
-          data.especialidad_obrero_id
-        );
-      if (!specialityWorkforceResponse.success) {
-        return specialityWorkforceResponse;
+      if (data.especialidad_obrero_id) {
+        const specialityWorkforceResponse =
+          await specialtyWorkforceValidation.findById(
+            data.especialidad_obrero_id
+          );
+        if (!specialityWorkforceResponse.success) {
+          return specialityWorkforceResponse;
+        }
       }
 
       if (workforce.documento_identidad != data.documento_identidad) {
@@ -281,8 +293,12 @@ class WorkforceService {
       const workforceFormat = {
         ...data,
         telefono: data.telefono,
-        categoria_obrero_id: +data.categoria_obrero_id,
-        especialidad_obrero_id: +data.especialidad_obrero_id,
+        categoria_obrero_id: data.categoria_obrero_id
+          ? +data.categoria_obrero_id
+          : null,
+        especialidad_obrero_id: data.especialidad_obrero_id
+          ? +data.especialidad_obrero_id
+          : null,
         fecha_nacimiento: fecha_nacimiento,
         fecha_inicio: fecha_inicio,
         fecha_cese: fecha_finalizacion,
@@ -437,13 +453,15 @@ class WorkforceService {
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
           index++;
 
-          const typeResponse = await typeWorkforceValidation.findByName(
-            item.TIPO.trim(),
-            responseProject.id
-          );
-          if (!typeResponse.success) {
-            error++;
-            errorRows.push(index + 1);
+          if (item.TIPO) {
+            const typeResponse = await typeWorkforceValidation.findByName(
+              item.TIPO.trim(),
+              responseProject.id
+            );
+            if (!typeResponse.success) {
+              error++;
+              errorRows.push(index + 1);
+            }
           }
         })
       );
@@ -460,13 +478,15 @@ class WorkforceService {
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
           index++;
 
-          const originResponse = await originWorkforceValidation.findByName(
-            item.ORIGEN.trim(),
-            responseProject.id
-          );
-          if (!originResponse.success) {
-            error++;
-            errorRows.push(index + 1);
+          if (item.ORIGEN) {
+            const originResponse = await originWorkforceValidation.findByName(
+              item.ORIGEN.trim(),
+              responseProject.id
+            );
+            if (!originResponse.success) {
+              error++;
+              errorRows.push(index + 1);
+            }
           }
         })
       );
@@ -483,13 +503,16 @@ class WorkforceService {
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
           index++;
 
-          const categoryResponse = await categoryWorkforceValidation.findByName(
-            item.CATEGORIA.trim(),
-            responseProject.id
-          );
-          if (!categoryResponse.success) {
-            error++;
-            errorRows.push(index + 1);
+          if (item.CATEGORIA) {
+            const categoryResponse =
+              await categoryWorkforceValidation.findByName(
+                item.CATEGORIA.trim(),
+                responseProject.id
+              );
+            if (!categoryResponse.success) {
+              error++;
+              errorRows.push(index + 1);
+            }
           }
         })
       );
@@ -506,14 +529,16 @@ class WorkforceService {
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
           index++;
 
-          const specialtyResponse =
-            await specialtyWorkforceValidation.findByName(
-              item.ESPECIALIDAD.trim(),
-              responseProject.id
-            );
-          if (!specialtyResponse.success) {
-            error++;
-            errorRows.push(index + 1);
+          if (item.ESPECIALIDAD) {
+            const specialtyResponse =
+              await specialtyWorkforceValidation.findByName(
+                item.ESPECIALIDAD.trim(),
+                responseProject.id
+              );
+            if (!specialtyResponse.success) {
+              error++;
+              errorRows.push(index + 1);
+            }
           }
         })
       );
@@ -563,27 +588,41 @@ class WorkforceService {
             workforce.id
           );
         } else {
-          const typeResponse = await typeWorkforceValidation.findByName(
-            item.TIPO.trim(),
-            responseProject.id
-          );
-          const type = typeResponse.payload as TipoObrero;
-          const originResponse = await originWorkforceValidation.findByName(
-            item.ORIGEN.trim(),
-            responseProject.id
-          );
-          const origin = originResponse.payload as OrigenObrero;
-          const categoryResponse = await categoryWorkforceValidation.findByName(
-            item.CATEGORIA,
-            responseProject.id
-          );
-          const category = categoryResponse.payload as CategoriaObrero;
-          const specialtyResponse =
-            await specialtyWorkforceValidation.findByName(
-              item.ESPECIALIDAD,
+          let type = null;
+          if (item.TIPO) {
+            const typeResponse = await typeWorkforceValidation.findByName(
+              item.TIPO.trim(),
               responseProject.id
             );
-          const specialty = specialtyResponse.payload as EspecialidadObrero;
+            type = typeResponse.payload as TipoObrero;
+          }
+          let origin = null;
+          if (item.ORIGEN) {
+            const originResponse = await originWorkforceValidation.findByName(
+              item.ORIGEN.trim(),
+              responseProject.id
+            );
+            origin = originResponse.payload as OrigenObrero;
+          }
+          let category = null;
+          if (item.CATEGORIA) {
+            const categoryResponse =
+              await categoryWorkforceValidation.findByName(
+                item.CATEGORIA,
+                responseProject.id
+              );
+            category = categoryResponse.payload as CategoriaObrero;
+          }
+          let specialty;
+          if (item.ESPECIALIDAD) {
+            const specialtyResponse =
+              await specialtyWorkforceValidation.findByName(
+                item.ESPECIALIDAD,
+                responseProject.id
+              );
+            specialty = specialtyResponse.payload as EspecialidadObrero;
+          }
+
           const unitResponse = await unitValidation.findBySymbol(
             "HH",
             responseProject.id
@@ -627,12 +666,12 @@ class WorkforceService {
               nombre_completo: item.NOMBRES,
               apellido_materno: item["APELLIDO MATERNO"],
               apellido_paterno: item["APELLIDO PATERNO"],
-              tipo_obrero_id: type.id,
-              origen_obrero_id: origin.id,
+              tipo_obrero_id: type ? type.id : type,
+              origen_obrero_id: origin ? origin.id : origin,
               genero: item.GENERO,
               estado_civil: item["ESTADO CIVIL"],
-              categoria_obrero_id: category.id,
-              especialidad_obrero_id: specialty.id,
+              categoria_obrero_id: category ? category.id : category,
+              especialidad_obrero_id: specialty ? specialty.id : specialty,
               unidad_id: unit.id,
               fecha_inicio: item.INGRESO ? inicioDate : null,
               fecha_cese: item.CESE ? endDate : null,
@@ -651,6 +690,7 @@ class WorkforceService {
 
       return httpResponse.SuccessResponse("Empleados creados correctamente!");
     } catch (error) {
+      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer la Mano de Obra",

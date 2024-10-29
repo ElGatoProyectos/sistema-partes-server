@@ -13,23 +13,27 @@ class PrismaDetailPriceHourWorkforceRepository
     price_hour_id: number,
     data: I_UpdateDetailPriceHourWorkforceBD[]
   ) {
-    await Promise.all(
-      data.map(async (detail) => {
-        await prisma.detallePrecioHoraMO.updateMany({
-          where: {
-            categoria_obrero_id: detail.categoria_obrero_id,
-            precio_hora_mo_id: price_hour_id,
-          },
-          data: {
-            hora_normal: detail.hora_normal,
-            hora_extra_60: detail.hora_extra_60,
-            hora_extra_100: detail.hora_extra_100,
-            categoria_obrero_id: detail.categoria_obrero_id,
-            precio_hora_mo_id: price_hour_id,
-          },
-        });
-      })
-    );
+    try {
+      await Promise.all(
+        data.map(async (detail) => {
+          await prisma.detallePrecioHoraMO.updateMany({
+            where: {
+              categoria_obrero_id: detail.categoria_obrero_id,
+              precio_hora_mo_id: price_hour_id,
+            },
+            data: {
+              hora_normal: detail.hora_normal,
+              hora_extra_60: detail.hora_extra_60,
+              hora_extra_100: detail.hora_extra_100,
+              categoria_obrero_id: detail.categoria_obrero_id,
+              precio_hora_mo_id: price_hour_id,
+            },
+          });
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
   async createDetailPriceHourWorkforce(
     data: I_CreateDetailPriceHourWorkforceBD[]

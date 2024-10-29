@@ -24,28 +24,43 @@ class WorkforceValidation {
     workforce_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const typeResponse = await typeWorkforceValidation.findByName(
-        data.TIPO.trim(),
-        project_id
-      );
-      const type = typeResponse.payload as TipoObrero;
-      const originResponse = await originWorkforceValidation.findByName(
-        data.ORIGEN.trim(),
-        project_id
-      );
-      const origin = originResponse.payload as OrigenObrero;
-      const categoryResponse = await categoryWorkforceValidation.findByName(
-        data.CATEGORIA.trim(),
-        project_id
-      );
+      let type = null;
+      if (data.TIPO) {
+        const typeResponse = await typeWorkforceValidation.findByName(
+          data.TIPO.trim(),
+          project_id
+        );
+        type = typeResponse.payload as TipoObrero;
+      }
 
-      const category = categoryResponse.payload as CategoriaObrero;
-      const specialtyResponse = await specialtyWorkforceValidation.findByName(
-        data.ESPECIALIDAD.trim(),
-        project_id
-      );
+      let origin = null;
+      if (data.ORIGEN) {
+        const originResponse = await originWorkforceValidation.findByName(
+          data.ORIGEN.trim(),
+          project_id
+        );
+        origin = originResponse.payload as OrigenObrero;
+      }
+      let category = null;
+      if (data.CATEGORIA) {
+        const categoryResponse = await categoryWorkforceValidation.findByName(
+          data.CATEGORIA.trim(),
+          project_id
+        );
 
-      const specialty = specialtyResponse.payload as EspecialidadObrero;
+        category = categoryResponse.payload as CategoriaObrero;
+      }
+
+      let specialty = null;
+      if (data.ESPECIALIDAD) {
+        const specialtyResponse = await specialtyWorkforceValidation.findByName(
+          data.ESPECIALIDAD.trim(),
+          project_id
+        );
+
+        specialty = specialtyResponse.payload as EspecialidadObrero;
+      }
+
       const unitResponse = await unitValidation.findBySymbol("HH", project_id);
       const unit = unitResponse.payload as Unidad;
 
@@ -72,13 +87,13 @@ class WorkforceValidation {
         nombre_completo: data.NOMBRES,
         apellido_materno: data["APELLIDO MATERNO"],
         apellido_paterno: data["APELLIDO PATERNO"],
-        tipo_obrero_id: type.id,
-        origen_obrero_id: origin.id,
+        tipo_obrero_id: type ? type.id : type,
+        origen_obrero_id: origin ? origin.id : origin,
         contrasena: data.DNI.toString(),
         genero: data.GENERO,
         estado_civil: data["ESTADO CIVIL"],
-        categoria_obrero_id: category.id,
-        especialidad_obrero_id: specialty.id,
+        categoria_obrero_id: category ? category.id : category,
+        especialidad_obrero_id: specialty ? specialty.id : specialty,
         unidad_id: unit.id,
         fecha_inicio: data.INGRESO ? inicioDate : null,
         fecha_cese: data.CESE ? endDate : null,
