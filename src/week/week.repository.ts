@@ -8,4 +8,5 @@ export abstract class WeekRepository {
   findLastWeek(): void {}
   findForDate(date: Date): void {}
   findByCode(code: string): void {}
+  findAllForYear(year: number): void {}
 }

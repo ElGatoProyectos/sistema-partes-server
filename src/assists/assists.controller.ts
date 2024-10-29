@@ -22,8 +22,8 @@ class AssistsController {
     }
   }
   async update(request: express.Request, response: express.Response) {
-    const data = request.body as I_AssistsBody;
     const project_id = request.get("project-id") as string;
+    const mano_obra_id = request.query.mano_obra_id as string;
     const tokenWithBearer = request.headers.authorization as string;
     if (!tokenWithBearer) {
       const result = httpResponse.UnauthorizedException(
@@ -32,7 +32,7 @@ class AssistsController {
       response.status(result.statusCode).json(result);
     }
     const result = await assistsService.update(
-      data,
+      +mano_obra_id,
       project_id,
       tokenWithBearer
     );

@@ -46,6 +46,7 @@ class WeekService {
         const currentEndDate = this.addDays(currentStartDate, 6);
         if (weekNumber > 52) {
           weekNumber = 1;
+          currentYear++;
         }
         week = weekNumber.toString().padStart(2, "0");
         const result = await prismaWeekRepository.createUnit(

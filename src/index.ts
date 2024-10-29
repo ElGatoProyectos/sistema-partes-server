@@ -32,6 +32,7 @@ import bankWorkforce from "./bankWorkforce/bankWorkforce.init";
 import categoryWorkforce from "./categoryWorkforce/categoryWorkforce.init";
 import assistsWorkforce from "./assists/assists.init";
 import priceHourWorkforceRouter from "./workforce/priceHourWorkforce/priceHourWorkforce.init";
+import detailWeekProjectRouter from "./week/detailWeekProject/detailWeekProject.init";
 const globalPrefix = "/api";
 
 const app = express();
@@ -71,6 +72,7 @@ app.use(globalPrefix, bankWorkforce);
 app.use(globalPrefix, categoryWorkforce);
 app.use(globalPrefix, assistsWorkforce);
 app.use(globalPrefix, priceHourWorkforceRouter);
+app.use(globalPrefix, detailWeekProjectRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

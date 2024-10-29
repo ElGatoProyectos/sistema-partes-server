@@ -38,6 +38,9 @@ import { unifiedIndexService } from "@/unifiedIndex/unifiedIndex.service";
 import { resourseCategoryService } from "@/resourseCategory/resourseCategory.service";
 import { detailProjectValidation } from "@/user/detailUserProject/detailUserProject.validation";
 import { prismaDetailUserProjectRepository } from "@/user/detailUserProject/prismaUserProject.repository";
+import { detailWeekProjectValidation } from "@/week/detailWeekProject/detailWeekProject.validation";
+import { weekValidation } from "@/week/week.validation";
+import { detailWeekProjectService } from "@/week/detailWeekProject/detailWeekProject.service";
 
 class ProjectService {
   isNumeric(word: string) {
@@ -198,7 +201,7 @@ class ProjectService {
 
   async updateProject(
     data: I_UpdateProyectBody,
-    idProject: number,
+    project_id: number,
     tokenWithBearer: string
   ): Promise<T_HttpResponse> {
     try {
@@ -219,7 +222,7 @@ class ProjectService {
 
       const company = resultCompany.payload as Empresa;
 
-      const projectResponse = await projectValidation.findById(idProject);
+      const projectResponse = await projectValidation.findById(project_id);
       if (!projectResponse.success) return projectResponse;
       let fecha_creacion = new Date(data.fecha_inicio);
       let fecha_fin = new Date(data.fecha_fin);
@@ -233,7 +236,7 @@ class ProjectService {
 
       const project = await prismaProyectoRepository.updateProject(
         proyectFormat,
-        idProject
+        project_id
       );
       const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.SuccessResponse(
@@ -489,11 +492,11 @@ class ProjectService {
     }
   }
   async updateStateProject(
-    idProject: number,
+    project_id: number,
     project_state: string
   ): Promise<T_HttpResponse> {
     try {
-      const projectResponse = await projectValidation.findById(idProject);
+      const projectResponse = await projectValidation.findById(project_id);
       const estadoEnum = this.stringToProyectoEstado(project_state);
       if (estadoEnum === undefined) {
         return httpResponse.NotFoundException(
@@ -503,8 +506,21 @@ class ProjectService {
       if (!projectResponse.success) {
         return projectResponse;
       } else {
+        const project = projectResponse.payload as Proyecto;
+        if (estadoEnum == "EJECUCION") {
+          const status = await detailWeekProjectValidation.findByIdProject(
+            project_id
+          );
+          if (!status.success) {
+            const detailWeekProjectResponse =
+              await detailWeekProjectService.createDetails(project);
+            if (!detailWeekProjectResponse?.success) {
+              return detailWeekProjectResponse;
+            }
+          }
+        }
         const result = await prismaProyectoRepository.updateStateProject(
-          idProject,
+          project_id,
           estadoEnum
         );
         return httpResponse.SuccessResponse(
