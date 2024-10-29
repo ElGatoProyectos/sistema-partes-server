@@ -275,7 +275,7 @@ class AssistsService {
     }
   }
   async update(
-    data: I_AssistsBody,
+    mano_obra_id: number,
     project_id: string,
     token: string
   ): Promise<T_HttpResponse> {
@@ -296,7 +296,7 @@ class AssistsService {
         }
 
         const workforceResponse = await workforceValidation.findById(
-          data.mano_obra_id
+          mano_obra_id
         );
         if (!workforceResponse.success) {
           return httpResponse.BadRequestException(
@@ -305,16 +305,15 @@ class AssistsService {
         }
 
         const workforce = workforceResponse.payload as ManoObra;
-        const date = new Date();
+       
         const assistsResponse =
           await assistsWorkforceValidation.findByDateAndMO(
-            date,
-            data.mano_obra_id
+            mano_obra_id
           );
 
         if (!assistsResponse.success) {
           return httpResponse.BadRequestException(
-            `No se encontró Asistencia para el día ${date} para ${workforce.nombre_completo} ${workforce.apellido_materno} ${workforce.apellido_paterno}`
+            `No se encontró Asistencia para ${workforce.nombre_completo} ${workforce.apellido_materno} ${workforce.apellido_paterno}`
           );
         }
 

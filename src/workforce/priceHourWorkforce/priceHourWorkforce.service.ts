@@ -145,7 +145,6 @@ class PriceHourWorkforceService {
         priceHourCreated
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al actualizar Precio Hora y su Detalle",
         error

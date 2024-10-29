@@ -38,13 +38,9 @@ class AssistsWorkforceValidation {
       );
     }
   }
-  async findByDateAndMO(
-    date: Date,
-    mano_obra_id: number
-  ): Promise<T_HttpResponse> {
+  async findByDateAndMO(mano_obra_id: number): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.findByIdMoAndDate(
-        date,
         mano_obra_id
       );
       if (!assists)

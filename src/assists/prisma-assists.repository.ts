@@ -52,19 +52,18 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     });
     return assists;
   }
-  async findByIdMoAndDate(
-    date: Date,
-    mano_obra_id: number
-  ): Promise<Asistencia | null> {
-    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+  async findByIdMoAndDate(mano_obra_id: number): Promise<Asistencia | null> {
+    const date = new Date();
+    const peruOffset = -5 * 60;
+
+    const peruDate = new Date(
+      date.getTime() + (date.getTimezoneOffset() + peruOffset) * 60000
+    );
+    peruDate.setUTCHours(0, 0, 0, 0);
 
     const assists = await prisma.asistencia.findFirst({
       where: {
-        fecha: {
-          gte: startOfDay, // Fecha mayor o igual al inicio del día
-          lte: endOfDay, // Fecha menor o igual al fin del día
-        },
+        fecha: peruDate,
         mano_obra_id: mano_obra_id,
         eliminado: E_Estado_BD.n,
       },

@@ -17,9 +17,7 @@ import { userValidation } from "../user/user.validation";
 import { companyValidation } from "./company.validation";
 import { Empresa, Usuario } from "@prisma/client";
 import { emailValid } from "../common/utils/email";
-import { userService } from "../user/user.service";
 import { jwtService } from "../auth/jwt.service";
-import { Console } from "console";
 
 class CompanyService {
   async createCompany(data: I_CreateCompanyBody): Promise<T_HttpResponse> {

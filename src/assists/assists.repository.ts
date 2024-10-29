@@ -17,7 +17,7 @@ export abstract class BankWorkforceRepository {
 
   findByDate(date: Date): void {}
 
-  findByIdMoAndDate(date: Date, mano_obra_id: number): void {}
+  findByIdMoAndDate(mano_obra_id: number): void {}
 
   createAssists(data: I_CreateAssistsWorkforceBD): void {}
 

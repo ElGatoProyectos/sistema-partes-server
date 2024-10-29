@@ -159,9 +159,8 @@ class PrismaJobRepository implements JobRepository {
     const fechaFinalizacionFilter = this.getFechaFinalizacionFilter(
       data.queryParams.fecha_finalizacion
     );
-
     const stateFilter = this.getStateFilter(data.queryParams.state);
-
+    const nameTrain = this.getTrenFilter(data.queryParams.nameTrain);
     const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
       prisma.trabajo.findMany({
         where: {
@@ -170,7 +169,7 @@ class PrismaJobRepository implements JobRepository {
           ...fechaFinalizacionFilter,
           ...stateFilter,
           Tren: {
-            ...filtersTrain,
+            ...nameTrain,
           },
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
@@ -191,7 +190,7 @@ class PrismaJobRepository implements JobRepository {
           ...fechaFinalizacionFilter,
           ...stateFilter,
           Tren: {
-            ...filtersTrain,
+            ...nameTrain,
           },
           eliminado: E_Estado_BD.n,
           proyecto_id: project_id,
@@ -235,76 +234,6 @@ class PrismaJobRepository implements JobRepository {
     if (!nameTrain) return {};
     return { nombre: { contains: nameTrain } };
   }
-  // async findAll(
-  //   skip: number,
-  //   data: T_FindAllJob,
-  //   project_id: number
-  // ): Promise<{ jobs: I_Job[]; total: number }> {
-  //   let filters: any = {};
-  //   let filtersTrain: any = {};
-  //   let fecha_inicio;
-  //   let fecha_finalizacion;
-  //   if (data.queryParams.search) {
-  //     if (isNaN(data.queryParams.search as any)) {
-  //       filters.nombre = {
-  //         contains: data.queryParams.search,
-  //       };
-  //     } else {
-  //       filters.codigo = {
-  //         contains: data.queryParams.search,
-  //       };
-  //     }
-  //   }
-
-  //   if (data.queryParams.fecha_inicio) {
-  //     fecha_inicio = converToDate(data.queryParams.fecha_inicio);
-  //     filters.fecha_inicio = {
-  //       gte: fecha_inicio,
-  //     };
-  //   }
-  //   if (data.queryParams.fecha_finalizacion) {
-  //     fecha_finalizacion = converToDate(data.queryParams.fecha_finalizacion);
-  //     filters.fecha_finalizacion = {
-  //       gte: fecha_finalizacion,
-  //     };
-  //   }
-  //   if (data.queryParams.nameTrain) {
-  //     filtersTrain.nombre = {
-  //       contains: data.queryParams.nameTrain,
-  //     };
-  //   }
-  //   const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
-  //     prisma.trabajo.findMany({
-  //       where: {
-  //         ...filters,
-  //         Tren: {
-  //           ...filtersTrain,
-  //         },
-  //         eliminado: E_Estado_BD.n,
-  //         proyecto_id: project_id,
-  //       },
-  //       skip,
-  //       take: data.queryParams.limit,
-  //       omit: {
-  //         eliminado: true,
-  //       },
-  //       orderBy: {
-  //         codigo: "asc",
-  //       },
-  //     }),
-  //     prisma.trabajo.count({
-  //       where: {
-  //         ...filters,
-  //         Tren: {
-  //           ...filtersTrain,
-  //         },
-  //         eliminado: E_Estado_BD.n,
-  //         proyecto_id: project_id,
-  //       },
-  //     }),
-  //   ]);
-  //   return { jobs, total };
-  // }
 
   async findById(job_id: number): Promise<I_Job | null> {
     const job = await prisma.trabajo.findFirst({
