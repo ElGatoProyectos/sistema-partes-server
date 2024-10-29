@@ -249,8 +249,8 @@ model ManoObra {
   codigo                 String
   documento_identidad    String
   nombre_completo        String
-  categoria_obrero_id    Int
-  especialidad_obrero_id Int
+  categoria_obrero_id    Int?
+  especialidad_obrero_id Int?
   unidad_id              Int
   fecha_inicio           DateTime?       @db.Date //año más dia
   fecha_cese             DateTime?       @db.Date //año más dia
@@ -304,8 +304,8 @@ model ManoObra {
   Banco                       Banco?                        @relation(fields: [banco_id], references: [id], onDelete: Cascade)
   Unidad                      Unidad                        @relation(fields: [unidad_id], references: [id], onDelete: Cascade)
   Asistencia                  Asistencia[]
-  CategoriaObrero             CategoriaObrero               @relation(fields: [categoria_obrero_id], references: [id], onDelete: Cascade)
-  EspecialidadObra            EspecialidadObrero            @relation(fields: [especialidad_obrero_id], references: [id], onDelete: Cascade)
+  CategoriaObrero             CategoriaObrero?              @relation(fields: [categoria_obrero_id], references: [id], onDelete: Cascade)
+  EspecialidadObra            EspecialidadObrero?           @relation(fields: [especialidad_obrero_id], references: [id], onDelete: Cascade)
   TipoObrero                  TipoObrero?                   @relation(fields: [tipo_obrero_id], references: [id], onDelete: Cascade)
   OrigenObrero                OrigenObrero?                 @relation(fields: [origen_obrero_id], references: [id], onDelete: Cascade)
   ParteDiarioMo               ParteDiarioMO[]
