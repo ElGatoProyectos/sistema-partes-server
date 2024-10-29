@@ -61,19 +61,34 @@ class DetailWeekProjectService {
         );
       }
       const weekDate = weekDateResponse.payload as Semana;
-      const modifiedData = result.map((item) => {
+      const detailsNewFormat = result.detailsNewFormat || [];
+      const modifiedData = detailsNewFormat.map((item) => {
         const itemNew = { ...item };
-        if (itemNew.semana_id === weekDate.id) {
+        if (itemNew.semana === weekDate.codigo) {
           return {
             ...itemNew,
-            nuevoCampo: true,
+            actual: true,
           };
         }
         return {
           ...itemNew,
-          nuevoCampo: false,
+          actual: false,
         };
       });
+      // const modifiedData = result.map((item) => {
+      //   const itemNew = { ...item };
+      //   if (itemNew.semana_id === weekDate.id) {
+      //     return {
+      //       ...itemNew,
+      //       esEstaSemana: true,
+      //     };
+      //   }
+      //   return {
+      //     ...itemNew,
+      //     esEstaSemana: false,
+      //   };
+      // });
+
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los Detalles de la Semana del Proyecto",
         modifiedData
