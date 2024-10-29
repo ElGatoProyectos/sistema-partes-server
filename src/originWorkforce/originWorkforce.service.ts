@@ -152,12 +152,13 @@ class OriginWorkforceService {
   }
   async createMasive(project_id: number): Promise<T_HttpResponse> {
     try {
-      const data: any = [];
-      data.push({ nombre: "Apafa", proyecto_id: project_id });
-      data.push({ nombre: "Casa", proyecto_id: project_id });
-      data.push({ nombre: "Comunidad", proyecto_id: project_id });
-      data.push({ nombre: "Externo", proyecto_id: project_id });
-      data.push({ nombre: "Sindicato", proyecto_id: project_id });
+      const data: any = [
+        { nombre: "Apafa", proyecto_id: project_id },
+        { nombre: "Casa", proyecto_id: project_id },
+        { nombre: "Comunidad", proyecto_id: project_id },
+        { nombre: "Externo", proyecto_id: project_id },
+        { nombre: "Sindicato", proyecto_id: project_id },
+      ];
 
       const originWorkforce =
         await prismaOriginWorkforceRepository.createOriginWorkforceMasive(data);

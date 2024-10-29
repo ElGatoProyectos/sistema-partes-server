@@ -14,6 +14,17 @@ class PriceHourWorkforceController {
       response.status(result.statusCode).json(result);
     }
   }
+  async update(request: express.Request, response: express.Response) {
+    const data = request.body as I_PriceHourWorkforce;
+    const project_id = request.get("project-id") as string;
+    const price_hour_id = Number(request.params.id);
+    const result = await priceHourWorkforceService.update(price_hour_id,data, +project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
   async all(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;

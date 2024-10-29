@@ -202,23 +202,23 @@ class CategoryWorkforceService {
   }
   async createMasive(project_id: number): Promise<T_HttpResponse> {
     try {
-      const data: any = [];
-
-      data.push({ nombre: "Administración", proyecto_id: project_id });
-      data.push({ nombre: "Apoyo", proyecto_id: project_id });
-      data.push({ nombre: "Asistente", proyecto_id: project_id });
-      data.push({ nombre: "Ing. Residencia", proyecto_id: project_id });
-      data.push({ nombre: "Ing. Producción", proyecto_id: project_id });
-      data.push({ nombre: "Ing. de Costos", proyecto_id: project_id });
-      data.push({ nombre: "Ing. Medio Ambiente", proyecto_id: project_id });
-      data.push({ nombre: "Ing. SSOMMA", proyecto_id: project_id });
-      data.push({ nombre: "Ing. Valorizaciones", proyecto_id: project_id });
-      data.push({ nombre: "Logística", proyecto_id: project_id });
-      data.push({ nombre: "Oficial", proyecto_id: project_id });
-      data.push({ nombre: "Operario", proyecto_id: project_id });
-      data.push({ nombre: "Peon", proyecto_id: project_id });
-      data.push({ nombre: "Representante Legal", proyecto_id: project_id });
-      data.push({ nombre: "Vigilancia", proyecto_id: project_id });
+      const data: any = [
+        { nombre: "Oficial", proyecto_id: project_id },
+        { nombre: "Operario", proyecto_id: project_id },
+        { nombre: "Peon", proyecto_id: project_id },
+        { nombre: "Administración", proyecto_id: project_id },
+        { nombre: "Apoyo", proyecto_id: project_id },
+        { nombre: "Asistente", proyecto_id: project_id },
+        { nombre: "Ing. Residencia", proyecto_id: project_id },
+        { nombre: "Ing. Producción", proyecto_id: project_id },
+        { nombre: "Ing. de Costos", proyecto_id: project_id },
+        { nombre: "Ing. Medio Ambiente", proyecto_id: project_id },
+        { nombre: "Ing. SSOMMA", proyecto_id: project_id },
+        { nombre: "Ing. Valorizaciones", proyecto_id: project_id },
+        { nombre: "Logística", proyecto_id: project_id },
+        { nombre: "Representante Legal", proyecto_id: project_id },
+        { nombre: "Vigilancia", proyecto_id: project_id },
+      ];
 
       const categoryWorkforce =
         await prismaCategoryWorkforceRepository.createCategoryWorkforceMasive(

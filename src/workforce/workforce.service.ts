@@ -375,14 +375,12 @@ class WorkforceService {
       await Promise.all(
         sheetToJson.map(async (item: I_WorkforceExcel, index: number) => {
           index++;
-          if (
-            item.DNI === undefined ||
-            item.NOMBRES === undefined ||
-            item.CATEGORIA === undefined ||
-            item.ESPECIALIDAD === undefined ||
-            item.TIPO === undefined ||
-            item.ORIGEN === undefined
-          ) {
+          if (item.DNI === undefined || item.NOMBRES === undefined) {
+            //Estaba esto en el if
+            // item.CATEGORIA === undefined ||
+            // item.ESPECIALIDAD === undefined ||
+            // item.TIPO === undefined ||
+            // item.ORIGEN === undefined
             error++;
             errorRows.push(index + 1);
           }
@@ -391,7 +389,7 @@ class WorkforceService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo.El DNI,NOMBRE, TIPO, ORIGEN, CATEGORIA, ESPECIALIDAD son obligatorios.Verificar las filas: ${errorRows.join(
+          `Error al leer el archivo.El DNI,NOMBRE son obligatorios.Verificar las filas: ${errorRows.join(
             ", "
           )}.`
         );

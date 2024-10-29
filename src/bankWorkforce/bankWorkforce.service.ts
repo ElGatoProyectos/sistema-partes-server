@@ -178,16 +178,16 @@ class BankWorkforceService {
   }
   async createMasive(project_id: number): Promise<T_HttpResponse> {
     try {
-      const data: any = [];
-
-      data.push({ nombre: "BAN BINF", proyecto_id: project_id });
-      data.push({ nombre: "BANCO NACION", proyecto_id: project_id });
-      data.push({ nombre: "BBVA", proyecto_id: project_id });
-      data.push({ nombre: "BCP", proyecto_id: project_id });
-      data.push({ nombre: "EFECTIVO", proyecto_id: project_id });
-      data.push({ nombre: "INTERBANK", proyecto_id: project_id });
-      data.push({ nombre: "OTROS", proyecto_id: project_id });
-      data.push({ nombre: "SCOTIABANK", proyecto_id: project_id });
+      const data: any = [
+        { nombre: "BAN BINF", proyecto_id: project_id },
+        { nombre: "BANCO NACION", proyecto_id: project_id },
+        { nombre: "BBVA", proyecto_id: project_id },
+        { nombre: "BCP", proyecto_id: project_id },
+        { nombre: "EFECTIVO", proyecto_id: project_id },
+        { nombre: "INTERBANK", proyecto_id: project_id },
+        { nombre: "OTROS", proyecto_id: project_id },
+        { nombre: "SCOTIABANK", proyecto_id: project_id }
+      ];
 
       const bankWorkforce =
         await prismaBankWorkforceRepository.createBankWorkforceMasive(data);

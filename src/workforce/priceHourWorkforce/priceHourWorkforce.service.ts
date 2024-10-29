@@ -83,6 +83,77 @@ class PriceHourWorkforceService {
       await prisma.$disconnect();
     }
   }
+  async update(
+    price_hour_id: number,
+    data: I_PriceHourWorkforce,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Tren con el id del Proyecto proporcionado"
+        );
+      }
+
+      const fecha_inicio = converToDate(data.fecha_inicio);
+      const fecha_fin = converToDate(data.fecha_fin);
+
+      if (fecha_fin < fecha_inicio) {
+        return httpResponse.BadRequestException(
+          "La fecha de Finalización debe ser mayor o igual a la fecha de inicio"
+        );
+      }
+
+      for (let i = 0; i < data.data.length; i++) {
+        const responseCategoryWorkforce =
+          await categoryWorkforceValidation.findById(
+            +data.data[i].categoria_obrero_id
+          );
+        if (!responseCategoryWorkforce) {
+          return responseCategoryWorkforce;
+        }
+      }
+
+      const priceHourFormat = {
+        fecha_inicio: fecha_inicio,
+        fecha_fin: fecha_fin,
+        nombre: data.nombre,
+        proyecto_id: project_id,
+      };
+      const priceHourCreated =
+        await prismaPriceHourWorkforceRepository.updatePriceHourWorkforce(
+          priceHourFormat,
+          price_hour_id
+        );
+
+      const detallesPrecioHoraMO = data.data.map((item) => ({
+        hora_normal: item.hora_normal,
+        hora_extra_60: item.hora_extra_60,
+        hora_extra_100: item.hora_extra_100,
+        categoria_obrero_id: item.categoria_obrero_id,
+        precio_hora_mo_id: priceHourCreated.id,
+      }));
+
+      await prismaDetailPriceHourWorkforceRepository.updateDetailPriceHourWorkforce(
+        price_hour_id,
+        detallesPrecioHoraMO
+      );
+
+      return httpResponse.CreatedResponse(
+        "Precio Hora y su Detalle actualizado correctamente",
+        priceHourCreated
+      );
+    } catch (error) {
+      console.log(error);
+      return httpResponse.InternalServerErrorException(
+        "Error al actualizar Precio Hora y su Detalle",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 
   async findAll(data: T_FindAllPriceHourWorkforce, project_id: string) {
     try {
