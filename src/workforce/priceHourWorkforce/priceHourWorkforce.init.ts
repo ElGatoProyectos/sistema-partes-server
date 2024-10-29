@@ -13,6 +13,14 @@ priceHourWorkforceRouter.post(
   authRoleMiddleware.authAdminUser,
   priceHourWorkforceController.create
 );
+priceHourWorkforceRouter.put(
+  `${prefix}/:id`,
+  priceHourWorkforceMiddleware.verifyHeadersFieldsId,
+  priceHourWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  priceHourWorkforceMiddleware.verifyFields,
+  authRoleMiddleware.authAdminUser,
+  priceHourWorkforceController.update
+);
 priceHourWorkforceRouter.get(
   `${prefix}`,
   priceHourWorkforceMiddleware.verifyHeadersFieldsIdProject,

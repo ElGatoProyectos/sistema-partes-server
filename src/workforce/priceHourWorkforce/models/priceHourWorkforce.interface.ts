@@ -4,7 +4,7 @@ export interface I_CreatePriceHourWorkforceBD
   extends Omit<PrecioHoraMO, "id" | "fecha_creacion"> {}
 
 export interface I_UpdatePriceHourWorkforceBody
-  extends Omit<PrecioHoraMO, "id"> {}
+  extends Omit<PrecioHoraMO, "id" | "eliminado" | "fecha_creacion"> {}
 
 export interface I_PriceHourWorkforceAll
   extends Omit<PrecioHoraMO, "eliminado"> {}

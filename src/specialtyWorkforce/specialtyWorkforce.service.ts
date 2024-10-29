@@ -193,35 +193,36 @@ class SpecialtyWorkforceService {
   }
   async createMasive(project_id: number): Promise<T_HttpResponse> {
     try {
-      const data: any = [];
-      data.push({ nombre: "Administrador", proyecto_id: project_id });
-      data.push({ nombre: "Albañil", proyecto_id: project_id });
-      data.push({ nombre: "Apoyo", proyecto_id: project_id });
-      data.push({ nombre: "Apoyo-Ayudante", proyecto_id: project_id });
-      data.push({ nombre: "Asistente Logística", proyecto_id: project_id });
-      data.push({ nombre: "Asistente SSOMMA", proyecto_id: project_id });
-      data.push({ nombre: "Carpintero", proyecto_id: project_id });
-      data.push({ nombre: "Control de Costos", proyecto_id: project_id });
-      data.push({ nombre: "Electricista", proyecto_id: project_id });
-      data.push({ nombre: "Fierrero", proyecto_id: project_id });
-      data.push({ nombre: "Gasfitero", proyecto_id: project_id });
-      data.push({
-        nombre: "Ingeniera de Planificación y Control",
-        proyecto_id: project_id,
-      });
-      data.push({
-        nombre: "Ingeniero Medio Ambiente",
-        proyecto_id: project_id,
-      });
-      data.push({ nombre: "Ingeniero SSOMMA", proyecto_id: project_id });
-      data.push({ nombre: "Operaciones", proyecto_id: project_id });
-      data.push({ nombre: "Logística", proyecto_id: project_id });
-      data.push({ nombre: "Maestro de obra", proyecto_id: project_id });
-      data.push({ nombre: "Producción", proyecto_id: project_id });
-      data.push({ nombre: "Representante Legal", proyecto_id: project_id });
-      data.push({ nombre: "Residencia de Obra", proyecto_id: project_id });
-      data.push({ nombre: "Topografo", proyecto_id: project_id });
-      data.push({ nombre: "Vigilancia", proyecto_id: project_id });
+      const data: any = [
+        { nombre: "Administrador", proyecto_id: project_id },
+        { nombre: "Albañil", proyecto_id: project_id },
+        { nombre: "Apoyo", proyecto_id: project_id },
+        { nombre: "Apoyo-Ayudante", proyecto_id: project_id },
+        { nombre: "Asistente Logística", proyecto_id: project_id },
+        { nombre: "Asistente SSOMMA", proyecto_id: project_id },
+        { nombre: "Carpintero", proyecto_id: project_id },
+        { nombre: "Control de Costos", proyecto_id: project_id },
+        { nombre: "Electricista", proyecto_id: project_id },
+        { nombre: "Fierrero", proyecto_id: project_id },
+        { nombre: "Gasfitero", proyecto_id: project_id },
+        {
+          nombre: "Ingeniera de Planificación y Control",
+          proyecto_id: project_id,
+        },
+        {
+          nombre: "Ingeniero Medio Ambiente",
+          proyecto_id: project_id,
+        },
+        { nombre: "Ingeniero SSOMMA", proyecto_id: project_id },
+        { nombre: "Operaciones", proyecto_id: project_id },
+        { nombre: "Logística", proyecto_id: project_id },
+        { nombre: "Maestro de obra", proyecto_id: project_id },
+        { nombre: "Producción", proyecto_id: project_id },
+        { nombre: "Representante Legal", proyecto_id: project_id },
+        { nombre: "Residencia de Obra", proyecto_id: project_id },
+        { nombre: "Topografo", proyecto_id: project_id },
+        { nombre: "Vigilancia", proyecto_id: project_id },
+      ];
 
       const specialtyWorkforce =
         await prismaSpecialtyWorkforceRepository.createSpecialtyWorkforceMasive(

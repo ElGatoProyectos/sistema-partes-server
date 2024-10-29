@@ -202,7 +202,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       const usersNotProductionEngineer =
         await prisma.detalleIngenieroProduccionMaestroObra.findMany({
           where: {
-            usuario_ingeniero_id: user_id,
+            // usuario_ingeniero_id: user_id,
             proyecto_id: project_id,
           },
         });
@@ -212,7 +212,6 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       );
       idsIngenieros.push(user_id);
       ids = idsIngenieros.length > 0 ? idsIngenieros : [];
-
       userAll = await this.getAll(skip, data, ids, project_id, rol_id);
 
       total = await this.totalUsers(project_id, ids, rol_id);
@@ -221,7 +220,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
       const usersNotMasterBuilder =
         await prisma.detalleMaestroObraCapataz.findMany({
           where: {
-            usuario_mo_id: user_id,
+            // usuario_mo_id: user_id,
             proyecto_id: project_id,
           },
         });
@@ -236,7 +235,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     } else if (nameRol === "CAPATAZ") {
       const usersNotForeman = await prisma.detalleCapatazJefeGrupo.findMany({
         where: {
-          usuario_capataz_id: user_id,
+          // usuario_capataz_id: user_id,
           proyecto_id: project_id,
         },
       });
