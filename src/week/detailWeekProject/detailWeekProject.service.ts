@@ -9,31 +9,32 @@ import { converToDate } from "@/common/utils/date";
 class DetailWeekProjectService {
   async createDetails(project: Proyecto): Promise<T_HttpResponse> {
     try {
-      const date = converToDate("2025-09-14 03:00:00.000");
-
+      const date = new Date();
+      date.setUTCHours(0, 0, 0, 0);
       const weekDateResponse = await weekValidation.findByDate(date);
-      console.log(weekDateResponse);
       const weekDate = weekDateResponse.payload as Semana;
-      const weekResponse = await weekValidation.findAll(date.getFullYear());
+      const weekResponse = await weekValidation.findAllForYear(
+        date.getFullYear()
+      );
       const weekAll = weekResponse.payload as Semana[];
 
       let reachedCurrentWeek = false;
-      // for (let index = 0; index < weekAll.length; index++) {
-      //   const isCurrentWeek = weekAll[index].codigo === weekDate.codigo;
+      for (let index = 0; index < weekAll.length; index++) {
+        const isCurrentWeek = weekAll[index].codigo === weekDate.codigo;
 
-      //   if (isCurrentWeek) {
-      //     reachedCurrentWeek = true;
-      //   }
+        if (isCurrentWeek) {
+          reachedCurrentWeek = true;
+        }
 
-      //   const detailFormat = {
-      //     semana_id: weekAll[index].id,
-      //     empresa_id: project.empresa_id,
-      //     proyecto_id: project.id,
-      //     cierre: !reachedCurrentWeek,
-      //   };
+        const detailFormat = {
+          semana_id: weekAll[index].id,
+          empresa_id: project.empresa_id,
+          proyecto_id: project.id,
+          cierre: !reachedCurrentWeek,
+        };
 
-      //   // await prismaDetailWeekProjectRepository.createDetail(detailFormat);
-      // }
+        await prismaDetailWeekProjectRepository.createDetail(detailFormat);
+      }
 
       return httpResponse.SuccessResponse(
         "Se creó correctamente el Detalle Semana Proyecto"
