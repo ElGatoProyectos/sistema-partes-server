@@ -1,5 +1,6 @@
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import { prismaDetailWeekProjectRepository } from "./prisma-detailWeekProject.repository";
+import { I_UpdateDetailWeekProject } from "./models/detailWeekProject.interface";
 
 class DetailWeekProjectValidation {
   async findByIdProject(project_id: number): Promise<T_HttpResponse> {
@@ -20,6 +21,27 @@ class DetailWeekProjectValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar el Detalle Semana Proyecto",
+        error
+      );
+    }
+  }
+  async updateProjectsForYear(
+    data: I_UpdateDetailWeekProject[],
+    week: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDetailWeekProjectRepository.updateDetailMany(
+        data,
+        week
+      );
+
+      return httpResponse.SuccessResponse(
+        "Los Detalles Semana Proyecto del Año fueron modificados",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar los Detalles Semana Proyecto del Año",
         error
       );
     }
