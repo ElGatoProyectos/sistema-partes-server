@@ -97,16 +97,16 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       NO_ASIGNADO: E_Estado_Asistencia_BD.NO_ASIGNADO,
     };
 
-    if (data.queryParams.search) {
-      filtersName.nombre_completo = {
-        contains: data.queryParams.search,
-      };
-    }
-    if (data.queryParams.state) {
-      const result = valuesState[data.queryParams.state];
-      filters.estado_asignacion = result;
-    }
     if (data.queryParams.week) {
+      if (data.queryParams.search) {
+        filtersName.nombre_completo = {
+          contains: data.queryParams.search,
+        };
+      }
+      if (data.queryParams.state) {
+        const result = valuesState[data.queryParams.state];
+        filters.estado_asignacion = result;
+      }
       const weekResponse = await weekValidation.findByCode(
         data.queryParams.week
       );
@@ -123,6 +123,15 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
           new Date(data.queryParams.date).setHours(23, 59, 59, 999)
         ),
       };
+      if (data.queryParams.search) {
+        filtersName.nombre_completo = {
+          contains: data.queryParams.search,
+        };
+      }
+      if (data.queryParams.state) {
+        const result = valuesState[data.queryParams.state];
+        filters.estado_asignacion = result;
+      }
     }
     if (data.queryParams.week && data.queryParams.date) {
       const weekResponse = await weekValidation.findByCode(
@@ -133,7 +142,22 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
         lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
       };
+      if (data.queryParams.search) {
+        filtersName.nombre_completo = {
+          contains: data.queryParams.search,
+        };
+      }
+      if (data.queryParams.state) {
+        const result = valuesState[data.queryParams.state];
+        filters.estado_asignacion = result;
+      }
     }
+    // console.log("-------");
+    // console.log(data.queryParams.week);
+    // console.log(filters);
+    // console.log(filtersName);
+    // console.log(data.queryParams.date);
+
     const assists = await prisma.asistencia.findMany({
       where: {
         ...filters,

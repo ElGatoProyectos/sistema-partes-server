@@ -1,5 +1,5 @@
 export abstract class WeekRepository {
-  createUnit(
+  createWeek(
     weekNumber: string,
     currentStartDate: Date,
     currentEndDate: Date

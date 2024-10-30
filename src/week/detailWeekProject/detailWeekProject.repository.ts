@@ -6,4 +6,10 @@ export abstract class DetailWeekProjectRepository {
   findByIdProject(project_id: number): void {}
 
   findAll(project_id: number): void {}
+
+  findIdWeek(week_id: number): void {}
+
+  updateDetailMany(data: I_CreateDetailWeekProject[]): void {}
+
+  findAllForYear(date: Date): void {}
 }

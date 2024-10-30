@@ -125,62 +125,62 @@ class ProjectService {
         proyectFormat
       );
 
-      //[SUCCESS] Si estuvo todo ok se crea lo siguiente
-      //[NOTE]:  TIPO DE MANO DE OBRA
-      const typeWorkforce = await typeWorkforceService.createMasive(project.id);
-      if (!typeWorkforce.success) {
-        return typeWorkforce;
-      }
-      //[NOTE]:  ORIGEN DE MANO DE OBRA
-      const responseOriginWorkforce = await originWorkforceService.createMasive(
-        project.id
-      );
-      if (!responseOriginWorkforce.success) {
-        return responseOriginWorkforce;
-      }
-      //[NOTE]:  CATEGORIA DE MANO DE OBRA
-      const responseCategoryWorkforce =
-        await categoryWorkforceService.createMasive(project.id);
-      if (!responseCategoryWorkforce.success) {
-        return responseCategoryWorkforce;
-      }
-      //[NOTE]:  ESPECIALIDAD DE MANO DE OBRA
-      const specialtyWorkforce = await specialtyWorkforceService.createMasive(
-        project.id
-      );
-      if (!specialtyWorkforce.success) {
-        return specialtyWorkforce;
-      }
-      //[NOTE]:  UNIDAD QUE LUEGO PUEDE SER USADO POR RECURSOS O MANO DE OBRA
-      const unitReponse = await unitService.createMasive(
-        company.id,
-        project.id
-      );
-      if (!unitReponse.success) {
-        return unitReponse;
-      }
-      //[NOTE]:  TIPOS DE BANCO PARA MANO DE OBRA
-      const responseBankWorkforce = await bankWorkforceService.createMasive(
-        project.id
-      );
-      if (!responseBankWorkforce.success) {
-        return responseBankWorkforce;
-      }
-      //[NOTE]:  INDICE UNIFICADO DE RECURSOS
-      const responseUnifiedIndex = await unifiedIndexService.createMasive(
-        company.id,
-        project.id
-      );
-      if (!responseUnifiedIndex.success) {
-        return responseUnifiedIndex;
-      }
-      //[NOTE]:  CATEGORIA DE LOS RECURSOS
-      const resourcesCategory = await resourseCategoryService.createMasive(
-        project.id
-      );
-      if (!resourcesCategory.success) {
-        return resourcesCategory;
-      }
+      // //[SUCCESS] Si estuvo todo ok se crea lo siguiente
+      // //[NOTE]:  TIPO DE MANO DE OBRA
+      // const typeWorkforce = await typeWorkforceService.createMasive(project.id);
+      // if (!typeWorkforce.success) {
+      //   return typeWorkforce;
+      // }
+      // //[NOTE]:  ORIGEN DE MANO DE OBRA
+      // const responseOriginWorkforce = await originWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!responseOriginWorkforce.success) {
+      //   return responseOriginWorkforce;
+      // }
+      // //[NOTE]:  CATEGORIA DE MANO DE OBRA
+      // const responseCategoryWorkforce =
+      //   await categoryWorkforceService.createMasive(project.id);
+      // if (!responseCategoryWorkforce.success) {
+      //   return responseCategoryWorkforce;
+      // }
+      // //[NOTE]:  ESPECIALIDAD DE MANO DE OBRA
+      // const specialtyWorkforce = await specialtyWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!specialtyWorkforce.success) {
+      //   return specialtyWorkforce;
+      // }
+      // //[NOTE]:  UNIDAD QUE LUEGO PUEDE SER USADO POR RECURSOS O MANO DE OBRA
+      // const unitReponse = await unitService.createMasive(
+      //   company.id,
+      //   project.id
+      // );
+      // if (!unitReponse.success) {
+      //   return unitReponse;
+      // }
+      // //[NOTE]:  TIPOS DE BANCO PARA MANO DE OBRA
+      // const responseBankWorkforce = await bankWorkforceService.createMasive(
+      //   project.id
+      // );
+      // if (!responseBankWorkforce.success) {
+      //   return responseBankWorkforce;
+      // }
+      // //[NOTE]:  INDICE UNIFICADO DE RECURSOS
+      // const responseUnifiedIndex = await unifiedIndexService.createMasive(
+      //   company.id,
+      //   project.id
+      // );
+      // if (!responseUnifiedIndex.success) {
+      //   return responseUnifiedIndex;
+      // }
+      // //[NOTE]:  CATEGORIA DE LOS RECURSOS
+      // const resourcesCategory = await resourseCategoryService.createMasive(
+      //   project.id
+      // );
+      // if (!resourcesCategory.success) {
+      //   return resourcesCategory;
+      // }
 
       const projectMapper = new ProjectResponseMapper(project);
       return httpResponse.CreatedResponse(
@@ -421,7 +421,6 @@ class ProjectService {
         "Todo relacionado al Proyecto fue eliminado correctamente"
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al eliminar todo del Proyecto",
         error
@@ -496,11 +495,7 @@ class ProjectService {
     try {
       const projectResponse = await projectValidation.findById(project_id);
       const estadoEnum = this.stringToProyectoEstado(project_state);
-      if (estadoEnum === undefined) {
-        return httpResponse.NotFoundException(
-          "El estado ingresado del proyecto no coincide con las opciones"
-        );
-      }
+
       if (!projectResponse.success) {
         return projectResponse;
       } else {

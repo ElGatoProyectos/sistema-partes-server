@@ -113,6 +113,7 @@ class AssistsService {
         );
       }
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear y traer las Asistencias",
         error
@@ -305,11 +306,9 @@ class AssistsService {
         }
 
         const workforce = workforceResponse.payload as ManoObra;
-       
+
         const assistsResponse =
-          await assistsWorkforceValidation.findByDateAndMO(
-            mano_obra_id
-          );
+          await assistsWorkforceValidation.findByDateAndMO(mano_obra_id);
 
         if (!assistsResponse.success) {
           return httpResponse.BadRequestException(
