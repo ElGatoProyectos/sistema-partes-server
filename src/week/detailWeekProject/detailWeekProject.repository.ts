@@ -1,4 +1,7 @@
-import { I_CreateDetailWeekProject } from "./models/detailWeekProject.interface";
+import {
+  I_CreateDetailWeekProject,
+  I_UpdateDetailWeekProject,
+} from "./models/detailWeekProject.interface";
 
 export abstract class DetailWeekProjectRepository {
   createDetail(data: I_CreateDetailWeekProject): void {}
@@ -9,7 +12,7 @@ export abstract class DetailWeekProjectRepository {
 
   findIdWeek(week_id: number): void {}
 
-  updateDetailMany(data: I_CreateDetailWeekProject[]): void {}
+  updateDetailMany(data: I_UpdateDetailWeekProject[], week: number): void {}
 
   findAllForYear(date: Date): void {}
 }
