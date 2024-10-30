@@ -33,14 +33,11 @@ class WeekService {
   addDays(date: Date, days: number): Date {
     const newDate = new Date(date);
     newDate.setDate(newDate.getDate() + days);
-    newDate.setHours(0);
-    newDate.setMinutes(0);
-    newDate.setSeconds(0);
     return newDate;
   }
   async createWeekThisYearAndNext(year: number) {
     try {
-      let currentStartDate = new Date(year, 0, 1, 0, 0, 0); // Año, mes (0 es enero), día (1)
+      let currentStartDate = new Date(year, 0, 1); // Año, mes (0 es enero), día (1)
       let weekNumber = 1;
       let week;
       for (let i = 0; i < 104; i++) {
@@ -54,8 +51,8 @@ class WeekService {
         week = weekNumber.toString().padStart(2, "0");
         const result = await prismaWeekRepository.createWeek(
           String(currentYear) + "." + week,
-          currentStartDate,
-          currentEndDate
+          new Date(currentStartDate.setUTCHours(0, 0, 0, 0)), // Fecha de inicio con horas en cero
+          new Date(currentEndDate.setUTCHours(0, 0, 0, 0)) // Fecha de fin con horas en cero
         );
         if (!result) {
           return httpResponse.InternalServerErrorException(

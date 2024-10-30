@@ -41,7 +41,7 @@ class WeekValidation {
       );
     }
   }
-  async findAll(year: number): Promise<T_HttpResponse> {
+  async findAllForYear(year: number): Promise<T_HttpResponse> {
     try {
       const weekResponse = await prismaWeekRepository.findAllForYear(year);
 

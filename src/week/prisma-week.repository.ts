@@ -25,18 +25,10 @@ class PrismaWeekRepository implements WeekRepository {
     return week;
   }
   async findForDate(date: Date): Promise<Semana | null> {
-    const dateIn = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDay(),
-      0,
-      0,
-      0
-    ); // Primer día de enero
     const week = await prisma.semana.findFirst({
       where: {
         fecha_inicio: {
-          lte: dateIn, // Menor o igual a la fecha de búsqueda
+          lte: date, // Menor o igual a la fecha de búsqueda
         },
         fecha_fin: {
           gte: date, // Mayor o igual a la fecha de búsqueda

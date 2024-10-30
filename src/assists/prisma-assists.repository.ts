@@ -88,7 +88,10 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     project_id: number,
     responsible_id?: number
   ): Promise<{ assistsConverter: any[]; total: number }> {
+    const peruDate = new Date();
+    peruDate.setUTCHours(0, 0, 0, 0);
     let filters: any = {};
+    filters.fecha = peruDate;
     let filtersName: any = {};
     const valuesState: { [key: string]: string } = {
       ASIGNADO: E_Estado_Asistencia_BD.ASIGNADO,
@@ -96,6 +99,26 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       FALTA: E_Estado_Asistencia_BD.FALTA,
       NO_ASIGNADO: E_Estado_Asistencia_BD.NO_ASIGNADO,
     };
+
+    if (
+      data.queryParams.search &&
+      !data.queryParams.date &&
+      !data.queryParams.week
+    ) {
+      filters.fecha = peruDate;
+      filtersName.nombre_completo = {
+        contains: data.queryParams.search,
+      };
+    }
+    if (
+      data.queryParams.state &&
+      !data.queryParams.date &&
+      !data.queryParams.week
+    ) {
+      filters.fecha = peruDate;
+      const result = valuesState[data.queryParams.state];
+      filters.estado_asignacion = result;
+    }
 
     if (data.queryParams.week) {
       if (data.queryParams.search) {
@@ -152,11 +175,6 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         filters.estado_asignacion = result;
       }
     }
-    // console.log("-------");
-    // console.log(data.queryParams.week);
-    // console.log(filters);
-    // console.log(filtersName);
-    // console.log(data.queryParams.date);
 
     const assists = await prisma.asistencia.findMany({
       where: {
