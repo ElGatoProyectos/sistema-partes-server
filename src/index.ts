@@ -33,6 +33,7 @@ import categoryWorkforce from "./categoryWorkforce/categoryWorkforce.init";
 import assistsWorkforce from "./assists/assists.init";
 import priceHourWorkforceRouter from "./workforce/priceHourWorkforce/priceHourWorkforce.init";
 import detailWeekProjectRouter from "./week/detailWeekProject/detailWeekProject.init";
+import { automaticTask } from "./config/cron.config";
 const globalPrefix = "/api";
 
 const app = express();
@@ -76,4 +77,5 @@ app.use(globalPrefix, detailWeekProjectRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);
+  automaticTask();
 });
