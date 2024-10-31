@@ -296,25 +296,54 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         eliminado: true,
       },
     });
-    const total = await prisma.asistencia.count({
-      where: {
-        ...filters,
-        eliminado: E_Estado_BD.n,
-        proyecto_id: project_id,
-        ManoObra: {
-          ...filtersName,
-        },
-      },
-    });
-    const assistsConverter = assists.map((item) => {
+
+    const assistsMap = new Map();
+    assists.forEach((item) => {
       const { ManoObra, ...ResData } = item;
-      const { Usuario, ...ManoObraData } = ManoObra || {}; // Desestructuramos Usuario de ManoObra
-      return {
-        Asistencia: ResData,
-        ManoObra: ManoObraData,
-        Responsable: Usuario,
-      };
+      const { Usuario, ...ManoObraData } = ManoObra || {};
+      const key = ManoObraData.id;
+
+      if (!assistsMap.has(key)) {
+        assistsMap.set(key, {
+          ManoObra: ManoObraData,
+          Lunes: "F",
+          Martes: "F",
+          Miercoles: "F",
+          Jueves: "F",
+          Viernes: "F",
+          Sabado: "F",
+          Domingo: "F",
+        });
+      }
+
+      const dayMap = assistsMap.get(key);
+      switch (ResData.fecha.getDay()) {
+        case 1:
+          dayMap.Lunes = ResData.asistencia;
+          break;
+        case 2:
+          dayMap.Martes = ResData.asistencia;
+          break;
+        case 3:
+          dayMap.Miercoles = ResData.asistencia;
+          break;
+        case 4:
+          dayMap.Jueves = ResData.asistencia;
+          break;
+        case 5:
+          dayMap.Viernes = ResData.asistencia;
+          break;
+        case 6:
+          dayMap.Sabado = ResData.asistencia;
+          break;
+        case 0:
+          dayMap.Domingo = ResData.asistencia;
+          break;
+      }
     });
+
+    const assistsConverter = Array.from(assistsMap.values());
+    let total = assistsConverter.length;
     return { assistsConverter, total };
   }
   async findById(assists_id: number): Promise<I_AssistsWorkforce | null> {
