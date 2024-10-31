@@ -117,6 +117,7 @@ class AssistsController {
       project_id,
       tokenWithBearer
     );
+
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {

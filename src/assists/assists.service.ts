@@ -125,7 +125,19 @@ class AssistsService {
         data,
         +project_id
       );
-      return this.createSuccessResponse(resultAllAssists, data.queryParams);
+      const { assistsConverter, total } = resultAllAssists;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        limit: data.queryParams.limit,
+        pageCount,
+        data: assistsConverter,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todas las Asistencias ya que existen",
+        formData
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Asistencia de la Semana ",
