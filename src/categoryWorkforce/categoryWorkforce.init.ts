@@ -10,7 +10,13 @@ categoryWorkforce.post(
   `${prefix}`,
   categoryWorkforceMiddleware.verifyHeadersFieldsIdProject,
   categoryWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   categoryWorkforceController.create
 );
 categoryWorkforce.put(
@@ -18,25 +24,49 @@ categoryWorkforce.put(
   categoryWorkforceMiddleware.verifyHeadersFieldsId,
   categoryWorkforceMiddleware.verifyHeadersFieldsIdProject,
   categoryWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   categoryWorkforceController.update
 );
 categoryWorkforce.delete(
   `${prefix}/:id`,
   categoryWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   categoryWorkforceController.updateStatus
 );
 categoryWorkforce.get(
   `${prefix}`,
   categoryWorkforceMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   categoryWorkforceController.all
 );
 categoryWorkforce.get(
   `${prefix}/:id`,
   categoryWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   categoryWorkforceController.findById
 );
 

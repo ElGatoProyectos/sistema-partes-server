@@ -8,3 +8,11 @@ export type T_FindAllAssists = {
     date: string;
   };
 };
+export type T_FindAllWeekAssists = {
+  queryParams: {
+    page: number;
+    limit: number;
+    search: string;
+    week: string;
+  };
+};

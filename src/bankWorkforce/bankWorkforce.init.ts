@@ -10,7 +10,13 @@ bankWorkforce.post(
   `${prefix}`,
   bankWorkforceMiddleware.verifyHeadersFieldsIdProject,
   bankWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   bankWorkforceController.create
 );
 bankWorkforce.put(
@@ -18,19 +24,35 @@ bankWorkforce.put(
   bankWorkforceMiddleware.verifyHeadersFieldsId,
   bankWorkforceMiddleware.verifyHeadersFieldsIdProject,
   bankWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   bankWorkforceController.update
 );
 bankWorkforce.delete(
   `${prefix}/:id`,
   bankWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   bankWorkforceController.updateStatus
 );
 bankWorkforce.get(
   `${prefix}`,
   bankWorkforceMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   bankWorkforceController.all
 );
 bankWorkforce.get(

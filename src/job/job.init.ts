@@ -10,27 +10,49 @@ const prefix = "/job";
 jobRouter.post(
   `${prefix}`,
   jobMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   jobController.create
 );
 jobRouter.get(
   `${prefix}`,
   jobMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   jobController.allJobs
 );
 
 jobRouter.delete(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   jobController.updateStatus
 );
 
 jobRouter.get(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   jobController.findById
 );
 
@@ -38,14 +60,24 @@ jobRouter.put(
   `${prefix}/:id`,
   jobMiddleware.verifyHeadersFieldsId,
   jobMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   jobController.update
 );
 
 jobRouter.post(
   `${prefix}/upload-excel`,
   jobMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   jobController.jobReadExcel
 );
 

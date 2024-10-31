@@ -11,7 +11,12 @@ unifiedIndexRouter.post(
   `${prefix}`,
   unifiedIndexMiddleware.verifyFieldsRegistry,
   unifiedIndexMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   unifiedIndexController.create
 );
 //te va a dar error xq le falta lo de project-id

@@ -10,7 +10,7 @@ import { workforceValidation } from "@/workforce/workforce.validation";
 import { projectValidation } from "@/project/project.validation";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
 import { assistsWorkforceValidation } from "./assists.validation";
-import { T_FindAllAssists } from "./models/assists.types";
+import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
 import { jwtService } from "@/auth/jwt.service";
 import { I_Usuario } from "@/user/models/user.interface";
 import { I_AssistsBody } from "./models/assists.interface";
@@ -69,53 +69,66 @@ class AssistsService {
       if (
         userResponse.Rol?.rol === "ADMIN" ||
         userResponse.Rol?.rol === "USER" ||
-        userResponse.Rol?.rol === "CONTROL_COSTOS"
+        userResponse.Rol?.rol === "GERENTE_PROYECTO" ||
+        userResponse.Rol?.rol === "CONTROL_COSTOS" ||
+        userResponse.Rol?.rol === "ASISTENTE_CONTROL_COSTOS"
       ) {
         return this.findAndResponseWithAssists(+project_id, skip, data);
-      } else if (userResponse.Rol?.rol === "INGENIERO_PRODUCCION") {
-        return this.findAndResponseWithAssists(
-          +project_id,
-          skip,
-          data,
-          userResponse.id
-        );
-      } else if (userResponse.Rol?.rol === "INGENIERO_SSOMMA") {
-        return this.findAndResponseWithAssists(
-          +project_id,
-          skip,
-          data,
-          userResponse.id
-        );
-      } else if (userResponse.Rol?.rol === "MAESTRO_OBRA") {
-        return this.findAndResponseWithAssists(
-          +project_id,
-          skip,
-          data,
-          userResponse.id
-        );
-      } else if (userResponse.Rol?.rol === "CAPATAZ") {
-        return this.findAndResponseWithAssists(
-          +project_id,
-          skip,
-          data,
-          userResponse.id
-        );
-      } else if (userResponse.Rol?.rol === "JEFE_GRUPO") {
-        return this.findAndResponseWithAssists(
-          +project_id,
-          skip,
-          data,
-          userResponse.id
-        );
       } else {
-        return httpResponse.BadRequestException(
-          "No tiene acceso para ver esta sección"
+        return this.findAndResponseWithAssists(
+          +project_id,
+          skip,
+          data,
+          userResponse.id
         );
       }
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear y traer las Asistencias",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAllForWeek(
+    data: T_FindAllWeekAssists,
+    project_id: string,
+    token: string
+  ): Promise<T_HttpResponse> {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear la Asistencia con el id del Proyecto proporcionado"
+        );
+      }
+
+      const weekOfTheYear = Array.from({ length: 52 }, (v, i) =>
+        String(i + 1).padStart(2, "0")
+      );
+      if (data.queryParams.week) {
+        const week = data.queryParams.week as string;
+        const result = week.split(".");
+        const dayWeek = result[1];
+        if (!weekOfTheYear.includes(dayWeek)) {
+          return httpResponse.BadRequestException(
+            "No existe la semana que ha pasado"
+          );
+        }
+      }
+
+      const resultAllAssists = await prismaAssistsRepository.findAllByWeek(
+        skip,
+        data,
+        +project_id
+      );
+      return this.createSuccessResponse(resultAllAssists, data.queryParams);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia de la Semana ",
         error
       );
     } finally {
@@ -217,55 +230,43 @@ class AssistsService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as I_Usuario;
 
-      if (
-        userResponse.Rol?.rol === "ADMIN" ||
-        userResponse.Rol?.rol === "USER" ||
-        userResponse.Rol?.rol === "CONTROL_COSTOS"
-      ) {
-        const resultIdProject = await projectValidation.findById(+project_id);
-        if (!resultIdProject.success) {
-          return httpResponse.BadRequestException(
-            "No se puede crear la Asistencia con el id del Proyecto proporcionado"
-          );
-        }
-
-        const date = new Date();
-        const verifyDate = await assistsWorkforceValidation.findByDate(date);
-        const workforcesManyResponse =
-          await workforceValidation.findAllWithPagination(+project_id);
-
-        if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
-          return httpResponse.SuccessResponse(
-            "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
-            []
-          );
-        }
-
-        if (verifyDate.success) {
-          return httpResponse.BadRequestException(
-            "Ya se realizó la asistencia para este día"
-          );
-        }
-
-        const assistsResponse = await this.processWorkforceAssists(
-          workforcesManyResponse,
-          date,
-          +project_id
-        );
-        if (!assistsResponse.success) {
-          return httpResponse.BadRequestException(
-            "Hubo un problema en crear las asistencias de la Mano de Obra"
-          );
-        }
-
-        return httpResponse.CreatedResponse(
-          "Asistencias creadas correctamente"
-        );
-      } else {
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "Usted no tiene acceso para la creación de la Asistencia"
+          "No se puede crear la Asistencia con el id del Proyecto proporcionado"
         );
       }
+
+      const date = new Date();
+      const verifyDate = await assistsWorkforceValidation.findByDate(date);
+      const workforcesManyResponse =
+        await workforceValidation.findAllWithPagination(+project_id);
+
+      if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
+        return httpResponse.SuccessResponse(
+          "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
+          []
+        );
+      }
+
+      if (verifyDate.success) {
+        return httpResponse.BadRequestException(
+          "Ya se realizó la asistencia para este día"
+        );
+      }
+
+      const assistsResponse = await this.processWorkforceAssists(
+        workforcesManyResponse,
+        date,
+        +project_id
+      );
+      if (!assistsResponse.success) {
+        return httpResponse.BadRequestException(
+          "Hubo un problema en crear las asistencias de la Mano de Obra"
+        );
+      }
+
+      return httpResponse.CreatedResponse("Asistencias creadas correctamente");
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al crear la asistencia",
@@ -284,60 +285,52 @@ class AssistsService {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as I_Usuario;
-      if (
-        userResponse.Rol?.rol === "ADMIN" ||
-        userResponse.Rol?.rol === "USER" ||
-        userResponse.Rol?.rol === "CONTROL_COSTOS"
-      ) {
-        const resultIdProject = await projectValidation.findById(+project_id);
-        if (!resultIdProject.success) {
-          return httpResponse.BadRequestException(
-            "No se puede actualizar la Asistencia con el id del Proyecto proporcionado"
-          );
-        }
 
-        const workforceResponse = await workforceValidation.findById(
-          mano_obra_id
-        );
-        if (!workforceResponse.success) {
-          return httpResponse.BadRequestException(
-            "No se encontró el id de la Mano de Obra que quiere actualizar"
-          );
-        }
-
-        const workforce = workforceResponse.payload as ManoObra;
-
-        const assistsResponse =
-          await assistsWorkforceValidation.findByDateAndMO(mano_obra_id);
-
-        if (!assistsResponse.success) {
-          return httpResponse.BadRequestException(
-            `No se encontró Asistencia para ${workforce.nombre_completo} ${workforce.apellido_materno} ${workforce.apellido_paterno}`
-          );
-        }
-
-        const assists = assistsResponse.payload as Asistencia;
-
-        const valuesAssists: { [key: string]: E_Asistencia_BD } = {
-          A: E_Asistencia_BD.F,
-          F: E_Asistencia_BD.A,
-        };
-        const resultValue = valuesAssists[assists.asistencia];
-
-        const updateAssists = await prismaAssistsRepository.updateAssists(
-          assists.id,
-          resultValue
-        );
-
-        return httpResponse.CreatedResponse(
-          "Asistencia actualizada correctamente",
-          updateAssists
-        );
-      } else {
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "Usted no tiene acceso para actualizar la Asistencia"
+          "No se puede actualizar la Asistencia con el id del Proyecto proporcionado"
         );
       }
+
+      const workforceResponse = await workforceValidation.findById(
+        mano_obra_id
+      );
+      if (!workforceResponse.success) {
+        return httpResponse.BadRequestException(
+          "No se encontró el id de la Mano de Obra que quiere actualizar"
+        );
+      }
+
+      const workforce = workforceResponse.payload as ManoObra;
+
+      const assistsResponse = await assistsWorkforceValidation.findByDateAndMO(
+        mano_obra_id
+      );
+
+      if (!assistsResponse.success) {
+        return httpResponse.BadRequestException(
+          `No se encontró Asistencia para ${workforce.nombre_completo} ${workforce.apellido_materno} ${workforce.apellido_paterno}`
+        );
+      }
+
+      const assists = assistsResponse.payload as Asistencia;
+
+      const valuesAssists: { [key: string]: E_Asistencia_BD } = {
+        A: E_Asistencia_BD.F,
+        F: E_Asistencia_BD.A,
+      };
+      const resultValue = valuesAssists[assists.asistencia];
+
+      const updateAssists = await prismaAssistsRepository.updateAssists(
+        assists.id,
+        resultValue
+      );
+
+      return httpResponse.CreatedResponse(
+        "Asistencia actualizada correctamente",
+        updateAssists
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al actualizar la Asistencia",
@@ -355,29 +348,21 @@ class AssistsService {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as I_Usuario;
-      if (
-        userResponse.Rol?.rol === "ADMIN" ||
-        userResponse.Rol?.rol === "USER" ||
-        userResponse.Rol?.rol === "CONTROL_COSTOS"
-      ) {
-        const resultAsssits = await assistsWorkforceValidation.findById(
-          assists_id
-        );
-        if (!resultAsssits.success) {
-          return resultAsssits;
-        }
 
-        const responseAssists =
-          await prismaAssistsRepository.updateStatusAssists(assists_id);
-        return httpResponse.CreatedResponse(
-          "Asistencia eliminada correctamente",
-          responseAssists
-        );
-      } else {
-        return httpResponse.BadRequestException(
-          "Usted no tiene acceso para eliminar la Asistencia"
-        );
+      const resultAsssits = await assistsWorkforceValidation.findById(
+        assists_id
+      );
+      if (!resultAsssits.success) {
+        return resultAsssits;
       }
+
+      const responseAssists = await prismaAssistsRepository.updateStatusAssists(
+        assists_id
+      );
+      return httpResponse.CreatedResponse(
+        "Asistencia eliminada correctamente",
+        responseAssists
+      );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al eliminar la Asistencia",
@@ -445,40 +430,6 @@ class AssistsService {
     return { success };
   }
 
-  // async processWorkforceAssists(
-  //   workforcesManyResponse: any[],
-  //   date: Date,
-  //   project_id: number
-  // ): Promise<{ success: boolean }> {
-  //   //[message] se formatea la fecha en la zona horaria local (en formato ISO)
-  //   const processedDate = new Date(date.toLocaleDateString("en-CA"));
-
-  //   for (let index = 0; index < workforcesManyResponse.length; index++) {
-  //     let value;
-  //     const valueIsBetweenWeek = 8.5;
-  //     const valueIsEndWeek = 5.5;
-  //     value = this.isBetweenWeek(date) ? valueIsBetweenWeek : valueIsEndWeek;
-
-  //     const assistsFormat = {
-  //       fecha: processedDate,
-  //       horas: value,
-  //       horas_60: 0,
-  //       horas_100: 0,
-  //       asistencia: E_Asistencia_BD.F,
-  //       horas_extras_estado: E_Estado_BD.n,
-  //       mano_obra_id: workforcesManyResponse[index].id,
-  //       proyecto_id: project_id,
-  //     };
-  //     const assistsResponse = await prismaAssistsRepository.createAssists(
-  //       assistsFormat
-  //     );
-  //     if (!assistsResponse) {
-  //       return { success: false };
-  //     }
-  //   }
-
-  //   return { success: true };
-  // }
   createSuccessResponse(result: any, queryParams: any): T_HttpResponse {
     const { assistsConverter, total } = result;
     const pageCount = Math.ceil(total / queryParams.limit);
@@ -515,119 +466,3 @@ class AssistsService {
 }
 
 export const assistsService = new AssistsService();
-
-//[note] este es el viejo codigo que traia las asistencias pero toda la mano de obra dependiendo el rol
-// async findAll(
-//   data: T_FindAllAssists,
-//   project_id: string,
-//   token: string
-// ): Promise<T_HttpResponse> {
-//   try {
-//     const skip = (data.queryParams.page - 1) * data.queryParams.limit;
-//     const userTokenResponse = await jwtService.getUserFromToken(token);
-//     if (!userTokenResponse) return userTokenResponse;
-//     const userResponse = userTokenResponse.payload as I_Usuario;
-//     const resultIdProject = await projectValidation.findById(+project_id);
-//     if (!resultIdProject.success) {
-//       return httpResponse.BadRequestException(
-//         "No se puede crear la Asistencia con el id del Proyecto proporcionado"
-//       );
-//     }
-
-//     const workforcesManyResponse =
-//       await workforceValidation.findAllWithPagination(+project_id);
-
-//     if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
-//       return httpResponse.BadRequestException(
-//         "No se entontraron registros en la Mano de Obra en el Proyecto para crear la asistencia",
-//         []
-//       );
-//     }
-//     const weekOfTheYear = Array.from({ length: 52 }, (v, i) =>
-//       String(i + 1).padStart(2, "0")
-//     );
-//     if (data.queryParams.week) {
-//       const week = data.queryParams.week as string;
-//       const result = week.split(".");
-//       const dayWeek = result[1];
-//       if (!weekOfTheYear.includes(dayWeek)) {
-//         return httpResponse.BadRequestException(
-//           "No existe la semana que ha pasado"
-//         );
-//       }
-//     }
-
-//     if (data.queryParams.state) {
-//       const valueState = this.verifyState(data.queryParams.state);
-//       if (!valueState) {
-//         return httpResponse.BadRequestException(
-//           "El Estado ingresado de la Asistencia no existe"
-//         );
-//       }
-//     }
-//     if (
-//       userResponse.Rol?.rol === "ADMIN" ||
-//       userResponse.Rol?.rol === "USER" ||
-//       userResponse.Rol?.rol === "CONTROL_COSTOS"
-//     ) {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id
-//       );
-
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else if (userResponse.Rol?.rol === "INGENIERO_PRODUCCION") {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id,
-//         userResponse.id
-//       );
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else if (userResponse.Rol?.rol === "INGENIERO_SSOMMA") {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id,
-//         userResponse.id
-//       );
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else if (userResponse.Rol?.rol === "MAESTRO_OBRA") {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id,
-//         userResponse.id
-//       );
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else if (userResponse.Rol?.rol === "CAPATAZ") {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id,
-//         userResponse.id
-//       );
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else if (userResponse.Rol?.rol === "JEFE_GRUPO") {
-//       const result = await prismaAssistsRepository.findAll(
-//         skip,
-//         data,
-//         +project_id,
-//         userResponse.id
-//       );
-//       return this.createSuccessResponse(result, data.queryParams);
-//     } else {
-//       return httpResponse.BadRequestException(
-//         "No tiene acceso para ver esta sección"
-//       );
-//     }
-//   } catch (error) {
-//     return httpResponse.InternalServerErrorException(
-//       "Error al traer las Asistencias",
-//       error
-//     );
-//   } finally {
-//     await prisma.$disconnect();
-//   }
-// }

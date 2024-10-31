@@ -4,7 +4,7 @@ import {
   I_AssistsWorkforce,
   I_CreateAssistsWorkforceBD,
 } from "./models/assists.interface";
-import { T_FindAllAssists } from "./models/assists.types";
+import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
 import {
   Asistencia,
   E_Asistencia_BD,
@@ -211,6 +211,101 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       },
     });
 
+    const assistsConverter = assists.map((item) => {
+      const { ManoObra, ...ResData } = item;
+      const { Usuario, ...ManoObraData } = ManoObra || {}; // Desestructuramos Usuario de ManoObra
+      return {
+        Asistencia: ResData,
+        ManoObra: ManoObraData,
+        Responsable: Usuario,
+      };
+    });
+    return { assistsConverter, total };
+  }
+
+  async findAllByWeek(
+    skip: number,
+    data: T_FindAllWeekAssists,
+    project_id: number
+  ): Promise<{ assistsConverter: any[]; total: number }> {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    let filters: any = {};
+    const weekResponse = await weekValidation.findByDate(date);
+    const week = weekResponse.payload as Semana;
+    filters.fecha = {
+      gte: week.fecha_inicio, // Mayor o igual a la fecha de inicio
+      lte: week.fecha_fin, // Fin del día
+    };
+    let filtersName: any = {};
+    if (data.queryParams.week) {
+      const weekResponse = await weekValidation.findByCode(
+        data.queryParams.week
+      );
+      const week = weekResponse.payload as Semana;
+      filters.fecha = {
+        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+      };
+    }
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filtersName.OR = [
+          {
+            nombre_completo: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_materno: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_paterno: {
+              contains: data.queryParams.search,
+            },
+          },
+        ];
+      } else {
+        filtersName.documento_identidad = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
+
+    const assists = await prisma.asistencia.findMany({
+      where: {
+        ...filters,
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+        ManoObra: {
+          ...filtersName,
+        },
+      },
+      include: {
+        ManoObra: {
+          include: {
+            Usuario: true,
+          },
+        },
+      },
+      skip,
+      take: data.queryParams.limit,
+      omit: {
+        eliminado: true,
+      },
+    });
+    const total = await prisma.asistencia.count({
+      where: {
+        ...filters,
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+        ManoObra: {
+          ...filtersName,
+        },
+      },
+    });
     const assistsConverter = assists.map((item) => {
       const { ManoObra, ...ResData } = item;
       const { Usuario, ...ManoObraData } = ManoObra || {}; // Desestructuramos Usuario de ManoObra

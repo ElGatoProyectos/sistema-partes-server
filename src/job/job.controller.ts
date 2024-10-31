@@ -60,7 +60,7 @@ class JobController {
         search: search,
         fecha_inicio: fecha_inicio,
         fecha_finalizacion: fecha_finalizacion,
-        nameTrain: train,
+        train: train,
         state: state,
       },
     };

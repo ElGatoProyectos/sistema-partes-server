@@ -3,7 +3,7 @@ export type T_FindAllJob = {
     page: number;
     limit: number;
     search: string;
-    nameTrain: string;
+    train: string;
     fecha_inicio: string;
     fecha_finalizacion: string;
     state: string;

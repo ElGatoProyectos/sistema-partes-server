@@ -3,7 +3,7 @@ import {
   I_CreateAssistsWorkforceBD,
   I_UpdateAssitsBD,
 } from "./models/assists.interface";
-import { T_FindAllAssists } from "./models/assists.types";
+import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
 
 export abstract class BankWorkforceRepository {
   findAll(
@@ -16,6 +16,13 @@ export abstract class BankWorkforceRepository {
   findById(assists_id: number): void {}
 
   findByDate(date: Date): void {}
+
+  findAllByWeek(
+    skip: number,
+    data: T_FindAllWeekAssists,
+    project_id: number,
+    week: string
+  ): void {}
 
   findByIdMoAndDate(mano_obra_id: number): void {}
 

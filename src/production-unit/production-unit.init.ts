@@ -9,7 +9,12 @@ const prefix = "/unidad-de-produccion";
 prouductionUnitRouter.post(`${prefix}`, productionUnitController.create);
 prouductionUnitRouter.post(
   `${prefix}/upload-excel`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   productionUnitController.productionUnitReadExcel
 );
 prouductionUnitRouter.post(
@@ -18,37 +23,79 @@ prouductionUnitRouter.post(
 );
 prouductionUnitRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.findByName
 );
 prouductionUnitRouter.get(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.findById
 );
 prouductionUnitRouter.get(
   `${prefix}/file/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.findImage
 );
 prouductionUnitRouter.get(
   `${prefix}/sectorization/project`,
   productionUnitMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.findImageSectorizacionProject
 );
 prouductionUnitRouter.put(`${prefix}/:id`, productionUnitController.update);
 prouductionUnitRouter.delete(
   `${prefix}/:id`,
   productionUnitMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   productionUnitController.updateStatus
 );
 

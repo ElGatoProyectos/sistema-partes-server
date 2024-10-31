@@ -109,6 +109,23 @@ class AuthService {
       return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }
+  authorizeRolesService(authorization: string, allowedRoles: string[]) {
+    try {
+      const [bearer, token] = authorization.split(" ");
+
+      const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+      if (allowedRoles.includes(tokenDecrypted.role)) {
+        return httpResponse.SuccessResponse("Éxito en la autenticación");
+      } else {
+        return httpResponse.BadRequestException(
+          "Usted no tiene permiso para hacer esta acción"
+        );
+      }
+    } catch (error) {
+      return httpResponse.UnauthorizedException("Error en la autenticación");
+    }
+  }
 
   async findMe(token: string) {
     try {
