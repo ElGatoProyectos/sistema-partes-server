@@ -10,7 +10,12 @@ priceHourWorkforceRouter.post(
   `${prefix}`,
   priceHourWorkforceMiddleware.verifyHeadersFieldsIdProject,
   priceHourWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   priceHourWorkforceController.create
 );
 priceHourWorkforceRouter.put(
@@ -18,19 +23,42 @@ priceHourWorkforceRouter.put(
   priceHourWorkforceMiddleware.verifyHeadersFieldsId,
   priceHourWorkforceMiddleware.verifyHeadersFieldsIdProject,
   priceHourWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   priceHourWorkforceController.update
 );
 priceHourWorkforceRouter.get(
   `${prefix}`,
   priceHourWorkforceMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "GERENTE_PROYECTO",
+    "RESIDENCIA",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+    "MAESTRO_OBRA",
+    "CAPATAZ",
+    "JEFE_GRUPO",
+    "ADMINISTRACION_OBRA",
+  ]),
   priceHourWorkforceController.all
 );
 priceHourWorkforceRouter.get(
   `${prefix}/:id`,
   priceHourWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   priceHourWorkforceController.findById
 );
 

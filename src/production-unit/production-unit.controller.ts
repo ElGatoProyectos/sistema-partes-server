@@ -37,8 +37,15 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate = authService.verifyRolProjectAdminUser(
-              request.get("Authorization") as string
+            const rolsPermitted = [
+              "ADMIN",
+              "USER",
+              "CONTROL_COSTOS",
+              "ASISTENTE_PRODUCCION",
+            ];
+            const responseValidate = authService.authorizeRolesService(
+              request.get("Authorization") as string,
+              rolsPermitted
             );
             const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {
@@ -118,8 +125,15 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate = authService.verifyRolProjectAdminUser(
-              request.get("Authorization") as string
+            const rolsPermitted = [
+              "ADMIN",
+              "USER",
+              "CONTROL_COSTOS",
+              "ASISTENTE_PRODUCCION",
+            ];
+            const responseValidate = authService.authorizeRolesService(
+              request.get("Authorization") as string,
+              rolsPermitted
             );
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
@@ -207,8 +221,15 @@ class ProductionUnitController {
           response.status(customError.statusCode).json(customError);
         } else {
           try {
-            const responseValidate = authService.verifyRolProjectAdminUser(
-              request.get("Authorization") as string
+            const rolsPermitted = [
+              "ADMIN",
+              "USER",
+              "CONTROL_COSTOS",
+              "ASISTENTE_PRODUCCION",
+            ];
+            const responseValidate = authService.authorizeRolesService(
+              request.get("Authorization") as string,
+              rolsPermitted
             );
             const project_id = request.get("project-id") as string;
             if (!responseValidate?.success) {

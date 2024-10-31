@@ -10,20 +10,36 @@ const prefix = "/users_project";
 detailUserProjectRouter.post(
   `${prefix}/assignment`,
   detailUserProjectMiddleware.verifyFieldsAssignment,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   detailUserProjectController.createDetailAssignment
 );
 detailUserProjectRouter.get(
   `${prefix}`,
   detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "GERENTE_PROYECTO",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   detailUserProjectController.allUsersByProject
 );
 detailUserProjectRouter.get(
   `${prefix}/available/:id`,
   detailUserProjectMiddleware.verifyHeadersFieldsId,
   detailUserProjectMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   detailUserProjectController.allUsersAvailableForAssignDetail
 );
 detailUserProjectRouter.get(
@@ -47,7 +63,12 @@ detailUserProjectRouter.get(
 );
 detailUserProjectRouter.delete(
   `${prefix}/delete-assignment`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   detailUserProjectController.deleteDetail
 );
 detailUserProjectRouter.delete(

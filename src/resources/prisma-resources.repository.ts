@@ -55,7 +55,8 @@ class PrismaResourcesRepository implements ResourcesRepository {
     if (data.queryParams.search) {
       filtersResource.nombre = data.queryParams.search;
     }
-    if (data.queryParams.category) {
+
+    if (data.queryParams.category && data.queryParams.category !== "TODOS") {
       filters.nombre = data.queryParams.category;
     }
 

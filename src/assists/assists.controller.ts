@@ -1,6 +1,6 @@
 import express from "@/config/express.config";
 import { assistsService } from "./assists.service";
-import { T_FindAllAssists } from "./models/assists.types";
+import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
 import { httpResponse } from "@/common/http.response";
 import { I_AssistsBody } from "./models/assists.interface";
 
@@ -83,7 +83,36 @@ class AssistsController {
         date: date,
       },
     };
+
     const result = await assistsService.findAll(
+      data,
+      project_id,
+      tokenWithBearer
+    );
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
+  async getAllForWeek(request: express.Request, response: express.Response) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const search = request.query.search as string;
+    const week = request.query.week as string;
+    const project_id = request.get("project-id") as string;
+    const tokenWithBearer = request.headers.authorization as string;
+
+    let data: T_FindAllWeekAssists = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+        week: week,
+      },
+    };
+
+    const result = await assistsService.findAllForWeek(
       data,
       project_id,
       tokenWithBearer

@@ -73,6 +73,31 @@ class AuthRoleMiddleware {
       response.status(customError.statusCode).send(customError);
     }
   }
+  authorizeRoles(allowedRoles: string[]) {
+    return (request: express.Request, response: express.Response, nextFunction: express.NextFunction) => {
+      const customError = httpResponse.UnauthorizedException("Error en la autenticación");
+
+      try {
+        const authorization = request.get("Authorization") as string;
+
+        if (!authorization) {
+          return response.status(customError.statusCode).send(customError);
+        }
+
+        const [bearer, token] = authorization.split(" ");
+        const tokenDecrypted = jwtService.verify(token) as T_ResponseToken;
+
+        // Verificar si el rol del usuario está en la lista de roles permitidos
+        if (allowedRoles.includes(tokenDecrypted.role)) {
+          nextFunction();
+        } else {
+          response.status(customError.statusCode).send(customError);
+        }
+      } catch (error) {
+        response.status(customError.statusCode).send(customError);
+      }
+    };
+  }
 }
 
 export const authRoleMiddleware = new AuthRoleMiddleware();

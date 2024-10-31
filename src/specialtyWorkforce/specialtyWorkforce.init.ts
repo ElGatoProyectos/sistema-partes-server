@@ -10,7 +10,13 @@ specialtyWorkforce.post(
   `${prefix}`,
   specialityWorkforceMiddleware.verifyHeadersFieldsIdProject,
   specialityWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   specialtyWorkforceController.create
 );
 specialtyWorkforce.put(
@@ -18,25 +24,49 @@ specialtyWorkforce.put(
   specialityWorkforceMiddleware.verifyHeadersFieldsId,
   specialityWorkforceMiddleware.verifyHeadersFieldsIdProject,
   specialityWorkforceMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   specialtyWorkforceController.update
 );
 specialtyWorkforce.delete(
   `${prefix}/:id`,
   specialityWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   specialtyWorkforceController.updateStatus
 );
 specialtyWorkforce.get(
   `${prefix}`,
   specialityWorkforceMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   specialtyWorkforceController.all
 );
 specialtyWorkforce.get(
   `${prefix}/:id`,
   specialityWorkforceMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "ADMINISTRACION_OBRA",
+  ]),
   specialtyWorkforceController.findByIdSpecialty
 );
 

@@ -9,14 +9,26 @@ const prefix = "/train";
 trainRouter.get(
   `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   trainController.allTrains
 );
 
 trainRouter.get(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   trainController.findByIdTrain
 );
 
@@ -24,20 +36,35 @@ trainRouter.post(
   `${prefix}`,
   trainMiddleware.verifyHeadersFieldsIdProject,
   trainMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   trainController.create
 );
 trainRouter.post(
   `${prefix}/upload-excel`,
   trainMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   trainController.trainReadExcel
 );
 
 trainRouter.delete(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   trainController.updateStatus
 );
 
@@ -45,7 +72,12 @@ trainRouter.put(
   `${prefix}/:id`,
   trainMiddleware.verifyHeadersFieldsId,
   trainMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   trainController.update
 );
 

@@ -160,7 +160,7 @@ class PrismaJobRepository implements JobRepository {
       data.queryParams.fecha_finalizacion
     );
     const stateFilter = this.getStateFilter(data.queryParams.state);
-    const nameTrain = this.getTrenFilter(data.queryParams.nameTrain);
+    const nameTrain = this.getTrenFilter(data.queryParams.train);
     const [jobs, total]: [I_Job[], number] = await prisma.$transaction([
       prisma.trabajo.findMany({
         where: {

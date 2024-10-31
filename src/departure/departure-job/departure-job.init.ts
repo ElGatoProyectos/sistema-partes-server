@@ -10,33 +10,60 @@ const prefix = "/departure-job";
 departureJobRouter.post(
   `${prefix}`,
   departureJobMiddleware.verifyFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   departureJobController.createDetails
 );
 departureJobRouter.put(
   `${prefix}/:id`,
   departureJobMiddleware.verifyHeadersFieldsId,
   departureJobMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   departureJobController.updateDetails
 );
 
 departureJobRouter.post(
   `${prefix}/upload-excel`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   departureJobController.departureJobReadExcel
 );
 
 departureJobRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   departureJobController.allDetailsDepartureJob
 );
 
 departureJobRouter.delete(
   `${prefix}/:id`,
   departureJobMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
   departureJobController.updateStatus
 );
 

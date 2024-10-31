@@ -14,7 +14,7 @@ userRouter.get(
 );
 userRouter.post(
   `${prefix}/company`,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminUser,
   userController.createUserandCompany
 );
 userRouter.get(
@@ -40,7 +40,7 @@ userRouter.post(
 
 userRouter.put(
   `${prefix}/:id/company`,
-  authRoleMiddleware.authAdmin,
+  authRoleMiddleware.authAdminUser,
   userController.updateUserandCompany
 );
 
@@ -55,7 +55,14 @@ userRouter.put(
   `${prefix}/users_project`,
   userMiddleware.verifyFieldsUpdateRol,
   userMiddleware.verifyHeadersFieldsIdProjectHeader,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "GERENTE_PROYECTO",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+  ]),
   userController.createDetailUserProjectandChangeRol
 );
 

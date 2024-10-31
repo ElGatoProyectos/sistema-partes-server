@@ -10,21 +10,42 @@ const prefix = "/unit";
 unitRouter.get(
   `${prefix}`,
   unitMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   unitController.allResoursesCategories
 );
 
 unitRouter.delete(
   `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   unitController.updateStatus
 );
 
 unitRouter.get(
   `${prefix}/:id`,
   unitMiddleware.verifyHeadersFieldsId,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   unitController.findByIdUnit
 );
 
@@ -32,7 +53,14 @@ unitRouter.post(
   `${prefix}`,
   unitMiddleware.verifyHeadersFieldsIdProject,
   unitMiddleware.verifyFieldsRegistry,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   unitController.create
 );
 unitRouter.post(
@@ -47,7 +75,14 @@ unitRouter.put(
   unitMiddleware.verifyHeadersFieldsId,
   unitMiddleware.verifyHeadersFieldsIdProject,
   unitMiddleware.verifyFieldsUpdate,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   unitController.update
 );
 

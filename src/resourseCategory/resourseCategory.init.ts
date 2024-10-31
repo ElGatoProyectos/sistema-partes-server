@@ -1,6 +1,5 @@
 import express from "@/config/express.config";
 import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import { requestMiddleware } from "@/common/middlewares/request.middleware";
 import { resourseCategoryController } from "./resourseCategory.controller";
 import { resourseCategoryMiddleware } from "./resourseCategory.middleware";
 
@@ -10,21 +9,42 @@ const prefix = "/resourseCategory";
 
 resourseCategoryRouter.get(
   `${prefix}`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
   resourseCategoryController.allResoursesCategories
 );
 
 resourseCategoryRouter.get(
   `${prefix}/search`,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryController.findByName
 );
 
 resourseCategoryRouter.get(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryController.findByIdResourseCategory
 );
 
@@ -32,7 +52,14 @@ resourseCategoryRouter.post(
   `${prefix}`,
   resourseCategoryMiddleware.verifyFieldsRegistry,
   resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryController.create
 );
 
@@ -41,14 +68,28 @@ resourseCategoryRouter.put(
   resourseCategoryMiddleware.verifyHeadersFields,
   resourseCategoryMiddleware.verifyFieldsUpdate,
   resourseCategoryMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryController.update
 );
 
 resourseCategoryRouter.delete(
   `${prefix}/:id`,
   resourseCategoryMiddleware.verifyHeadersFields,
-  authRoleMiddleware.authAdminUser,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   resourseCategoryController.updateStatus
 );
 
