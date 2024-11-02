@@ -35,7 +35,9 @@ class AssistsService {
       }
 
       const workforcesManyResponse =
-        await workforceValidation.findAllWithPagination(+project_id);
+        await workforceValidation.findAllWithoutPaginationForProject(
+          +project_id
+        );
 
       if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
         return httpResponse.BadRequestException(
@@ -252,7 +254,9 @@ class AssistsService {
       const date = new Date();
       const verifyDate = await assistsWorkforceValidation.findByDate(date);
       const workforcesManyResponse =
-        await workforceValidation.findAllWithPagination(+project_id);
+        await workforceValidation.findAllWithoutPaginationForProject(
+          +project_id
+        );
 
       if (!workforcesManyResponse || workforcesManyResponse.length === 0) {
         return httpResponse.SuccessResponse(
@@ -466,7 +470,7 @@ class AssistsService {
     ];
     return valoresPosibles.includes(state);
   }
-  private isBetweenWeek(date: Date): boolean {
+  isBetweenWeek(date: Date): boolean {
     const dayWeek = date.getDay(); // Obtiene el día de la semana (0 para domingo, 1 para lunes, etc.)
     return dayWeek >= 1 && dayWeek <= 5; // Lunes (1) a viernes (5)
   }

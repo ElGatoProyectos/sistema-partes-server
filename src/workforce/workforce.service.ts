@@ -301,7 +301,8 @@ class WorkforceService {
           : null,
         fecha_nacimiento: fecha_nacimiento,
         fecha_inicio: fecha_inicio,
-        fecha_cese: fecha_finalizacion,
+        fecha_cese:
+          data.estado === E_Estado_MO_BD.ACTIVO ? null : fecha_finalizacion,
         proyecto_id: +project_id,
         usuario_id: user ? user.id : null,
         tipo_obrero_id: type.id,
@@ -690,7 +691,6 @@ class WorkforceService {
 
       return httpResponse.SuccessResponse("Empleados creados correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer la Mano de Obra",

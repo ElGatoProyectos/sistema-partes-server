@@ -54,16 +54,18 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
   }
   async findByIdMoAndDate(mano_obra_id: number): Promise<Asistencia | null> {
     const date = new Date();
-    const peruOffset = -5 * 60;
+    // const peruOffset = -5 * 60;
 
-    const peruDate = new Date(
-      date.getTime() + (date.getTimezoneOffset() + peruOffset) * 60000
-    );
-    peruDate.setUTCHours(0, 0, 0, 0);
+    // const peruDate = new Date(
+    //   date.getTime() + (date.getTimezoneOffset() + peruOffset) * 60000
+    // );
+    // peruDate.setUTCHours(0, 0, 0, 0);
+    date.setUTCHours(0, 0, 0, 0);
 
+    console.log(date);
     const assists = await prisma.asistencia.findFirst({
       where: {
-        fecha: peruDate,
+        fecha: date,
         mano_obra_id: mano_obra_id,
         eliminado: E_Estado_BD.n,
       },
@@ -302,7 +304,6 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       const { ManoObra, ...ResData } = item;
       const { Usuario, ...ManoObraData } = ManoObra || {};
       const key = ManoObraData.id;
-
       if (!assistsMap.has(key)) {
         assistsMap.set(key, {
           ManoObra: ManoObraData,
@@ -315,9 +316,9 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
           Domingo: "F",
         });
       }
-
       const dayMap = assistsMap.get(key);
-      switch (ResData.fecha.getDay()) {
+
+      switch (ResData.fecha.getUTCDay()) {
         case 1:
           dayMap.Lunes = ResData.asistencia;
           break;

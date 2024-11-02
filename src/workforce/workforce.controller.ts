@@ -74,7 +74,7 @@ class WorkforceController {
     const state = request.query.state as string;
     const category = request.query.category as string;
     const origin = request.query.origin as string;
-    const speciality = request.query.speciality as string;
+    const speciality = request.query.specialty as string;
     const type = request.query.type as string;
     let paginationOptions: T_FindAllWorkforce = {
       queryParams: {
