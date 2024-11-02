@@ -317,10 +317,13 @@ class WorkforceValidation {
       );
     }
   }
-  async findAllWithPagination(project_id: number): Promise<ManoObra[] | null> {
-    const workforces = await prismaWorkforceRepository.findAllWithPagination(
-      project_id
-    );
+  async findAllWithoutPaginationForProject(
+    project_id: number
+  ): Promise<ManoObra[] | null> {
+    const workforces =
+      await prismaWorkforceRepository.findAllWithoutPaginationForProject(
+        project_id
+      );
 
     return workforces;
   }

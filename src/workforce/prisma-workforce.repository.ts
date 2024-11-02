@@ -138,7 +138,9 @@ class PrismaWorkforceRepository implements WorkforceRepository {
       ]);
     return { workforces, total };
   }
-  async findAllWithPagination(project_id: number): Promise<ManoObra[] | null> {
+  async findAllWithoutPaginationForProject(
+    project_id: number
+  ): Promise<ManoObra[] | null> {
     const workforces = await prisma.manoObra.findMany({
       where: {
         eliminado: E_Estado_BD.n,
@@ -148,6 +150,16 @@ class PrismaWorkforceRepository implements WorkforceRepository {
     });
     return workforces;
   }
+  async findAllWithoutPagination(): Promise<ManoObra[] | null> {
+    const workforces = await prisma.manoObra.findMany({
+      where: {
+        eliminado: E_Estado_BD.n,
+        estado: "ACTIVO",
+      },
+    });
+    return workforces;
+  }
+
   async findAllByDate(
     date: Date,
     project_id: number

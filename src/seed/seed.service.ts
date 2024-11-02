@@ -88,6 +88,11 @@ class SeedService {
         descripcion: "Es el asistente de almacen",
         rol: "ASISTENTE_ALMACEN",
       };
+      const ing_valorizaciones = {
+        nombre_secundario: "Ing De Valorizaciones",
+        descripcion: "Es el Jefe de GRUPO",
+        rol: "INGENIERO_VALORIZACIONES",
+      };
       const rol_jefe_grupo = {
         nombre_secundario: "JEFE_GRUPO",
         descripcion: "Es el Jefe de GRUPO",
@@ -233,6 +238,7 @@ class SeedService {
       await rolValidation.createRol(rol_asistente_almacen as I_CreateRolBody);
       await rolValidation.createRol(rol_jefe_grupo as I_CreateRolBody);
       await rolValidation.createRol(rol_no_asignado as I_CreateRolBody);
+      await rolValidation.createRol(ing_valorizaciones as I_CreateRolBody);
 
       await userValidation.createUserAsAdmin(user as I_CreateUserBD);
 
