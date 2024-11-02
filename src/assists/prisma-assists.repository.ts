@@ -62,7 +62,6 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     // peruDate.setUTCHours(0, 0, 0, 0);
     date.setUTCHours(0, 0, 0, 0);
 
-    console.log(date);
     const assists = await prisma.asistencia.findFirst({
       where: {
         fecha: date,

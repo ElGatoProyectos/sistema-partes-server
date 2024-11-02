@@ -38,11 +38,12 @@ export async function automaticTask() {
         timezone: "America/Lima",
       }
     );
+    //"00 00 05 * * 1-6"
     cron.schedule(
       "00 00 05 * * 1-6",
       async () => {
         const date = new Date();
-        date.setUTCHours(0, 0, 0, 0);
+        const newDate = new Date(new Date(date).setUTCHours(0, 0, 0, 0));
         const workforces =
           await prismaWorkforceRepository.findAllWithoutPagination();
         const valueIsBetweenWeek = 8.5;
@@ -57,7 +58,7 @@ export async function automaticTask() {
           if (workforces) {
             const assistsPromises = workforces.map((workforce) => {
               const assistsFormat = {
-                fecha: date,
+                fecha: newDate,
                 horas: value,
                 horas_60: 0,
                 horas_100: 0,
@@ -66,7 +67,6 @@ export async function automaticTask() {
                 mano_obra_id: workforce.id,
                 proyecto_id: workforce.proyecto_id,
               };
-
               return prismaAssistsRepository.createAssists(assistsFormat);
             });
             await Promise.all(assistsPromises);
