@@ -23,7 +23,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     return asssists;
   }
 
-  async updateAssists(
+  async updateAssistsPresent(
     assists_id: number,
     data: E_Asistencia_BD
   ): Promise<Asistencia> {
@@ -33,6 +33,22 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       },
       data: {
         asistencia: data,
+        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
+      },
+    });
+    return assists;
+  }
+  async updateAssistsNotPresent(
+    assists_id: number,
+    data: E_Asistencia_BD
+  ): Promise<Asistencia> {
+    const assists = await prisma.asistencia.update({
+      where: {
+        id: assists_id,
+      },
+      data: {
+        asistencia: data,
+        estado_asignacion: E_Estado_Asistencia_BD.FALTA,
       },
     });
     return assists;

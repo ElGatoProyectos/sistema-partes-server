@@ -5,21 +5,18 @@ export interface I_DepartureJobExcel {
   PARTIDA: string;
   UNIDAD: string;
   METRADO: number;
-  COSTO: string;
-  MATERIAL: number;
-  "MANO DE OBRA": string;
-  EQUIPOS: string;
-  VARIOS: string;
 }
 
 export interface I_DepartureJob
   extends Omit<DetalleTrabajoPartida, "eliminado"> {}
 
 export interface I_DetailDepartureJob {
-  id: 1;
+  id: number;
+  trabajo_id: number;
+  partida_id: number;
   Trabajo: I_Job;
   Partida: I_Departure;
-  metrado_utilizado: 1;
+  metrado_utilizado: number;
 }
 
 export interface I_Departure extends Partida {}

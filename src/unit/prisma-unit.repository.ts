@@ -40,16 +40,18 @@ class PrismaUnitRepository implements UnitRepository {
     symbol: string,
     project_id: number
   ): Promise<Unidad | null> {
-    const unit = await prisma.unidad.findFirst({
+    const units = await prisma.unidad.findMany({
       where: {
-        simbolo: {
-          contains: symbol,
-        },
         proyecto_id: project_id,
         eliminado: E_Estado_BD.n,
       },
     });
-    return unit;
+    const symbolUpperCase = symbol.toUpperCase();
+    const unit = units.find((result) => {
+      return result.simbolo?.toUpperCase() === symbolUpperCase;
+    });
+    console.log("Lo q da como resultado es " + unit);
+    return unit || null;
   }
   // async existsName(name: string): Promise<Unidad | null> {
   //   const resourseCategory = await prisma.unidad.findFirst({

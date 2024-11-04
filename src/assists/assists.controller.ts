@@ -31,8 +31,9 @@ class AssistsController {
       );
       response.status(result.statusCode).json(result);
     }
+    const numberMO = parseInt(mano_obra_id);
     const result = await assistsService.update(
-      +mano_obra_id,
+      +numberMO,
       project_id,
       tokenWithBearer
     );

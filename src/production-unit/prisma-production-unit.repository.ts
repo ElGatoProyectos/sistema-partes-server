@@ -133,6 +133,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
         prisma.unidadProduccion.count({
           where: {
             ...filters,
+            proyecto_id: project_id,
             eliminado: E_Estado_BD.n,
           },
         }),

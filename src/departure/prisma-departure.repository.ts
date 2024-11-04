@@ -38,7 +38,7 @@ class PrismaDepartureRepository implements DepartureRepository {
           contains: data.queryParams.search,
         };
       } else {
-        filters.item = {
+        filters.id_interno = {
           contains: data.queryParams.search,
         };
       }

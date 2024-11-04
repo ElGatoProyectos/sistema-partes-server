@@ -11,7 +11,7 @@ import {
 import { httpResponse, T_HttpResponse } from "@/common/http.response";
 import prisma from "@/config/prisma.config";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
-import validator from "validator";
+import validator, { isNumeric } from "validator";
 import { unitValidation } from "@/unit/unit.validation";
 import { departureValidation } from "./departure.validation";
 import { T_FindAllDeparture } from "./models/departure.types";
@@ -336,6 +336,108 @@ class DepartureService {
         );
       }
 
+      // //[note] verifico q no tenga letras
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          index++;
+          if (item["PRECIO"]) {
+            const withoutComma = String(item["PRECIO"]).replace(",", "");
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+          if (item["MANO DE OBRA UNITARIO"]) {
+            const withoutComma = String(item["MANO DE OBRA UNITARIO"]).replace(
+              ",",
+              ""
+            );
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+
+          if (item["MATERIAL UNITARIO"]) {
+            const withoutComma = String(item["MATERIAL UNITARIO"]).replace(
+              ",",
+              ""
+            );
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+
+          if (item["EQUIPO UNITARIO"]) {
+            const withoutComma = String(item["EQUIPO UNITARIO"]).replace(
+              ",",
+              ""
+            );
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+
+          if (item["SUBCONTRATA - VARIOS UNITARIO"]) {
+            const withoutComma = String(
+              item["SUBCONTRATA - VARIOS UNITARIO"]
+            ).replace(",", "");
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+        })
+      );
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.Hay letras en campos no autorizados.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+
+      //[note] Verifico si tiene si la suma de la fila es igual al precio.
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          index++;
+          let suma = 0;
+          if (item["MANO DE OBRA UNITARIO"]) {
+            suma = +item["MANO DE OBRA UNITARIO"] + suma;
+          }
+
+          if (item["MATERIAL UNITARIO"]) {
+            suma = +item["MATERIAL UNITARIO"] + suma;
+          }
+
+          if (item["EQUIPO UNITARIO"]) {
+            suma = +item["EQUIPO UNITARIO"] + suma;
+          }
+
+          if (item["SUBCONTRATA - VARIOS UNITARIO"]) {
+            suma = +["SUBCONTRATA - VARIOS UNITARIO"] + suma;
+          }
+
+          if (item.PRECIO) {
+            if (suma != Number(item.PRECIO)) {
+              errorNumber++;
+              errorRows.push(index);
+            }
+          }
+        })
+      );
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.La suma de los campos no es igual al precio.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+
       //[note] Aca verificamos que el codigo no tenga letras ni que sea menor que el anterior
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
@@ -413,6 +515,7 @@ class DepartureService {
               String(item.UNI).trim(),
               project_id
             );
+            console.log(unit);
             if (!unit.success) {
               errorNumber++;
               errorRows.push(index + 1);
@@ -427,13 +530,13 @@ class DepartureService {
           )}.`
         );
       }
-      // await Promise.all(
-      //   sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
-      //     if (item.METRADO && item.PRECIO) {
-      //       console.log("hay metrado y precio en  " + item["ID-PARTIDA"]);
-      //     }
-      //   })
-      // );
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+          if (item.METRADO && item.PRECIO) {
+            console.log("hay metrado y precio en  " + item["ID-PARTIDA"]);
+          }
+        })
+      );
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
       let code;
@@ -493,11 +596,10 @@ class DepartureService {
         })
       );
 
-      // await prisma.$disconnect();
+      await prisma.$disconnect();
 
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {
-      console.log(error);
       await prisma.$disconnect();
       return httpResponse.InternalServerErrorException(
         "Error al leer las Partidas",
