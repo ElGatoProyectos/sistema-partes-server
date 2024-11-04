@@ -83,13 +83,45 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     project_id: number
   ): Promise<{ detailsDepartureJob: any[]; total: number }> {
     let details: any = {};
+    let total: any = {};
 
+    const detail = await prisma.trabajo.findMany({
+      where: {
+        DetalleTrabajoPartida: {
+          some: {},
+        },
+        proyecto_id: project_id,
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+
+    const ids = detail.map((trabajo) => trabajo.id);
     details = await prisma.detalleTrabajoPartida.findMany({
       where: {
         Trabajo: {
-          proyecto_id: project_id,
+          id: {
+            in: ids,
+          },
         },
+        OR: [
+          {
+            Trabajo: {
+              nombre: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+          {
+            Partida: {
+              partida: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+        ],
       },
+
       include: {
         Trabajo: true,
         Partida: true,
@@ -112,33 +144,22 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         id_detalle: item.id,
       });
     });
+    // const detailsDepartureJob = details.map((item: I_DetailDepartureJob) => {
+    //   const { Trabajo, Partida, ...data } = item;
+    //   // const { Partida } = item;
+    //   return {
+    //     data: data,
+    //     trabajo: Trabajo,
+    //     partida: Partida,
+    //     metrado_utilizado: item.metrado_utilizado,
+    //   };
+    // });
 
-    //[note] Transformo aca el map en un array ya q el retorno debe ser así
-    let detailsDepartureJob: any = [];
-    let detailsDepartureJobWithOutFilter: any = [];
-    let detailsDepartureJobFilter: any = [];
-    detailsDepartureJobWithOutFilter = Array.from(departureJobMap.values());
-
-    if (data.queryParams.search) {
-      detailsDepartureJobFilter = Array.from(departureJobMap.values()).filter(
-        (job) => job.trabajo.nombre.includes(data.queryParams.search)
-      );
-      //[note] asi seria una forma de paginación de manera manual
-      detailsDepartureJob = detailsDepartureJobFilter.slice(
-        skip,
-        skip + data.queryParams.limit
-      );
-    } else {
-      //[note] asi seria una forma de paginación de manera manual
-      detailsDepartureJob = detailsDepartureJobWithOutFilter.slice(
-        skip,
-        skip + data.queryParams.limit
-      );
-    }
+    let detailsDepartureJob = Array.from(departureJobMap.values());
 
     return {
       detailsDepartureJob,
-      total: detailsDepartureJobWithOutFilter.length,
+      total: detailsDepartureJob.length,
     };
   }
 
@@ -158,3 +179,63 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
   }
 }
 export const prismaDepartureJobRepository = new PrismaDepartureJobRepository();
+
+//[message] esto era de getall antes
+// let details: any = {};
+
+// details = await prisma.detalleTrabajoPartida.findMany({
+//   where: {
+//     Trabajo: {
+//       proyecto_id: project_id,
+//     },
+//   },
+//   include: {
+//     Trabajo: true,
+//     Partida: true,
+//   },
+// });
+
+// const departureJobMap = new Map();
+
+// details.forEach((item: I_DetailDepartureJob) => {
+//   const trabajoId = item.trabajo_id;
+//   if (!departureJobMap.has(trabajoId)) {
+//     departureJobMap.set(trabajoId, {
+//       trabajo: item.Trabajo,
+//       partidas: [],
+//     });
+//   }
+//   departureJobMap.get(trabajoId).partidas.push({
+//     ...item.Partida,
+//     metrado_utilizado: item.metrado_utilizado,
+//     id_detalle: item.id,
+//   });
+// });
+
+// //[note] Transformo aca el map en un array ya q el retorno debe ser así
+// let detailsDepartureJob: any = [];
+// let detailsDepartureJobWithOutFilter: any = [];
+// let detailsDepartureJobFilter: any = [];
+// detailsDepartureJobWithOutFilter = Array.from(departureJobMap.values());
+
+// if (data.queryParams.search) {
+//   detailsDepartureJobFilter = Array.from(departureJobMap.values()).filter(
+//     (job) => job.trabajo.nombre.includes(data.queryParams.search)
+//   );
+//   //[note] asi seria una forma de paginación de manera manual
+//   detailsDepartureJob = detailsDepartureJobFilter.slice(
+//     skip,
+//     skip + data.queryParams.limit
+//   );
+// } else {
+//   //[note] asi seria una forma de paginación de manera manual
+//   detailsDepartureJob = detailsDepartureJobWithOutFilter.slice(
+//     skip,
+//     skip + data.queryParams.limit
+//   );
+// }
+
+// return {
+//   detailsDepartureJob,
+//   total: detailsDepartureJobWithOutFilter.length,
+// };

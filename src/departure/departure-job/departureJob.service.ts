@@ -148,11 +148,11 @@ class DepartureJobService {
     try {
       const detailFind = await this.getDetailJobById(detail_id);
       if (!detailFind.success) {
+        console.log("no encontro el detallee");
         return httpResponse.BadRequestException(
           "No se encontró el Detalle Trabajo Partida que se quiere editar"
         );
       }
-
       const departureResponse = await this.getDepartureById(data.departure_id);
       if (!departureResponse.success) {
         return httpResponse.BadRequestException(
@@ -168,13 +168,15 @@ class DepartureJobService {
           "El metrado que ha colocado es mayor para la nueva Partida "
         );
       }
-
       const existsDetailDepartureJobResponse =
         await this.checkExistingDepartureJob(departure.id, detail.trabajo_id);
+      const detailExist =
+        existsDetailDepartureJobResponse.payload as I_DepartureJobBBDD;
 
-      if (existsDetailDepartureJobResponse.success) {
-        const detailExist =
-          existsDetailDepartureJobResponse.payload as I_DepartureJobBBDD;
+      //[note] verificamos si es el mismo detalle ya que si es el mismo no lo eliminamos
+      if (!existsDetailDepartureJobResponse.success) {
+        return await this.updateNewDepartureJob(detail, departure, data);
+      } else {
         return await this.updateExistingDepartureJob(
           detail,
           detailExist,
@@ -182,9 +184,8 @@ class DepartureJobService {
           data.metrado
         );
       }
-
-      return await this.updateNewDepartureJob(detail, departure, data);
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error en editar el Detalle Trabajo-Partida",
         error
