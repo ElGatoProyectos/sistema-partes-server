@@ -182,6 +182,9 @@ class PrismaJobRepository implements JobRepository {
         orderBy: {
           codigo: "asc",
         },
+        include:{
+          Tren:true 
+        }
       }),
       prisma.trabajo.count({
         where: {

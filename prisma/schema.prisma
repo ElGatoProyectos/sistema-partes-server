@@ -523,12 +523,12 @@ model Proyecto {
   fecha_fin                          DateTime                                @db.Date()
   fecha_creacion                     DateTime                                @default(now())
   plazo_proyecto                     String
-  color_primario                     String?
-  color_personalizado                String?
-  color_linea                        String?
-  color_detalle                      String?
-  color_menu                         String?
-  color_submenu                      String?
+  color_primario                     String?                                 @default("000000")
+  color_personalizado                String?                                 @default("000000")
+  color_linea                        String?                                 @default("000000")
+  color_detalle                      String?                                 @default("000000")
+  color_menu                         String?                                 @default("000000")
+  color_submenu                      String?                                 @default("000000")
   codigo_proyecto                    String
   empresa_id                         Int
   Empresa                            Empresa                                 @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
@@ -773,24 +773,24 @@ model Asistencia {
 //[success] actual
 model ParteDiario {
   id                     Int                  @id @default(autoincrement())
-  nombre                 String
-  fecha                  DateTime             @db.Date()
-  etapa                  String
-  jornada                String
+  nombre                 String //
+  fecha                  DateTime?            @db.Date()
+  etapa                  String?
+  jornada                String?
   fecha_creacion         DateTime             @default(now())
-  hora_inicio            String
-  hora_fin               String
+  hora_inicio            String?
+  hora_fin               String?
   descripcion_actividad  String?              @db.Text()
   nota                   String?              @db.Text()
   distanciamiento        E_Estado_BD?
   protocolo_ingreso      E_Estado_BD?
   protocolo_salida       E_Estado_BD?
   eliminado              E_Estado_BD          @default(n)
-  riesto_parte_diario_id Int
-  trabajo_id             Int                  @unique
+  riesto_parte_diario_id Int?
+  trabajo_id             Int
   proyecto_id            Int
   Proyecto               Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
-  RiesgoParteDiario      RiesgoParteDiario    @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
+  RiesgoParteDiario      RiesgoParteDiario?   @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
   Trabajo                Trabajo              @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
   ParteDiarioMo          ParteDiarioMO[]
   ParteDiarioRecurso     ParteDiarioRecurso[]

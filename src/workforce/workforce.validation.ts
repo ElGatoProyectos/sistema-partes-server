@@ -311,6 +311,7 @@ class WorkforceValidation {
       }
       return httpResponse.SuccessResponse("Mano de Obra encontrado", workforce);
     } catch (error) {
+      console.log(error)
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Mano de Obra",
         error

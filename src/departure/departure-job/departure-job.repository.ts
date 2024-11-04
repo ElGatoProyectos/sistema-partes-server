@@ -11,7 +11,11 @@ export abstract class DepartureJobRepository {
     departure_Id: number,
     metrado: number
   ): void {}
-  findAll(skip: number, data: T_FindAllDepartureJob): void {}
+  findAll(
+    skip: number,
+    data: T_FindAllDepartureJob,
+    project_id: number
+  ): void {}
   deleteDetailDepartureJob(detail_id: number): void {}
   findById(detail_id: number): void {}
   findByIdJob(job_id: number): void {}

@@ -145,7 +145,7 @@ class JobValidation {
       return httpResponse.SuccessResponse("Trabajo encontrado", job);
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar Tren",
+        "Error al buscar el Trabajo",
         error
       );
     }

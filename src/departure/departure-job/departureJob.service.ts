@@ -21,6 +21,7 @@ import { departureJobValidation } from "./departureJob.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { prismaJobRepository } from "@/job/prisma-job.repository";
+import { isNumeric } from "validator";
 
 class DepartureJobService {
   async createDetailJobDeparture(data: I_DepartureJob) {
@@ -615,6 +616,28 @@ class DepartureJobService {
           )}`
         );
       }
+
+      // //[note] verifico q no tenga letras el metrado
+      await Promise.all(
+        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+          index++;
+          if (item.METRADO) {
+            const withoutComma = String(item.METRADO).replace(",", "");
+            if (!isNumeric(String(withoutComma))) {
+              errorNumber++;
+              errorRows.push(index + 1);
+            }
+          }
+        })
+      );
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.Hay letras en campos no autorizados.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
       //[success] Verifico si el metrado supera al de la partida
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
@@ -669,11 +692,22 @@ class DepartureJobService {
       );
     }
   }
-  async findAll(data: T_FindAllDepartureJob) {
+  async findAll(data: T_FindAllDepartureJob, job_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
 
-      const result = await prismaDepartureJobRepository.findAll(skip, data);
+      const jobResponse = await projectValidation.findById(+job_id);
+      if (!jobResponse.success) {
+        return jobResponse;
+      }
+
+      const job = jobResponse.payload as Trabajo;
+
+      const result = await prismaDepartureJobRepository.findAll(
+        skip,
+        data,
+        job.id
+      );
 
       const { detailsDepartureJob, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

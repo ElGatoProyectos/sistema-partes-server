@@ -300,7 +300,6 @@ class AssistsService {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse) return userTokenResponse;
-      const userResponse = userTokenResponse.payload as I_Usuario;
 
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
@@ -310,7 +309,7 @@ class AssistsService {
       }
 
       const workforceResponse = await workforceValidation.findById(
-        mano_obra_id
+        +mano_obra_id
       );
       if (!workforceResponse.success) {
         return httpResponse.BadRequestException(
@@ -338,10 +337,18 @@ class AssistsService {
       };
       const resultValue = valuesAssists[assists.asistencia];
 
-      const updateAssists = await prismaAssistsRepository.updateAssists(
-        assists.id,
-        resultValue
-      );
+      let updateAssists;
+      if (resultValue === E_Asistencia_BD.A) {
+        updateAssists = await prismaAssistsRepository.updateAssistsPresent(
+          assists.id,
+          resultValue
+        );
+      } else {
+        updateAssists = await prismaAssistsRepository.updateAssistsNotPresent(
+          assists.id,
+          resultValue
+        );
+      }
 
       return httpResponse.CreatedResponse(
         "Asistencia actualizada correctamente",
@@ -363,7 +370,6 @@ class AssistsService {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse) return userTokenResponse;
-      const userResponse = userTokenResponse.payload as I_Usuario;
 
       const resultAsssits = await assistsWorkforceValidation.findById(
         assists_id
