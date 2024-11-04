@@ -109,26 +109,37 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       departureJobMap.get(trabajoId).partidas.push({
         ...item.Partida,
         metrado_utilizado: item.metrado_utilizado,
+        id_detalle: item.id,
       });
     });
 
     //[note] Transformo aca el map en un array ya q el retorno debe ser así
+    let detailsDepartureJob: any = [];
+    let detailsDepartureJobWithOutFilter: any = [];
     let detailsDepartureJobFilter: any = [];
-    detailsDepartureJobFilter = Array.from(departureJobMap.values());
+    detailsDepartureJobWithOutFilter = Array.from(departureJobMap.values());
 
     if (data.queryParams.search) {
       detailsDepartureJobFilter = Array.from(departureJobMap.values()).filter(
         (job) => job.trabajo.nombre.includes(data.queryParams.search)
       );
+      //[note] asi seria una forma de paginación de manera manual
+      detailsDepartureJob = detailsDepartureJobFilter.slice(
+        skip,
+        skip + data.queryParams.limit
+      );
+    } else {
+      //[note] asi seria una forma de paginación de manera manual
+      detailsDepartureJob = detailsDepartureJobWithOutFilter.slice(
+        skip,
+        skip + data.queryParams.limit
+      );
     }
 
-    //[note] asi seria una forma de paginación de manera manual
-    const detailsDepartureJob = detailsDepartureJobFilter.slice(
-      skip,
-      skip + data.queryParams.limit
-    );
-
-    return { detailsDepartureJob, total: detailsDepartureJob.length };
+    return {
+      detailsDepartureJob,
+      total: detailsDepartureJobWithOutFilter.length,
+    };
   }
 
   async createDetailDepartureJob(
