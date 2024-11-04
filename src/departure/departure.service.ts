@@ -515,7 +515,6 @@ class DepartureService {
               String(item.UNI).trim(),
               project_id
             );
-            console.log(unit);
             if (!unit.success) {
               errorNumber++;
               errorRows.push(index + 1);
@@ -530,13 +529,6 @@ class DepartureService {
           )}.`
         );
       }
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
-          if (item.METRADO && item.PRECIO) {
-            console.log("hay metrado y precio en  " + item["ID-PARTIDA"]);
-          }
-        })
-      );
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
       let code;

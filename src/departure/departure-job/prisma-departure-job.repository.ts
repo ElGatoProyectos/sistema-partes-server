@@ -107,10 +107,8 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         });
       }
       departureJobMap.get(trabajoId).partidas.push({
-        partida: {
-          ...item.Partida,
-          metrado_utilizado: item.metrado_utilizado,
-        },
+        ...item.Partida,
+        metrado_utilizado: item.metrado_utilizado,
       });
     });
 
