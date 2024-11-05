@@ -28,6 +28,8 @@ departureJobRouter.put(
     "CONTROL_COSTOS",
     "ASISTENTE_CONTROL_COSTOS",
   ]),
+  departureJobMiddleware.verifyHeadersFieldsId,
+  departureJobMiddleware.verifyHeadersFieldsIdProject,
   departureJobController.updateDetails
 );
 
@@ -39,6 +41,7 @@ departureJobRouter.post(
     "CONTROL_COSTOS",
     "ASISTENTE_CONTROL_COSTOS",
   ]),
+  departureJobMiddleware.verifyHeadersFieldsIdProject,
   departureJobController.departureJobReadExcel
 );
 
@@ -52,7 +55,22 @@ departureJobRouter.get(
     "INGENIERO_PRODUCCION",
     "ASISTENTE_PRODUCCION",
   ]),
+  departureJobMiddleware.verifyHeadersFieldsIdProject,
   departureJobController.allDetailsDepartureJob
+);
+
+departureJobRouter.get(
+  `${prefix}/detail`,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  departureJobMiddleware.verifyHeadersFieldsIdProject,
+  departureJobController.allDetailsDepartureJobForDetail
 );
 
 departureJobRouter.delete(
@@ -64,6 +82,7 @@ departureJobRouter.delete(
     "CONTROL_COSTOS",
     "ASISTENTE_CONTROL_COSTOS",
   ]),
+  departureJobMiddleware.verifyHeadersFieldsId,
   departureJobController.updateStatus
 );
 

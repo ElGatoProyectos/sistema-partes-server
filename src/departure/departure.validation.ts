@@ -72,6 +72,19 @@ class DepartureValidation {
       );
     }
   }
+  async findAllWithOutPagination(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const departure =
+        await prismaDepartureRepository.findAllWithOutPagination(project_id);
+
+      return httpResponse.SuccessResponse("Partidas encontradas", departure);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar las Partida",
+        error
+      );
+    }
+  }
 
   async findByCodeValidation(
     code: string,

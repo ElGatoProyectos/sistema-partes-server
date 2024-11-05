@@ -64,6 +64,27 @@ class DepartureJobController {
     );
     response.status(result.statusCode).json(result);
   }
+  async allDetailsDepartureJobForDetail(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const search = request.query.search as string;
+    const project_id = request.get("project-id") as string;
+    let paginationOptions: T_FindAllDepartureJob = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+      },
+    };
+    const result = await departureJobService.findAllForDetail(
+      paginationOptions,
+      project_id
+    );
+    response.status(result.statusCode).json(result);
+  }
   departureJobReadExcel = async (
     request: express.Request,
     response: express.Response

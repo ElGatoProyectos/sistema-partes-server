@@ -762,7 +762,7 @@ class UnitService {
         {
           codigo: "045",
           nombre: "METRO LINEAL",
-          simbolo: "m",
+          simbolo: "ml",
           empresa_id: company_id,
           proyecto_id: project_id,
         },

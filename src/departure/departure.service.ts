@@ -260,6 +260,13 @@ class DepartureService {
       const workbook = xlsx.read(buffer, { type: "buffer" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
+      const departuresResponse =
+        await departureValidation.findAllWithOutPagination(project_id);
+      const departures = departuresResponse.payload as Partida[];
+      const unitsResponse = await unitValidation.findAllWithOutPagination(
+        project_id
+      );
+      const units = unitsResponse.payload as Unidad[];
       const sheetToJson = xlsx.utils.sheet_to_json(sheet) as I_DepartureExcel[];
       let error = 0;
       let errorNumber = 0;
@@ -294,48 +301,42 @@ class DepartureService {
       const seenCodes = new Set<string>();
       let previousCodigo: number | null = null;
 
-      //[note] aca si hay espacio en blanco.
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
-          index++;
-          if (
-            item["ID-PARTIDA"] === undefined ||
-            item.ITEM === undefined ||
-            item.PARTIDA === undefined
-          ) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
+      let emptyFieldRows: number[] = [];
+      let shortCodeRows: number[] = [];
+      sheetToJson.forEach((item: I_DepartureExcel, index: number) => {
+        index++;
 
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo.Los campos ID-PARTIDA, ITEM Y PARTIDA son obligatorios.Verificar las filas: ${errorRows.join(
-            ", "
-          )}.`
-        );
+        // Validación de campos obligatorios
+        if (
+          item["ID-PARTIDA"] === undefined ||
+          item.ITEM === undefined ||
+          item.PARTIDA === undefined
+        ) {
+          emptyFieldRows.push(index + 1);
+        }
+
+        // Validación de longitud de ID-PARTIDA
+        const codigoSinEspacios = item["ID-PARTIDA"]?.trim();
+        if (codigoSinEspacios && codigoSinEspacios.length < 4) {
+          shortCodeRows.push(index + 1);
+        }
+      });
+
+      let errorMessage = "";
+      if (emptyFieldRows.length > 0) {
+        errorMessage += `Error: Los campos ID-PARTIDA, ITEM y PARTIDA son obligatorios. Verificar las filas: ${emptyFieldRows.join(
+          ", "
+        )}.`;
       }
-      //[note] Verifico si tiene 4 digitos.
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
-          index++;
-          const codigoSinEspacios = item["ID-PARTIDA"].trim();
-          if (codigoSinEspacios.length < 4) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo.Los códigos sólo pueden tener 4 digitos .Verificar las filas: ${errorRows.join(
-            ", "
-          )}.`
-        );
+      if (shortCodeRows.length > 0) {
+        errorMessage += `Error: El código ID-PARTIDA debe tener al menos 4 dígitos. Verificar las filas: ${shortCodeRows.join(
+          ", "
+        )}.`;
       }
 
+      if (errorMessage) {
+        return httpResponse.BadRequestException(errorMessage);
+      }
       // //[note] verifico q no tenga letras
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
@@ -403,28 +404,28 @@ class DepartureService {
       //[note] Verifico si tiene si la suma de la fila es igual al precio.
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
-          index++;
-          let suma = 0;
-          if (item["MANO DE OBRA UNITARIO"]) {
-            suma = +item["MANO DE OBRA UNITARIO"] + suma;
-          }
-
-          if (item["MATERIAL UNITARIO"]) {
-            suma = +item["MATERIAL UNITARIO"] + suma;
-          }
-
-          if (item["EQUIPO UNITARIO"]) {
-            suma = +item["EQUIPO UNITARIO"] + suma;
-          }
-
-          if (item["SUBCONTRATA - VARIOS UNITARIO"]) {
-            suma = +["SUBCONTRATA - VARIOS UNITARIO"] + suma;
-          }
-
           if (item.PRECIO) {
-            if (suma != Number(item.PRECIO)) {
+            index++;
+            let suma = 0;
+            if (item["MANO DE OBRA UNITARIO"]) {
+              suma = +item["MANO DE OBRA UNITARIO"] + suma;
+            }
+
+            if (item["MATERIAL UNITARIO"]) {
+              suma = +item["MATERIAL UNITARIO"] + suma;
+            }
+
+            if (item["EQUIPO UNITARIO"]) {
+              suma = +item["EQUIPO UNITARIO"] + suma;
+            }
+
+            if (item["SUBCONTRATA - VARIOS UNITARIO"]) {
+              suma = +["SUBCONTRATA - VARIOS UNITARIO"] + suma;
+            }
+
+            if (Math.round(suma) != Math.round(Number(item.PRECIO))) {
               errorNumber++;
-              errorRows.push(index);
+              errorRows.push(index + 1);
             }
           }
         })
@@ -505,17 +506,15 @@ class DepartureService {
         );
       }
 
-      //[SUCCESS] VERIFICAR SI LAS UNIDADES QUE VIENEN EXISTEN EN LA BASE DE DATOS
-      let unit: T_HttpResponse;
+      //[Validation] VERIFICAR SI LAS UNIDADES QUE VIENEN EXISTEN EN LA BASE DE DATOS
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
           index++;
           if (item.UNI) {
-            unit = await unitValidation.findBySymbol(
-              String(item.UNI).trim(),
-              project_id
+            const unitExists = units.some(
+              (unit) => unit.simbolo?.toUpperCase() == item.UNI.toUpperCase()
             );
-            if (!unit.success) {
+            if (!unitExists) {
               errorNumber++;
               errorRows.push(index + 1);
             }
@@ -531,28 +530,35 @@ class DepartureService {
       }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      let code;
-      let departure;
+      // let code;
+      let departureFind: Partida | undefined;
+
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureExcel) => {
-          code = await departureValidation.findByCodeValidation(
-            String(item["ID-PARTIDA"].trim()),
-            project_id
-          );
-          if (code.success) {
-            departure = code.payload as Partida;
+          departureFind = departures.find((departure) => {
+            return departure.id_interno === String(item["ID-PARTIDA"].trim());
+          });
+          // code = await departureValidation.findByCodeValidation(
+          //   String(item["ID-PARTIDA"].trim()),
+          //   project_id
+          // );
+          if (departureFind && departureFind.id !== undefined) {
             await departureValidation.updateDeparture(
-              departure.id,
+              departureFind.id,
               item,
               userResponse.id,
               responseProject.id
             );
           } else {
-            const unitResponse = await unitValidation.findBySymbol(
-              String(item.UNI),
-              project_id
-            );
-            const unit = unitResponse.payload as Unidad;
+            const unit = units.find((unit) => {
+              return unit.simbolo === item.UNI;
+            });
+            // const unitResponse = await unitValidation.findBySymbol(
+            //   String(item.UNI),
+            //   project_id
+            // );
+            // const unit = unitResponse.payload as Unidad;
+
             let resultado;
             if (item.METRADO && item.PRECIO) {
               resultado = parseInt(item.METRADO) * parseInt(item.PRECIO);
@@ -578,7 +584,7 @@ class DepartureService {
                 ? +item["SUBCONTRATA - VARIOS UNITARIO"]
                 : 0,
               usuario_id: userResponse.id,
-              unidad_id: item.UNI ? unit.id : null,
+              unidad_id: item.UNI ? unit?.id ?? null : null,
               proyecto_id: project_id,
             };
             await prisma.partida.create({
@@ -588,8 +594,6 @@ class DepartureService {
         })
       );
 
-      await prisma.$disconnect();
-
       return httpResponse.SuccessResponse("Partidas creadas correctamente!");
     } catch (error) {
       await prisma.$disconnect();
@@ -597,6 +601,8 @@ class DepartureService {
         "Error al leer las Partidas",
         error
       );
+    } finally {
+      await prisma.$disconnect();
     }
   }
   async updateStatusJob(departure_id: number): Promise<T_HttpResponse> {
@@ -653,3 +659,46 @@ class DepartureService {
 }
 
 export const departureService = new DepartureService();
+
+//[message] viejo codigo para validacion carga masiva
+//  //[note] aca si hay espacio en blanco.
+//  await Promise.all(
+//   sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+//     index++;
+//     if (
+//       item["ID-PARTIDA"] === undefined ||
+//       item.ITEM === undefined ||
+//       item.PARTIDA === undefined
+//     ) {
+//       error++;
+//       errorRows.push(index + 1);
+//     }
+//   })
+// );
+
+// if (error > 0) {
+//   return httpResponse.BadRequestException(
+//     `Error al leer el archivo.Los campos ID-PARTIDA, ITEM Y PARTIDA son obligatorios.Verificar las filas: ${errorRows.join(
+//       ", "
+//     )}.`
+//   );
+// }
+// //[note] Verifico si tiene 4 digitos.
+// await Promise.all(
+//   sheetToJson.map(async (item: I_DepartureExcel, index: number) => {
+//     index++;
+//     const codigoSinEspacios = item["ID-PARTIDA"].trim();
+//     if (codigoSinEspacios.length < 4) {
+//       error++;
+//       errorRows.push(index + 1);
+//     }
+//   })
+// );
+
+// if (error > 0) {
+//   return httpResponse.BadRequestException(
+//     `Error al leer el archivo.Los códigos sólo pueden tener 4 digitos .Verificar las filas: ${errorRows.join(
+//       ", "
+//     )}.`
+//   );
+// }

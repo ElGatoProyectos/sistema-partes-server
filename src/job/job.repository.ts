@@ -4,6 +4,8 @@ import { T_FindAllJob } from "./models/job.types";
 export abstract class JobRepository {
   findAll(skip: number, data: T_FindAllJob, project_id: number): void {}
 
+  findAllWithOutPagination(project_id: number): void {}
+
   findByCode(code: string, project_id: number): void {}
 
   findById(idUser: number): void {}

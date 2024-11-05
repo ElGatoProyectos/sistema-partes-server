@@ -129,6 +129,22 @@ class UnitValidation {
       );
     }
   }
+  async findAllWithOutPagination(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const units = await prismaUnitRepository.findAllWithOutPagination(
+        project_id
+      );
+      return httpResponse.SuccessResponse(
+        "Se trajo con éxito todas las Unidas",
+        units
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar las Unidades",
+        error
+      );
+    }
+  }
   async findBySymbolForCreate(
     symbol: string,
     project_id: number

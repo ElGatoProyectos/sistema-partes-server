@@ -11,7 +11,12 @@ export abstract class DepartureJobRepository {
     departure_Id: number,
     metrado: number
   ): void {}
-  findAll(
+  findAllWithPaginationForJob(
+    skip: number,
+    data: T_FindAllDepartureJob,
+    project_id: number
+  ): void {}
+  findAllWithPaginationForDetail(
     skip: number,
     data: T_FindAllDepartureJob,
     project_id: number
