@@ -5,5 +5,5 @@ export abstract class DailyPartRepository {
 
   createDailyPart(data: I_CreateDailyPartBD): void {}
 
-  findById(daily_part: number): void {}
+  findById(daily_part_id: number): void {}
 }

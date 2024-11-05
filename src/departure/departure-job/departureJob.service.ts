@@ -14,6 +14,7 @@ import {
   Partida,
   Proyecto,
   Trabajo,
+  Unidad,
 } from "@prisma/client";
 import { jobValidation } from "@/job/job.validation";
 import { unitValidation } from "@/unit/unit.validation";
@@ -148,7 +149,6 @@ class DepartureJobService {
     try {
       const detailFind = await this.getDetailJobById(detail_id);
       if (!detailFind.success) {
-        console.log("no encontro el detallee");
         return httpResponse.BadRequestException(
           "No se encontró el Detalle Trabajo Partida que se quiere editar"
         );
@@ -174,18 +174,36 @@ class DepartureJobService {
         existsDetailDepartureJobResponse.payload as I_DepartureJobBBDD;
 
       //[note] verificamos si es el mismo detalle ya que si es el mismo no lo eliminamos
-      if (!existsDetailDepartureJobResponse.success) {
+
+      if (
+        existsDetailDepartureJobResponse.success &&
+        detail.partida_id === detailExist.partida_id &&
+        detail.trabajo_id === detailExist.trabajo_id
+      ) {
         return await this.updateNewDepartureJob(detail, departure, data);
-      } else {
+
+        // return httpResponse.SuccessResponse("va a editar el mismo ");
+      } else if (
+        existsDetailDepartureJobResponse.success &&
+        detailExist.partida_id != detail.partida_id &&
+        detail.trabajo_id == detailExist.trabajo_id
+      ) {
         return await this.updateExistingDepartureJob(
           detail,
           detailExist,
           departure,
           data.metrado
         );
+        // return httpResponse.SuccessResponse(
+        //   "Esto que introdujo va a otro detalle "
+        // );
+      } else {
+        // return httpResponse.SuccessResponse(
+        //   "va a editar el mismo pero otra partida "
+        // );
+        return await this.updateNewDepartureJob(detail, departure, data);
       }
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error en editar el Detalle Trabajo-Partida",
         error
@@ -491,6 +509,21 @@ class DepartureJobService {
       const responseProject = await projectValidation.findById(project_id);
       if (!responseProject.success) return responseProject;
       const project = responseProject.payload as Proyecto;
+
+      //trabajo
+      const jobsResponse = await jobValidation.findAllWithOutPagination(
+        project_id
+      );
+      const jobs = jobsResponse.payload as Trabajo[];
+      //partida
+      const departuresResponse =
+        await departureValidation.findAllWithOutPagination(project_id);
+      const departures = departuresResponse.payload as Partida[];
+      //unidad
+      const unitsResponse = await unitValidation.findAllWithOutPagination(
+        project_id
+      );
+      const units = unitsResponse.payload as Unidad[];
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -544,30 +577,38 @@ class DepartureJobService {
         );
       }
 
-      //[note] buscar si existe el id del trabajo
+      //[validation] buscar si existe el id del trabajo
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
 
-          const jobResponse = await jobValidation.findByCodeValidation(
-            item["ID-TRABAJO"].trim(),
-            project.id
+          // const jobResponse = await jobValidation.findByCodeValidation(
+          //   item["ID-TRABAJO"],
+          //   project.id
+          // );
+          // if (!jobResponse.success) {
+          //   error++;
+          //   errorRows.push(index + 1);
+          // }
+
+          const jobExists = jobs.some(
+            (job) => job.codigo == item["ID-TRABAJO"]
           );
-          if (!jobResponse.success) {
-            error++;
+          if (!jobExists) {
+            errorNumber++;
             errorRows.push(index + 1);
           }
         })
       );
 
-      if (error > 0) {
+      if (errorNumber > 0) {
         return httpResponse.BadRequestException(
           `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
-      //[note] separar el id de la Partida y buscar si existe
+      //[validation] separar el id de la Partida y buscar si existe
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
@@ -575,42 +616,59 @@ class DepartureJobService {
 
           const codeDeparture = departureWithComa[0];
 
-          const departureResponse =
-            await departureValidation.findByCodeValidation(
-              codeDeparture,
-              project.id
-            );
-          if (!departureResponse.success) {
-            error++;
+          // const departureResponse =
+          //   await departureValidation.findByCodeValidation(
+          //     codeDeparture,
+          //     project.id
+          //   );
+          // if (!departureResponse.success) {
+          //   error++;
+          //   errorRows.push(index + 1);
+          // }
+
+          const departureExists = departures.some(
+            (departure) => departure.id_interno == codeDeparture
+          );
+          if (!departureExists) {
+            errorNumber++;
             errorRows.push(index + 1);
           }
         })
       );
 
-      if (error > 0) {
+      if (errorNumber > 0) {
         return httpResponse.BadRequestException(
           `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );
       }
-      //[note] buscar si existe el id de la Unidad
+      //[validation] buscar si existe el id de la Unidad
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
 
-          const jobResponse = await unitValidation.findBySymbol(
-            item.UNIDAD.trim(),
-            project.id
+          // const jobResponse = await unitValidation.findBySymbol(
+          //   item.UNIDAD.trim(),
+          //   project.id
+          // );
+          // if (!jobResponse.success) {
+          //   error++;
+          //   errorRows.push(index + 1);
+          // }
+
+          const unitExists = units.some(
+            (unit) =>
+              unit.simbolo?.toUpperCase() == item.UNIDAD.trim().toUpperCase()
           );
-          if (!jobResponse.success) {
-            error++;
+          if (!unitExists) {
+            errorNumber++;
             errorRows.push(index + 1);
           }
         })
       );
 
-      if (error > 0) {
+      if (errorNumber > 0) {
         return httpResponse.BadRequestException(
           `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
             ", "
@@ -622,12 +680,10 @@ class DepartureJobService {
       await Promise.all(
         sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
           index++;
-          if (item.METRADO) {
-            const withoutComma = String(item.METRADO).replace(",", "");
-            if (!isNumeric(String(withoutComma))) {
-              errorNumber++;
-              errorRows.push(index + 1);
-            }
+          const withoutComma = String(item.METRADO).replace(",", "");
+          if (!isNumeric(String(withoutComma))) {
+            errorNumber++;
+            errorRows.push(index + 1);
           }
         })
       );
@@ -647,15 +703,21 @@ class DepartureJobService {
 
           const codeDeparture = departureWithComa[0];
 
-          const departureResponse =
-            await departureValidation.findByCodeValidation(
-              codeDeparture,
-              project.id
-            );
-          const partida = departureResponse.payload as Partida;
-
-          if (partida.metrado_inicial) {
-            if (Number(item.METRADO) > partida.metrado_inicial) {
+          // const departureResponse =
+          //   await departureValidation.findByCodeValidation(
+          //     codeDeparture,
+          //     project.id
+          //   );
+          // const partida = departureResponse.payload as Partida;
+          const departureExists = departures.find((departure) => {
+            return departure.id_interno == codeDeparture;
+          });
+          if (!departureExists) {
+            errorNumber++;
+            errorRows.push(index + 1);
+          }
+          if (departureExists?.metrado_inicial) {
+            if (Number(item.METRADO) > departureExists.metrado_inicial) {
               error++;
               errorRows.push(index + 1);
             }
@@ -674,13 +736,15 @@ class DepartureJobService {
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
 
       for (const item of sheetToJson) {
-        await departureJobValidation.updateDepartureJob(item, project_id);
+        // await departureJobValidation.updateDepartureJob(item, project_id);
+
         await departureJobValidation.createDetailDepartureJobFromExcel(
           item,
-          project_id
+          project_id,
+          jobs,
+          departures
         );
       }
-      await prisma.$disconnect();
 
       return httpResponse.SuccessResponse(
         "Partidas y Trabajos actualizados correctamente!"
@@ -691,24 +755,27 @@ class DepartureJobService {
         "Error al leer las Partidas con sus Trabajos",
         error
       );
+    } finally {
+      await prisma.$disconnect();
     }
   }
-  async findAll(data: T_FindAllDepartureJob, job_id: string) {
+  async findAll(data: T_FindAllDepartureJob, project_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
 
-      const jobResponse = await projectValidation.findById(+job_id);
-      if (!jobResponse.success) {
-        return jobResponse;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
       }
 
-      const job = jobResponse.payload as Trabajo;
+      const project = projectResponse.payload as Proyecto;
 
-      const result = await prismaDepartureJobRepository.findAll(
-        skip,
-        data,
-        job.id
-      );
+      const result =
+        await prismaDepartureJobRepository.findAllWithPaginationForJob(
+          skip,
+          data,
+          project.id
+        );
 
       const { detailsDepartureJob, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
@@ -728,6 +795,46 @@ class DepartureJobService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos y sus Partidas",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAllForDetail(data: T_FindAllDepartureJob, project_id: string) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+
+      const result =
+        await prismaDepartureJobRepository.findAllWithPaginationForDetail(
+          skip,
+          data,
+          +project_id
+        );
+
+      const { detailsDepartureJob, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: detailsDepartureJob,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Trabajos y sus Partidas del Detalle",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todas los Trabajos y sus Partidas del Detalle",
         error
       );
     } finally {

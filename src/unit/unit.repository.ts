@@ -4,6 +4,8 @@ import { T_FindAllUnit } from "./models/unit.types";
 export abstract class UnitRepository {
   findAll(skip: number, data: T_FindAllUnit, project_id: number): void {}
 
+  findAllWithOutPagination(project_id: number): void {}
+
   findByCode(code: string, project_id: number): void {}
 
   findById(idUnit: number): void {}

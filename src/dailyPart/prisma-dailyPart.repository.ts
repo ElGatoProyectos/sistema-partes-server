@@ -4,11 +4,21 @@ import { DailyPartRepository } from "./dailyPart.repository";
 import { I_CreateDailyPartBD } from "./models/dailyPart.interface";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
-  createDailyPart(data: I_CreateDailyPartBD): void {
-    throw new Error("Method not implemented.");
+  async createDailyPart(
+    data: I_CreateDailyPartBD
+  ): Promise<ParteDiario | null> {
+    const dailyPart = await prisma.parteDiario.create({
+      data: data,
+    });
+    return dailyPart;
   }
-  findById(daily_part: number): void {
-    throw new Error("Method not implemented.");
+  async findById(daily_part_id: number): Promise<ParteDiario | null> {
+    const dailyPart = await prisma.parteDiario.findFirst({
+      where: {
+        id: daily_part_id,
+      },
+    });
+    return dailyPart;
   }
   async findByIdJob(job_id: number): Promise<ParteDiario | null> {
     const dailyPart = await prisma.parteDiario.findFirst({

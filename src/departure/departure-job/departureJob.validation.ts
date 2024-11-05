@@ -104,32 +104,58 @@ class DepartureJobValidation {
   }
   async createDetailDepartureJobFromExcel(
     data: I_DepartureJobExcel,
-    project_id: number
+    project_id: number,
+    jobs: Trabajo[],
+    departures: Partida[]
   ): Promise<T_HttpResponse> {
     try {
-      const jobResponse = await jobValidation.findByCodeValidation(
-        data["ID-TRABAJO"],
-        project_id
-      );
-      const job = jobResponse.payload as Trabajo;
+      const jobResponse = jobs.find((departure) => {
+        return departure.codigo === data["ID-TRABAJO"];
+      });
+
+      if (!jobResponse) {
+        return httpResponse.BadRequestException(
+          "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+        );
+      }
+      // const jobResponse = await jobValidation.findByCodeValidation(
+      //   data["ID-TRABAJO"],
+      //   project_id
+      // );
+      // const job = jobResponse.payload as Trabajo;
       const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
 
       const codeDeparture = departureWithComa[0];
-      const departureResponse = await departureValidation.findByCodeValidation(
-        String(codeDeparture),
-        project_id
-      );
-      const departure = departureResponse.payload as Partida;
+
+      const departureResponse = departures.find((departure) => {
+        return departure.id_interno === codeDeparture;
+      });
+
+      if (!departureResponse) {
+        return httpResponse.BadRequestException(
+          "No se encontró la partida que se quiere agregar en el Detalle"
+        );
+      }
+
+      // const departureResponse = await departureValidation.findByCodeValidation(
+      //   String(codeDeparture),
+      //   project_id
+      // );
+      // const departure = departureResponse.payload as Partida;
+      // if (departureResponse && departureResponse.id !== undefined) {
+
       const detail =
         await prismaDepartureJobRepository.createDetailDepartureJob(
-          job.id,
-          departure.id,
+          jobResponse.id,
+          departureResponse.id,
           +data.METRADO
         );
+
       return httpResponse.SuccessResponse(
         "El Detalle Trabajo-Partida fue creado correctamente",
         detail
       );
+      // }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al modificar los Trabajos de las Partidas",

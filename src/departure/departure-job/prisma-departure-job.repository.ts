@@ -77,7 +77,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     });
     return detail;
   }
-  async findAll(
+  async findAllWithPaginationForJob(
     skip: number,
     data: T_FindAllDepartureJob,
     project_id: number
@@ -157,6 +157,62 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
 
     let detailsDepartureJob = Array.from(departureJobMap.values());
 
+    return {
+      detailsDepartureJob,
+      total: detailsDepartureJob.length,
+    };
+  }
+  async findAllWithPaginationForDetail(
+    skip: number,
+    data: T_FindAllDepartureJob,
+    project_id: number
+  ): Promise<{ detailsDepartureJob: any[]; total: number }> {
+    let details: any = {};
+
+    details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        Trabajo: {
+          proyecto_id: project_id,
+        },
+        Partida: {
+          proyecto_id: project_id,
+        },
+        OR: [
+          {
+            Trabajo: {
+              nombre: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+          {
+            Partida: {
+              partida: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+        ],
+      },
+
+      skip,
+      take: data.queryParams.limit,
+
+      include: {
+        Trabajo: true,
+        Partida: true,
+      },
+    });
+
+    const detailsDepartureJob = details.map((item: I_DetailDepartureJob) => {
+      const { Trabajo, Partida, ...data } = item;
+      return {
+        data: data,
+        trabajo: Trabajo,
+        partida: Partida,
+        metrado_utilizado: item.metrado_utilizado,
+      };
+    });
     return {
       detailsDepartureJob,
       total: detailsDepartureJob.length,

@@ -150,6 +150,20 @@ class JobValidation {
       );
     }
   }
+  async findAllWithOutPagination(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const jobs = await prismaJobRepository.findAllWithOutPagination(
+        project_id
+      );
+
+      return httpResponse.SuccessResponse("Trabajos encontrados", jobs);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Trabajos",
+        error
+      );
+    }
+  }
   async findByName(name: string, project_id: number): Promise<T_HttpResponse> {
     try {
       const job = await prismaJobRepository.existsName(name, project_id);

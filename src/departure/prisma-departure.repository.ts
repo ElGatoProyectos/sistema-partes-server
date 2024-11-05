@@ -9,6 +9,16 @@ import { T_FindAllDeparture } from "./models/departure.types";
 import prisma from "@/config/prisma.config";
 
 class PrismaDepartureRepository implements DepartureRepository {
+  async findAllWithOutPagination(
+    project_id: number
+  ): Promise<Partida[] | null> {
+    const departures = await prisma.partida.findMany({
+      where: {
+        proyecto_id: project_id,
+      },
+    });
+    return departures;
+  }
   async createDeparture(data: I_CreateDepartureBD): Promise<Partida> {
     const departure = await prisma.partida.create({
       data,

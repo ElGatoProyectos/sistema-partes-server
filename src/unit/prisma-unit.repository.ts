@@ -10,6 +10,14 @@ import { UnitRepository } from "./unit.repository";
 import { T_FindAllUnit } from "./models/unit.types";
 
 class PrismaUnitRepository implements UnitRepository {
+  async findAllWithOutPagination(project_id: number): Promise<Unidad[] | null> {
+    const units = await prisma.unidad.findMany({
+      where: {
+        proyecto_id: project_id,
+      },
+    });
+    return units;
+  }
   async createUnitMasive(data: I_CreateUnitBody[]): Promise<{ count: number }> {
     const units = await prisma.unidad.createMany({
       data,
@@ -50,7 +58,6 @@ class PrismaUnitRepository implements UnitRepository {
     const unit = units.find((result) => {
       return result.simbolo?.toUpperCase() === symbolUpperCase;
     });
-    console.log("Lo q da como resultado es " + unit);
     return unit || null;
   }
   // async existsName(name: string): Promise<Unidad | null> {
