@@ -93,6 +93,11 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         proyecto_id: project_id,
         OR: [
           {
+            nombre: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
             DetalleTrabajoPartida: {
               some: {
                 Trabajo: {
@@ -112,6 +117,9 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       },
       skip,
       take: data.queryParams.limit,
+      orderBy: {
+        nombre: "asc",
+      },
     });
     total = await prisma.trabajo.count({
       where: {
@@ -120,6 +128,11 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         },
         proyecto_id: project_id,
         OR: [
+          {
+            nombre: {
+              contains: data.queryParams.search,
+            },
+          },
           {
             DetalleTrabajoPartida: {
               some: {
@@ -154,6 +167,11 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       include: {
         Trabajo: true,
         Partida: true,
+      },
+      orderBy: {
+        Trabajo: {
+          nombre: "asc",
+        },
       },
     });
 
