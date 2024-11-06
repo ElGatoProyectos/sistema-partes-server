@@ -93,13 +93,13 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         proyecto_id: project_id,
         OR: [
           {
-            nombre: {
-              contains: data.queryParams.search,
-            },
-          },
-          {
             DetalleTrabajoPartida: {
               some: {
+                Trabajo: {
+                  nombre: {
+                    contains: data.queryParams.search,
+                  },
+                },
                 Partida: {
                   partida: {
                     contains: data.queryParams.search,
@@ -115,6 +115,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     });
 
     const ids = detail.map((trabajo) => trabajo.id);
+
     details = await prisma.detalleTrabajoPartida.findMany({
       where: {
         Trabajo: {
