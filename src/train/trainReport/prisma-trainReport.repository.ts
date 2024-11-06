@@ -1,6 +1,6 @@
 import { ReporteTren } from "@prisma/client";
 import { TrainReportRepository } from "./trainReport.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 
 class PrismaTrainReportRepository implements TrainReportRepository {
   async findById(train_id: number): Promise<ReporteTren | null> {

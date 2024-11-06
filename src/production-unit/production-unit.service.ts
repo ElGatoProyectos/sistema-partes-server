@@ -1,11 +1,11 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import {
   I_CreateProductionUnitBody,
   I_ProductionUnitExcel,
   I_UpdateProductionUnitBody,
 } from "./models/production-unit.interface";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import fs from "fs/promises";
 import * as xlsx from "xlsx";
 import appRootPath from "app-root-path";
@@ -14,9 +14,9 @@ import {
   ProductionUnitMulterProperties,
 } from "./models/production-unit.constant";
 import { Proyecto, Unidad, UnidadProduccion } from "@prisma/client";
-import { T_FindAll } from "@/common/models/pagination.types";
+import { T_FindAll } from "../common/models/pagination.types";
 import { productionUnitValidation } from "./productionUnit.validation";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
 import validator from "validator";
 import { T_FindAllUp } from "./models/up.types";

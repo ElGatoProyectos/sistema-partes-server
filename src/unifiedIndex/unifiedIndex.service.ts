@@ -7,15 +7,15 @@ import {
 import { unifiedIndexValidation } from "./unifiedIndex.validation";
 import { prismaUnifiedIndexRepository } from "./prisma-unified-index";
 import { UnifiedIndexResponseMapper } from "./mapper/unifiedIndex.mapper";
-import prisma from "@/config/prisma.config";
-import { T_FindAll } from "@/common/models/pagination.types";
-import { companyValidation } from "@/company/company.validation";
+import prisma from "../config/prisma.config";
+import { T_FindAll } from "../common/models/pagination.types";
+import { companyValidation } from "../company/company.validation";
 import { Empresa, IndiceUnificado, Usuario } from "@prisma/client";
 import * as xlsx from "xlsx";
 import validator from "validator";
-import { jwtService } from "@/auth/jwt.service";
+import { jwtService } from "../auth/jwt.service";
 import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 
 class UnifiedIndexService {
   async createUnifiedIndex(

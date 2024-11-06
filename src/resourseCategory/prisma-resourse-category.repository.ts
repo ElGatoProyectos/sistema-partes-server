@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { ResourseCategoryRepository } from "./resourseCategory.repository";
 import {
   I_ResourseCategory,
@@ -6,7 +6,7 @@ import {
   I_UpdateResourseCategoryBody,
 } from "./models/resourseCategory.interface";
 import { CategoriaRecurso, E_Estado_BD } from "@prisma/client";
-import { I_CreateResourcesBD } from "@/resources/models/resources.interface";
+import { I_CreateResourcesBD } from "../resources/models/resources.interface";
 
 class PrismaResourseCategoryRepository implements ResourseCategoryRepository {
   async createResourcesCategoryMasive(

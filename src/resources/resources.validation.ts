@@ -1,15 +1,15 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaResourcesRepository } from "./prisma-resources.repository";
 import { I_ResourcesExcel } from "./models/resources.interface";
-import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
+import { resourseCategoryValidation } from "../resourseCategory/resourseCategory.validation";
 import {
   CategoriaRecurso,
   IndiceUnificado,
   Recurso,
   Unidad,
 } from "@prisma/client";
-import { unitValidation } from "@/unit/unit.validation";
-import { unifiedIndexValidation } from "@/unifiedIndex/unifiedIndex.validation";
+import { unitValidation } from "../unit/unit.validation";
+import { unifiedIndexValidation } from "../unifiedIndex/unifiedIndex.validation";
 
 class ResourceValidation {
   async updateResource(

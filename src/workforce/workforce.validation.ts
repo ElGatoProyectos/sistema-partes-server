@@ -1,9 +1,8 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { I_WorkforceExcel } from "./models/workforce.interface";
 import { prismaWorkforceRepository } from "./prisma-workforce.repository";
-import { typeWorkforceValidation } from "@/typeWorkforce/typeWorkforce.validation";
+import { typeWorkforceValidation } from "../typeWorkforce/typeWorkforce.validation";
 import {
-  Banco,
   CategoriaObrero,
   E_Estado_MO_BD,
   EspecialidadObrero,
@@ -12,10 +11,10 @@ import {
   TipoObrero,
   Unidad,
 } from "@prisma/client";
-import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
-import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
-import { specialtyWorkforceValidation } from "@/specialtyWorkforce/specialtyWorkfoce.validation";
-import { unitValidation } from "@/unit/unit.validation";
+import { originWorkforceValidation } from "../originWorkforce/originWorkforce.validation";
+import { categoryWorkforceValidation } from "../categoryWorkforce/categoryWorkforce.validation";
+import { specialtyWorkforceValidation } from "../specialtyWorkforce/specialtyWorkfoce.validation";
+import { unitValidation } from "../unit/unit.validation";
 
 class WorkforceValidation {
   async updateWorkforce(
@@ -311,7 +310,7 @@ class WorkforceValidation {
       }
       return httpResponse.SuccessResponse("Mano de Obra encontrado", workforce);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Mano de Obra",
         error

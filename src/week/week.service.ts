@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { httpResponse, T_HttpResponse } from "./../common/http.response";
 import { prismaWeekRepository } from "./prisma-week.repository";
 

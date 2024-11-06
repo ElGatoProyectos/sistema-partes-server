@@ -1,5 +1,5 @@
-import { httpResponse } from "@/common/http.response";
-import express from "@/config/express.config";
+import { httpResponse } from "../../common/http.response";
+import express from "../../config/express.config";
 import validator from "validator";
 import { departureJobDto } from "./dto/departureJob.dto";
 import { departureJobUpdateDto } from "./dto/departureJobUpdate.dto";

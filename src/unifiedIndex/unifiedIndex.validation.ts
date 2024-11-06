@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaUnifiedIndexRepository } from "./prisma-unified-index";
 import { I_UnifiedIndexExcel } from "./models/unifiedIndex.interface";
 

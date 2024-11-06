@@ -1,5 +1,5 @@
 import { ParteDiario } from "@prisma/client";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { DailyPartRepository } from "./dailyPart.repository";
 import { I_CreateDailyPartBD } from "./models/dailyPart.interface";
 

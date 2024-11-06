@@ -1,8 +1,6 @@
 import { departureJobValidation } from "../departure/departure-job/departureJob.validation";
 import { I_DepartureJobExcel } from "../departure/departure-job/models/departureJob.interface";
-import { Partida, Trabajo } from "@prisma/client";
 
-// const sunatService = new SunatService();
 async function testSyncronize(
   data: I_DepartureJobExcel,
   project_id: string,

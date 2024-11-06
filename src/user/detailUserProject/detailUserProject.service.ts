@@ -1,17 +1,17 @@
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../../project/project.validation";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 import { prismaDetailUserProjectRepository } from "./prismaUserProject.repository";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
+import prisma from "../../config/prisma.config";
 import { userValidation } from "../user.validation";
-import { rolValidation } from "@/rol/rol.validation";
+import { rolValidation } from "../../rol/rol.validation";
 import { Proyecto, Usuario, Rol, DetalleUsuarioProyecto } from "@prisma/client";
 import { detailProjectValidation } from "./detailUserProject.validation";
 import {
   I_CreateDetailAssignment,
   I_DeleteDetail,
 } from "./models/detail.interface";
-import { jwtService } from "@/auth/jwt.service";
+import { jwtService } from "../../auth/jwt.service";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";

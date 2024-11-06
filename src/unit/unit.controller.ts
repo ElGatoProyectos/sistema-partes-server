@@ -1,14 +1,14 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import {
   I_CreateUnitBody,
   I_ImportExcelRequestUnit,
   I_UpdateUnitBody,
 } from "./models/unit.interface";
 import { unitService } from "./unit.service";
-import { T_FindAll } from "@/common/models/pagination.types";
+import { T_FindAll } from "../common/models/pagination.types";
 import multer from "multer";
-import { httpResponse } from "@/common/http.response";
-import { authService } from "@/auth/auth.service";
+import { httpResponse } from "../common/http.response";
+import { authService } from "../auth/auth.service";
 import { T_FindAllUnit } from "./models/unit.types";
 
 const storage = multer.memoryStorage();

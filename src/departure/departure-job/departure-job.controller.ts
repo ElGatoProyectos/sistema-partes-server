@@ -1,5 +1,4 @@
-import { authService } from "@/auth/auth.service";
-import express from "@/config/express.config";
+import express from "../../config/express.config";
 
 import multer from "multer";
 import { departureJobService } from "./departureJob.service";

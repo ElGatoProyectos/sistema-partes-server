@@ -1,5 +1,5 @@
 import { DetailUserProjectRepository } from "./detailUserProject.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 import {
   I_CreateDetailUserProject,
@@ -9,7 +9,7 @@ import { DetalleUsuarioProyecto, Rol } from "@prisma/client";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
-import { T_FindAllProject } from "@/project/dto/project.type";
+import { T_FindAllProject } from "../../project/dto/project.type";
 
 class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
   async getAllResponsible(

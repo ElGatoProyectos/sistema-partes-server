@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { I_CreateDetailUserProject } from "./models/detailUserProject.interface";
 import { prismaDetailUserProjectRepository } from "./prismaUserProject.repository";
 

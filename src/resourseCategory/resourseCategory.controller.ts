@@ -1,10 +1,10 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import {
   I_CreateResourseCategoryBody,
   I_UpdateResourseCategoryBody,
 } from "./models/resourseCategory.interface";
 import { resourseCategoryService } from "./resourseCategory.service";
-import { T_FindAll } from "@/common/models/pagination.types";
+import { T_FindAll } from "../common/models/pagination.types";
 
 class ResourceCategoryController {
   async create(request: express.Request, response: express.Response) {

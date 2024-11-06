@@ -1,5 +1,5 @@
-import { T_FindAll } from "@/common/models/pagination.types";
-import express from "@/config/express.config";
+import { T_FindAll } from "../common/models/pagination.types";
+import express from "../config/express.config";
 import {
   I_CreateUnifiedIndexBody,
   I_ImportExcelRequestUnifiedIndex,
@@ -8,7 +8,7 @@ import {
 import { unifiedIndexService } from "./unifiedIndex.service";
 import multer from "multer";
 import { unifiedIndexExcelDto } from "./dto/unifiedIndexExcel.dto";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 import { T_FindAllUnifiedIndex } from "./models/unifiedIndex.types";
 
 const storage = multer.memoryStorage();

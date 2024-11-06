@@ -1,5 +1,5 @@
-import { httpResponse } from "@/common/http.response";
-import express from "@/config/express.config";
+import { httpResponse } from "../common/http.response";
+import express from "../config/express.config";
 import validator from "validator";
 import { workforceDto } from "./dto/workforce.dto";
 import { workforceUpdateDto } from "./dto/workforceUpdate.dto";

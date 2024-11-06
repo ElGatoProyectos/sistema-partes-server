@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { DepartureJobRepository } from "./departure-job.repository";
 import { DetalleTrabajoPartida } from "@prisma/client";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";

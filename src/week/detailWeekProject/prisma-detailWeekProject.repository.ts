@@ -4,7 +4,7 @@ import {
   I_CreateDetailWeekProject,
   I_UpdateDetailWeekProject,
 } from "./models/detailWeekProject.interface";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 
 class PrismaDetailWeekProjectRepository implements DetailWeekProjectRepository {
   async findAllForYear(date: Date): Promise<DetalleSemanaProyecto[] | null> {

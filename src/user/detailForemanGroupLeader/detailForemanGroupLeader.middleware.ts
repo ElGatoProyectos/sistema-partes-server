@@ -1,5 +1,5 @@
-import express from "@/config/express.config";
-import { httpResponse } from "@/common/http.response";
+import express from "../../config/express.config";
+import { httpResponse } from "../../common/http.response";
 import validator from "validator";
 
 class DetailForemanGroupLeaderMiddleware {

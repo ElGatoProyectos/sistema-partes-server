@@ -1,20 +1,20 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import prisma from "../config/prisma.config";
 import {
   Asistencia,
   E_Asistencia_BD,
   E_Estado_BD,
   ManoObra,
 } from "@prisma/client";
-import { workforceValidation } from "@/workforce/workforce.validation";
-import { projectValidation } from "@/project/project.validation";
+import { workforceValidation } from "../workforce/workforce.validation";
+import { projectValidation } from "../project/project.validation";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
 import { assistsWorkforceValidation } from "./assists.validation";
 import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
-import { jwtService } from "@/auth/jwt.service";
-import { I_Usuario } from "@/user/models/user.interface";
+import { jwtService } from "../auth/jwt.service";
+import { I_Usuario } from "../user/models/user.interface";
 import { I_AssistsBody } from "./models/assists.interface";
-import { prismaWorkforceRepository } from "@/workforce/prisma-workforce.repository";
+import { prismaWorkforceRepository } from "../workforce/prisma-workforce.repository";
 
 class AssistsService {
   async findAll(

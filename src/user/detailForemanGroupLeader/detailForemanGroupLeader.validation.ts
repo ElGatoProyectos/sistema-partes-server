@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { prismaDetailForemanGroupLeaderRepository } from "./prisma-detailForemanGroupLeader.respository";
 
 class DetailForemanGroupLeaderValidation {

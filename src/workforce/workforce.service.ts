@@ -4,8 +4,8 @@ import {
   I_UpdateWorkforceBody,
   I_WorkforceExcel,
 } from "./models/workforce.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import { projectValidation } from "@/project/project.validation";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import { projectValidation } from "../project/project.validation";
 import {
   CategoriaObrero,
   E_Estado_MO_BD,
@@ -17,18 +17,18 @@ import {
   Unidad,
   Usuario,
 } from "@prisma/client";
-import prisma from "@/config/prisma.config";
-import { specialtyWorkforceValidation } from "@/specialtyWorkforce/specialtyWorkfoce.validation";
-import { unitValidation } from "@/unit/unit.validation";
-import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
+import prisma from "../config/prisma.config";
+import { specialtyWorkforceValidation } from "../specialtyWorkforce/specialtyWorkfoce.validation";
+import { unitValidation } from "../unit/unit.validation";
+import { categoryWorkforceValidation } from "../categoryWorkforce/categoryWorkforce.validation";
 import { workforceValidation } from "./workforce.validation";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { prismaWorkforceRepository } from "./prisma-workforce.repository";
-import { converToDate } from "@/common/utils/date";
-import { userValidation } from "@/user/user.validation";
+import { converToDate } from "../common/utils/date";
+import { userValidation } from "../user/user.validation";
 import validator from "validator";
-import { typeWorkforceValidation } from "@/typeWorkforce/typeWorkforce.validation";
-import { originWorkforceValidation } from "@/originWorkforce/originWorkforce.validation";
+import { typeWorkforceValidation } from "../typeWorkforce/typeWorkforce.validation";
+import { originWorkforceValidation } from "../originWorkforce/originWorkforce.validation";
 
 class WorkforceService {
   async createWorkforce(

@@ -1,5 +1,5 @@
 import { E_Estado_BD, IndiceUnificado } from "@prisma/client";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import {
   I_CreateUnifiedIndexBD,
   I_UnifiedIndex,

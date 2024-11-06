@@ -1,7 +1,7 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { assistsService } from "./assists.service";
 import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 import { I_AssistsBody } from "./models/assists.interface";
 
 class AssistsController {

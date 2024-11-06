@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { prismaDetailWeekProjectRepository } from "./prisma-detailWeekProject.repository";
 import { I_UpdateDetailWeekProject } from "./models/detailWeekProject.interface";
 

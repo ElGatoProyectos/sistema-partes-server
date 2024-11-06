@@ -1,17 +1,17 @@
-import { httpResponse } from "@/common/http.response";
-import express from "@/config/express.config";
+import { httpResponse } from "../common/http.response";
+import express from "../config/express.config";
 import multer from "multer";
 import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";
 import { projectService } from "./project.service";
-import { ProjectMulterProperties } from "@/project/models/project.constant";
+import { ProjectMulterProperties } from "../project/models/project.constant";
 import { Proyecto } from "@prisma/client";
 import { proyectoDto } from "./dto/project.dto";
 import fs from "fs/promises";
 import { I_UpdateProyectBody } from "./models/project.interface";
 import { proyectoDtoUpdate } from "./dto/proyectUpdate.dto";
-import { authService } from "@/auth/auth.service";
+import { authService } from "../auth/auth.service";
 import { T_FindAllProject } from "./dto/project.type";
 
 //los archivos subidos serán almacenados directamente en la memoria (RAM) en lugar de ser guardados en el disco duro.

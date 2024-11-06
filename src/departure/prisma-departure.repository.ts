@@ -6,7 +6,7 @@ import {
   I_UpdateDepartureBD,
 } from "./models/departure.interface";
 import { T_FindAllDeparture } from "./models/departure.types";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 
 class PrismaDepartureRepository implements DepartureRepository {
   async findAllWithOutPagination(

@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { SectionRepository } from "./section.repository";
 import { Seccion } from "@prisma/client";
 import { I_CreateSeccionBD } from "./models/section.repository";

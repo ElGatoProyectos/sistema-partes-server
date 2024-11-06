@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { T_FindAllDetailUserCompany } from "./models/detailsUserCompany.types";
 import { detailUserCompanyService } from "./detailuserservice.service";
 

@@ -1,8 +1,8 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
-import { trainValidation } from "@/train/train.validation";
-import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
-import { converToDate } from "@/common/utils/date";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import prisma from "../config/prisma.config";
+import { trainValidation } from "../train/train.validation";
+import { productionUnitValidation } from "../production-unit/productionUnit.validation";
+import { converToDate } from "../common/utils/date";
 import { jobValidation } from "./job.validation";
 import {
   E_Trabajo_Estado,
@@ -18,15 +18,15 @@ import {
   I_UpdateJobBody,
 } from "./models/job.interface";
 import { prismaJobRepository } from "./prisma-job.repository";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 import { T_FindAllJob } from "./models/job.types";
 import { JobResponseMapper } from "./mappers/job.mapper";
-import { userValidation } from "@/user/user.validation";
+import { userValidation } from "../user/user.validation";
 import * as xlsx from "xlsx";
 import validator from "validator";
-import { jwtService } from "@/auth/jwt.service";
-import { departureJobValidation } from "@/departure/departure-job/departureJob.validation";
-import { dailyPartReportValidation } from "@/dailyPart/dailyPart.validation";
+import { jwtService } from "../auth/jwt.service";
+import { departureJobValidation } from "../departure/departure-job/departureJob.validation";
+import { dailyPartReportValidation } from "../dailyPart/dailyPart.validation";
 
 class JobService {
   async createJob(

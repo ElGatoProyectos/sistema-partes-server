@@ -1,7 +1,7 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { companyController } from "./company.controller";
 import { companyMiddleware } from "./company.middleware";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 
 const companyRouter = express.Router();
 

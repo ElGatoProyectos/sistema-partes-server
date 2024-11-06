@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../../config/express.config";
 import {
   T_FindAllDetailUser,
   T_FindAllDetailUserProject,
@@ -8,7 +8,7 @@ import {
   I_CreateDetailAssignment,
   I_DeleteDetail,
 } from "./models/detail.interface";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../../common/http.response";
 
 class DetailUserProjectController {
   async createDetailAssignment(

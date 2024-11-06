@@ -1,10 +1,10 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaCategoryWorkforceRepository } from "./prisma-categoryWorkfoce.repository";
 import { T_FindAllCategoryWorkforce } from "./models/categoryWorkforce.types";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
-import { detailPriceHourWorkforceValidation } from "@/workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
-import { workforceValidation } from "@/workforce/workforce.validation";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
+import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
+import { workforceValidation } from "../workforce/workforce.validation";
 import { I_CreateCategoryWorkforceBody } from "./models/categoryWorkforce.interface";
 import { CategoriaObrero } from "@prisma/client";
 import { categoryWorkforceValidation } from "./categoryWorkforce.validation";

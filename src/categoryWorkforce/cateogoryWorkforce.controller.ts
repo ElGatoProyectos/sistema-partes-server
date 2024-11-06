@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import {
   I_CategoryWorkforceBody,
   I_CreateCategoryWorkforceBody,

@@ -1,8 +1,8 @@
-import { assistsWorkforceValidation } from "@/assists/assists.validation";
-import { prismaAssistsRepository } from "@/assists/prisma-assists.repository";
-import { detailWeekProjectValidation } from "@/week/detailWeekProject/detailWeekProject.validation";
-import { weekValidation } from "@/week/week.validation";
-import { prismaWorkforceRepository } from "@/workforce/prisma-workforce.repository";
+import { assistsWorkforceValidation } from "../assists/assists.validation";
+import { prismaAssistsRepository } from "../assists/prisma-assists.repository";
+import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWeekProject.validation";
+import { weekValidation } from "../week/week.validation";
+import { prismaWorkforceRepository } from "../workforce/prisma-workforce.repository";
 import {
   DetalleSemanaProyecto,
   E_Asistencia_BD,

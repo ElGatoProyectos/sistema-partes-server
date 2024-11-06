@@ -1,6 +1,6 @@
 import * as xlsx from "xlsx";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
+import prisma from "../../config/prisma.config";
 import {
   I_DepartureJob,
   I_DepartureJobBBDD,
@@ -8,7 +8,7 @@ import {
   I_DepartureJobUpdate,
 } from "./models/departureJob.interface";
 import { departureValidation } from "../departure.validation";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../../project/project.validation";
 import {
   DetalleTrabajoPartida,
   Partida,
@@ -16,16 +16,16 @@ import {
   Trabajo,
   Unidad,
 } from "@prisma/client";
-import { jobValidation } from "@/job/job.validation";
-import { unitValidation } from "@/unit/unit.validation";
+import { jobValidation } from "../../job/job.validation";
+import { unitValidation } from "../../unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
-import { prismaJobRepository } from "@/job/prisma-job.repository";
+import { prismaJobRepository } from "../../job/prisma-job.repository";
 import { isNumeric } from "validator";
 import { fork } from "child_process";
 import path from "path";
-import { envConfig } from "@/config/env.config";
+import { envConfig } from "../../config/env.config";
 
 class DepartureJobService {
   async createDetailJobDeparture(data: I_DepartureJob) {

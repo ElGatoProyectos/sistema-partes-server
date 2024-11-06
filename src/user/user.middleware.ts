@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { userDto } from "./dto/user.dto";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 import { userUpdateDto } from "./dto/update.dto";
 import validator from "validator";
 import { userAndCompanyDto } from "./dto/userAndCompany.dto";

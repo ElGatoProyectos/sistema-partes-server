@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../../config/express.config";
 import { priceHourWorkforceService } from "./priceHourWorkforce.service";
 import { I_PriceHourWorkforce } from "./models/priceHourWorkforce.interface";
 import { T_FindAllPriceHourWorkforce } from "./models/priceHourWorkforce.types";
@@ -18,7 +18,11 @@ class PriceHourWorkforceController {
     const data = request.body as I_PriceHourWorkforce;
     const project_id = request.get("project-id") as string;
     const price_hour_id = Number(request.params.id);
-    const result = await priceHourWorkforceService.update(price_hour_id,data, +project_id);
+    const result = await priceHourWorkforceService.update(
+      price_hour_id,
+      data,
+      +project_id
+    );
     if (!result.success) {
       response.status(result.statusCode).json(result);
     } else {

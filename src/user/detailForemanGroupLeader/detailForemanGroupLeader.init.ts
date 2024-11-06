@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../../config/express.config";
 import { detailForemanGroupLeaderController } from "./detailForemanGroupLeader.controller";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../../auth/middlewares/auth-role.middleware";
 import { detailForemanGroupLeaderMiddleware } from "./detailForemanGroupLeader.middleware";
 
 const detailForemanGroupLeaderRouter = express.Router();

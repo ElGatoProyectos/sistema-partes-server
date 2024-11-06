@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { DetalleMaestroObraCapataz } from "@prisma/client";
 import { DetailMasterBuilderForemanRepository } from "./detailMasterBuilderForeman.repository";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";

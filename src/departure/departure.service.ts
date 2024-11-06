@@ -1,6 +1,6 @@
-import { jwtService } from "@/auth/jwt.service";
-import { companyValidation } from "@/company/company.validation";
-import { projectValidation } from "@/project/project.validation";
+import { jwtService } from "../auth/jwt.service";
+import { companyValidation } from "../company/company.validation";
+import { projectValidation } from "../project/project.validation";
 import { Empresa, Partida, Proyecto, Unidad, Usuario } from "@prisma/client";
 import * as xlsx from "xlsx";
 import {
@@ -8,11 +8,11 @@ import {
   I_DepartureExcel,
   I_UpdateDepartureBody,
 } from "./models/departure.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import prisma from "../config/prisma.config";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
 import validator, { isNumeric } from "validator";
-import { unitValidation } from "@/unit/unit.validation";
+import { unitValidation } from "../unit/unit.validation";
 import { departureValidation } from "./departure.validation";
 import { T_FindAllDeparture } from "./models/departure.types";
 import { departureJobValidation } from "./departure-job/departureJob.validation";
