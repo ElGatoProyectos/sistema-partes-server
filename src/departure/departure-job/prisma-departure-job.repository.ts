@@ -91,6 +91,24 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
           some: {},
         },
         proyecto_id: project_id,
+        OR: [
+          {
+            nombre: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            DetalleTrabajoPartida: {
+              some: {
+                Partida: {
+                  partida: {
+                    contains: data.queryParams.search,
+                  },
+                },
+              },
+            },
+          },
+        ],
       },
       skip,
       take: data.queryParams.limit,
@@ -104,22 +122,6 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
             in: ids,
           },
         },
-        OR: [
-          {
-            Trabajo: {
-              nombre: {
-                contains: data.queryParams.search,
-              },
-            },
-          },
-          {
-            Partida: {
-              partida: {
-                contains: data.queryParams.search,
-              },
-            },
-          },
-        ],
       },
 
       include: {
@@ -168,7 +170,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     project_id: number
   ): Promise<{ detailsDepartureJob: any[]; total: number }> {
     let details: any = {};
-
+    let total;
     details = await prisma.detalleTrabajoPartida.findMany({
       where: {
         Trabajo: {
@@ -204,6 +206,33 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       },
     });
 
+    total = await prisma.detalleTrabajoPartida.count({
+      where: {
+        Trabajo: {
+          proyecto_id: project_id,
+        },
+        Partida: {
+          proyecto_id: project_id,
+        },
+        OR: [
+          {
+            Trabajo: {
+              nombre: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+          {
+            Partida: {
+              partida: {
+                contains: data.queryParams.search,
+              },
+            },
+          },
+        ],
+      },
+    });
+
     const detailsDepartureJob = details.map((item: I_DetailDepartureJob) => {
       const { Trabajo, Partida, ...data } = item;
       return {
@@ -215,7 +244,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
     });
     return {
       detailsDepartureJob,
-      total: detailsDepartureJob.length,
+      total,
     };
   }
 
