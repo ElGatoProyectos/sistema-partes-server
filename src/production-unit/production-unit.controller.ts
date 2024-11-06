@@ -112,6 +112,69 @@ class ProductionUnitController {
     );
   };
 
+  deleteImage = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    try {
+      const production_unit_id = request.params.id;
+      const rolesPermitted = [
+        "ADMIN",
+        "USER",
+        "CONTROL_COSTOS",
+        "ASISTENTE_PRODUCCION",
+      ];
+      const responseValidate = authService.authorizeRolesService(
+        request.get("Authorization") as string,
+        rolesPermitted
+      );
+
+      if (!responseValidate?.success) {
+        return response.status(401).json(responseValidate);
+      } else {
+        if (!validator.isNumeric(production_unit_id)) {
+          const customError = httpResponse.BadRequestException(
+            "El id del de la Unidad de Producción debe ser numérico"
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          const direction = path.join(
+            appRootPath.path,
+            "static",
+            ProductionUnitMulterProperties.folder
+          );
+          const ext = ".png";
+          const fileName = `${ProductionUnitMulterProperties.folder}_${production_unit_id}${ext}`;
+          const filePath = path.join(direction, fileName);
+
+          try {
+            await fs.access(filePath);
+
+            // Eliminar el archivo
+            await fs.unlink(filePath);
+
+            response.status(200).json({
+              success: true,
+              message: "Imagen eliminada correctamente",
+            });
+          } catch (err) {
+            const customError = httpResponse.NotFoundException(
+              "La imagen no existe o ya fue eliminada",
+              err
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    } catch (error) {
+      const customError = httpResponse.BadRequestException(
+        "Error al intentar eliminar la imagen",
+        error
+      );
+      response.status(customError.statusCode).json(customError);
+    }
+  };
+
   update = async (request: express.Request, response: express.Response) => {
     upload.single(ProductionUnitMulterProperties.field)(
       request,

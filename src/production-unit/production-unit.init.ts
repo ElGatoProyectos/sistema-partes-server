@@ -21,6 +21,7 @@ prouductionUnitRouter.post(
   `${prefix}/upload-photo`,
   productionUnitController.uploadImageForProject
 );
+
 prouductionUnitRouter.get(
   `${prefix}`,
   authRoleMiddleware.authorizeRoles([
@@ -97,6 +98,11 @@ prouductionUnitRouter.delete(
     "ASISTENTE_PRODUCCION",
   ]),
   productionUnitController.updateStatus
+);
+//[note]
+prouductionUnitRouter.delete(
+  `${prefix}/delete-photo/:id`,
+  productionUnitController.deleteImage
 );
 
 export default prouductionUnitRouter;

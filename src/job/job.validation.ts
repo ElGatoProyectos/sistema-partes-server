@@ -1,9 +1,9 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaJobRepository } from "./prisma-job.repository";
 import { I_JobExcel, I_UpdateJobBD } from "./models/job.interface";
-import { productionUnitValidation } from "@/production-unit/productionUnit.validation";
+import { productionUnitValidation } from "../production-unit/productionUnit.validation";
 import { Tren, UnidadProduccion } from "@prisma/client";
-import { trainValidation } from "@/train/train.validation";
+import { trainValidation } from "../train/train.validation";
 import { jobService } from "./job.service";
 
 class JobValidation {

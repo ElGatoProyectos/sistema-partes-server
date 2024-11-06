@@ -6,9 +6,9 @@ import {
   I_UpdateJobBD,
   I_UpdateJobBDValidationExcel,
 } from "./models/job.interface";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { T_FindAllJob } from "./models/job.types";
-import { converToDate } from "@/common/utils/date";
+import { converToDate } from "../common/utils/date";
 
 class PrismaJobRepository implements JobRepository {
   async findAllWithOutPagination(

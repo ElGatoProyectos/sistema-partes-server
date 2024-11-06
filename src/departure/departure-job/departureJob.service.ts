@@ -23,6 +23,9 @@ import { prismaDepartureJobRepository } from "./prisma-departure-job.repository"
 import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { prismaJobRepository } from "@/job/prisma-job.repository";
 import { isNumeric } from "validator";
+import { fork } from "child_process";
+import path from "path";
+import { envConfig } from "@/config/env.config";
 
 class DepartureJobService {
   async createDetailJobDeparture(data: I_DepartureJob) {
@@ -734,16 +737,64 @@ class DepartureJobService {
       }
 
       //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
+      const route = envConfig.DEV
+        ? path.join(__dirname, "../../scripts/test.ts")
+        : path.join(__dirname, "../../scripts/test.js");
+      const scriptPath = route;
 
       for (const item of sheetToJson) {
-        // await departureJobValidation.updateDepartureJob(item, project_id);
+        //   // await departureJobValidation.updateDepartureJob(item, project_id);
+        const jobResponse = jobs.find((departure) => {
+          return departure.codigo === item["ID-TRABAJO"];
+        });
 
-        await departureJobValidation.createDetailDepartureJobFromExcel(
-          item,
-          project_id,
-          jobs,
-          departures
-        );
+        if (!jobResponse) {
+          return httpResponse.BadRequestException(
+            "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+          );
+        }
+
+        const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
+
+        const codeDeparture = departureWithComa[0];
+
+        const departureResponse = departures.find((departure) => {
+          return departure.id_interno === codeDeparture;
+        });
+
+        if (!departureResponse) {
+          return httpResponse.BadRequestException(
+            "No se encontró la partida que se quiere agregar en el Detalle"
+          );
+        }
+
+        // //[note] acá hacemos creacion de un proceso hijo
+        const child = fork(scriptPath, [
+          JSON.stringify(item),
+          String(project_id),
+          String(jobResponse.id),
+          String(departureResponse.id),
+        ]);
+        //[note]Aunque en el test.ts no veas explícitamente exit ni message, el proceso hijo utiliza process.send,
+        //[note] y el proceso padre recibe estos mensajes con child.on("message", ...) y child.on("exit", ...).
+
+        //[note] child.on("message", ...) en el proceso padre recibe y muestra el mensaje enviado desde el hijo.
+        // child.on("message", (message) => {
+        //   console.log(message);
+        // });
+
+        //[note] child.on("exit", ...) se ejecuta cuando el hijo finaliza, mostrando el código de salida
+        //[note] si termina con el codigo cero es q termino bien
+        child.on("exit", (code) => {
+          console.log(`El proceso hijo terminó con el código ${code}`);
+        });
+
+        // await departureJobValidation.createDetailDepartureJobFromExcel(
+        //   item,
+        //   project_id,
+        //   jobResponse.id,
+        //   departureResponse.id
+        // );
       }
 
       return httpResponse.SuccessResponse(

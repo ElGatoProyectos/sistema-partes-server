@@ -1,9 +1,8 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import { jobValidation } from "@/job/job.validation";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
+import { jobValidation } from "../../job/job.validation";
 import { I_DepartureJobExcel } from "./models/departureJob.interface";
 import { Partida, Trabajo } from "@prisma/client";
 import { departureValidation } from "../departure.validation";
-import { prismaJobRepository } from "@/job/prisma-job.repository";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 
 class DepartureJobValidation {
@@ -105,37 +104,45 @@ class DepartureJobValidation {
   async createDetailDepartureJobFromExcel(
     data: I_DepartureJobExcel,
     project_id: number,
-    jobs: Trabajo[],
-    departures: Partida[]
+    job_id: number,
+    departure_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const jobResponse = jobs.find((departure) => {
-        return departure.codigo === data["ID-TRABAJO"];
-      });
+      //////
+      //[note] esto comentado se usaba antes cuando no estaba fork y se pasaba por argumentos todas los trabajos
+      // const jobResponse = jobs.find((departure) => {
+      //   return departure.codigo === data["ID-TRABAJO"];
+      // });
 
-      if (!jobResponse) {
-        return httpResponse.BadRequestException(
-          "No se encontró el id del trabajo que se quiere agregar en el Detalle"
-        );
-      }
+      // if (!jobResponse) {
+      //   return httpResponse.BadRequestException(
+      //     "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+      //   );
+      // }
+      ///////
+
       // const jobResponse = await jobValidation.findByCodeValidation(
       //   data["ID-TRABAJO"],
       //   project_id
       // );
       // const job = jobResponse.payload as Trabajo;
-      const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
 
-      const codeDeparture = departureWithComa[0];
+      ////////////////////////
+      //[note] esto comentado se usaba antes cuando no estaba fork y se pasaba por argumentos todas las partidas
+      // const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
 
-      const departureResponse = departures.find((departure) => {
-        return departure.id_interno === codeDeparture;
-      });
+      // const codeDeparture = departureWithComa[0];
 
-      if (!departureResponse) {
-        return httpResponse.BadRequestException(
-          "No se encontró la partida que se quiere agregar en el Detalle"
-        );
-      }
+      // const departureResponse = departures.find((departure) => {
+      //   return departure.id_interno === codeDeparture;
+      // });
+
+      // if (!departureResponse) {
+      //   return httpResponse.BadRequestException(
+      //     "No se encontró la partida que se quiere agregar en el Detalle"
+      //   );
+      // }
+      /////////////////////////////
 
       // const departureResponse = await departureValidation.findByCodeValidation(
       //   String(codeDeparture),
@@ -146,8 +153,8 @@ class DepartureJobValidation {
 
       const detail =
         await prismaDepartureJobRepository.createDetailDepartureJob(
-          jobResponse.id,
-          departureResponse.id,
+          job_id,
+          departure_id,
           +data.METRADO
         );
 
