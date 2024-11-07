@@ -1,11 +1,11 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaOriginWorkforceRepository } from "./prisma-originWorkforce.repository";
 import { I_CreateOriginWorkforceBody } from "./models/originWorkforce.interface";
 import { originWorkforceValidation } from "./originWorkforce.validation";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
 import { OrigenObrero } from "@prisma/client";
-import { workforceValidation } from "@/workforce/workforce.validation";
+import { workforceValidation } from "../workforce/workforce.validation";
 import { T_FindAllOrigin } from "./models/originWorkforce.types";
 
 class OriginWorkforceService {

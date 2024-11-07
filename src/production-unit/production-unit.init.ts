@@ -1,7 +1,7 @@
 import { productionUnitController } from "./production-unit.controller";
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { productionUnitMiddleware } from "./production-unit.middleware";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 
 const prouductionUnitRouter = express.Router();
 const prefix = "/unidad-de-produccion";

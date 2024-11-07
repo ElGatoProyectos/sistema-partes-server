@@ -1,12 +1,12 @@
-import { httpResponse } from "@/common/http.response";
-import express from "@/config/express.config";
+import { httpResponse } from "../common/http.response";
+import express from "../config/express.config";
 import multer from "multer";
 import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";
 import fs from "fs/promises";
-import { T_FindAll } from "@/common/models/pagination.types";
-import { authService } from "@/auth/auth.service";
+import { T_FindAll } from "../common/models/pagination.types";
+import { authService } from "../auth/auth.service";
 import {
   ProductionUnitMulterFileProject,
   ProductionUnitMulterProperties,
@@ -18,7 +18,7 @@ import { prouductionUnitUpdateDto } from "./dto/update-production-unit.dto";
 import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
 import validator from "validator";
 import { T_FindAllUp } from "./models/up.types";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });

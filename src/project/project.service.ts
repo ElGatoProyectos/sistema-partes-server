@@ -24,21 +24,21 @@ import {
   Usuario,
 } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
-import { rolValidation } from "@/rol/rol.validation";
-import { weekService } from "@/week/week.service";
-import { categoryWorkforceService } from "@/categoryWorkforce/categoryWorkforce.service";
-import { bankWorkforceService } from "@/bankWorkforce/bankWorkforce.service";
-import { originWorkforceService } from "@/originWorkforce/originWorkforce.service";
-import { specialtyWorkforceService } from "@/specialtyWorkforce/specialtyWorkforce.service";
-import { typeWorkforceService } from "@/typeWorkforce/typeWorkforce.service";
-import { unitService } from "@/unit/unit.service";
-import { unifiedIndexService } from "@/unifiedIndex/unifiedIndex.service";
-import { resourseCategoryService } from "@/resourseCategory/resourseCategory.service";
-import { detailProjectValidation } from "@/user/detailUserProject/detailUserProject.validation";
-import { prismaDetailUserProjectRepository } from "@/user/detailUserProject/prismaUserProject.repository";
-import { detailWeekProjectValidation } from "@/week/detailWeekProject/detailWeekProject.validation";
-import { weekValidation } from "@/week/week.validation";
-import { detailWeekProjectService } from "@/week/detailWeekProject/detailWeekProject.service";
+import { rolValidation } from "../rol/rol.validation";
+import { weekService } from "../week/week.service";
+import { categoryWorkforceService } from "../categoryWorkforce/categoryWorkforce.service";
+import { bankWorkforceService } from "../bankWorkforce/bankWorkforce.service";
+import { originWorkforceService } from "../originWorkforce/originWorkforce.service";
+import { specialtyWorkforceService } from "../specialtyWorkforce/specialtyWorkforce.service";
+import { typeWorkforceService } from "../typeWorkforce/typeWorkforce.service";
+import { unitService } from "../unit/unit.service";
+import { unifiedIndexService } from "../unifiedIndex/unifiedIndex.service";
+import { resourseCategoryService } from "../resourseCategory/resourseCategory.service";
+import { detailProjectValidation } from "../user/detailUserProject/detailUserProject.validation";
+import { prismaDetailUserProjectRepository } from "../user/detailUserProject/prismaUserProject.repository";
+import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWeekProject.validation";
+import { weekValidation } from "../week/week.validation";
+import { detailWeekProjectService } from "../week/detailWeekProject/detailWeekProject.service";
 
 class ProjectService {
   isNumeric(word: string) {

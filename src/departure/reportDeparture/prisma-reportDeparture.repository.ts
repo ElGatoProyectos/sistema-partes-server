@@ -1,6 +1,6 @@
 import { ReportePartida } from "@prisma/client";
 import { DepartureReportRepository } from "./reportDeparture.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 
 class PrismaDepartureReportRepository implements DepartureReportRepository {
   async findById(departure_id: number): Promise<ReportePartida | null> {
