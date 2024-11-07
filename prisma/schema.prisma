@@ -773,6 +773,7 @@ model Asistencia {
 //[success] actual
 model ParteDiario {
   id                     Int                  @id @default(autoincrement())
+  codigo                 String
   nombre                 String //
   fecha                  DateTime?            @db.Date()
   etapa                  String?

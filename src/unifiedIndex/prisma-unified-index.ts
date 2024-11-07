@@ -88,6 +88,7 @@ class PrismaUnifiedIndexRepository implements UnifiedIndexRepository {
         prisma.indiceUnificado.count({
           where: {
             ...filters,
+            proyect_id: project_id,
             eliminado: E_Estado_BD.n,
           },
         }),
