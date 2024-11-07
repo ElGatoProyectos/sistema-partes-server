@@ -1,7 +1,7 @@
-import express from "@/config/express.config";
+import express from "../../config/express.config";
 import { T_ResponseToken } from "../models/auth.type";
 import { jwtService } from "../jwt.service";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../../common/http.response";
 
 class AuthRoleMiddleware {
   authAdmin(
@@ -74,8 +74,14 @@ class AuthRoleMiddleware {
     }
   }
   authorizeRoles(allowedRoles: string[]) {
-    return (request: express.Request, response: express.Response, nextFunction: express.NextFunction) => {
-      const customError = httpResponse.UnauthorizedException("Error en la autenticación");
+    return (
+      request: express.Request,
+      response: express.Response,
+      nextFunction: express.NextFunction
+    ) => {
+      const customError = httpResponse.UnauthorizedException(
+        "Error en la autenticación"
+      );
 
       try {
         const authorization = request.get("Authorization") as string;

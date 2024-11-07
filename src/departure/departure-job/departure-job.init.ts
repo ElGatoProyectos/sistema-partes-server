@@ -1,5 +1,5 @@
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
-import express from "@/config/express.config";
+import { authRoleMiddleware } from "../../auth/middlewares/auth-role.middleware";
+import express from "../../config/express.config";
 import { departureJobController } from "./departure-job.controller";
 import { departureJobMiddleware } from "./departureJob.middleware";
 

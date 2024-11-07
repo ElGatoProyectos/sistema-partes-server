@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { authAuthmiddleware } from "../auth/middlewares/auth.middleware";
 import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 import { rolController } from "./rol.controller";

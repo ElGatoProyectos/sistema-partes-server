@@ -1,5 +1,5 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import express from "@/config/express.config";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
+import express from "../../config/express.config";
 import { LoginDto } from "../dtos/login.dto";
 
 class LoginMiddleware {

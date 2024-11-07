@@ -1,7 +1,7 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import validator from "validator";
 import { prouductionUnitDto } from "./dto/production-unit.dto";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 
 class ProductionUnitMiddleware {
   verifyFields(
