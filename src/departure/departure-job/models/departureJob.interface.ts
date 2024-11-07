@@ -39,3 +39,9 @@ export interface I_DepartureJobBBDD {
   Partida: Partida;
   Trabajo: Trabajo;
 }
+
+export interface createDetailWorkDeparture {
+  trabajo_id: number;
+  partida_id: number;
+  metrado_utilizado: number;
+}

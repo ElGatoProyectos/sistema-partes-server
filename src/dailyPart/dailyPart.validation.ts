@@ -22,6 +22,26 @@ class DailyPartReportValidation {
       );
     }
   }
+  async codeMoreHigh(
+    project_id: number,
+    job_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const dailyPart = await prismaDailyPartRepository.codeMoreHigh(
+        project_id,
+        job_id
+      );
+      if (!dailyPart) {
+        return httpResponse.SuccessResponse("No se encontraron resultados", 0);
+      }
+      return httpResponse.SuccessResponse("Parte Diario encontrado", dailyPart);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Parte Diario",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartReportValidation = new DailyPartReportValidation();

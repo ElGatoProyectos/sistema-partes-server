@@ -8,99 +8,42 @@ import { prismaDepartureJobRepository } from "./prisma-departure-job.repository"
 class DepartureJobValidation {
   async updateDepartureJob(
     data: I_DepartureJobExcel,
-    project_id: number
+    project_id: number,
+    job: Trabajo,
+    departure: Partida
   ): Promise<T_HttpResponse> {
     try {
-      const jobResponse = await jobValidation.findByCodeValidation(
-        data["ID-TRABAJO"],
-        project_id
-      );
-      const job = jobResponse.payload as Trabajo;
-      const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
-
-      const codeDeparture = departureWithComa[0];
-      const departureResponse = await departureValidation.findByCodeValidation(
-        String(codeDeparture),
-        project_id
-      );
-      const departure = departureResponse.payload as Partida;
-      let jobFormat = {
-        ...job,
-      };
       if (departure.precio) {
-        let suma = 0;
         const resultado = data.METRADO * departure.precio;
-        // console.log(
-        //   "la partida " +
-        //     data.PARTIDA +
-        //     " viene con valor de la base de datos el trabajo " +
-        //     job.costo_partida +
-        //     " esto da del codigo de la partida " +
-        //     departure.id +
-        //     " de multiplicar el metrado " +
-        //     data.METRADO +
-        //     " por el precio de la partida " +
-        //     departure.precio +
-        //     " el siguiente resultado " +
-        //     resultado +
-        //     " para el id del trabajo " +
-        //     job.id
-        // );
-        suma = resultado + job.costo_partida;
-        // console.log("el resultado de la suma da  " + suma);
-        jobFormat.costo_partida = suma;
-        // await prismaJobRepository.updateJobCost(suma, job.id);
+        job.costo_partida += resultado; // Actualiza el valor directamente en `job`
       }
       if (departure.mano_de_obra_unitaria) {
-        let suma = 0;
         const resultado = data.METRADO * departure.mano_de_obra_unitaria;
-
-        suma = resultado + job.costo_mano_obra;
-        // await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
-        jobFormat.costo_mano_obra = suma;
+        job.costo_mano_obra += resultado;
       }
       if (departure.material_unitario) {
-        let suma = 0;
         const resultado = data.METRADO * departure.material_unitario;
-
-        suma = resultado + job.costo_material;
-        // await prismaJobRepository.updateJobMaterialCost(suma, job.id);
-        jobFormat.costo_material = suma;
+        job.costo_material += resultado;
       }
       if (departure.equipo_unitario) {
-        let suma = 0;
         const resultado = data.METRADO * departure.equipo_unitario;
-
-        suma = resultado + job.costo_equipo;
-        // await prismaJobRepository.updateJobEquipment(suma, job.id);
-        jobFormat.costo_equipo = suma;
+        job.costo_equipo += resultado;
       }
       if (departure.subcontrata_varios) {
-        let suma = 0;
         const resultado = data.METRADO * departure.subcontrata_varios;
-        suma = resultado + job.costo_varios;
-        // await prismaJobRepository.updateJobSeveral(suma, job.id);
-        jobFormat.costo_varios = suma;
-      }
-      const jobResponseUpdate = await jobValidation.updateJob(
-        jobFormat,
-        job.id
-      );
-      if (!jobResponseUpdate.success) {
-        return httpResponse.BadRequestException(
-          "Hubo un problema para actualizar el trabajo en uno de sus campos"
-        );
+        job.costo_varios += resultado;
       }
       return httpResponse.SuccessResponse(
-        "Los Trabajos de las Partidas modificada correctamente"
+        "Trabajo actualizado en memoria con los nuevos valores."
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al modificar los Trabajos de las Partidas",
+        "Error al actualizar el trabajo en memoria.",
         error
       );
     }
   }
+
   async createDetailDepartureJobFromExcel(
     data: I_DepartureJobExcel,
     project_id: number,
@@ -285,3 +228,103 @@ class DepartureJobValidation {
 }
 
 export const departureJobValidation = new DepartureJobValidation();
+
+//[note] codigo que usaba antes para actualizar el trabajo
+// async updateDepartureJob(
+//   data: I_DepartureJobExcel,
+//   project_id: number,
+//   job: Trabajo,
+//   departure: Partida
+// ): Promise<T_HttpResponse> {
+//   try {
+//     const jobResponse = await jobValidation.findByCodeValidation(
+//       data["ID-TRABAJO"],
+//       project_id
+//     );
+//     const jobfind = jobResponse.payload as Trabajo;
+//     const departureWithComa = data.PARTIDA.split(" "); // Divide por espacios
+
+//     const codeDeparture = departureWithComa[0];
+//     const departureResponse = await departureValidation.findByCodeValidation(
+//       String(codeDeparture),
+//       project_id
+//     );
+//     const departureFind = departureResponse.payload as Partida;
+
+//     let jobFormat = {
+//       ...jobfind,
+//     };
+//     if (departureFind.precio) {
+//       let suma = 0;
+//       const resultado = data.METRADO * departureFind.precio;
+//       // console.log(
+//       //   "la partida " +
+//       //     data.PARTIDA +
+//       //     " viene con valor de la base de datos el trabajo " +
+//       //     job.costo_partida +
+//       //     " esto da del codigo de la partida " +
+//       //     departure.id +
+//       //     " de multiplicar el metrado " +
+//       //     data.METRADO +
+//       //     " por el precio de la partida " +
+//       //     departure.precio +
+//       //     " el siguiente resultado " +
+//       //     resultado +
+//       //     " para el id del trabajo " +
+//       //     job.id
+//       // );
+//       suma = resultado + jobfind.costo_partida;
+//       // console.log("el resultado de la suma da  " + suma);
+//       jobFormat.costo_partida = suma;
+//       // await prismaJobRepository.updateJobCost(suma, job.id);
+//     }
+//     if (departureFind.mano_de_obra_unitaria) {
+//       let suma = 0;
+//       const resultado = data.METRADO * departureFind.mano_de_obra_unitaria;
+
+//       suma = resultado + jobfind.costo_mano_obra;
+//       // await prismaJobRepository.updateJobCostOfLabor(suma, job.id);
+//       jobFormat.costo_mano_obra = suma;
+//     }
+//     if (departureFind.material_unitario) {
+//       let suma = 0;
+//       const resultado = data.METRADO * departureFind.material_unitario;
+
+//       suma = resultado + jobfind.costo_material;
+//       // await prismaJobRepository.updateJobMaterialCost(suma, job.id);
+//       jobFormat.costo_material = suma;
+//     }
+//     if (departureFind.equipo_unitario) {
+//       let suma = 0;
+//       const resultado = data.METRADO * departureFind.equipo_unitario;
+
+//       suma = resultado + jobfind.costo_equipo;
+//       // await prismaJobRepository.updateJobEquipment(suma, job.id);
+//       jobFormat.costo_equipo = suma;
+//     }
+//     if (departureFind.subcontrata_varios) {
+//       let suma = 0;
+//       const resultado = data.METRADO * departureFind.subcontrata_varios;
+//       suma = resultado + jobfind.costo_varios;
+//       // await prismaJobRepository.updateJobSeveral(suma, job.id);
+//       jobFormat.costo_varios = suma;
+//     }
+//     const jobResponseUpdate = await jobValidation.updateJob(
+//       jobFormat,
+//       job.id
+//     );
+//     if (!jobResponseUpdate.success) {
+//       return httpResponse.BadRequestException(
+//         "Hubo un problema para actualizar el trabajo en uno de sus campos"
+//       );
+//     }
+//     return httpResponse.SuccessResponse(
+//       "Los Trabajos de las Partidas modificada correctamente"
+//     );
+//   } catch (error) {
+//     return httpResponse.InternalServerErrorException(
+//       "Error al modificar los Trabajos de las Partidas",
+//       error
+//     );
+//   }
+// }

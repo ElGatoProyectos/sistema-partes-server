@@ -2,6 +2,7 @@ import * as xlsx from "xlsx";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import {
+  createDetailWorkDeparture,
   I_DepartureJob,
   I_DepartureJobBBDD,
   I_DepartureJobExcel,
@@ -495,321 +496,6 @@ class DepartureJobService {
     }
   }
 
-  async updateDepartureJobMasive(file: any, project_id: number) {
-    try {
-      const buffer = file.buffer;
-
-      const workbook = xlsx.read(buffer, { type: "buffer" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const sheetToJson = xlsx.utils.sheet_to_json(
-        sheet
-      ) as I_DepartureJobExcel[];
-      let error = 0;
-      let errorNumber = 0;
-      let errorRows: number[] = [];
-      let errorMessages: string[] = [];
-      const responseProject = await projectValidation.findById(project_id);
-      if (!responseProject.success) return responseProject;
-      const project = responseProject.payload as Proyecto;
-
-      //trabajo
-      const jobsResponse = await jobValidation.findAllWithOutPagination(
-        project_id
-      );
-      const jobs = jobsResponse.payload as Trabajo[];
-      //partida
-      const departuresResponse =
-        await departureValidation.findAllWithOutPagination(project_id);
-      const departures = departuresResponse.payload as Partida[];
-      //unidad
-      const unitsResponse = await unitValidation.findAllWithOutPagination(
-        project_id
-      );
-      const units = unitsResponse.payload as Unidad[];
-      //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
-      //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
-      //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
-      //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
-      //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
-      //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
-      //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
-
-      //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
-      //Usamos rango 0 para verificar q estamos leyendo las primeras filas
-      const firstTwoRows: any = xlsx.utils
-        .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
-        .slice(0, 2); //nos limitamos a las primeras 2
-      //verificamos si están vacias las primeras filas
-      const isEmptyRow = (row: any[]) =>
-        row.every((cell) => cell === null || cell === undefined || cell === "");
-      //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
-      if (
-        firstTwoRows.length < 2 ||
-        (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
-      ) {
-        return httpResponse.BadRequestException(
-          "Error al leer el archivo. El archivo no puede tener arriba varias filas en blanco "
-        );
-      }
-
-      const seenCodes = new Set<string>();
-      let previousCodigo: number | null = null;
-
-      //[note] aca si hay espacio en blanco.
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-          if (
-            item["ID-TRABAJO"] == undefined ||
-            item.PARTIDA == undefined ||
-            item.UNIDAD == undefined ||
-            item.METRADO == undefined
-          ) {
-            error++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-
-      //[validation] buscar si existe el id del trabajo
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-
-          // const jobResponse = await jobValidation.findByCodeValidation(
-          //   item["ID-TRABAJO"],
-          //   project.id
-          // );
-          // if (!jobResponse.success) {
-          //   error++;
-          //   errorRows.push(index + 1);
-          // }
-
-          const jobExists = jobs.some(
-            (job) => job.codigo == item["ID-TRABAJO"]
-          );
-          if (!jobExists) {
-            errorNumber++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (errorNumber > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-      //[validation] separar el id de la Partida y buscar si existe
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-          const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
-
-          const codeDeparture = departureWithComa[0];
-
-          // const departureResponse =
-          //   await departureValidation.findByCodeValidation(
-          //     codeDeparture,
-          //     project.id
-          //   );
-          // if (!departureResponse.success) {
-          //   error++;
-          //   errorRows.push(index + 1);
-          // }
-
-          const departureExists = departures.some(
-            (departure) => departure.id_interno == codeDeparture
-          );
-          if (!departureExists) {
-            errorNumber++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (errorNumber > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-      //[validation] buscar si existe el id de la Unidad
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-
-          // const jobResponse = await unitValidation.findBySymbol(
-          //   item.UNIDAD.trim(),
-          //   project.id
-          // );
-          // if (!jobResponse.success) {
-          //   error++;
-          //   errorRows.push(index + 1);
-          // }
-
-          const unitExists = units.some(
-            (unit) =>
-              unit.simbolo?.toUpperCase() == item.UNIDAD.trim().toUpperCase()
-          );
-          if (!unitExists) {
-            errorNumber++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (errorNumber > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-
-      // //[note] verifico q no tenga letras el metrado
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-          const withoutComma = String(item.METRADO).replace(",", "");
-          if (!isNumeric(String(withoutComma))) {
-            errorNumber++;
-            errorRows.push(index + 1);
-          }
-        })
-      );
-
-      if (errorNumber > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo.Hay letras en campos no autorizados.Verificar las filas: ${errorRows.join(
-            ", "
-          )}.`
-        );
-      }
-      //[success] Verifico si el metrado supera al de la partida
-      await Promise.all(
-        sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
-          index++;
-          const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
-
-          const codeDeparture = departureWithComa[0];
-
-          // const departureResponse =
-          //   await departureValidation.findByCodeValidation(
-          //     codeDeparture,
-          //     project.id
-          //   );
-          // const partida = departureResponse.payload as Partida;
-          const departureExists = departures.find((departure) => {
-            return departure.id_interno == codeDeparture;
-          });
-          if (!departureExists) {
-            errorNumber++;
-            errorRows.push(index + 1);
-          }
-          if (departureExists?.metrado_inicial) {
-            if (Number(item.METRADO) > departureExists.metrado_inicial) {
-              error++;
-              errorRows.push(index + 1);
-            }
-          }
-        })
-      );
-
-      if (error > 0) {
-        return httpResponse.BadRequestException(
-          `Error al leer el archivo. El metrado ingresado de la partida es mayor de la que está guardada. Fallo en las siguientes filas: ${errorRows.join(
-            ", "
-          )}`
-        );
-      }
-
-      //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      const route = envConfig.DEV
-        ? path.join(__dirname, "../../scripts/test.ts")
-        : path.join(__dirname, "../../scripts/test.js");
-      const scriptPath = route;
-
-      for (const item of sheetToJson) {
-        //   // await departureJobValidation.updateDepartureJob(item, project_id);
-        const jobResponse = jobs.find((departure) => {
-          return departure.codigo === item["ID-TRABAJO"];
-        });
-
-        if (!jobResponse) {
-          return httpResponse.BadRequestException(
-            "No se encontró el id del trabajo que se quiere agregar en el Detalle"
-          );
-        }
-
-        const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
-
-        const codeDeparture = departureWithComa[0];
-
-        const departureResponse = departures.find((departure) => {
-          return departure.id_interno === codeDeparture;
-        });
-
-        if (!departureResponse) {
-          return httpResponse.BadRequestException(
-            "No se encontró la partida que se quiere agregar en el Detalle"
-          );
-        }
-
-        // //[note] acá hacemos creacion de un proceso hijo
-        const child = fork(scriptPath, [
-          JSON.stringify(item),
-          String(project_id),
-          String(jobResponse.id),
-          String(departureResponse.id),
-        ]);
-        //[note]Aunque en el test.ts no veas explícitamente exit ni message, el proceso hijo utiliza process.send,
-        //[note] y el proceso padre recibe estos mensajes con child.on("message", ...) y child.on("exit", ...).
-
-        //[note] child.on("message", ...) en el proceso padre recibe y muestra el mensaje enviado desde el hijo.
-        // child.on("message", (message) => {
-        //   console.log(message);
-        // });
-
-        //[note] child.on("exit", ...) se ejecuta cuando el hijo finaliza, mostrando el código de salida
-        //[note] si termina con el codigo cero es q termino bien
-        child.on("exit", (code) => {
-          console.log(`El proceso hijo terminó con el código ${code}`);
-        });
-
-        // await departureJobValidation.createDetailDepartureJobFromExcel(
-        //   item,
-        //   project_id,
-        //   jobResponse.id,
-        //   departureResponse.id
-        // );
-      }
-
-      return httpResponse.SuccessResponse(
-        "Partidas y Trabajos actualizados correctamente!"
-      );
-    } catch (error) {
-      await prisma.$disconnect();
-      return httpResponse.InternalServerErrorException(
-        "Error al leer las Partidas con sus Trabajos",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
   async findAll(data: T_FindAllDepartureJob, project_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
@@ -892,295 +578,564 @@ class DepartureJobService {
       await prisma.$disconnect();
     }
   }
+
+  async updateDepartureJobMasive(file: any, project_id: number) {
+    try {
+      const buffer = file.buffer;
+
+      // [message] obtenemos la informacion
+
+      const workbook = xlsx.read(buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetToJson = xlsx.utils.sheet_to_json(
+        sheet
+      ) as I_DepartureJobExcel[];
+
+      // [message] validamos que el proyecto existe
+      const responseProject = await projectValidation.findById(project_id);
+      if (!responseProject.success) return responseProject;
+
+      // [message] validamos la informacion y creamos los errores
+
+      let error = 0;
+      let errorNumber = 0;
+      let errorRows: number[] = [];
+      let errorMessages: string[] = [];
+
+      //trabajo
+      const jobsResponse = await jobValidation.findAllWithOutPagination(
+        project_id
+      );
+      const jobs = jobsResponse.payload as Trabajo[];
+      //partida
+      const departuresResponse =
+        await departureValidation.findAllWithOutPagination(project_id);
+      const departures = departuresResponse.payload as Partida[];
+
+      //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+      //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
+      //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
+      //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
+      //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
+      //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+      //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
+
+      //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
+      //Usamos rango 0 para verificar q estamos leyendo las primeras filas
+      const firstTwoRows: any = xlsx.utils
+        .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
+        .slice(0, 2); //nos limitamos a las primeras 2
+      //verificamos si están vacias las primeras filas
+      const isEmptyRow = (row: any[]) =>
+        row.every((cell) => cell === null || cell === undefined || cell === "");
+      //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
+      if (
+        firstTwoRows.length < 2 ||
+        (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
+      ) {
+        return httpResponse.BadRequestException(
+          "Error al leer el archivo. El archivo no puede tener arriba varias filas en blanco "
+        );
+      }
+
+      // [error] correcion: no usar promesas
+      sheetToJson.forEach((item: I_DepartureJobExcel, index: number) => {
+        index++;
+        if (
+          item["ID-TRABAJO"] == undefined ||
+          item.PARTIDA == undefined ||
+          item.METRADO == undefined
+        ) {
+          error++;
+          errorRows.push(index + 1);
+        }
+      });
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+
+      sheetToJson.forEach((item: I_DepartureJobExcel, index: number) => {
+        const jobExists = jobs.some((job) => job.codigo == item["ID-TRABAJO"]);
+
+        if (!jobExists) {
+          errorNumber++;
+          errorRows.push(index + 1);
+        }
+      });
+
+      // [error] correcion: no usar promesas
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+      //[validation] separar el id de la Partida y buscar si existe
+
+      sheetToJson.forEach((item: I_DepartureJobExcel, index: number) => {
+        const departureWithComa = item.PARTIDA.split(" ");
+        const codeDeparture = departureWithComa[0];
+
+        const departureExists = departures.some(
+          (departure) => departure.id_interno == codeDeparture
+        );
+
+        if (!departureExists) {
+          errorNumber++;
+          errorRows.push(index + 1);
+        }
+      });
+      // [error] correcion: no usar promesas
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+
+      // //[note] verifico q no tenga letras el metrado
+
+      sheetToJson.forEach((item: I_DepartureJobExcel, index: number) => {
+        const withoutComma = String(item.METRADO).replace(",", "");
+        if (!isNumeric(String(withoutComma))) {
+          errorNumber++;
+          errorRows.push(index + 1);
+        }
+      });
+      // [error] correcion: no usar promesas
+
+      if (errorNumber > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo.Hay letras en campos no autorizados.Verificar las filas: ${errorRows.join(
+            ", "
+          )}.`
+        );
+      }
+      //[success] Verifico si el metrado supera al de la partida
+
+      const departuresMap = new Map(
+        departures.map((departure) => [departure.id_interno, departure])
+      );
+
+      sheetToJson.forEach((item: I_DepartureJobExcel, index: number) => {
+        index++;
+        const departureWithComa = item.PARTIDA.split(" ");
+        const codeDeparture = departureWithComa[0];
+
+        // Buscar el `departure` en el Map en lugar de recorrer toda la lista
+        const departureExists = departuresMap.get(codeDeparture);
+
+        if (!departureExists) {
+          errorNumber++;
+          errorRows.push(index + 1);
+        } else if (
+          departureExists.metrado_inicial &&
+          Number(item.METRADO) > departureExists.metrado_inicial
+        ) {
+          error++;
+          errorRows.push(index + 1);
+        }
+      });
+
+      // [error] correcion: no usar promesas
+
+      if (error > 0) {
+        return httpResponse.BadRequestException(
+          `Error al leer el archivo. El metrado ingresado de la partida es mayor de la que está guardada. Fallo en las siguientes filas: ${errorRows.join(
+            ", "
+          )}`
+        );
+      }
+
+      //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
+      const route = envConfig.DEV
+        ? path.join(__dirname, "../../scripts/test.ts")
+        : path.join(__dirname, "../../scripts/test.js");
+      const scriptPath = route;
+
+      const responseFormatData: createDetailWorkDeparture[] = sheetToJson
+        .map((item) => {
+          const job = jobs.find((departure) => {
+            return departure.codigo === item["ID-TRABAJO"];
+          });
+          const departure = departures.find((departure) => {
+            return departure.id_interno === item.PARTIDA.split(" ")[0];
+          });
+
+          if (job && departure) {
+            return {
+              trabajo_id: job.id,
+              partida_id: departure.id,
+              metrado_utilizado: +item.METRADO,
+            } as any;
+          }
+        })
+        .filter(Boolean);
+
+      await prisma.detalleTrabajoPartida.createMany({
+        data: responseFormatData,
+      });
+
+      for (const item of sheetToJson) {
+        const jobResponse = jobs.find(
+          (job) => job.codigo === item["ID-TRABAJO"]
+        );
+        if (!jobResponse) {
+          return httpResponse.BadRequestException(
+            "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+          );
+        }
+
+        const departureWithComa = item.PARTIDA.split(" ");
+        const codeDeparture = departureWithComa[0];
+        const departureResponse = departures.find(
+          (departure) => departure.id_interno === codeDeparture
+        );
+
+        if (!departureResponse) {
+          return httpResponse.BadRequestException(
+            "No se encontró la partida que se quiere agregar en el Detalle"
+          );
+        }
+
+        await departureJobValidation.updateDepartureJob(
+          item,
+          +project_id,
+          jobResponse,
+          departureResponse
+        );
+      }
+
+      for (const job of jobs) {
+        await jobValidation.updateJob(job, job.id);
+      }
+
+      return httpResponse.SuccessResponse(
+        "Partidas y Trabajos actualizados correctamente!"
+      );
+    } catch (error) {
+      await prisma.$disconnect();
+      return httpResponse.InternalServerErrorException(
+        "Error al leer las Partidas con sus Trabajos",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
 
 export const departureJobService = new DepartureJobService();
 
-//  async updateDepartureJob(
-//     detail_id: number,
-//     data: I_DepartureJobUpdate
-//   ): Promise<T_HttpResponse> {
-//     try {
-//       //[note] Buscas el detalle que queres editar
-//       const detailFind = await departureJobValidation.findById(detail_id);
-//       if (!detailFind) {
-//         return httpResponse.BadRequestException(
-//           "No se encontró el Detalle Trabajo Partida que se quiere editar"
-//         );
-//       }
-//       //[note] Buscas la Partida que enviaste
-//       const departureResponse = await departureValidation.findById(
-//         data.departure_id
-//       );
-//       if (!departureResponse.success) {
-//         return httpResponse.BadRequestException(
-//           "El id ingresado de la Partida no existe en la Base de datos"
-//         );
-//       }
-//       const departure = departureResponse.payload as Partida;
-//       const detail = detailFind.payload as I_DepartureJobBBDD;
-
-//       //[note] Comprobamos si hay algún detalle existente con el trabajo del detalle que buscamos antes y de la partida nueva
-//       //[note] ya que si la hay editamos esa
-//       const existsDetailDepartureJobResponse =
-//         await departureJobValidation.findByForDepartureAndJob(
-//           detail.trabajo_id,
-//           departure.id
-//         );
-
-//       const existsDetailDepartureJob =
-//         existsDetailDepartureJobResponse.payload as I_DepartureJobBBDD;
-
-//       if (data.metrado > departure.metrado_inicial) {
-//         return httpResponse.BadRequestException(
-//           "El metrado que ha colocado es mayor para la nueva Partida "
-//         );
-//       }
-
-//       if (existsDetailDepartureJobResponse.success) {
-//         //[success] acá se edita el detalle existente
-//         const aditionMetradoPrecio = data.metrado * departure.precio;
-
-//         const aditionMetadoCostOfLabor =
-//           data.metrado * departure.mano_de_obra_unitaria;
-
-//         const aditionMetradoMaterialCost =
-//           data.metrado * departure.material_unitario;
-
-//         const aditionMetradoJobEquipment =
-//           data.metrado * departure.equipo_unitario;
-
-//         const aditionMetradoJobSeveral =
-//           data.metrado * departure.subcontrata_varios;
-
-//         const jobFormat = {
-//           ...detail.Trabajo,
-//           costo_partida: detail.Trabajo.costo_partida + aditionMetradoPrecio,
-//           costo_mano_obra:
-//             detail.Trabajo.costo_mano_obra + aditionMetadoCostOfLabor,
-//           costo_material:
-//             detail.Trabajo.costo_material + aditionMetradoMaterialCost,
-//           costo_equipo:
-//             detail.Trabajo.costo_equipo + aditionMetradoJobEquipment,
-//           costo_varios: detail.Trabajo.costo_varios + aditionMetradoJobSeveral,
-//         };
-//         await jobValidation.updateJob(jobFormat, detail.Trabajo.id);
-//         const newMetrado =
-//           existsDetailDepartureJob.metrado_utilizado + data.metrado;
-//         const updateDetail =
-//           await prismaDepartureJobRepository.updateDetailDepartureJob(
-//             existsDetailDepartureJob.id,
-//             departure.id,
-//             newMetrado
-//           );
-//         await prismaDepartureJobRepository.deleteDetailDepartureJob(detail.id);
-//         return httpResponse.SuccessResponse(
-//           "Ya habia un Detalle Trabajo Partida con la Partida que pasaste por lo que esa fue editada",
-//           updateDetail
-//         );
-//       }
-
-//       //[note] aca sacamos la resta de cuanto seria
-//       const subtractMetradoPrecio =
-//         detail.metrado_utilizado * detail.Partida.precio;
-
-//       const subtractMetadoCostOfLabor =
-//         detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
-
-//       const subtractMetradoMaterialCost =
-//         detail.metrado_utilizado * detail.Partida.material_unitario;
-
-//       const subtractMetradoJobEquipment =
-//         detail.metrado_utilizado * detail.Partida.equipo_unitario;
-
-//       const subtractMetradoJobSeveral =
-//         detail.metrado_utilizado * detail.Partida.subcontrata_varios;
-
-//       //[note] acá sacamos el cálculo de la nueva partida para el trabajo
-//       const aditionMetradoPrecio = data.metrado * departure.precio;
-
-//       const aditionMetadoCostOfLabor =
-//         data.metrado * departure.mano_de_obra_unitaria;
-
-//       const aditionMetradoMaterialCost =
-//         data.metrado * departure.material_unitario;
-
-//       const aditionMetradoJobEquipment =
-//         data.metrado * departure.equipo_unitario;
-
-//       const aditionMetradoJobSeveral =
-//         data.metrado * departure.subcontrata_varios;
-
-//       //[success] acá finalmente sacamos la cuenta final para actualizarlo
-
-//       const totalResultMetradoPrice =
-//         detail.Trabajo.costo_partida +
-//         aditionMetradoPrecio -
-//         subtractMetradoPrecio;
-//       const totalResultMetradoCostOfLabor =
-//         detail.Trabajo.costo_mano_obra +
-//         aditionMetadoCostOfLabor -
-//         subtractMetadoCostOfLabor;
-//       const totalResultMetradoMaterialCost =
-//         detail.Trabajo.costo_material +
-//         aditionMetradoMaterialCost -
-//         subtractMetradoMaterialCost;
-//       const totalResultMetradoJobEquipment =
-//         detail.Trabajo.costo_equipo +
-//         aditionMetradoJobEquipment -
-//         subtractMetradoJobEquipment;
-//       const totalResultMetradoJobSeveral =
-//         detail.Trabajo.costo_varios +
-//         aditionMetradoJobSeveral -
-//         subtractMetradoJobSeveral;
-
-//       const jobFormat = {
-//         ...detail.Trabajo,
-//         costo_partida: totalResultMetradoPrice,
-//         costo_mano_obra: totalResultMetradoCostOfLabor,
-//         costo_material: totalResultMetradoMaterialCost,
-//         costo_equipo: totalResultMetradoJobEquipment,
-//         costo_varios: totalResultMetradoJobSeveral,
-//       };
-
-//       await jobValidation.updateJob(jobFormat, detail.Trabajo.id);
-
-//       const updateDetail =
-//         await prismaDepartureJobRepository.updateDetailDepartureJob(
-//           detail.id,
-//           departure.id,
-//           data.metrado
-//         );
-
-//       return httpResponse.SuccessResponse(
-//         "Detalle Trabajo Partida editado correctamente",
-//         updateDetail
-//       );
-//     } catch (error) {
-//       return httpResponse.InternalServerErrorException(
-//         "Error en editar el Detalle Trabajo-Partida",
-//         error
-//       );
-//     } finally {
-//       await prisma.$disconnect();
-//     }
-//   }
-
-////////////////////////////////
-// async createDetailJobDeparture(data: I_DepartureJob) {
+// async updateDepartureJobMasive(file: any, project_id: number) {
 //   try {
-//     const jobResponse = await jobValidation.findById(data.job_id);
-//     if (!jobResponse.success) {
-//       return jobResponse;
-//     }
-//     const job = jobResponse.payload as Trabajo;
+//     const buffer = file.buffer;
 
-//     const departureResponse = await departureValidation.findById(
-//       data.departure_id
+//     const workbook = xlsx.read(buffer, { type: "buffer" });
+//     const sheetName = workbook.SheetNames[0];
+//     const sheet = workbook.Sheets[sheetName];
+//     const sheetToJson = xlsx.utils.sheet_to_json(
+//       sheet
+//     ) as I_DepartureJobExcel[];
+//     let error = 0;
+//     let errorNumber = 0;
+//     let errorRows: number[] = [];
+//     let errorMessages: string[] = [];
+//     const responseProject = await projectValidation.findById(project_id);
+//     if (!responseProject.success) return responseProject;
+//     const project = responseProject.payload as Proyecto;
+
+//     //trabajo
+//     const jobsResponse = await jobValidation.findAllWithOutPagination(
+//       project_id
 //     );
+//     const jobs = jobsResponse.payload as Trabajo[];
+//     //partida
+//     const departuresResponse =
+//       await departureValidation.findAllWithOutPagination(project_id);
+//     const departures = departuresResponse.payload as Partida[];
+//     //unidad
+//     const unitsResponse = await unitValidation.findAllWithOutPagination(
+//       project_id
+//     );
+//     const units = unitsResponse.payload as Unidad[];
+//     //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
+//     //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
+//     //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
+//     //[NOTE] -NO DEBE EL CODIGO TENER LETRAS
+//     //[NOTE] -QUE EL CÓDIGO EMPIECE CON EL 001
+//     //[NOTE] -QUE LOS CÓDIGOS VAYAN AUMENTANDO
+//     //[NOTE] -NO PUEDE SER EL CÓDGO MAYOR A 1 LA DIFERENCIA ENTRE CADA UNO
 
-//     if (!departureResponse.success) {
-//       return departureResponse;
-//     }
-
-//     const departure = departureResponse.payload as Partida;
-
-//     if (data.metrado > departure.metrado_inicial) {
+//     //[NOTE] ACÁ VERIFICA SI HAY 2 FILAS VACIAS
+//     //Usamos rango 0 para verificar q estamos leyendo las primeras filas
+//     const firstTwoRows: any = xlsx.utils
+//       .sheet_to_json(sheet, { header: 1, range: 0, raw: true })
+//       .slice(0, 2); //nos limitamos a las primeras 2
+//     //verificamos si están vacias las primeras filas
+//     const isEmptyRow = (row: any[]) =>
+//       row.every((cell) => cell === null || cell === undefined || cell === "");
+//     //verificamos si tiene menos de 2 filas o si en las primeras 2 esta vacia lanzamos el error
+//     if (
+//       firstTwoRows.length < 2 ||
+//       (isEmptyRow(firstTwoRows[0]) && isEmptyRow(firstTwoRows[1]))
+//     ) {
 //       return httpResponse.BadRequestException(
-//         "No puede colocar más métrado del que tiene la partida"
+//         "Error al leer el archivo. El archivo no puede tener arriba varias filas en blanco "
 //       );
 //     }
-//     const detailFind = await departureJobValidation.findByForDepartureAndJob(
-//       departure.id,
-//       job.id
+
+//     const seenCodes = new Set<string>();
+//     let previousCodigo: number | null = null;
+
+//     //[note] aca si hay espacio en blanco.
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+//         if (
+//           item["ID-TRABAJO"] == undefined ||
+//           item.PARTIDA == undefined ||
+//           item.METRADO == undefined
+//         ) {
+//           error++;
+//           errorRows.push(index + 1);
+//         }
+//       })
 //     );
-//     const detail = detailFind.payload as DetalleTrabajoPartida;
-//     if (detailFind.success) {
-//       const newMetrado = detail.metrado_utilizado + data.metrado;
-//       const result = newMetrado > departure.metrado_inicial;
-//       if (result) {
+
+//     if (error > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
+//           ", "
+//         )}`
+//       );
+//     }
+
+//     //[validation] buscar si existe el id del trabajo
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+
+//         // const jobResponse = await jobValidation.findByCodeValidation(
+//         //   item["ID-TRABAJO"],
+//         //   project.id
+//         // );
+//         // if (!jobResponse.success) {
+//         //   error++;
+//         //   errorRows.push(index + 1);
+//         // }
+
+//         const jobExists = jobs.some(
+//           (job) => job.codigo == item["ID-TRABAJO"]
+//         );
+//         if (!jobExists) {
+//           errorNumber++;
+//           errorRows.push(index + 1);
+//         }
+//       })
+//     );
+
+//     if (errorNumber > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo. El Id del Trabajo no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+//           ", "
+//         )}`
+//       );
+//     }
+//     //[validation] separar el id de la Partida y buscar si existe
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+//         const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
+
+//         const codeDeparture = departureWithComa[0];
+
+//         // const departureResponse =
+//         //   await departureValidation.findByCodeValidation(
+//         //     codeDeparture,
+//         //     project.id
+//         //   );
+//         // if (!departureResponse.success) {
+//         //   error++;
+//         //   errorRows.push(index + 1);
+//         // }
+
+//         const departureExists = departures.some(
+//           (departure) => departure.id_interno == codeDeparture
+//         );
+//         if (!departureExists) {
+//           errorNumber++;
+//           errorRows.push(index + 1);
+//         }
+//       })
+//     );
+
+//     if (errorNumber > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo. El Id de la Partida no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+//           ", "
+//         )}`
+//       );
+//     }
+//     //[validation] buscar si existe el id de la Unidad
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+
+//         const unitExists = units.some(
+//           (unit) =>
+//             unit.simbolo?.toUpperCase() == item.UNIDAD.trim().toUpperCase()
+//         );
+//         if (!unitExists) {
+//           errorNumber++;
+//           errorRows.push(index + 1);
+//         }
+//       })
+//     );
+
+//     if (errorNumber > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo. El Id de la Unidad no fue encontrada. Fallo en las siguientes filas: ${errorRows.join(
+//           ", "
+//         )}`
+//       );
+//     }
+
+//     // //[note] verifico q no tenga letras el metrado
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+//         const withoutComma = String(item.METRADO).replace(",", "");
+//         if (!isNumeric(String(withoutComma))) {
+//           errorNumber++;
+//           errorRows.push(index + 1);
+//         }
+//       })
+//     );
+
+//     if (errorNumber > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo.Hay letras en campos no autorizados.Verificar las filas: ${errorRows.join(
+//           ", "
+//         )}.`
+//       );
+//     }
+//     //[success] Verifico si el metrado supera al de la partida
+//     await Promise.all(
+//       sheetToJson.map(async (item: I_DepartureJobExcel, index: number) => {
+//         index++;
+//         const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
+
+//         const codeDeparture = departureWithComa[0];
+
+//         // const departureResponse =
+//         //   await departureValidation.findByCodeValidation(
+//         //     codeDeparture,
+//         //     project.id
+//         //   );
+//         // const partida = departureResponse.payload as Partida;
+//         const departureExists = departures.find((departure) => {
+//           return departure.id_interno == codeDeparture;
+//         });
+//         if (!departureExists) {
+//           errorNumber++;
+//           errorRows.push(index + 1);
+//         }
+//         if (departureExists?.metrado_inicial) {
+//           if (Number(item.METRADO) > departureExists.metrado_inicial) {
+//             error++;
+//             errorRows.push(index + 1);
+//           }
+//         }
+//       })
+//     );
+
+//     if (error > 0) {
+//       return httpResponse.BadRequestException(
+//         `Error al leer el archivo. El metrado ingresado de la partida es mayor de la que está guardada. Fallo en las siguientes filas: ${errorRows.join(
+//           ", "
+//         )}`
+//       );
+//     }
+
+//     //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
+//     const route = envConfig.DEV
+//       ? path.join(__dirname, "../../scripts/test.ts")
+//       : path.join(__dirname, "../../scripts/test.js");
+//     const scriptPath = route;
+
+//     for (const item of sheetToJson) {
+//       await departureJobValidation.updateDepartureJob(item, project_id);
+//       const jobResponse = jobs.find((departure) => {
+//         return departure.codigo === item["ID-TRABAJO"];
+//       });
+
+//       if (!jobResponse) {
 //         return httpResponse.BadRequestException(
-//           "Se encontró un Detalle con el mismo Trabajo y Partida pero con esta última suma supera el metrado de la Partida"
+//           "No se encontró el id del trabajo que se quiere agregar en el Detalle"
 //         );
 //       }
-//     }
 
-//     let additionMetradoPrice = 0;
-//     const resultadoMetradoPrecio = data.metrado * departure.precio;
+//       const departureWithComa = item.PARTIDA.split(" "); // Divide por espacios
 
-//     additionMetradoPrice = resultadoMetradoPrecio + job.costo_partida;
-//     await prismaJobRepository.updateJobCost(additionMetradoPrice, job.id);
+//       const codeDeparture = departureWithComa[0];
 
-//     let additionMetradoCostOfLabor = 0;
-//     const resultMetadoCostOfLabor =
-//       data.metrado * departure.mano_de_obra_unitaria;
-//     additionMetradoCostOfLabor =
-//       resultMetadoCostOfLabor + job.costo_mano_obra;
-//     await prismaJobRepository.updateJobCostOfLabor(
-//       additionMetradoCostOfLabor,
-//       job.id
-//     );
+//       const departureResponse = departures.find((departure) => {
+//         return departure.id_interno === codeDeparture;
+//       });
 
-//     let addtionMetadoMaterialCost = 0;
-//     const resultMetradoMaterialCost =
-//       data.metrado * departure.material_unitario;
-//     addtionMetadoMaterialCost =
-//       resultMetradoMaterialCost + job.costo_material;
-//     await prismaJobRepository.updateJobMaterialCost(
-//       addtionMetadoMaterialCost,
-//       job.id
-//     );
-
-//     let addtionMetradoJobEquipment = 0;
-//     const resultMetradoJobEquipment =
-//       data.metrado * departure.equipo_unitario;
-//     addtionMetradoJobEquipment = resultMetradoJobEquipment + job.costo_equipo;
-//     await prismaJobRepository.updateJobEquipment(
-//       addtionMetradoJobEquipment,
-//       job.id
-//     );
-
-//     let addtionMetradoJobSeveral = 0;
-//     const resultMetradoJobSeveral =
-//       data.metrado * departure.subcontrata_varios;
-//     addtionMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
-//     await prismaJobRepository.updateJobSeveral(
-//       addtionMetradoJobSeveral,
-//       job.id
-//     );
-
-//     if (detailFind.success) {
-//       const newMetrado = detail.metrado_utilizado + data.metrado;
-//       const updateDetail =
-//         await prismaDepartureJobRepository.updateDetailDepartureJob(
-//           detail.id,
-//           departure.id,
-//           newMetrado
-//         );
-//       if (!updateDetail) {
+//       if (!departureResponse) {
 //         return httpResponse.BadRequestException(
-//           "El el proceso de actualizar el Detalle Trabajo-Partida hubo un problema"
+//           "No se encontró la partida que se quiere agregar en el Detalle"
 //         );
 //       }
-//       return httpResponse.SuccessResponse(
-//         `Al existir un Detalle Trabajo-Partida, se ha actualizado con éxito el mismo`
-//       );
+
+//       // //[note] acá hacemos creacion de un proceso hijo
+//       const child = fork(scriptPath, [
+//         JSON.stringify(item),
+//         String(project_id),
+//         String(jobResponse.id),
+//         String(departureResponse.id),
+//       ]);
+//       //[note]Aunque en el test.ts no veas explícitamente exit ni message, el proceso hijo utiliza process.send,
+//       //[note] y el proceso padre recibe estos mensajes con child.on("message", ...) y child.on("exit", ...).
+
+//       //[note] child.on("message", ...) en el proceso padre recibe y muestra el mensaje enviado desde el hijo.
+//       // child.on("message", (message) => {
+//       //   console.log(message);
+//       // });
+
+//       //[note] child.on("exit", ...) se ejecuta cuando el hijo finaliza, mostrando el código de salida
+//       //[note] si termina con el codigo cero es q termino bien
+//       child.on("exit", (code) => {
+//         console.log(`El proceso hijo terminó con el código ${code}`);
+//       });
+
+//       // await departureJobValidation.createDetailDepartureJobFromExcel(
+//       //   item,
+//       //   project_id,
+//       //   jobResponse.id,
+//       //   departureResponse.id
+//       // );
 //     }
 
-//     const departureJob =
-//       await departureJobValidation.createDetailDepartureJob(
-//         job.id,
-//         departure.id,
-//         data.metrado
-//       );
 //     return httpResponse.SuccessResponse(
-//       "Éxito al el Detalle de la Partida con su Trabajo",
-//       departureJob.payload
+//       "Partidas y Trabajos actualizados correctamente!"
 //     );
 //   } catch (error) {
 //     await prisma.$disconnect();
 //     return httpResponse.InternalServerErrorException(
-//       "Error al leer la Partida con su Trabajo",
+//       "Error al leer las Partidas con sus Trabajos",
 //       error
 //     );
 //   } finally {
