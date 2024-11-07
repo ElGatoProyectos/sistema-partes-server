@@ -1,9 +1,9 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { I_PriceHourWorkforce } from "./models/priceHourWorkforce.interface";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
-import { converToDate } from "@/common/utils/date";
-import { categoryWorkforceValidation } from "@/categoryWorkforce/categoryWorkforce.validation";
+import { projectValidation } from "../../project/project.validation";
+import prisma from "../../config/prisma.config";
+import { converToDate } from "../../common/utils/date";
+import { categoryWorkforceValidation } from "../../categoryWorkforce/categoryWorkforce.validation";
 import { prismaDetailPriceHourWorkforceRepository } from "../detailPriceHourWorkforce/prisma-detailPriceHourWorkforce.repository";
 import { prismaPriceHourWorkforceRepository } from "./prisma-priceHourWorkforce.repository";
 import { T_FindAllPriceHourWorkforce } from "./models/priceHourWorkforce.types";

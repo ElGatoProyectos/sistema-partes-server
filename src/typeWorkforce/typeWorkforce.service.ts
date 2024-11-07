@@ -1,10 +1,10 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaTypeWorkforceRepository } from "./prisma-typeWorkfoce.repository";
 import { I_CreateTypeWorkforceBody } from "./models/typeWorkforce.interface";
 import { typeWorkforceValidation } from "./typeWorkforce.validation";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
-import { workforceValidation } from "@/workforce/workforce.validation";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
+import { workforceValidation } from "../workforce/workforce.validation";
 import { TipoObrero } from "@prisma/client";
 import { T_FindAllType } from "./models/typeWorkforce.types";
 

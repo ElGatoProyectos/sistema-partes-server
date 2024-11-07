@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { BankWorkforceRepository } from "./assists.repository";
 import {
   I_AssistsWorkforce,
@@ -13,7 +13,7 @@ import {
   ManoObra,
   Semana,
 } from "@prisma/client";
-import { weekValidation } from "@/week/week.validation";
+import { weekValidation } from "../week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
   async createAssists(data: I_CreateAssistsWorkforceBD): Promise<Asistencia> {

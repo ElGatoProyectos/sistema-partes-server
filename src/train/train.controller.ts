@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { trainService } from "./train.service";
 import {
   I_CreateTrainUnitBody,

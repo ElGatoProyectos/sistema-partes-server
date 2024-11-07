@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { OriginWorkforceRepository } from "./originWorkforce.repository";
 import {
   I_CreateOriginWorkforceBD,

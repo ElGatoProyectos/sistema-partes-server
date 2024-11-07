@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 
 import multer from "multer";
 import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";

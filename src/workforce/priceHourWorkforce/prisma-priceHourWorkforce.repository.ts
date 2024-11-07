@@ -6,7 +6,7 @@ import {
 } from "./models/priceHourWorkforce.interface";
 import { T_FindAllPriceHourWorkforce } from "./models/priceHourWorkforce.types";
 import { PriceHourRepository } from "./priceHourWorkforce.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 
 class PrismaPriceHourWorkforceRepository implements PriceHourRepository {
   async findById(price_hour_id: number): Promise<PrecioHoraMO | null> {

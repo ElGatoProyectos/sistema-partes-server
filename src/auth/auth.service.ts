@@ -1,11 +1,11 @@
-import { detailUserCompanyValidation } from "@/detailsUserCompany/detail-user-company.validation";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { detailUserCompanyValidation } from "../detailsUserCompany/detail-user-company.validation";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { jwtService } from "./jwt.service";
-import { bcryptService } from "@/auth/bcrypt.service";
-import prisma from "@/config/prisma.config";
+import { bcryptService } from "../auth/bcrypt.service";
+import prisma from "../config/prisma.config";
 import LoginResponseMapper from "./mappers/login.mapper";
 import { T_ResponseToken } from "./models/auth.type";
-import { rolService } from "@/rol/rol.service";
+import { rolService } from "../rol/rol.service";
 import {
   DetalleUsuarioEmpresa,
   E_Estado_BD,
@@ -14,8 +14,8 @@ import {
   Usuario,
 } from "@prisma/client";
 import { authValidation } from "./auth.validation";
-import { companyValidation } from "@/company/company.validation";
-import { rolValidation } from "@/rol/rol.validation";
+import { companyValidation } from "../company/company.validation";
+import { rolValidation } from "../rol/rol.validation";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {

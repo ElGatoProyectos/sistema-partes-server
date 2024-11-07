@@ -1,14 +1,14 @@
-import { actionService } from "@/action/actionservice.service";
-import { bcryptService } from "@/auth/bcrypt.service";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import { companyValidation } from "@/company/company.validation";
-import { I_CreateCompanyAdminBody } from "@/company/models/company.interface";
-import prisma from "@/config/prisma.config";
-import { I_CreateRolBody } from "@/rol/models/rol.interfaces";
-import { rolValidation } from "@/rol/rol.validation";
-import { sectionService } from "@/section/section.service";
-import { I_CreateUserBD } from "@/user/models/user.interface";
-import { userValidation } from "@/user/user.validation";
+import { actionService } from "../action/actionservice.service";
+import { bcryptService } from "../auth/bcrypt.service";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import { companyValidation } from "../company/company.validation";
+import { I_CreateCompanyAdminBody } from "../company/models/company.interface";
+import prisma from "../config/prisma.config";
+import { I_CreateRolBody } from "../rol/models/rol.interfaces";
+import { rolValidation } from "../rol/rol.validation";
+import { sectionService } from "../section/section.service";
+import { I_CreateUserBD } from "../user/models/user.interface";
+import { userValidation } from "../user/user.validation";
 
 class SeedService {
   async create(): Promise<T_HttpResponse> {

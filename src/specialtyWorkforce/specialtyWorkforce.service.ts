@@ -1,11 +1,11 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaSpecialtyWorkforceRepository } from "./prisma-specialtyWorkforce.repository";
 import { specialtyWorkforceValidation } from "./specialtyWorkfoce.validation";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
 import { I_CreateSpecialtyWorkforceBody } from "./models/specialtyWorkforce.interface";
 import { EspecialidadObrero } from "@prisma/client";
-import { workforceValidation } from "@/workforce/workforce.validation";
+import { workforceValidation } from "../workforce/workforce.validation";
 import { T_FindAllSpecialty } from "./models/specialtyWorkforce.types";
 
 class SpecialtyWorkforceService {

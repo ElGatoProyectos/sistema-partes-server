@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
 
 class DailyPartReportValidation {

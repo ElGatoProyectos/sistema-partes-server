@@ -1,20 +1,20 @@
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 import {
   I_CreateTrainUnitBody,
   I_TrainExcel,
   I_UpdateTrainBody,
 } from "./models/production-unit.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { trainValidation } from "./train.validation";
 import { Prisma, Proyecto, Tren } from "@prisma/client";
 import { prismaTrainRepository } from "./prisma-train.repository";
 import { TrainResponseMapper } from "./mappers/train.mapper";
 import * as xlsx from "xlsx";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import validator from "validator";
 import { T_FindAllTrain } from "./models/train.types";
 import { trainReportValidation } from "./trainReport/trainReport.validation";
-import { jobValidation } from "@/job/job.validation";
+import { jobValidation } from "../job/job.validation";
 
 class TrainService {
   async createTrain(

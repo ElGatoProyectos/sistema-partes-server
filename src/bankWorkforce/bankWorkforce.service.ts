@@ -1,11 +1,11 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaBankWorkforceRepository } from "./prisma-bankWorkforce.repository";
 import { I_CreateBankWorkforceBody } from "./models/bankWorkforce.interface";
 import { bankWorkforceValidation } from "./bankWorkforce.validation";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
 import { Banco } from "@prisma/client";
-import { workforceValidation } from "@/workforce/workforce.validation";
+import { workforceValidation } from "../workforce/workforce.validation";
 import { T_FindAllBank } from "./models/bankWorkforce.types";
 
 class BankWorkforceService {

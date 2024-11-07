@@ -1,7 +1,7 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { typeWorkforceController } from "./typeWorkforce.controller";
 import { typeWorkforceMiddleware } from "./typeWorkforce.middleware";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 
 const typeWorkforce = express.Router();
 const prefix = "/type-workforce";

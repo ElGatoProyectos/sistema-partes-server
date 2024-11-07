@@ -1,5 +1,5 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
+import prisma from "../config/prisma.config";
 import { prismaProyectoRepository } from "./prisma-project.repository";
 import {
   I_CreateCompanyBody,
@@ -9,12 +9,12 @@ import {
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "./models/project.constant";
 import fs from "fs/promises";
-import { converToDate } from "@/common/utils/date";
+import { converToDate } from "../common/utils/date";
 import validator from "validator";
 import { ProjectResponseMapper } from "./mapper/project.mapper";
-import { companyValidation } from "@/company/company.validation";
+import { companyValidation } from "../company/company.validation";
 import { projectValidation } from "./project.validation";
-import { jwtService } from "@/auth/jwt.service";
+import { jwtService } from "../auth/jwt.service";
 import {
   DetalleUsuarioProyecto,
   E_Proyecto_Estado,

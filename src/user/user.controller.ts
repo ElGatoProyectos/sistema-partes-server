@@ -1,5 +1,5 @@
 import { T_FindAll } from "../common/models/pagination.types";
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyBody,
@@ -12,10 +12,10 @@ import {
   IAssignUserPermissionsRequest,
 } from "./models/user.interface";
 import { userService } from "./user.service";
-import { httpResponse } from "@/common/http.response";
-import { CompanyMulterProperties } from "@/company/models/company.constant";
+import { httpResponse } from "../common/http.response";
+import { CompanyMulterProperties } from "../company/models/company.constant";
 import multer from "multer";
-import { authService } from "@/auth/auth.service";
+import { authService } from "../auth/auth.service";
 import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";

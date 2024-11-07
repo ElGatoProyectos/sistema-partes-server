@@ -1,6 +1,6 @@
 import { DetalleCapatazJefeGrupo } from "@prisma/client";
 import { DetailForemanGroupLeaderRepository } from "./detailForemanGroupLeader.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 class PrismaDetailForemanGroupLeaderRepository

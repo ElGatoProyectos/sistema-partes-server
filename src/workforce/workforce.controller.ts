@@ -1,11 +1,11 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import multer from "multer";
 import { workforceService } from "./workforce.service";
 import { T_FindAllWorkforce } from "./models/workforce.types";
 import { I_UpdateWorkforceBody } from "./models/workforce.interface";
 import * as ExcelJS from "exceljs";
-import prisma from "@/config/prisma.config";
-import { httpResponse } from "@/common/http.response";
+import prisma from "../config/prisma.config";
+import { httpResponse } from "../common/http.response";
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 

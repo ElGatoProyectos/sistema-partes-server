@@ -1,13 +1,13 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import {
   I_CreateCompanyBody,
   I_UpdateCompanyBody,
 } from "./models/company.interface";
 import { companyService } from "./company.service";
-import { T_FindAll } from "@/common/models/pagination.types";
-import { httpResponse } from "@/common/http.response";
+import { T_FindAll } from "../common/models/pagination.types";
+import { httpResponse } from "../common/http.response";
 import { CompanyMulterProperties } from "./models/company.constant";
-import { authService } from "@/auth/auth.service";
+import { authService } from "../auth/auth.service";
 import { empresaDto } from "./dto/companydto";
 import multer from "multer";
 import { Empresa } from "@prisma/client";
@@ -15,7 +15,7 @@ import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";
 import { empresaUpdateDto } from "./dto/companyupdatedto";
-import { productionUnitService } from "@/production-unit/production-unit.service";
+import { productionUnitService } from "../production-unit/production-unit.service";
 import fs from "fs/promises";
 import validator from "validator";
 

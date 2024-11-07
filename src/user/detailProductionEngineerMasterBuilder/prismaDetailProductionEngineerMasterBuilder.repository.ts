@@ -1,6 +1,6 @@
 import { DetalleIngenieroProduccionMaestroObra } from "@prisma/client";
 import { DetailProductionEngineerMasterBuilder } from "./detailProductionEngineerMasterBuilder.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
 class PrismaDetailProductionEngineerMasterBuilderRepository

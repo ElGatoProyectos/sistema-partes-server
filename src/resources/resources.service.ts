@@ -5,7 +5,7 @@ import {
   I_ResourcesExcel,
   I_UpdateResourcesBody,
 } from "./models/resources.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import {
   CategoriaRecurso,
   IndiceUnificado,
@@ -13,11 +13,11 @@ import {
   Recurso,
   Unidad,
 } from "@prisma/client";
-import { projectValidation } from "@/project/project.validation";
-import prisma from "@/config/prisma.config";
+import { projectValidation } from "../project/project.validation";
+import prisma from "../config/prisma.config";
 import { resourceValidation } from "./resources.validation";
-import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
-import { unitValidation } from "@/unit/unit.validation";
+import { resourseCategoryValidation } from "../resourseCategory/resourseCategory.validation";
+import { unitValidation } from "../unit/unit.validation";
 import { T_FindAllResource } from "./models/resource.types";
 import { prismaResourcesRepository } from "./prisma-resources.repository";
 import { ResourseMapper } from "./mappers/resource.mapper";

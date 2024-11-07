@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { ResourcesRepository } from "./resources.repository";
 import {
   I_CreateResourcesBD,
@@ -7,7 +7,7 @@ import {
 } from "./models/resources.interface";
 import { CategoriaRecurso, E_Estado_BD, Recurso } from "@prisma/client";
 import { T_FindAllResource } from "./models/resource.types";
-import { resourseCategoryValidation } from "@/resourseCategory/resourseCategory.validation";
+import { resourseCategoryValidation } from "../resourseCategory/resourseCategory.validation";
 import { contains } from "validator";
 
 class PrismaResourcesRepository implements ResourcesRepository {

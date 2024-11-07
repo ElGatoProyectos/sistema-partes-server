@@ -2,8 +2,8 @@ import { prismaRolRepository } from "../rol/prisma-rol.repository";
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaUserRepository } from "./prisma-user.repository";
 import { I_CreateUserBD } from "./models/user.interface";
-import { rolValidation } from "@/rol/rol.validation";
-import { projectValidation } from "@/project/project.validation";
+import { rolValidation } from "../rol/rol.validation";
+import { projectValidation } from "../project/project.validation";
 import { UserResponseMapper } from "./mappers/user.mapper";
 
 class UserValidation {

@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaProductionUnitRepository } from "./prisma-production-unit.repository";
 import { ProductionUnitResponseMapper } from "./mappers/production-unit.mapper";
 import { I_ProductionUnitExcel } from "./models/production-unit.interface";

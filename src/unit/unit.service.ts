@@ -1,18 +1,18 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import {
   I_CreateUnitBody,
   I_UnitExcel,
   I_UpdateUnitBody,
 } from "./models/unit.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { unitValidation } from "./unit.validation";
 import { prismaUnitRepository } from "./prisma-unit.repository";
 import { ResponseUnitMapper } from "./mapper/unit.mapper.dto";
-import { companyValidation } from "@/company/company.validation";
+import { companyValidation } from "../company/company.validation";
 import { Empresa, Proyecto, Unidad, Usuario } from "@prisma/client";
-import { jwtService } from "@/auth/jwt.service";
+import { jwtService } from "../auth/jwt.service";
 import * as xlsx from "xlsx";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 import validator from "validator";
 import { T_FindAllUnit } from "./models/unit.types";
 

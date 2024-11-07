@@ -1,5 +1,5 @@
 import { T_FindAll } from "../common/models/pagination.types";
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { I_CreateRolBody } from "./models/rol.interfaces";
 import { rolService } from "./rol.service";
 

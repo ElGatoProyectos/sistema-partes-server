@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { workforceMiddleware } from "./workforce.middleware";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 import { workforceController } from "./workforce.controller";
 
 const workforceRouter = express.Router();

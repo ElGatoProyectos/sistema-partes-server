@@ -1,5 +1,5 @@
 import { I_TrainExcel } from "./models/production-unit.interface";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaTrainRepository } from "./prisma-train.repository";
 
 class TrainValidation {

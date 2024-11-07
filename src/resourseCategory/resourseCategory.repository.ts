@@ -1,4 +1,4 @@
-import { I_CreateResourcesBD } from "@/resources/models/resources.interface";
+import { I_CreateResourcesBD } from "../resources/models/resources.interface";
 import {
   I_CreateResourseCategoryBD,
   I_UpdateResourseCategoryBody,

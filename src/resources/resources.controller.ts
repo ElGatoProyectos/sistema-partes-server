@@ -1,4 +1,4 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import multer from "multer";
 import { resourceService } from "./resources.service";
 import { T_FindAllResource } from "./models/resource.types";

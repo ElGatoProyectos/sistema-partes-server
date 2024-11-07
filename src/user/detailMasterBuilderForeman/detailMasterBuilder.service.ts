@@ -1,6 +1,6 @@
-import { projectValidation } from "@/project/project.validation";
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
-import prisma from "@/config/prisma.config";
+import { projectValidation } from "../../project/project.validation";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
+import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 import { prismaDetailMasterBuilderForemanRepository } from "./prismaDetailMasterBuilderForeman.repository";
 import { detailMasterBuilderForemanValidation } from "./detailMasterBuilderForeman.validation";

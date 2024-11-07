@@ -1,4 +1,4 @@
-import { T_FindAllProject } from "@/project/dto/project.type";
+import { T_FindAllProject } from "../../project/dto/project.type";
 import { I_CreateDetailUserProject } from "./models/detailUserProject.interface";
 import { T_FindAllDetailUserProject } from "./models/detailUserProject.types";
 

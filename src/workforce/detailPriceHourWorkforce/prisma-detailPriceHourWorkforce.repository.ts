@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../../config/prisma.config";
 import { DetailPriceHoueWorkforceRepository } from "./detailPriceHourWorkforce.repository";
 import { DetallePrecioHoraMO, E_Estado_BD } from "@prisma/client";
 import {

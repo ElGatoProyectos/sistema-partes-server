@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { trainController } from "./train.controller";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 import { trainMiddleware } from "./train.middleware";
 
 const trainRouter = express.Router();

@@ -1,4 +1,4 @@
-import { userValidation } from "@/user/user.validation";
+import { userValidation } from "../user/user.validation";
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { I_CreateCompanyAdminBody } from "./models/company.interface";
 import { prismaCompanyRepository } from "./prisma-company.repository";

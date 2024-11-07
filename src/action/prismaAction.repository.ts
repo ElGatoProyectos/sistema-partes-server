@@ -1,6 +1,6 @@
 import { Accion } from "@prisma/client";
 import { ActionRepository } from "./action.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { I_CreateAccionBD } from "./models/action.repository";
 
 class PrismaActionRepository implements ActionRepository {

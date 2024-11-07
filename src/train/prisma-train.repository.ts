@@ -1,6 +1,6 @@
 import { E_Estado_BD, Tren } from "@prisma/client";
 
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { TrainRepository } from "./train.repository";
 import {
   I_CreateTrainBD,

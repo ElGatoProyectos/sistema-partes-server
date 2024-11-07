@@ -2,11 +2,10 @@ import { E_Estado_BD, UnidadProduccion } from "@prisma/client";
 import {
   I_CreateProductionUnitBD,
   I_ProductionUnit,
-  I_UpdateProductionUnitBody,
   I_UpdateProductionUnitBodyValidation,
 } from "./models/production-unit.interface";
 import { ProudctionUnitRepository } from "./production-unit.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { T_FindAllUp } from "./models/up.types";
 
 class PrimsaProductionUnitRepository implements ProudctionUnitRepository {

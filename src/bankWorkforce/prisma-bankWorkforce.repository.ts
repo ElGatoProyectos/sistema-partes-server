@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { Banco, E_Estado_BD } from "@prisma/client";
 import {
   I_Bank,

@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import {
   I_CreateUnitBD,
   I_CreateUnitBody,

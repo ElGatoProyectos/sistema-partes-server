@@ -1,4 +1,4 @@
-import { rolValidation } from "@/rol/rol.validation";
+import { rolValidation } from "../rol/rol.validation";
 import prisma from "../config/prisma.config";
 import {
   I_CreateUserBD,
@@ -9,8 +9,8 @@ import {
 } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
 import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
-import { companyValidation } from "@/company/company.validation";
-import { I_Empresa } from "@/company/models/company.interface";
+import { companyValidation } from "../company/company.validation";
+import { I_Empresa } from "../company/models/company.interface";
 import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {

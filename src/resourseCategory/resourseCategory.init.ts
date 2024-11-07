@@ -1,5 +1,5 @@
-import express from "@/config/express.config";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import express from "../config/express.config";
+import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 import { resourseCategoryController } from "./resourseCategory.controller";
 import { resourseCategoryMiddleware } from "./resourseCategory.middleware";
 

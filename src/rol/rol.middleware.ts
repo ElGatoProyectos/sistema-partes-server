@@ -1,8 +1,8 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 
 import validator from "validator";
 import { rolDto } from "./dto/rol.dto";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 
 class RolMiddleware {
   verifyFields(

@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 import {
   I_CreateResourseCategoryBody,
   I_UpdateResourseCategoryBody,
@@ -6,10 +6,10 @@ import {
 import { resourseCategoryValidation } from "./resourseCategory.validation";
 import { prismaResourseCategoryRepository } from "./prisma-resourse-category.repository";
 import { ResourseCategoryMapper } from "./mapper/resourseCategory.mapper";
-import prisma from "@/config/prisma.config";
-import { T_FindAll } from "@/common/models/pagination.types";
+import prisma from "../config/prisma.config";
+import { T_FindAll } from "../common/models/pagination.types";
 import { CategoriaRecurso } from "@prisma/client";
-import { projectValidation } from "@/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 
 class ResourseCategoryService {
   async createResourseCategory(

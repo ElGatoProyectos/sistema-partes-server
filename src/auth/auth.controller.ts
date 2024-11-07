@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { authService } from "./auth.service";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 
 class AuthController {
   async login(request: express.Request, response: express.Response) {

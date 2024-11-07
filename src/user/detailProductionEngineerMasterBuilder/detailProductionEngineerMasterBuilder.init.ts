@@ -1,5 +1,5 @@
-import express from "@/config/express.config";
-import { authRoleMiddleware } from "@/auth/middlewares/auth-role.middleware";
+import express from "../../config/express.config";
+import { authRoleMiddleware } from "../../auth/middlewares/auth-role.middleware";
 import { detailProductionEngineerMasterBuilderController } from "./detailProductionEngineerMasterBuilder.controller";
 import { detailProductionEngineerMasterBuilderMiddleware } from "./detailProductionEngineerMasterBuilder.middleware";
 

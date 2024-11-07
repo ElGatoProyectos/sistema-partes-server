@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
+import express from "../config/express.config";
 import { trainDto } from "./dto/train.dto";
-import { httpResponse } from "@/common/http.response";
+import { httpResponse } from "../common/http.response";
 import { trainUpdateDto } from "./dto/update.dto";
 import validator from "validator";
 

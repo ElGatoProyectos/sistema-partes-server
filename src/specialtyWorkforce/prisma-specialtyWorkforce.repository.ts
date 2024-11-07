@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { SpecialtyWorkforceRepository } from "./specialtyWorkforce.repository";
 
 import { E_Estado_BD, EspecialidadObrero } from "@prisma/client";
@@ -63,7 +63,6 @@ class PrismaSpecialtyWorkforceRepository
   async updateStatusSpecialtyWorkforce(
     origin_id: number
   ): Promise<EspecialidadObrero> {
-
     const specialityWorkforce = await prisma.especialidadObrero.update({
       where: {
         id: origin_id,

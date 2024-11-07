@@ -1,4 +1,4 @@
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import { WeekRepository } from "./week.repository";
 import { Semana } from "@prisma/client";
 

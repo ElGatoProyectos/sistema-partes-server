@@ -1,6 +1,6 @@
 import { E_Estado_BD, E_Estado_MO_BD, ManoObra } from "@prisma/client";
 import { WorkforceRepository } from "./workforce.repository";
-import prisma from "@/config/prisma.config";
+import prisma from "../config/prisma.config";
 import {
   I_CreateWorkforceBD,
   I_UpdateWorkforceBodyValidation,

@@ -1,5 +1,5 @@
 import { seedController } from "./seed.controller";
-import express from "@/config/express.config";
+import express from "../config/express.config";
 const seedRouter = express.Router();
 const prefix = "/seed";
 

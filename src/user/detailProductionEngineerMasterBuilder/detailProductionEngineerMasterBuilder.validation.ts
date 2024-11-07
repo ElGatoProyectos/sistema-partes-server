@@ -1,4 +1,4 @@
-import { httpResponse, T_HttpResponse } from "@/common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "./prismaDetailProductionEngineerMasterBuilder.repository";
 
 class DetailDetailProductionEngineerMasterBuilderValidation {
