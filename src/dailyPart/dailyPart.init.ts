@@ -7,9 +7,24 @@ import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 const dailyPartRouter = express.Router();
 const prefix = "/daily-part";
 
+dailyPartRouter.get(
+  `${prefix}`,
+  dailyPartMiddleware.verifyHeadersFieldsIdJob,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  dailyPartController.all
+);
+
 dailyPartRouter.post(
   `${prefix}`,
   dailyPartMiddleware.verifyHeadersFieldsIdProject,
+  dailyPartMiddleware.verifyFields,
   //[message] fijarme que roles
   authRoleMiddleware.authorizeRoles([
     "ADMIN",
@@ -18,6 +33,32 @@ dailyPartRouter.post(
     "ASISTENTE_CONTROL_COSTOS",
   ]),
   dailyPartController.create
+);
+dailyPartRouter.put(
+  `${prefix}/:id`,
+  dailyPartMiddleware.verifyHeadersFieldsId,
+  dailyPartMiddleware.verifyHeadersFieldsIdProject,
+  dailyPartMiddleware.verifyFieldsUpdate,
+  //[message] fijarme que roles
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
+  dailyPartController.update
+);
+
+dailyPartRouter.get(
+  `${prefix}/:id`,
+  dailyPartMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
+  dailyPartController.findById
 );
 
 export default dailyPartRouter;

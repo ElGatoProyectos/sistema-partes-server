@@ -799,13 +799,14 @@ model ParteDiario {
 
 //[success] actual
 model RiesgoParteDiario {
-  id             Int                @id @default(autoincrement())
-  descripcion    String
-  estado         E_Estado_Riesgo_BD
-  riesgo         E_Riesgo_BD
-  fecha_creacion DateTime           @default(now())
+  id             Int                 @id @default(autoincrement())
+  descripcion    String?
+  estado         E_Estado_Riesgo_BD?
+  riesgo         E_Riesgo_BD?
+  fecha_creacion DateTime            @default(now())
   proyecto_id    Int
-  Proyecto       Proyecto           @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Proyecto       Proyecto            @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  eliminado      E_Estado_BD         @default(n)
   ParteDiario    ParteDiario[]
 }
 
