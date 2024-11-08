@@ -6,39 +6,131 @@ import { departureValidation } from "../departure.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 
 class DepartureJobValidation {
-  async updateDepartureJob(
-    data: I_DepartureJobExcel,
-    project_id: number,
+  async updateJobForAdd(
+    metrado: number,
     job: Trabajo,
     departure: Partida
   ): Promise<T_HttpResponse> {
     try {
       if (departure.precio) {
-        const resultado = data.METRADO * departure.precio;
-        job.costo_partida += resultado; // Actualiza el valor directamente en `job`
+        const resultado = metrado * departure.precio;
+        job.costo_partida += resultado;
       }
       if (departure.mano_de_obra_unitaria) {
-        const resultado = data.METRADO * departure.mano_de_obra_unitaria;
+        const resultado = metrado * departure.mano_de_obra_unitaria;
         job.costo_mano_obra += resultado;
       }
       if (departure.material_unitario) {
-        const resultado = data.METRADO * departure.material_unitario;
+        const resultado = metrado * departure.material_unitario;
         job.costo_material += resultado;
       }
       if (departure.equipo_unitario) {
-        const resultado = data.METRADO * departure.equipo_unitario;
+        const resultado = metrado * departure.equipo_unitario;
         job.costo_equipo += resultado;
       }
       if (departure.subcontrata_varios) {
-        const resultado = data.METRADO * departure.subcontrata_varios;
+        const resultado = metrado * departure.subcontrata_varios;
         job.costo_varios += resultado;
       }
       return httpResponse.SuccessResponse(
-        "Trabajo actualizado en memoria con los nuevos valores."
+        "Trabajo actualizado con los nuevos valores."
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al actualizar el trabajo en memoria.",
+        "Error al actualizar el trabajo con los nuevos valores .",
+        error
+      );
+    }
+  }
+  async updateJobForSubtractAndAdd(
+    oldMetrado: number,
+    newMetrado: number,
+    job: Trabajo,
+    departure: Partida
+  ): Promise<T_HttpResponse> {
+    try {
+      if (departure.precio) {
+        const resultado = newMetrado * departure.precio;
+        const resultadoOld = oldMetrado * departure.precio;
+        // console.log(
+        //   "el resultado de nuevo metrado " +
+        //     newMetrado +
+        //     " por el precio " +
+        //     departure.precio +
+        //     " es igual a " +
+        //     resultado
+        // );
+        // console.log(
+        //   "el resultado del viejo metrado " +
+        //     oldMetrado +
+        //     " por el precio " +
+        //     departure.precio +
+        //     "  es igual a " +
+        //     resultadoOld
+        // );
+        // console.log(
+        //   "el costo partida de sumar costo partida anterior " +
+        //     job.costo_partida +
+        //     " resultado nuevo " +
+        //     resultado +
+        //     " resultado viejo " +
+        //     resultadoOld
+        // );
+        job.costo_partida = job.costo_partida + resultado - resultadoOld;
+        // console.log("COSTO PARTIDA EL TOTAL ES " + job.costo_partida);
+      }
+      if (departure.mano_de_obra_unitaria) {
+        const resultado = newMetrado * departure.mano_de_obra_unitaria;
+        const resultadoOld = oldMetrado * departure.mano_de_obra_unitaria;
+        job.costo_mano_obra = job.costo_mano_obra + resultado - resultadoOld;
+      }
+      if (departure.material_unitario) {
+        const resultado = newMetrado * departure.material_unitario;
+        const resultadoOld = oldMetrado * departure.material_unitario;
+        // console.log(
+        //   "el resultado de nuevo metrado " +
+        //     newMetrado +
+        //     " por material unitario " +
+        //     departure.material_unitario +
+        //     " es igual a " +
+        //     resultado
+        // );
+        // console.log(
+        //   "el resultado del viejo metrado " +
+        //     oldMetrado +
+        //     " por material unitario " +
+        //     departure.material_unitario +
+        //     " es igual a " +
+        //     resultadoOld
+        // );
+        // console.log(
+        //   "el costo partida de sumar costo_material anterior " +
+        //     job.costo_material +
+        //     " resultado nuevo " +
+        //     resultado +
+        //     " resultado viejo " +
+        //     resultadoOld
+        // );
+        job.costo_material = job.costo_material + resultado - resultadoOld;
+        // console.log("te quedaria asi costo material " + job.costo_material);
+        // console.log("---------------");
+      }
+      if (departure.equipo_unitario) {
+        const resultado = newMetrado * departure.equipo_unitario;
+        const resultadoOld = oldMetrado * departure.equipo_unitario;
+        job.costo_equipo = job.costo_equipo + resultado - resultadoOld;
+      }
+      if (departure.subcontrata_varios) {
+        const resultado = newMetrado * departure.subcontrata_varios;
+        const resultadoOld = oldMetrado * departure.subcontrata_varios;
+        job.costo_varios = job.costo_varios + resultado - resultadoOld;
+      }
+      return httpResponse.SuccessResponse(
+        "Trabajo actualizado de los Detalles ya existentes"
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al actualizar el trabajo de los Detalles ya existentes",
         error
       );
     }
@@ -221,6 +313,24 @@ class DepartureJobValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar Detalle Trabajo Partida al buscar por el id de la Partida y el Trabajo ",
+        error
+      );
+    }
+  }
+  async findAllDepartureJobWithOutPagination(
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const details =
+        await prismaDepartureJobRepository.findAllWithOutPagination(project_id);
+
+      return httpResponse.SuccessResponse(
+        "Los Detalles Trabajo Partida por el id del Proyecto fue encontrado con éxito",
+        details
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Detalles Trabajo Partida por el id del Proyecto",
         error
       );
     }

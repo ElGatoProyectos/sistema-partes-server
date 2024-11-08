@@ -11,6 +11,7 @@ export abstract class DepartureJobRepository {
     departure_Id: number,
     metrado: number
   ): void {}
+  findAllWithOutPagination(project_id: number): void {}
   findAllWithPaginationForJob(
     skip: number,
     data: T_FindAllDepartureJob,
