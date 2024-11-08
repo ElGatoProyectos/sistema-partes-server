@@ -1,4 +1,4 @@
-import { I_Empresa } from "@/company/models/company.interface";
+import { I_Empresa } from "../../company/models/company.interface";
 import { Accion, E_Estado_BD, Empresa, Seccion, Usuario } from "@prisma/client";
 //defini esquemas de base de datos
 export interface I_CreateUserBD

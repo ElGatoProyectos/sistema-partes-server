@@ -45,3 +45,9 @@ export interface createDetailWorkDeparture {
   partida_id: number;
   metrado_utilizado: number;
 }
+export interface existsDetailWorkDeparture {
+  id: number;
+  trabajo_id: number;
+  partida_id: number;
+  metrado_utilizado: number;
+}

@@ -5,6 +5,25 @@ import { T_FindAllDepartureJob } from "./models/departure-job.types";
 import { I_DetailDepartureJob } from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
+  async findAllWithOutPagination(
+    project_id: number
+  ): Promise<DetalleTrabajoPartida[] | null> {
+    const details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        Trabajo: {
+          proyecto_id: project_id,
+        },
+        Partida: {
+          proyecto_id: project_id,
+        },
+      },
+      include: {
+        Trabajo: true,
+        Partida: true,
+      },
+    });
+    return details;
+  }
   async updateDetailDepartureJob(
     detail_id: number,
     departure_Id: number,

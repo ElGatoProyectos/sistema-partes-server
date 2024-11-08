@@ -3,6 +3,7 @@ import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import {
   createDetailWorkDeparture,
+  existsDetailWorkDeparture,
   I_DepartureJob,
   I_DepartureJobBBDD,
   I_DepartureJobExcel,
@@ -613,6 +614,13 @@ class DepartureJobService {
         await departureValidation.findAllWithOutPagination(project_id);
       const departures = departuresResponse.payload as Partida[];
 
+      //Detalle Trabajo-Partida
+      const detailsResponse =
+        await departureJobValidation.findAllDepartureJobWithOutPagination(
+          project_id
+        );
+      const details = detailsResponse.payload as I_DepartureJobBBDD[];
+
       //[NOTE] PARA QUE NO TE DE ERROR EL ARCHIVO:
       //[NOTE] SI HAY 2 FILAS AL PRINCIPIO VACIAS
       //[NOTE] EL CODIGO DEBE ESTAR COMO STRING
@@ -757,68 +765,140 @@ class DepartureJobService {
         );
       }
 
-      //[SUCCESS] Guardo o actualizo la Unidad de Producciónn
-      const route = envConfig.DEV
-        ? path.join(__dirname, "../../scripts/test.ts")
-        : path.join(__dirname, "../../scripts/test.js");
-      const scriptPath = route;
+      //[SUCCESS] Guardo o actualizo el Detalle Trabajo-Partida
 
-      const responseFormatData: createDetailWorkDeparture[] = sheetToJson
-        .map((item) => {
-          const job = jobs.find((departure) => {
-            return departure.codigo === item["ID-TRABAJO"];
-          });
-          const departure = departures.find((departure) => {
-            return departure.id_interno === item.PARTIDA.split(" ")[0];
-          });
+      //[message] lleno dentro de un map todos los detalles q hay
+      const detailsMap = new Map<string, DetalleTrabajoPartida>();
+      details.forEach((detail) => {
+        const key = `${detail.trabajo_id}-${detail.partida_id}`;
+        detailsMap.set(key, detail);
+      });
+      //[note] forma vieja
+      // let existsDatInDetail: createDetailWorkDeparture[];
+      // const responseFormatData: createDetailWorkDeparture[] = sheetToJson
+      //   .map((item) => {
+      //     const job = jobs.find((departure) => {
+      //       return departure.codigo === item["ID-TRABAJO"];
+      //     });
+      //     const departure = departures.find((departure) => {
+      //       return departure.id_interno === item.PARTIDA.split(" ")[0];
+      //     });
 
-          if (job && departure) {
-            return {
-              trabajo_id: job.id,
-              partida_id: departure.id,
-              metrado_utilizado: +item.METRADO,
-            } as any;
+      //     if (job && departure) {
+      //       return {
+      //         trabajo_id: job.id,
+      //         partida_id: departure.id,
+      //         metrado_utilizado: +item.METRADO,
+      //       } as any;
+      //     }
+      //   })
+      //   .filter(Boolean);
+
+      let existsDataInDetail: existsDetailWorkDeparture[] = []; // Para registros que ya existen
+      const responseFormatData: createDetailWorkDeparture[] = [];
+      sheetToJson.forEach((item) => {
+        const job = jobs.find((job) => job.codigo === item["ID-TRABAJO"]);
+        const departure = departures.find(
+          (departure) => departure.id_interno === item.PARTIDA.split(" ")[0]
+        );
+
+        if (job && departure) {
+          const data = {
+            trabajo_id: job.id,
+            partida_id: departure.id,
+            metrado_utilizado: +item.METRADO,
+          } as createDetailWorkDeparture;
+
+          const key = `${job.id}-${departure.id}`;
+
+          if (detailsMap.has(key)) {
+            const detail = detailsMap.get(key);
+            if (detail && detail.id !== undefined) {
+              existsDataInDetail.push({
+                ...data,
+                id: detail.id,
+              });
+            }
+          } else {
+            responseFormatData.push(data);
           }
-        })
-        .filter(Boolean);
-
-      await prisma.detalleTrabajoPartida.createMany({
-        data: responseFormatData,
+        }
       });
 
-      for (const item of sheetToJson) {
-        const jobResponse = jobs.find(
-          (job) => job.codigo === item["ID-TRABAJO"]
-        );
-        if (!jobResponse) {
-          return httpResponse.BadRequestException(
-            "No se encontró el id del trabajo que se quiere agregar en el Detalle"
-          );
-        }
-
-        const departureWithComa = item.PARTIDA.split(" ");
-        const codeDeparture = departureWithComa[0];
-        const departureResponse = departures.find(
-          (departure) => departure.id_interno === codeDeparture
-        );
-
-        if (!departureResponse) {
-          return httpResponse.BadRequestException(
-            "No se encontró la partida que se quiere agregar en el Detalle"
-          );
-        }
-
-        await departureJobValidation.updateDepartureJob(
-          item,
-          +project_id,
-          jobResponse,
-          departureResponse
+      // await prisma.detalleTrabajoPartida.createMany({
+      //   data: responseFormatData,
+      // });
+      if (responseFormatData.length > 0) {
+        // console.log("entro a crear");
+        await prisma.detalleTrabajoPartida.createMany({
+          data: responseFormatData,
+        });
+        this.updateJobWithoutExistingDetail(
+          responseFormatData,
+          jobs,
+          departures
         );
       }
 
-      for (const job of jobs) {
-        await jobValidation.updateJob(job, job.id);
+      if (existsDataInDetail.length > 0) {
+        // console.log("entro a editar");
+
+        for (let index = 0; index < existsDataInDetail.length; index++) {
+          const detail = details.find(
+            (details) =>
+              details.trabajo_id === existsDataInDetail[index].trabajo_id &&
+              details.partida_id === existsDataInDetail[index].partida_id
+          );
+
+          if (
+            detail?.metrado_utilizado !=
+            existsDataInDetail[index].metrado_utilizado
+          ) {
+            // console.log("entro para editar el detalle id " + detail?.id);
+            await prisma.detalleTrabajoPartida.update({
+              where: {
+                id: existsDataInDetail[index].id,
+              },
+              data: existsDataInDetail[index],
+            });
+          }
+        }
+        this.updateJobExistingDetail(existsDataInDetail, details, jobs);
       }
+
+      // for (const item of sheetToJson) {
+      //   const jobResponse = jobs.find(
+      //     (job) => job.codigo === item["ID-TRABAJO"]
+      //   );
+      //   if (!jobResponse) {
+      //     return httpResponse.BadRequestException(
+      //       "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+      //     );
+      //   }
+
+      //   const departureWithComa = item.PARTIDA.split(" ");
+      //   const codeDeparture = departureWithComa[0];
+      //   const departureResponse = departures.find(
+      //     (departure) => departure.id_interno === codeDeparture
+      //   );
+
+      //   if (!departureResponse) {
+      //     return httpResponse.BadRequestException(
+      //       "No se encontró la partida que se quiere agregar en el Detalle"
+      //     );
+      //   }
+
+      //   await departureJobValidation.updateDepartureJob(
+      //     item,
+      //     +project_id,
+      //     jobResponse,
+      //     departureResponse
+      //   );
+      // }
+
+      // for (const job of jobs) {
+      //   await jobValidation.updateJob(job, job.id);
+      // }
 
       return httpResponse.SuccessResponse(
         "Partidas y Trabajos actualizados correctamente!"
@@ -833,10 +913,91 @@ class DepartureJobService {
       await prisma.$disconnect();
     }
   }
+
+  private async updateJobWithoutExistingDetail(
+    detailsNews: createDetailWorkDeparture[],
+    jobs: Trabajo[],
+    departures: Partida[]
+  ) {
+    for (const item of detailsNews) {
+      const job = jobs.find((job) => job.id === item.trabajo_id);
+      const departure = departures.find(
+        (departure) => departure.id === item.partida_id
+      );
+      if (!job) {
+        return httpResponse.BadRequestException(
+          "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+        );
+      }
+
+      if (!departure) {
+        return httpResponse.BadRequestException(
+          "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+        );
+      }
+
+      //[note] esto suma a lo q ya tiene
+      await departureJobValidation.updateJobForAdd(
+        item.metrado_utilizado,
+        job,
+        departure
+      );
+    }
+
+    for (const job of jobs) {
+      await jobValidation.updateJob(job, job.id);
+    }
+  }
+  //[note] primer parametro paso lo nuevo y en el segundo lo viejo
+  private async updateJobExistingDetail(
+    detailsExisting: createDetailWorkDeparture[],
+    details: I_DepartureJobBBDD[],
+    jobs: Trabajo[]
+  ) {
+    let flag = false;
+    for (const item of detailsExisting) {
+      const detailOld = details.find(
+        (details) =>
+          details.trabajo_id === item.trabajo_id &&
+          details.partida_id === item.partida_id
+      );
+      const job = jobs.find((job) => job.id === item.trabajo_id);
+      //[message] muy pero muy importante buscar la referencia de memoria de cual es el trabajo al que vamos a editar
+      //[message] ya que luego cuando editemos los trabajos ya se va a haber moficicado el trabajo
+      if (!job) {
+        return httpResponse.BadRequestException(
+          "No se encontró el id del trabajo que se quiere agregar en el Detalle"
+        );
+      }
+
+      if (!detailOld) {
+        return httpResponse.BadRequestException(
+          "No se encontró el detalle existente en la base de datos"
+        );
+      }
+
+      if (detailOld?.metrado_utilizado != item.metrado_utilizado) {
+        // console.log("hay que editar el id del trabajo " + detailOld.trabajo_id);
+        flag = true;
+        await departureJobValidation.updateJobForSubtractAndAdd(
+          detailOld?.metrado_utilizado,
+          item.metrado_utilizado,
+          job,
+          detailOld.Partida
+        );
+      }
+    }
+    if (flag) {
+      for (const job of jobs) {
+        await jobValidation.updateJob(job, job.id);
+      }
+    }
+  }
 }
 
 export const departureJobService = new DepartureJobService();
 
+//[message] deje esto de abajo xq es el codigo del script cuando lo hice funcionar
 // async updateDepartureJobMasive(file: any, project_id: number) {
 //   try {
 //     const buffer = file.buffer;
