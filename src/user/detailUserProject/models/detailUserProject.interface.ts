@@ -1,4 +1,4 @@
-import { I_Usuario } from "@/user/models/user.interface";
+import { I_Usuario } from "src/user/models/user.interface";
 
 export interface I_CreateDetailUserProject {
   usuario_id: number;

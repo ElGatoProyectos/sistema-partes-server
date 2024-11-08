@@ -1,14 +1,14 @@
-import { projectValidation } from "src/project/project.validation";
+import { projectValidation } from "../project/project.validation";
 import { I_DailyPartCreateBody } from "./models/dailyPart.interface";
-import { httpResponse, T_HttpResponse } from "src/common/http.response";
 import { dailyPartReportValidation } from "./dailyPart.validation";
-import { ParteDiario } from "@prisma/client";
+import { ParteDiario, Trabajo } from "@prisma/client";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
-import { converToDate } from "src/common/utils/date";
-import { jobValidation } from "src/job/job.validation";
-import prisma from "src/config/prisma.config";
+import { converToDate } from "../common/utils/date";
+import { jobValidation } from "../job/job.validation";
+import prisma from "../config/prisma.config";
+import { httpResponse, T_HttpResponse } from "../common/http.response";
 
-class DailyPart {
+class DailyPartService {
   async createDailyPart(
     data: I_DailyPartCreateBody,
     project_id: number
@@ -28,14 +28,15 @@ class DailyPart {
       if (!jobResponse.success) {
         return jobResponse;
       }
+      const job = jobResponse.payload as Trabajo;
       const date = converToDate(data.fecha);
       date.setUTCHours(0, 0, 0, 0);
       const lastDailyPartResponse = lastDailyPart.payload as ParteDiario;
       const nextCodigo = (parseInt(lastDailyPartResponse?.codigo) || 0) + 1;
-      const formattedCodigo = nextCodigo.toString().padStart(3, "0");
+      const formattedCodigo = nextCodigo.toString().padStart(4, "0");
       const dailyPartFormat = {
         codigo: formattedCodigo,
-        nombre: formattedCodigo + "-" + date.getFullYear(),
+        nombre: job.codigo + "-" + formattedCodigo,
         proyecto_id: project_id,
         trabajo_id: data.job_id,
         fecha: date,
@@ -57,3 +58,4 @@ class DailyPart {
     }
   }
 }
+export const dailyPartService = new DailyPartService();

@@ -34,6 +34,8 @@ import assistsWorkforce from "./assists/assists.init";
 import priceHourWorkforceRouter from "./workforce/priceHourWorkforce/priceHourWorkforce.init";
 import detailWeekProjectRouter from "./week/detailWeekProject/detailWeekProject.init";
 import { automaticTask } from "./config/cron.config";
+import dailyPartRouter from "./dailyPart/dailyPart.init";
+
 const globalPrefix = "/api";
 
 const app = express();
@@ -74,6 +76,7 @@ app.use(globalPrefix, categoryWorkforce);
 app.use(globalPrefix, assistsWorkforce);
 app.use(globalPrefix, priceHourWorkforceRouter);
 app.use(globalPrefix, detailWeekProjectRouter);
+app.use(globalPrefix, dailyPartRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

@@ -1,6 +1,6 @@
-import express from "@/config/express.config";
 import validator from "validator";
 import { httpResponse } from "../http.response";
+import express from "src/config/express.config";
 
 class RequestMiddleware {
   validatePagination(
