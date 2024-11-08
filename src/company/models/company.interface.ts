@@ -1,5 +1,5 @@
-import { I_Usuario } from "@/user/models/user.interface";
 import { Empresa } from "@prisma/client";
+import { I_Usuario } from "src/user/models/user.interface";
 
 export interface I_CreateCompanyBD
   extends Omit<Empresa, "id" | "fecha_creacion" | "eliminado"> {}
