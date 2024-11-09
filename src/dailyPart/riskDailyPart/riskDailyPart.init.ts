@@ -5,9 +5,10 @@ import { authRoleMiddleware } from "../../auth/middlewares/auth-role.middleware"
 
 const riskDailyPartRouter = express.Router();
 const prefix = "/risk-daily-part";
+const prefixWithDailyPart = "/daily-part/:id/risk-daily-part";
 
 riskDailyPartRouter.post(
-  `${prefix}/:id`,
+  `${prefixWithDailyPart}`,
   riskDailyPartMiddleware.verifyHeadersFieldsId,
   riskDailyPartMiddleware.verifyFields,
   //[message] fijarme que roles

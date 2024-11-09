@@ -1,6 +1,7 @@
 import { E_Estado_BD, RiesgoParteDiario } from "@prisma/client";
 import {
   I_CreateRiskDailyPartBD,
+  I_RiskDailyPartForId,
   I_UpdateRiskDailyPartBD,
 } from "./models/riskDailyPart.interface";
 import { RiskDailyPartRepository } from "./riskDailyPart.respository";
@@ -28,12 +29,18 @@ class PrismaRiskDailyPartRepository implements RiskDailyPartRepository {
     return riskDailyPart;
   }
 
-  async findById(risk_daily_part: number): Promise<RiesgoParteDiario | null> {
+  async findById(risk_daily_part: number): Promise<I_RiskDailyPartForId | null> {
     const riskDailyPart = await prisma.riesgoParteDiario.findFirst({
       where: {
         id: risk_daily_part,
         eliminado: E_Estado_BD.n,
+       
       },
+      omit: {
+        eliminado:true,
+        fecha_creacion:true,
+        proyecto_id:true
+      }
     });
     return riskDailyPart;
   }

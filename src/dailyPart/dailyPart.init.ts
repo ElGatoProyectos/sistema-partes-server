@@ -9,7 +9,7 @@ const prefix = "/daily-part";
 
 dailyPartRouter.get(
   `${prefix}`,
-  dailyPartMiddleware.verifyHeadersFieldsIdJob,
+  dailyPartMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authorizeRoles([
     "ADMIN",
     "USER",
@@ -19,6 +19,19 @@ dailyPartRouter.get(
     "ASISTENTE_PRODUCCION",
   ]),
   dailyPartController.all
+);
+dailyPartRouter.get(
+  `${prefix}/work/:id`,
+  dailyPartMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  dailyPartController.allForJob
 );
 
 dailyPartRouter.post(

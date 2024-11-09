@@ -1,4 +1,5 @@
-import { E_Estado_BD, ParteDiario, Trabajo } from "@prisma/client";
+import { ParteDiario, Trabajo } from "@prisma/client";
+import { I_RiskDailyPart } from "../riskDailyPart/models/riskDailyPart.interface";
 
 export interface I_CreateDailyPartBD
   extends Omit<
@@ -21,6 +22,7 @@ export interface I_UpdateDailyPartBD
   extends Omit<
     ParteDiario,
     | "id"
+    | "fecha"
     | "codigo"
     | "nombre"
     | "fecha_creacion"
@@ -40,11 +42,24 @@ export interface I_DailyPartUpdateBody {
   hora_fin: string;
   descripcion_actividad: string;
   nota: string;
-  distanciamiento: string;
-  protocolo_ingreso: string;
-  protocolo_salida: string;
+  distanciamiento: boolean;
+  protocolo_ingreso: boolean;
+  protocolo_salida: boolean;
 }
 
 export interface I_DailyPart extends ParteDiario {
   Trabajo: Trabajo;
+}
+export interface I_DailyPartId
+  extends Omit<
+    ParteDiario,
+    | "codigo"
+    | "eliminado"
+    | "trabajo_id"
+    | "proyecto_id"
+    | "fecha_creacion"
+    | "riesto_parte_diario_id"
+    | "RiesgoParteDiario"
+  > {
+  restriccion: I_RiskDailyPart | null;
 }
