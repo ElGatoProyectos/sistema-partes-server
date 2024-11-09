@@ -2,9 +2,9 @@ import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
 
 class DailyPartReportValidation {
-  async findById(daily_part_id: number): Promise<T_HttpResponse> {
+  async findByIdValidation(daily_part_id: number): Promise<T_HttpResponse> {
     try {
-      const dailyPart = await prismaDailyPartRepository.findById(daily_part_id);
+      const dailyPart = await prismaDailyPartRepository.findByIdValidation(daily_part_id);
       if (!dailyPart) {
         return httpResponse.NotFoundException(
           "El Parte Diario no fue encontrado",
@@ -18,6 +18,29 @@ class DailyPartReportValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar Parte Diario",
+        error
+      );
+    }
+  }
+
+  async findByRiskId(risk_daily_part_id: number): Promise<T_HttpResponse> {
+    try {
+      const dailyPart = await prismaDailyPartRepository.findByIdRisk(
+        risk_daily_part_id
+      );
+      if (!dailyPart) {
+        return httpResponse.NotFoundException(
+          "El Parte Diario por el id del Riesgo no fue encontrado",
+          dailyPart
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El Parte Diario por el id del Riesgo fue encontrado",
+        dailyPart
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Parte Diario por el id del Riesgo",
         error
       );
     }
@@ -65,7 +88,7 @@ class DailyPartReportValidation {
   }
   async updateDailyPartForRisk(
     daily_part_id: number,
-    risk_daily_part_id: number
+    risk_daily_part_id: number | null
   ): Promise<T_HttpResponse> {
     try {
       const dailyPart = await prismaDailyPartRepository.updateDailyParForRisk(

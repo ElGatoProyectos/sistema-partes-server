@@ -15,7 +15,11 @@ import {
   valueBooleanState,
 } from "../common/utils/trueOrFalse";
 import { projectValidation } from "../project/project.validation";
-import { T_FindAllDailyPart } from "./models/dailyPart.types";
+import {
+  T_FindAllDailyPart,
+  T_FindAllDailyPartForJob,
+} from "./models/dailyPart.types";
+import validator from "validator";
 
 class DailyPartService {
   async createDailyPart(
@@ -79,29 +83,23 @@ class DailyPartService {
           "No se puede crear el Tren con el id del Proyecto proporcionado"
         );
       }
-      const dailyPartResponse = await dailyPartReportValidation.findById(
-        daily_part_id
-      );
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
       if (!dailyPartResponse.success) {
         return dailyPartResponse;
       }
       const dailyPart = dailyPartResponse.payload as I_DailyPart;
-
-      const date = converToDate(data.fecha);
-      date.setUTCHours(0, 0, 0, 0);
 
       const distancingValue = valueBooleanState(data.distanciamiento);
       const entranceValue = valueBooleanState(data.protocolo_ingreso);
       const exitValue = valueBooleanState(data.protocolo_salida);
 
       const dailyPartFormat = {
-        codigo: dailyPart.codigo,
         nombre: dailyPart.Trabajo.codigo + "-" + dailyPart.codigo,
         etapa: data.etapa,
         jornada: data.jornada,
         hora_inicio: data.hora_inicio,
         hora_fin: data.hora_fin,
-        fecha: date,
         descripcion_actividad: data.descripcion_actividad,
         nota: data.nota,
         distanciamiento: distancingValue,
@@ -141,6 +139,7 @@ class DailyPartService {
         formatDailyPart
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al Actualizar el Parte Diario",
         error
@@ -189,12 +188,19 @@ class DailyPartService {
     }
   }
 
-  async findAll(data: T_FindAllDailyPart, job_id: string) {
+  async findAllForJob(data: T_FindAllDailyPartForJob, job_id: string) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const jobResponse = await jobValidation.findById(+job_id);
       if (!jobResponse.success) {
         return jobResponse;
+      }
+      if (data.queryParams.date) {
+        if (!validator.isDate(data.queryParams.date)) {
+          return httpResponse.BadRequestException(
+            "El formato de la fecha que a pasado no es compatible"
+          );
+        }
       }
       const result = await prismaDailyPartRepository.findAllForJob(
         skip,
@@ -220,6 +226,54 @@ class DailyPartService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todos los Partes Diarios del Trabajo",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAll(data: T_FindAllDailyPart, project_id: string) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede buscar todos los Partes Diarios con el id del proyecto proporcionado"
+        );
+      }
+      const stage = ["PROCESO", "REVISADO", "TERMINADO", "INGRESADO"];
+      if (data.queryParams.stage) {
+        if (!stage.includes(data.queryParams.stage)) {
+          return httpResponse.BadRequestException(
+            "La etapa ingresada no es válida"
+          );
+        }
+      }
+      const result = await prismaDailyPartRepository.findAllForProject(
+        skip,
+        data,
+        +project_id
+      );
+
+      const { dailyParts, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: dailyParts,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Partes Diarios",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Partes Diarios",
         error
       );
     } finally {

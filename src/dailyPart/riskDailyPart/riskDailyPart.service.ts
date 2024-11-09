@@ -25,9 +25,8 @@ class RiskDailyPartService {
           "No se puede crear el Tren con el id del Proyecto proporcionado"
         );
       }
-      const dailyPartResponse = await dailyPartReportValidation.findById(
-        daily_part_id
-      );
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
       if (!dailyPartResponse.success) {
         return dailyPartResponse;
       }
@@ -174,6 +173,18 @@ class RiskDailyPartService {
       if (!riskDailyPartResponse.success) {
         return riskDailyPartResponse;
       }
+
+      const dailyPartResponse = await dailyPartReportValidation.findByRiskId(
+        risk_daily_part_id
+      );
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
+      await dailyPartReportValidation.updateDailyPartForRisk(
+        dailyPart.id,
+        null
+      );
 
       const rieskDailyPart = riskDailyPartResponse.payload as RiesgoParteDiario;
 
