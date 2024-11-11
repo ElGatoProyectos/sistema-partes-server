@@ -41,6 +41,23 @@ class CategoryWorkforceValidation {
       );
     }
   }
+  async findAllWithPagination(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const categoryWorkforce =
+        await prismaCategoryWorkforceRepository.findAllWithOutPagination(
+          project_id
+        );
+      return httpResponse.SuccessResponse(
+        "Categoria de la Mano de Obra del Proyecto fue encontrado con éxito",
+        categoryWorkforce
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Categoria de la Mano de Obra del Proyecto",
+        error
+      );
+    }
+  }
   async createBank(data: I_CreateCategoryWorkforceBD): Promise<T_HttpResponse> {
     try {
       const categoryWorkforce =

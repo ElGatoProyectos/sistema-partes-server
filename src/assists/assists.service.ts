@@ -2,6 +2,7 @@ import { httpResponse, T_HttpResponse } from "../common/http.response";
 import prisma from "../config/prisma.config";
 import {
   Asistencia,
+  CategoriaObrero,
   E_Asistencia_BD,
   E_Estado_BD,
   ManoObra,
@@ -19,6 +20,7 @@ import { jwtService } from "../auth/jwt.service";
 import { I_Usuario } from "../user/models/user.interface";
 import { I_AssistsBody } from "./models/assists.interface";
 import { prismaWorkforceRepository } from "../workforce/prisma-workforce.repository";
+import { categoryWorkforceValidation } from "../categoryWorkforce/categoryWorkforce.validation";
 
 class AssistsService {
   async findAll(
@@ -465,11 +467,27 @@ class AssistsService {
       if (!projectResponse.success) {
         return projectResponse;
       }
+
+      const categoriesWorkforce =
+        await categoryWorkforceValidation.findAllWithPagination(project_id);
+
+      const categories = categoriesWorkforce.payload as CategoriaObrero[];
       const result = await prismaAssistsRepository.findAllPresents(
         skip,
         data,
         project_id
       );
+
+      if (data.queryParams.category) {
+        const flag = categories.some(
+          (categorie) => categorie.id === +data.queryParams.category
+        );
+        if (!flag) {
+          return httpResponse.BadRequestException(
+            "El id introducido de la Categoria no existe"
+          );
+        }
+      }
 
       const { assists, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);

@@ -22,6 +22,8 @@ export abstract class BankWorkforceRepository {
     project_id: number
   ): void {}
 
+  findAllWithOutPagination(project_id: number): void {}
+
   findById(assists_id: number): void {}
 
   findByDate(date: Date): void {}
@@ -42,6 +44,12 @@ export abstract class BankWorkforceRepository {
   updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD): void {}
 
   updateStatusAssists(assists_id: number): void {}
+
+  updateManyStatusAsigned(ids: number[], project_id: number): void {}
+
+  updateManyStatusAsignedX2(ids: number[], project_id: number): void {}
+
+  updateManyStatusNotAsigned(ids: number[], project_id: number): void {}
 
   findDatesByLegend(project_id: number): void {}
 }

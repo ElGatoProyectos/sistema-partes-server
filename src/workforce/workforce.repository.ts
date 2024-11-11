@@ -19,6 +19,8 @@ export abstract class WorkforceRepository {
 
   findById(idUser: number): void {}
 
+  findManyId(workforces_id: number[]): void {}
+
   createWorkforce(data: I_CreateWorkforceBD): void {}
 
   existsName(name: string, project_id: number): void {}

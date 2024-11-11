@@ -21,6 +21,75 @@ import {
 import { weekValidation } from "../week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
+  async updateManyStatusAsigned(ids: number[], project_id: number) {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    // await Promise.all(
+    //   ids.map(async (id) => {
+    //     await prisma.asistencia.updateMany({
+    //       where: {
+    //         fecha: date,
+    //         proyecto_id: project_id,
+    //       },
+    //       data: {
+    //         estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
+    //       },
+    //     });
+    //   })
+    // );
+    await prisma.asistencia.updateMany({
+      where: {
+        fecha: date,
+        proyecto_id: project_id,
+        mano_obra_id: { in: ids },
+      },
+      data: {
+        estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
+      },
+    });
+  }
+  async updateManyStatusAsignedX2(ids: number[], project_id: number) {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    await prisma.asistencia.updateMany({
+      where: {
+        fecha: date,
+        proyecto_id: project_id,
+        mano_obra_id: { in: ids },
+      },
+      data: {
+        estado_asignacion: E_Estado_Asistencia_BD.DOBLEMENTE_ASIGNADO,
+      },
+    });
+  }
+  async updateManyStatusNotAsigned(ids: number[], project_id: number) {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+
+    await prisma.asistencia.updateMany({
+      where: {
+        fecha: date,
+        proyecto_id: project_id,
+        mano_obra_id: { in: ids },
+      },
+      data: {
+        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
+      },
+    });
+  }
+  async findAllWithOutPagination(
+    project_id: number
+  ): Promise<Asistencia[] | null> {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    const asssits = await prisma.asistencia.findMany({
+      where: {
+        fecha: date,
+        proyecto_id: project_id,
+      },
+    });
+    return asssits;
+  }
   async findDatesByLegend(project_id: number): Promise<EstadoAsistenciaCounts> {
     const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
@@ -54,37 +123,102 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     project_id: number
   ): Promise<{ assists: any[]; total: number }> {
     let filters: any = {};
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    if (data.queryParams.search) {
+      if (isNaN(data.queryParams.search as any)) {
+        filters.OR = [
+          {
+            nombre_completo: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_materno: {
+              contains: data.queryParams.search,
+            },
+          },
+          {
+            apellido_paterno: {
+              contains: data.queryParams.search,
+            },
+          },
+        ];
+      } else {
+        filters.documento_identidad = {
+          contains: data.queryParams.search,
+        };
+      }
+    }
 
-    // if (data.queryParams.search) {
-    //   if (isNaN(data.queryParams.search as any)) {
-    //     filters.nombre = {
-    //       contains: data.queryParams.search,
-    //     };
-    //   } else {
-    //     filters.codigo = {
-    //       contains: data.queryParams.search,
-    //     };
-    //   }
-    // }
-    const [assists, total]: [Asistencia[], number] = await prisma.$transaction([
-      prisma.asistencia.findMany({
-        where: {
+    if (data.queryParams.category) {
+      filters.categoria_obrero_id = +data.queryParams.category;
+    }
+
+    // const detailsDailyPartMO = await prisma.parteDiarioMO.findMany({
+    //   where: {
+    //     proyecto_id: project_id,
+    //   },
+    // });
+
+    // let ids = detailsDailyPartMO.map((detail) => detail.mano_obra_id);
+
+    const assists = await prisma.asistencia.findMany({
+      where: {
+        fecha: date,
+        proyecto_id: project_id,
+        // mano_obra_id: {
+        //   notIn: ids,
+        // },
+        asistencia: E_Asistencia_BD.A,
+        ManoObra: {
           ...filters,
-          proyecto_id: project_id,
-          asistencia: E_Asistencia_BD.A,
         },
-        skip,
-        take: data.queryParams.limit,
-      }),
-      prisma.asistencia.count({
-        where: {
+      },
+      include: {
+        ManoObra: {
+          include: {
+            CategoriaObrero: true,
+            OrigenObrero: true,
+            TipoObrero: true,
+          },
+        },
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+    const total = await prisma.asistencia.count({
+      where: {
+        proyecto_id: project_id,
+        // mano_obra_id: {
+        //   notIn: ids,
+        // },
+        fecha: date,
+        ManoObra: {
           ...filters,
-          proyecto_id: project_id,
-          asistencia: E_Asistencia_BD.A,
         },
-      }),
-    ]);
-    return { assists, total };
+      },
+    });
+
+    const assistsMO = assists.map((item) => {
+      const { ManoObra, ...ResData } = item;
+      const { CategoriaObrero, OrigenObrero, TipoObrero } = ManoObra;
+      return {
+        id: ManoObra.id,
+        dni: ManoObra.documento_identidad,
+        nombre_completo:
+          ManoObra.nombre_completo +
+          " " +
+          ManoObra.apellido_materno +
+          " " +
+          ManoObra.apellido_paterno,
+        categoria: CategoriaObrero?.nombre,
+        origen: OrigenObrero?.nombre,
+        puesto: TipoObrero?.nombre,
+      };
+    });
+
+    return { assists: assistsMO, total };
   }
 
   async createAssists(data: I_CreateAssistsWorkforceBD): Promise<Asistencia> {

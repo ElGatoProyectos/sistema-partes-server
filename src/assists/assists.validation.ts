@@ -59,6 +59,87 @@ class AssistsWorkforceValidation {
       );
     }
   }
+
+  async findAllWithPagination(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.findAllWithOutPagination(
+        project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Asistencia encontrada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia",
+        error
+      );
+    }
+  }
+  async updateManyAsigned(
+    ids: number[],
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.updateManyStatusAsigned(
+        ids,
+        project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Asistencia ahora con estado Asignado modfificada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Asistencia con estado Asignado",
+        error
+      );
+    }
+  }
+  async updateManyAsignedX2(
+    ids: number[],
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.updateManyStatusAsignedX2(
+        ids,
+        project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Asistenciaa ahora con estado Doblemente Asignado fueron modificadas con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Asistencia con estado Doblemente Asignado",
+        error
+      );
+    }
+  }
+  async updateManyNotAsigned(
+    ids: number[],
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.updateManyStatusNotAsigned(
+        ids,
+        project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Asistencia con estado No Asignado modfificada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Asistencia con estado Asignado",
+        error
+      );
+    }
+  }
 }
 
 export const assistsWorkforceValidation = new AssistsWorkforceValidation();
