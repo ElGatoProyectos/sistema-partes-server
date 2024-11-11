@@ -3,7 +3,11 @@ import {
   I_CreateAssistsWorkforceBD,
   I_UpdateAssitsBD,
 } from "./models/assists.interface";
-import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
+import {
+  T_FindAllAssists,
+  T_FindAllAssistsForDailyPart,
+  T_FindAllWeekAssists,
+} from "./models/assists.types";
 
 export abstract class BankWorkforceRepository {
   findAll(
@@ -12,7 +16,11 @@ export abstract class BankWorkforceRepository {
     project_id: number,
     responsible_id?: number
   ): void {}
-  findAllPresents(project_id: number): void {}
+  findAllPresents(
+    skip: number,
+    data: T_FindAllAssistsForDailyPart,
+    project_id: number
+  ): void {}
 
   findById(assists_id: number): void {}
 
@@ -34,4 +42,6 @@ export abstract class BankWorkforceRepository {
   updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD): void {}
 
   updateStatusAssists(assists_id: number): void {}
+
+  findDatesByLegend(project_id: number): void {}
 }

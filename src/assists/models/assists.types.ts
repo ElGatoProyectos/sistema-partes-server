@@ -16,3 +16,19 @@ export type T_FindAllWeekAssists = {
     week: string;
   };
 };
+export type T_FindAllAssistsForDailyPart = {
+  queryParams: {
+    page: number;
+    limit: number;
+    search: string;
+    category: string;
+    combo: string;
+  };
+};
+
+export type EstadoAsistenciaCounts = {
+  ASIGNADO: number;
+  NO_ASIGNADO: number;
+  FALTA: number;
+  DOBLEMENTE_ASIGNADO: number;
+};

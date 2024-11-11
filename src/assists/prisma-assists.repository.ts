@@ -4,7 +4,12 @@ import {
   I_AssistsWorkforce,
   I_CreateAssistsWorkforceBD,
 } from "./models/assists.interface";
-import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
+import {
+  EstadoAsistenciaCounts,
+  T_FindAllAssists,
+  T_FindAllAssistsForDailyPart,
+  T_FindAllWeekAssists,
+} from "./models/assists.types";
 import {
   Asistencia,
   E_Asistencia_BD,
@@ -16,15 +21,72 @@ import {
 import { weekValidation } from "../week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
-  async findAllPresents(project_id: number): Promise<Asistencia[] | null> {
-    const assists = await prisma.asistencia.findMany({
+  async findDatesByLegend(project_id: number): Promise<EstadoAsistenciaCounts> {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    const result = await prisma.asistencia.groupBy({
       where: {
+        fecha: date,
         proyecto_id: project_id,
-        asistencia: E_Asistencia_BD.A,
+      },
+      by: ["estado_asignacion"],
+      _count: {
+        estado_asignacion: true,
       },
     });
-    return assists;
+
+    const counts = {
+      ASIGNADO: 0,
+      NO_ASIGNADO: 0,
+      FALTA: 0,
+      DOBLEMENTE_ASIGNADO: 0,
+    };
+
+    result.forEach((item) => {
+      counts[item.estado_asignacion] = item._count.estado_asignacion;
+    });
+
+    return counts;
   }
+  async findAllPresents(
+    skip: number,
+    data: T_FindAllAssistsForDailyPart,
+    project_id: number
+  ): Promise<{ assists: any[]; total: number }> {
+    let filters: any = {};
+
+    // if (data.queryParams.search) {
+    //   if (isNaN(data.queryParams.search as any)) {
+    //     filters.nombre = {
+    //       contains: data.queryParams.search,
+    //     };
+    //   } else {
+    //     filters.codigo = {
+    //       contains: data.queryParams.search,
+    //     };
+    //   }
+    // }
+    const [assists, total]: [Asistencia[], number] = await prisma.$transaction([
+      prisma.asistencia.findMany({
+        where: {
+          ...filters,
+          proyecto_id: project_id,
+          asistencia: E_Asistencia_BD.A,
+        },
+        skip,
+        take: data.queryParams.limit,
+      }),
+      prisma.asistencia.count({
+        where: {
+          ...filters,
+          proyecto_id: project_id,
+          asistencia: E_Asistencia_BD.A,
+        },
+      }),
+    ]);
+    return { assists, total };
+  }
+
   async createAssists(data: I_CreateAssistsWorkforceBD): Promise<Asistencia> {
     const asssists = await prisma.asistencia.create({
       data,
