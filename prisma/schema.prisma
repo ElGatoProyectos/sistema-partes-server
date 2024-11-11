@@ -751,6 +751,13 @@ enum E_Estado_Asistencia_BD {
   DOBLEMENTE_ASIGNADO
 }
 
+enum E_Etapa_Parte_Diario {
+  PROCESO
+  REVISADO
+  TERMINADO
+  INGRESADO
+}
+
 //[success] actual
 model Asistencia {
   id                  Int                    @id @default(autoincrement())
@@ -772,27 +779,27 @@ model Asistencia {
 
 //[success] actual
 model ParteDiario {
-  id                     Int                  @id @default(autoincrement())
+  id                     Int                   @id @default(autoincrement())
   codigo                 String
   nombre                 String //
-  fecha                  DateTime?            @db.Date()
-  etapa                  String?
+  fecha                  DateTime?             @db.Date()
+  etapa                  E_Etapa_Parte_Diario?
   jornada                String?
-  fecha_creacion         DateTime             @default(now())
+  fecha_creacion         DateTime              @default(now())
   hora_inicio            String?
   hora_fin               String?
-  descripcion_actividad  String?              @db.Text()
-  nota                   String?              @db.Text()
+  descripcion_actividad  String?               @db.Text()
+  nota                   String?               @db.Text()
   distanciamiento        E_Estado_BD?
   protocolo_ingreso      E_Estado_BD?
   protocolo_salida       E_Estado_BD?
-  eliminado              E_Estado_BD          @default(n)
+  eliminado              E_Estado_BD           @default(n)
   riesto_parte_diario_id Int?
   trabajo_id             Int
   proyecto_id            Int
-  Proyecto               Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
-  RiesgoParteDiario      RiesgoParteDiario?   @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
-  Trabajo                Trabajo              @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
+  Proyecto               Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  RiesgoParteDiario      RiesgoParteDiario?    @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
+  Trabajo                Trabajo               @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
   ParteDiarioMo          ParteDiarioMO[]
   ParteDiarioRecurso     ParteDiarioRecurso[]
 }
@@ -813,15 +820,15 @@ model RiesgoParteDiario {
 //[success] actual
 model ParteDiarioMO {
   id              Int         @id @default(autoincrement())
-  hora_inicio     Float
-  hora_fin        Float
-  hora_parcial    Float
-  hora_normal     Float
-  hora_60         Float
-  hora_100        Float
+  hora_inicio     Float?
+  hora_fin        Float?
+  hora_parcial    Float?
+  hora_normal     Float?
+  hora_60         Float?
+  hora_100        Float?
   parte_diario_id Int
   mano_obra_id    Int
-  fecha_creacion  DateTime    @default(now())
+  fecha_creacion  DateTime
   proyecto_id     Int
   Proyecto        Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ParteDiario     ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)

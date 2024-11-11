@@ -11,6 +11,8 @@ export abstract class CategoryWorkforceRepository {
     project_id: number
   ): void {}
 
+  findAllWithOutPagination(project_id: number): void {}
+
   findById(category_id: number): void {}
 
   createCategoryWorkforce(data: I_CreateCategoryWorkforceBD): void {}

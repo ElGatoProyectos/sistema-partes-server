@@ -366,6 +366,27 @@ class WorkforceValidation {
       );
     }
   }
+
+  async findManyId(ids: number[]): Promise<T_HttpResponse> {
+    try {
+      const workforces = await prismaWorkforceRepository.findManyId(ids);
+
+      if (workforces.length < ids.length) {
+        return httpResponse.NotFoundException(
+          "Un Trabajador ingresado no existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Los Trabajadores ingresados existen, pueden proceguir",
+        workforces
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Trabajadores Ingresados",
+        error
+      );
+    }
+  }
 }
 
 export const workforceValidation = new WorkforceValidation();

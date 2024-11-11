@@ -1,11 +1,15 @@
 import {
   I_DailyPart,
   I_DailyPartCreateBody,
-  I_DailyPartMO,
   I_DailyPartUpdateBody,
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
-import { Asistencia, ParteDiario, Trabajo } from "@prisma/client";
+import {
+  E_Etapa_Parte_Diario,
+  ParteDiario,
+  ParteDiarioMO,
+  Trabajo,
+} from "@prisma/client";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
 import { converToDate } from "../common/utils/date";
 import { jobValidation } from "../job/job.validation";
@@ -22,6 +26,7 @@ import {
 } from "./models/dailyPart.types";
 import validator from "validator";
 import { assistsWorkforceValidation } from "../assists/assists.validation";
+import { dailyPartMOValidation } from "./dailyPartMO/dailyPartMO.validation";
 
 class DailyPartService {
   async createDailyPart(
@@ -49,10 +54,11 @@ class DailyPartService {
       const lastDailyPartResponse = lastDailyPart.payload as ParteDiario;
       const nextCodigo = (parseInt(lastDailyPartResponse?.codigo) || 0) + 1;
       const formattedCodigo = nextCodigo.toString().padStart(4, "0");
+
       const dailyPartFormat = {
         codigo: formattedCodigo,
         nombre: job.codigo + "-" + formattedCodigo,
-        etapa: "PROCESO",
+        etapa: E_Etapa_Parte_Diario.PROCESO,
         proyecto_id: project_id,
         trabajo_id: data.job_id,
         fecha: date,
@@ -97,9 +103,17 @@ class DailyPartService {
       const entranceValue = valueBooleanState(data.protocolo_ingreso);
       const exitValue = valueBooleanState(data.protocolo_salida);
 
+      const valuesAssists: { [key: string]: E_Etapa_Parte_Diario } = {
+        PROCESO: E_Etapa_Parte_Diario.PROCESO,
+        REVISADO: E_Etapa_Parte_Diario.REVISADO,
+        TERMINADO: E_Etapa_Parte_Diario.TERMINADO,
+        INGRESADO: E_Etapa_Parte_Diario.INGRESADO,
+      };
+      const resultStage = valuesAssists[data.etapa];
+
       const dailyPartFormat = {
         nombre: dailyPart.Trabajo.codigo + "-" + dailyPart.codigo,
-        etapa: data.etapa,
+        etapa: resultStage,
         jornada: data.jornada,
         hora_inicio: data.hora_inicio,
         hora_fin: data.hora_fin,
@@ -111,6 +125,23 @@ class DailyPartService {
         proyecto_id: project_id,
         trabajo_id: dailyPart.Trabajo.id,
       };
+
+      const dailyPartMOResponse =
+        await dailyPartMOValidation.findAllWithOutPagination(
+          project_id,
+          dailyPart.id
+        );
+
+      const dailyPartMO = dailyPartMOResponse.payload as ParteDiarioMO[];
+
+      if (dailyPartMO.length > 0) {
+        const idsMO = dailyPartMO.map((dailyPart) => dailyPart.mano_obra_id);
+
+        await assistsWorkforceValidation.updateManyNotAsigned(
+          idsMO,
+          project_id
+        );
+      }
 
       const responseDailyPart = await prismaDailyPartRepository.updateDailyPart(
         dailyPartFormat,
@@ -149,28 +180,6 @@ class DailyPartService {
     } finally {
       await prisma.$disconnect();
     }
-  }
-
-  async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
-    const projectResponse = await projectValidation.findById(project_id);
-
-    if (!projectResponse.success) {
-      return projectResponse;
-    }
-
-    const dailyPartResponse =
-      await dailyPartReportValidation.findByIdValidation(data.daily_part_id);
-    if (!dailyPartResponse.success) {
-      return dailyPartResponse;
-    }
-
-    // const resultAllAssists = await prismaAssistsRepository.findAll(
-    //   skip,
-    //   data,
-    //   +project_id,
-    //   user_id
-    // );
-    // return this.createSuccessResponse(resultAllAssists, data.queryParams);
   }
 
   async findById(daily_part_id: number): Promise<T_HttpResponse> {

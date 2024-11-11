@@ -36,6 +36,7 @@ import detailWeekProjectRouter from "./week/detailWeekProject/detailWeekProject.
 import { automaticTask } from "./config/cron.config";
 import dailyPartRouter from "./dailyPart/dailyPart.init";
 import riskDailyPartRouter from "./dailyPart/riskDailyPart/riskDailyPart.init";
+import dailyPartMORouter from "./dailyPart/dailyPartMO/dailyPartMO.init";
 
 const globalPrefix = "/api";
 
@@ -79,6 +80,7 @@ app.use(globalPrefix, priceHourWorkforceRouter);
 app.use(globalPrefix, detailWeekProjectRouter);
 app.use(globalPrefix, dailyPartRouter);
 app.use(globalPrefix, riskDailyPartRouter);
+app.use(globalPrefix, dailyPartMORouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

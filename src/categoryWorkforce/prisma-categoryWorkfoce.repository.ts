@@ -9,6 +9,17 @@ import { CategoryWorkforceRepository } from "./categoryWorkforce.repository";
 import { T_FindAllCategoryWorkforce } from "./models/categoryWorkforce.types";
 
 class PrismaCategoryWorkforceRepository implements CategoryWorkforceRepository {
+  async findAllWithOutPagination(
+    project_id: number
+  ): Promise<CategoriaObrero[] | null> {
+    const categories = await prisma.categoriaObrero.findMany({
+      where: {
+        proyecto_id: project_id,
+        eliminado: E_Estado_BD.y,
+      },
+    });
+    return categories;
+  }
   async createCategoryWorkforce(
     data: I_CreateCategoryWorkforceBD
   ): Promise<CategoriaObrero> {
