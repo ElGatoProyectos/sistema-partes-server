@@ -34,19 +34,6 @@ dailyPartRouter.get(
   dailyPartController.allForJob
 );
 
-dailyPartRouter.post(
-  `${prefix}`,
-  dailyPartMiddleware.verifyHeadersFieldsIdProject,
-  dailyPartMiddleware.verifyFields,
-  //[message] fijarme que roles
-  authRoleMiddleware.authorizeRoles([
-    "ADMIN",
-    "USER",
-    "CONTROL_COSTOS",
-    "ASISTENTE_CONTROL_COSTOS",
-  ]),
-  dailyPartController.create
-);
 dailyPartRouter.put(
   `${prefix}/:id`,
   dailyPartMiddleware.verifyHeadersFieldsId,

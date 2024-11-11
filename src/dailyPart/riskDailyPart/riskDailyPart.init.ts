@@ -4,24 +4,24 @@ import { riskDailyPartController } from "./riskDailyPart.controller";
 import { authRoleMiddleware } from "../../auth/middlewares/auth-role.middleware";
 
 const riskDailyPartRouter = express.Router();
-const prefix = "/risk-daily-part";
-const prefixWithDailyPart = "/daily-part/:id/risk-daily-part";
+const prefix = "/restriction-daily-part";
+const prefixWithDailyPart = "/daily-part/:id/restriction";
 
-riskDailyPartRouter.post(
-  `${prefixWithDailyPart}`,
-  riskDailyPartMiddleware.verifyHeadersFieldsId,
-  riskDailyPartMiddleware.verifyFields,
-  //[message] fijarme que roles
-  authRoleMiddleware.authorizeRoles([
-    "ADMIN",
-    "USER",
-    "CONTROL_COSTOS",
-    "ASISTENTE_CONTROL_COSTOS",
-  ]),
-  riskDailyPartController.create
-);
+// riskDailyPartRouter.post(
+//   `${prefixWithDailyPart}`,
+//   riskDailyPartMiddleware.verifyHeadersFieldsId,
+//   riskDailyPartMiddleware.verifyFields,
+//   //[message] fijarme que roles
+//   authRoleMiddleware.authorizeRoles([
+//     "ADMIN",
+//     "USER",
+//     "CONTROL_COSTOS",
+//     "ASISTENTE_CONTROL_COSTOS",
+//   ]),
+//   riskDailyPartController.create
+// );
 riskDailyPartRouter.put(
-  `${prefix}/:id`,
+  `${prefixWithDailyPart}`,
   riskDailyPartMiddleware.verifyHeadersFieldsId,
   riskDailyPartMiddleware.verifyFieldsUpdate,
   //[message] fijarme que roles
