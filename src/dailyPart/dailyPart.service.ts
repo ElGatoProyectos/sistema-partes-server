@@ -1,6 +1,7 @@
 import {
   I_DailyPart,
   I_DailyPartCreateBody,
+  I_DailyPartMO,
   I_DailyPartUpdateBody,
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
@@ -51,6 +52,7 @@ class DailyPartService {
       const dailyPartFormat = {
         codigo: formattedCodigo,
         nombre: job.codigo + "-" + formattedCodigo,
+        etapa: "PROCESO",
         proyecto_id: project_id,
         trabajo_id: data.job_id,
         fecha: date,
@@ -149,7 +151,7 @@ class DailyPartService {
     }
   }
 
-  async createDailyPartMO(daily_part_id: number, project_id: number) {
+  async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
     const projectResponse = await projectValidation.findById(project_id);
 
     if (!projectResponse.success) {
@@ -157,22 +159,9 @@ class DailyPartService {
     }
 
     const dailyPartResponse =
-      await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      await dailyPartReportValidation.findByIdValidation(data.daily_part_id);
     if (!dailyPartResponse.success) {
       return dailyPartResponse;
-    }
-
-    const assistsPresents = await assistsWorkforceValidation.findAllPresents(
-      project_id
-    );
-
-    const assists = assistsPresents.payload as Asistencia[];
-
-    if (assists.length === 0) {
-      return httpResponse.SuccessResponse(
-        "No se encontraron trabajadores presentes para este día ",
-        []
-      );
     }
 
     // const resultAllAssists = await prismaAssistsRepository.findAll(

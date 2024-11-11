@@ -1,6 +1,10 @@
 import express from "../config/express.config";
 import { assistsService } from "./assists.service";
-import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
+import {
+  T_FindAllAssists,
+  T_FindAllAssistsForDailyPart,
+  T_FindAllWeekAssists,
+} from "./models/assists.types";
 import { httpResponse } from "../common/http.response";
 import { I_AssistsBody } from "./models/assists.interface";
 
@@ -96,6 +100,34 @@ class AssistsController {
       response.status(result.statusCode).json(result);
     }
   }
+  async getAllForDailyPart(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const search = request.query.search as string;
+    const category = request.query.category as string;
+    const combo = request.query.combo as string;
+    const project_id = request.get("project-id") as string;
+
+    let data: T_FindAllAssistsForDailyPart = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        search: search,
+        category: category,
+        combo: combo,
+      },
+    };
+
+    const result = await assistsService.findAllPresents(data, +project_id);
+    if (!result.success) {
+      response.status(result.statusCode).json(result);
+    } else {
+      response.status(result.statusCode).json(result);
+    }
+  }
   async getAllForWeek(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
@@ -138,6 +170,15 @@ class AssistsController {
   async findById(request: express.Request, response: express.Response) {
     const assists_id = Number(request.params.id);
     const result = await assistsService.findById(assists_id);
+    response.status(result.statusCode).json(result);
+  }
+
+  async findDatesForLegend(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const project_id = request.get("project-id") as string;
+    const result = await assistsService.findDatesForLegend(+project_id);
     response.status(result.statusCode).json(result);
   }
 

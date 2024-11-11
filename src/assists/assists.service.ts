@@ -10,7 +10,11 @@ import { workforceValidation } from "../workforce/workforce.validation";
 import { projectValidation } from "../project/project.validation";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
 import { assistsWorkforceValidation } from "./assists.validation";
-import { T_FindAllAssists, T_FindAllWeekAssists } from "./models/assists.types";
+import {
+  T_FindAllAssists,
+  T_FindAllAssistsForDailyPart,
+  T_FindAllWeekAssists,
+} from "./models/assists.types";
 import { jwtService } from "../auth/jwt.service";
 import { I_Usuario } from "../user/models/user.interface";
 import { I_AssistsBody } from "./models/assists.interface";
@@ -450,6 +454,66 @@ class AssistsService {
     const success = assistsResponses.every((response) => response !== null);
 
     return { success };
+  }
+  async findAllPresents(
+    data: T_FindAllAssistsForDailyPart,
+    project_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaAssistsRepository.findAllPresents(
+        skip,
+        data,
+        project_id
+      );
+
+      const { assists, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: assists,
+      };
+      return httpResponse.SuccessResponse(
+        "La Asistencia de los presentes fue encontrada con éxito",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia de los presentes",
+        error
+      );
+    }
+  }
+
+  async findDatesForLegend(project_id: number) {
+    try {
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const result = await prismaAssistsRepository.findDatesByLegend(
+        project_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Se encontró con éxito los datos de la Leyenda",
+        result
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los datos para la Leyenda de la Asistencia",
+        error
+      );
+    }
   }
 
   createSuccessResponse(result: any, queryParams: any): T_HttpResponse {

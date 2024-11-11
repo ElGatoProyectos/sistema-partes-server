@@ -58,6 +58,23 @@ assistsWorkforce.get(
   assistsController.getAll
 );
 assistsWorkforce.get(
+  `${prefix}/daily-part`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "GERENTE_PROYECTO",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+    "MAESTRO_OBRA",
+    "CAPATAZ",
+    "JEFE_GRUPO",
+  ]),
+  assistsController.getAllForDailyPart
+);
+assistsWorkforce.get(
   `${prefix}/week-assists`,
   assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authorizeRoles([
@@ -73,6 +90,24 @@ assistsWorkforce.get(
     "JEFE_GRUPO",
   ]),
   assistsController.getAllForWeek
+);
+
+assistsWorkforce.get(
+  `${prefix}/legend`,
+  assistsWorkforceMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "GERENTE_PROYECTO",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+    "MAESTRO_OBRA",
+    "CAPATAZ",
+    "JEFE_GRUPO",
+  ]),
+  assistsController.findDatesForLegend
 );
 
 assistsWorkforce.get(
@@ -92,6 +127,7 @@ assistsWorkforce.get(
   ]),
   assistsController.findById
 );
+
 assistsWorkforce.delete(
   `${prefix}/:id`,
   assistsWorkforceMiddleware.verifyHeadersFieldsId,

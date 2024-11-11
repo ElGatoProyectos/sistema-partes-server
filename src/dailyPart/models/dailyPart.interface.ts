@@ -63,3 +63,8 @@ export interface I_DailyPartId
   > {
   restriccion: I_RiskDailyPart | null;
 }
+
+export interface I_DailyPartMO {
+  daily_part_id: number;
+  workforces_id: number[];
+}
