@@ -74,6 +74,7 @@ class PrismaDailyPartRepository implements DailyPartRepository {
       return {
         id: item.id,
         etapa: item.etapa,
+        nombre: item.nombre,
         trabajo: ResData.nombre,
         tren: Tren.nombre,
         actividad: item.descripcion_actividad,

@@ -4,7 +4,9 @@ import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
 class DailyPartReportValidation {
   async findByIdValidation(daily_part_id: number): Promise<T_HttpResponse> {
     try {
-      const dailyPart = await prismaDailyPartRepository.findByIdValidation(daily_part_id);
+      const dailyPart = await prismaDailyPartRepository.findByIdValidation(
+        daily_part_id
+      );
       if (!dailyPart) {
         return httpResponse.NotFoundException(
           "El Parte Diario no fue encontrado",
@@ -30,17 +32,17 @@ class DailyPartReportValidation {
       );
       if (!dailyPart) {
         return httpResponse.NotFoundException(
-          "El Parte Diario por el id del Riesgo no fue encontrado",
+          "En los Partes Diarios el id del Riesgo no fue encontrado",
           dailyPart
         );
       }
       return httpResponse.SuccessResponse(
-        "El Parte Diario por el id del Riesgo fue encontrado",
+        "Fue encontrado el Parte Diario por el id del Riesgo proporcionado",
         dailyPart
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar Parte Diario por el id del Riesgo",
+        "Error al buscar Parte Diario por el id del Riesgo proporcionado",
         error
       );
     }

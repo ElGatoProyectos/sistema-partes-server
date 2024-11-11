@@ -11,26 +11,32 @@ import {
 } from "@prisma/client";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import { riskDailyPartReportValidation } from "./riskDailyPart.validation";
+import { prismaDailyPartRepository } from "../prisma-dailyPart.repository";
 
 class RiskDailyPartService {
-  async createRiskDailyPart(
+  async updateRiskDailyPart(
     data: I_RiskDailyPartBody,
-    project_id: number,
-    daily_part_id: number
+    daily_part_id: number,
+    project_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProject = await projectValidation.findById(project_id);
-      if (!resultIdProject.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el Tren con el id del Proyecto proporcionado"
-        );
-      }
       const dailyPartResponse =
         await dailyPartReportValidation.findByIdValidation(daily_part_id);
       if (!dailyPartResponse.success) {
-        return dailyPartResponse;
+        return httpResponse.NotFoundException(
+          "El Parte Diario no fue encontrado en el cración/actulización de la Restricción",
+          dailyPartResponse.payload
+        );
       }
+
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      const resultIdProject = await projectValidation.findById(project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear la Restricción del Parte Diario con el id del Proyecto proporcionado"
+        );
+      }
 
       let state: E_Estado_Riesgo_BD | null = null;
       if (data.estado != "") {
@@ -55,15 +61,37 @@ class RiskDailyPartService {
         descripcion: data.descripcion,
         estado: data.estado ? state : null,
         riesgo: data.riesgo ? risk : null,
-        proyecto_id: +project_id,
+        proyecto_id: project_id,
       };
+
+      if (dailyPart.riesto_parte_diario_id != null) {
+        const riskDailyPartResponse =
+          await riskDailyPartReportValidation.findById(
+            dailyPart.riesto_parte_diario_id
+          );
+        if (!riskDailyPartResponse.success) {
+          return riskDailyPartResponse;
+        }
+        const rieskDailyPart =
+          riskDailyPartResponse.payload as RiesgoParteDiario;
+
+        const responseDailyPart =
+          await prismaRiskDailyPartRepository.updateRiskDailyPart(
+            riskDailyPartFormat,
+            rieskDailyPart.id
+          );
+        return httpResponse.CreatedResponse(
+          "La Restricción del Parte Diario fue modificado correctamente",
+          responseDailyPart
+        );
+      }
       const responseDailyPart =
         await prismaRiskDailyPartRepository.createRiskDailyPart(
           riskDailyPartFormat
         );
       if (!responseDailyPart) {
         return httpResponse.BadRequestException(
-          "No se pudo guardar bien el Riesgo del Parte Diario"
+          "No se pudo guardar bien la Restricción del Parte Diario"
         );
       }
       const dailyPartUpdate =
@@ -75,68 +103,12 @@ class RiskDailyPartService {
         return dailyPartUpdate;
       }
       return httpResponse.CreatedResponse(
-        "Riesgo del Parte Diario creado correctamente",
+        "La Restricción del Parte Diario fue creado correctamente",
         responseDailyPart
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al crear el Riesgo del Parte Diario",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-  async updateRiskDailyPart(
-    data: I_RiskDailyPartBody,
-    daily_part_id: number
-  ): Promise<T_HttpResponse> {
-    try {
-      const riskDailyPartResponse =
-        await riskDailyPartReportValidation.findById(daily_part_id);
-      if (!riskDailyPartResponse.success) {
-        return riskDailyPartResponse;
-      }
-      const rieskDailyPart = riskDailyPartResponse.payload as RiesgoParteDiario;
-
-      let state: E_Estado_Riesgo_BD | null = null;
-      if (data.estado != "") {
-        const valuesState: { [key: string]: E_Estado_Riesgo_BD } = {
-          PENDIENTE: E_Estado_Riesgo_BD.PENDIENTE,
-          SOLUCIONADO: E_Estado_Riesgo_BD.SOLUCIONADO,
-        };
-        state = valuesState[data.estado];
-      }
-
-      let risk: E_Riesgo_BD | null = null;
-      if (data.riesgo != "") {
-        const valuesStateRisk: { [key: string]: E_Riesgo_BD } = {
-          BAJO: E_Riesgo_BD.BAJO,
-          MEDIO: E_Riesgo_BD.MEDIO,
-          ALTO: E_Riesgo_BD.ALTO,
-        };
-        risk = valuesStateRisk[data.riesgo];
-      }
-
-      const riskDailyPartFormat = {
-        descripcion: data.descripcion,
-        estado: data.estado ? state : null,
-        riesgo: data.riesgo ? risk : null,
-        proyecto_id: rieskDailyPart.proyecto_id,
-      };
-      const responseDailyPart =
-        await prismaRiskDailyPartRepository.updateRiskDailyPart(
-          riskDailyPartFormat,
-          rieskDailyPart.id
-        );
-
-      return httpResponse.CreatedResponse(
-        "Riesgo del Parte Diario modificado correctamente",
-        responseDailyPart
-      );
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al modificar el Riesgo del Parte Diario",
+        "Error al crear o modificar la Restricción del Parte Diario",
         error
       );
     } finally {
@@ -150,17 +122,17 @@ class RiskDailyPartService {
       );
       if (!dailyPart) {
         return httpResponse.NotFoundException(
-          "Riesgo Parte Diario no fue encontrado",
+          "Restricción Parte Diario no fue encontrado",
           dailyPart
         );
       }
       return httpResponse.SuccessResponse(
-        "Riesgo Parte Diario fue encontrado",
+        "Restricción Parte Diario fue encontrado",
         dailyPart
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar el Riesgo Parte Diario",
+        "Error al buscar la Restricción Parte Diario",
         error
       );
     }
@@ -192,11 +164,11 @@ class RiskDailyPartService {
         rieskDailyPart.id
       );
       return httpResponse.SuccessResponse(
-        "Riesgo del Parte Diario eliminado correctamente"
+        "Restricción del Parte Diario eliminado correctamente"
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error en eliminar el Riesgo del Parte Diario",
+        "Error en eliminar la Restricción del Parte Diario",
         error
       );
     } finally {
