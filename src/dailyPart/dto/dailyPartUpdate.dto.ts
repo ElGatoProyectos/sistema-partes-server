@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const dailyPartUpdateDto = z.object({
-  etapa: z.enum(["PROCESO", "REVISADO", "TERMINADO", "INGRESADO"]),
+  etapa: z.enum(["TODOS,PROCESO", "REVISADO", "TERMINADO", "INGRESADO"]),
   jornada: z.string(),
   hora_inicio: z.string(),
   hora_fin: z.string(),

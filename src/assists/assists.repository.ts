@@ -12,6 +12,7 @@ export abstract class BankWorkforceRepository {
     project_id: number,
     responsible_id?: number
   ): void {}
+  findAllPresents(project_id: number): void {}
 
   findById(assists_id: number): void {}
 

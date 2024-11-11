@@ -5,3 +5,10 @@ export type T_FindAllDepartureJob = {
     search: string;
   };
 };
+export type T_FindAllWork = {
+  queryParams: {
+    page: number;
+    limit: number;
+    search: string;
+  };
+};

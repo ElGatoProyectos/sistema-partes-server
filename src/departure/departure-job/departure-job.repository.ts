@@ -1,4 +1,7 @@
-import { T_FindAllDepartureJob } from "./models/departure-job.types";
+import {
+  T_FindAllDepartureJob,
+  T_FindAllWork,
+} from "./models/departure-job.types";
 
 export abstract class DepartureJobRepository {
   createDetailDepartureJob(
@@ -16,6 +19,12 @@ export abstract class DepartureJobRepository {
     skip: number,
     data: T_FindAllDepartureJob,
     project_id: number
+  ): void {}
+  findAllForJob(
+    skip: number,
+    data: T_FindAllWork,
+    project_id: number,
+    job_id: number
   ): void {}
   findAllWithPaginationForDetail(
     skip: number,
