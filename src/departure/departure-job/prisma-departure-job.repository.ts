@@ -54,7 +54,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       return {
         codigo: Partida.item,
         partida: Partida.partida,
-        unidad: Unidad?.nombre,
+        unidad: Unidad?.nombre ? Unidad?.nombre : null,
         cantidad_utilizada: ResData.metrado_utilizado,
       };
     });

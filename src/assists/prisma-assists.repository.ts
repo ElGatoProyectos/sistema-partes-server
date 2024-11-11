@@ -212,9 +212,9 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
           ManoObra.apellido_materno +
           " " +
           ManoObra.apellido_paterno,
-        categoria: CategoriaObrero?.nombre,
-        origen: OrigenObrero?.nombre,
-        puesto: TipoObrero?.nombre,
+        categoria: CategoriaObrero?.nombre ? CategoriaObrero.nombre : null,
+        origen: OrigenObrero?.nombre ? CategoriaObrero?.nombre : null,
+        puesto: TipoObrero?.nombre ? TipoObrero?.nombre : null,
       };
     });
 
