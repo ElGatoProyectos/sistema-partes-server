@@ -278,7 +278,7 @@ class DailyPartService {
           "No se puede buscar todos los Partes Diarios con el id del proyecto proporcionado"
         );
       }
-      const stage = ["TODOS,PROCESO", "REVISADO", "TERMINADO", "INGRESADO"];
+      const stage = ["TODOS", "PROCESO", "REVISADO", "TERMINADO", "INGRESADO"];
       if (data.queryParams.stage) {
         if (!stage.includes(data.queryParams.stage)) {
           return httpResponse.BadRequestException(
