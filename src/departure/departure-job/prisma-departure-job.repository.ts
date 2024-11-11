@@ -1,10 +1,69 @@
 import prisma from "../../config/prisma.config";
 import { DepartureJobRepository } from "./departure-job.repository";
 import { DetalleTrabajoPartida } from "@prisma/client";
-import { T_FindAllDepartureJob } from "./models/departure-job.types";
+import {
+  T_FindAllDepartureJob,
+  T_FindAllWork,
+} from "./models/departure-job.types";
 import { I_DetailDepartureJob } from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
+  async findAllForJob(
+    skip: number,
+    data: T_FindAllWork,
+    project_id: number,
+    job_id: number
+  ): Promise<{ details: any[]; total: number }> {
+    const details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        trabajo_id: job_id,
+        Trabajo: {
+          proyecto_id: project_id,
+        },
+        Partida: {
+          proyecto_id: project_id,
+        },
+      },
+      include: {
+        Trabajo: true,
+        Partida: {
+          include: {
+            Unidad: true,
+          },
+        },
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+
+    const total = await prisma.detalleTrabajoPartida.count({
+      where: {
+        trabajo_id: job_id,
+        Trabajo: {
+          proyecto_id: project_id,
+        },
+        Partida: {
+          proyecto_id: project_id,
+        },
+      },
+    });
+
+    const detailsForJob = details.map((detail) => {
+      const { Trabajo, Partida, ...ResData } = detail;
+      const { Unidad } = Partida;
+      return {
+        codigo: Partida.item,
+        partida: Partida.partida,
+        unidad: Unidad?.nombre,
+        cantidad_utilizada: ResData.metrado_utilizado,
+      };
+    });
+
+    return {
+      details: detailsForJob,
+      total,
+    };
+  }
   async findAllWithOutPagination(
     project_id: number
   ): Promise<DetalleTrabajoPartida[] | null> {

@@ -14,6 +14,9 @@ import {
 import { converToDate } from "../common/utils/date";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
+  createDailyPartMO(): void {
+    throw new Error("Method not implemented.");
+  }
   async findAllForProject(
     skip: number,
     data: T_FindAllDailyPart,
@@ -130,7 +133,6 @@ class PrismaDailyPartRepository implements DailyPartRepository {
         proyecto_id: true,
         fecha_creacion: true,
         riesto_parte_diario_id: true,
-        nombre: true,
         jornada: true,
         hora_inicio: true,
         hora_fin: true,

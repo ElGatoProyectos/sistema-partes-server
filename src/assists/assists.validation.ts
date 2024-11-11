@@ -38,6 +38,20 @@ class AssistsWorkforceValidation {
       );
     }
   }
+  async findAllPresents(project_id: number): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.findAllPresents(project_id);
+      return httpResponse.SuccessResponse(
+        "La Asistencia de los presentes fue encontrada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia de los presentes",
+        error
+      );
+    }
+  }
   async findByDateAndMO(mano_obra_id: number): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.findByIdMoAndDate(

@@ -16,18 +16,19 @@ import {
   Partida,
   Proyecto,
   Trabajo,
-  Unidad,
 } from "@prisma/client";
 import { jobValidation } from "../../job/job.validation";
-import { unitValidation } from "../../unit/unit.validation";
 import { departureJobValidation } from "./departureJob.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
-import { T_FindAllDepartureJob } from "./models/departure-job.types";
+import {
+  T_FindAllDepartureJob,
+  T_FindAllWork,
+} from "./models/departure-job.types";
 import { prismaJobRepository } from "../../job/prisma-job.repository";
 import { isNumeric } from "validator";
-import { fork } from "child_process";
-import path from "path";
-import { envConfig } from "../../config/env.config";
+// import { fork } from "child_process";
+// import path from "path";
+// import { envConfig } from "../../config/env.config";
 
 class DepartureJobService {
   async createDetailJobDeparture(data: I_DepartureJob) {
@@ -533,6 +534,56 @@ class DepartureJobService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos y sus Partidas",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAllForJob(data: T_FindAllWork, project_id: string, job_id: number) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+
+      const project = projectResponse.payload as Proyecto;
+
+      const jobResponse = await jobValidation.findById(job_id);
+
+      if (!jobResponse.success) {
+        return jobResponse;
+      }
+
+      const job = (await jobResponse.payload) as Trabajo;
+
+      const result = await prismaDepartureJobRepository.findAllForJob(
+        skip,
+        data,
+        project.id,
+        job.id
+      );
+
+      const { details, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: details,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Trabajos y sus Partidas de acuerdo al Trabajo que se ha pasado",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todas los Trabajos y sus Partidas de acuerdo al Trabajo que se ha pasado",
         error
       );
     } finally {

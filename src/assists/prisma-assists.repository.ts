@@ -16,6 +16,15 @@ import {
 import { weekValidation } from "../week/week.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
+  async findAllPresents(project_id: number): Promise<Asistencia[] | null> {
+    const assists = await prisma.asistencia.findMany({
+      where: {
+        proyecto_id: project_id,
+        asistencia: E_Asistencia_BD.A,
+      },
+    });
+    return assists;
+  }
   async createAssists(data: I_CreateAssistsWorkforceBD): Promise<Asistencia> {
     const asssists = await prisma.asistencia.create({
       data,

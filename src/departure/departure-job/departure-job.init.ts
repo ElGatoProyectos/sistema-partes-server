@@ -6,6 +6,7 @@ import { departureJobMiddleware } from "./departureJob.middleware";
 const departureJobRouter = express.Router();
 
 const prefix = "/departure-job";
+const prefixWithIdJob = "/departure-job/job/:id";
 
 departureJobRouter.post(
   `${prefix}`,
@@ -57,6 +58,21 @@ departureJobRouter.get(
   ]),
   departureJobMiddleware.verifyHeadersFieldsIdProject,
   departureJobController.allDetailsDepartureJob
+);
+
+departureJobRouter.get(
+  `${prefixWithIdJob}`,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  departureJobMiddleware.verifyHeadersFieldsId,
+  departureJobMiddleware.verifyHeadersFieldsIdProject,
+  departureJobController.allForJob
 );
 
 departureJobRouter.get(

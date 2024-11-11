@@ -4,7 +4,7 @@ import {
   I_DailyPartUpdateBody,
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
-import { E_Estado_BD, ParteDiario, Trabajo } from "@prisma/client";
+import { Asistencia, ParteDiario, Trabajo } from "@prisma/client";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
 import { converToDate } from "../common/utils/date";
 import { jobValidation } from "../job/job.validation";
@@ -20,6 +20,7 @@ import {
   T_FindAllDailyPartForJob,
 } from "./models/dailyPart.types";
 import validator from "validator";
+import { assistsWorkforceValidation } from "../assists/assists.validation";
 
 class DailyPartService {
   async createDailyPart(
@@ -139,7 +140,6 @@ class DailyPartService {
         formatDailyPart
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al Actualizar el Parte Diario",
         error
@@ -148,6 +148,42 @@ class DailyPartService {
       await prisma.$disconnect();
     }
   }
+
+  async createDailyPartMO(daily_part_id: number, project_id: number) {
+    const projectResponse = await projectValidation.findById(project_id);
+
+    if (!projectResponse.success) {
+      return projectResponse;
+    }
+
+    const dailyPartResponse =
+      await dailyPartReportValidation.findByIdValidation(daily_part_id);
+    if (!dailyPartResponse.success) {
+      return dailyPartResponse;
+    }
+
+    const assistsPresents = await assistsWorkforceValidation.findAllPresents(
+      project_id
+    );
+
+    const assists = assistsPresents.payload as Asistencia[];
+
+    if (assists.length === 0) {
+      return httpResponse.SuccessResponse(
+        "No se encontraron trabajadores presentes para este día ",
+        []
+      );
+    }
+
+    // const resultAllAssists = await prismaAssistsRepository.findAll(
+    //   skip,
+    //   data,
+    //   +project_id,
+    //   user_id
+    // );
+    // return this.createSuccessResponse(resultAllAssists, data.queryParams);
+  }
+
   async findById(daily_part_id: number): Promise<T_HttpResponse> {
     try {
       const dailyPart = await prismaDailyPartRepository.findById(daily_part_id);
@@ -242,7 +278,7 @@ class DailyPartService {
           "No se puede buscar todos los Partes Diarios con el id del proyecto proporcionado"
         );
       }
-      const stage = ["PROCESO", "REVISADO", "TERMINADO", "INGRESADO"];
+      const stage = ["TODOS,PROCESO", "REVISADO", "TERMINADO", "INGRESADO"];
       if (data.queryParams.stage) {
         if (!stage.includes(data.queryParams.stage)) {
           return httpResponse.BadRequestException(
@@ -279,6 +315,22 @@ class DailyPartService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  private createSuccessResponse(result: any, queryParams: any): T_HttpResponse {
+    const { assistsConverter, total } = result;
+    const pageCount = Math.ceil(total / queryParams.limit);
+    const formData = {
+      total,
+      page: queryParams.page,
+      limit: queryParams.limit,
+      pageCount,
+      data: assistsConverter,
+    };
+    return httpResponse.SuccessResponse(
+      "Éxito al traer todas las Asistencias ya que existen",
+      formData
+    );
   }
 }
 export const dailyPartService = new DailyPartService();
