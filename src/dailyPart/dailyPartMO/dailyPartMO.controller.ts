@@ -1,7 +1,7 @@
 import express from "../../config/express.config";
 import { I_DailyPartMO } from "../models/dailyPart.interface";
 import { dailyPartMOService } from "./dailyPartMO.service";
-import { T_FindAllDailyPartMO } from "./models/dailyPartMO.dto";
+import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 
 class DailyPartMOController {
   async create(request: express.Request, response: express.Response) {

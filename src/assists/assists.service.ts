@@ -3,6 +3,7 @@ import prisma from "../config/prisma.config";
 import {
   Asistencia,
   CategoriaObrero,
+  Combo,
   E_Asistencia_BD,
   E_Estado_BD,
   ManoObra,
@@ -21,6 +22,7 @@ import { I_Usuario } from "../user/models/user.interface";
 import { I_AssistsBody } from "./models/assists.interface";
 import { prismaWorkforceRepository } from "../workforce/prisma-workforce.repository";
 import { categoryWorkforceValidation } from "../categoryWorkforce/categoryWorkforce.validation";
+import { comboValidation } from "../dailyPart/combo/combo.validation";
 
 class AssistsService {
   async findAll(
@@ -468,17 +470,11 @@ class AssistsService {
         return projectResponse;
       }
 
-      const categoriesWorkforce =
-        await categoryWorkforceValidation.findAllWithPagination(project_id);
-
-      const categories = categoriesWorkforce.payload as CategoriaObrero[];
-      const result = await prismaAssistsRepository.findAllPresents(
-        skip,
-        data,
-        project_id
-      );
-
       if (data.queryParams.category) {
+        const categoriesWorkforce =
+          await categoryWorkforceValidation.findAllWithPagination(project_id);
+        const categories = categoriesWorkforce.payload as CategoriaObrero[];
+
         const flag = categories.some(
           (categorie) => categorie.id === +data.queryParams.category
         );
@@ -488,6 +484,27 @@ class AssistsService {
           );
         }
       }
+
+      if (data.queryParams.combo) {
+        const comboResponse = await comboValidation.findManyWithOutPagination(
+          project_id
+        );
+        const combos = comboResponse.payload as Combo[];
+        const flag = combos.some(
+          (combo) => combo.id === +data.queryParams.category
+        );
+        if (!flag) {
+          return httpResponse.BadRequestException(
+            "El id introducido del Combo no existe"
+          );
+        }
+      }
+
+      const result = await prismaAssistsRepository.findAllPresents(
+        skip,
+        data,
+        project_id
+      );
 
       const { assists, total } = result;
       const pageCount = Math.ceil(total / data.queryParams.limit);
@@ -505,6 +522,7 @@ class AssistsService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Asistencia de los presentes",
         error

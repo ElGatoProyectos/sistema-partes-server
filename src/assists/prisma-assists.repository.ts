@@ -12,6 +12,7 @@ import {
 } from "./models/assists.types";
 import {
   Asistencia,
+  detalle_combo_mo,
   E_Asistencia_BD,
   E_Estado_Asistencia_BD,
   E_Estado_BD,
@@ -19,6 +20,7 @@ import {
   Semana,
 } from "@prisma/client";
 import { weekValidation } from "../week/week.validation";
+import { comboValidation } from "../dailyPart/combo/combo.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
   async updateManyStatusAsigned(ids: number[], project_id: number) {
@@ -155,6 +157,18 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       filters.categoria_obrero_id = +data.queryParams.category;
     }
 
+    let idsWorkforces: number[] = [];
+    if (data.queryParams.combo) {
+      const detailsCombo =
+        await comboValidation.findManyWithOutPaginationOfDetail(
+          +data.queryParams.combo
+        );
+      const detailsComboMO = detailsCombo.payload as detalle_combo_mo[];
+      idsWorkforces = detailsComboMO.map((detail) => detail.mo_id);
+    }
+
+    console.log("tiene los ids " + idsWorkforces);
+
     // const detailsDailyPartMO = await prisma.parteDiarioMO.findMany({
     //   where: {
     //     proyecto_id: project_id,
@@ -170,7 +184,10 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         // mano_obra_id: {
         //   notIn: ids,
         // },
-        asistencia: E_Asistencia_BD.A,
+        mano_obra_id: {
+          in: idsWorkforces,
+        },
+        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
         ManoObra: {
           ...filters,
         },
@@ -187,12 +204,17 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       skip,
       take: data.queryParams.limit,
     });
+    console.log(assists);
     const total = await prisma.asistencia.count({
       where: {
         proyecto_id: project_id,
         // mano_obra_id: {
         //   notIn: ids,
         // },
+        mano_obra_id: {
+          in: idsWorkforces,
+        },
+        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
         fecha: date,
         ManoObra: {
           ...filters,

@@ -68,7 +68,7 @@ class DepartureJobController {
     const limit = parseInt(request.query.limit as string) || 20;
     const search = request.query.search as string;
     const project_id = request.get("project-id") as string;
-    const job_id = Number(request.params.id);
+    const daily_part_id = Number(request.params.id);
     let paginationOptions: T_FindAllDepartureJob = {
       queryParams: {
         page: page,
@@ -79,7 +79,7 @@ class DepartureJobController {
     const result = await departureJobService.findAllForJob(
       paginationOptions,
       project_id,
-      job_id
+      daily_part_id
     );
     response.status(result.statusCode).json(result);
   }

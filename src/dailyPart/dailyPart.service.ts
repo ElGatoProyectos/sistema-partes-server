@@ -37,7 +37,7 @@ class DailyPartService {
       const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear el Tren con el id del Proyecto proporcionado"
+          "No se puede crear el Parte Diario con el id del Proyecto proporcionado"
         );
       }
       const lastDailyPart = await dailyPartReportValidation.codeMoreHigh(

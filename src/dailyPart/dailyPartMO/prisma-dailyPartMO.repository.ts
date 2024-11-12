@@ -1,7 +1,7 @@
 import { DailyPartMORepository } from "./dailyPartMO.repository";
 import prisma from "../../config/prisma.config";
 import { ParteDiarioMO } from "@prisma/client";
-import { T_FindAllDailyPartMO } from "./models/dailyPartMO.dto";
+import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 
 class PrismaDailyPartMORepository implements DailyPartMORepository {
   async findAll(

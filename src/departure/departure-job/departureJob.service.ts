@@ -13,6 +13,7 @@ import { departureValidation } from "../departure.validation";
 import { projectValidation } from "../../project/project.validation";
 import {
   DetalleTrabajoPartida,
+  ParteDiario,
   Partida,
   Proyecto,
   Trabajo,
@@ -26,6 +27,7 @@ import {
 } from "./models/departure-job.types";
 import { prismaJobRepository } from "../../job/prisma-job.repository";
 import { isNumeric } from "validator";
+import { dailyPartReportValidation } from "../../dailyPart/dailyPart.validation";
 // import { fork } from "child_process";
 // import path from "path";
 // import { envConfig } from "../../config/env.config";
@@ -540,7 +542,11 @@ class DepartureJobService {
       await prisma.$disconnect();
     }
   }
-  async findAllForJob(data: T_FindAllWork, project_id: string, job_id: number) {
+  async findAllForJob(
+    data: T_FindAllWork,
+    project_id: string,
+    daily_part_id: number
+  ) {
     try {
       const skip = (data.queryParams.page - 1) * data.queryParams.limit;
 
@@ -551,19 +557,20 @@ class DepartureJobService {
 
       const project = projectResponse.payload as Proyecto;
 
-      const jobResponse = await jobValidation.findById(job_id);
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
 
-      if (!jobResponse.success) {
-        return jobResponse;
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
       }
 
-      const job = (await jobResponse.payload) as Trabajo;
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
 
       const result = await prismaDepartureJobRepository.findAllForJob(
         skip,
         data,
         project.id,
-        job.id
+        dailyPart.trabajo_id
       );
 
       const { details, total } = result;

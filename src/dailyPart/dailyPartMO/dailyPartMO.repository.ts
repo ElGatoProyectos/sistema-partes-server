@@ -1,4 +1,4 @@
-import { T_FindAllDailyPartMO } from "./models/dailyPartMO.dto";
+import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 
 export abstract class DailyPartMORepository {
   createDailyPartMO(ids: number[], project_id: number, job_id: number): void {}

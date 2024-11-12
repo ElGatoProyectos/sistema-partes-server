@@ -6,7 +6,7 @@ import { departureJobMiddleware } from "./departureJob.middleware";
 const departureJobRouter = express.Router();
 
 const prefix = "/departure-job";
-const prefixWithIdJob = "/departure-job/job/:id";
+const prefixWithIdJob = "/departure/job/:id";
 
 departureJobRouter.post(
   `${prefix}`,
@@ -60,6 +60,8 @@ departureJobRouter.get(
   departureJobController.allDetailsDepartureJob
 );
 
+//[note] esto es una api para dentro de  parte diario
+//[note] el id es del parte diario
 departureJobRouter.get(
   `${prefixWithIdJob}`,
   authRoleMiddleware.authorizeRoles([

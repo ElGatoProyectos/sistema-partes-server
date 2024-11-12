@@ -12,8 +12,6 @@ export abstract class DailyPartRepository {
 
   createDailyPart(data: I_CreateDailyPartBD): void {}
 
-  createDailyPartMO(): void {}
-
   updateDailyPart(data: I_UpdateDailyPartBD, daily_part_id: number): void {}
 
   updateDailyParForRisk(
