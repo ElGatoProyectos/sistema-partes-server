@@ -10,7 +10,7 @@ import { workforceValidation } from "../../workforce/workforce.validation";
 import { assistsWorkforceValidation } from "../../assists/assists.validation";
 import { httpResponse } from "../../common/http.response";
 import { dailyPartMOValidation } from "./dailyPartMO.validation";
-import { T_FindAllDailyPartMO } from "./models/dailyPartMO.dto";
+import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 import { prismaDailyPartMORepository } from "./prisma-dailyPartMO.repository";
 import prisma from "../../config/prisma.config";
 
