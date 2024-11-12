@@ -6,7 +6,7 @@ import { departureJobMiddleware } from "./departureJob.middleware";
 const departureJobRouter = express.Router();
 
 const prefix = "/departure-job";
-const prefixWithIdJob = "/departure/job/:id";
+const prefixWithIdJob = "/daily-part-departure/:id";
 
 departureJobRouter.post(
   `${prefix}`,
