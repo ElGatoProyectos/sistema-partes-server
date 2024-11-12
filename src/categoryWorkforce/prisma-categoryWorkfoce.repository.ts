@@ -15,7 +15,7 @@ class PrismaCategoryWorkforceRepository implements CategoryWorkforceRepository {
     const categories = await prisma.categoriaObrero.findMany({
       where: {
         proyecto_id: project_id,
-        eliminado: E_Estado_BD.y,
+        eliminado: E_Estado_BD.n,
       },
     });
     return categories;

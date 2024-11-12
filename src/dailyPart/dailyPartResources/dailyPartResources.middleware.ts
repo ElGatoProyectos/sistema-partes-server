@@ -1,18 +1,17 @@
-import express from "../config/express.config";
-
 import validator from "validator";
-import { dailyPartDto } from "./dto/dailyPart.dto";
-import { httpResponse } from "../common/http.response";
-import { dailyPartUpdateDto } from "./dto/dailyPartUpdate.dto";
+import { httpResponse } from "../../common/http.response";
+import express from "../../config/express.config";
+import { dailyPartResourceMO } from "./dto/dailyPartResources.dto";
+import { dailyPartResourceUpdateMO } from "./dto/dailyPartResourcesUpdate.dto";
 
-class DailyPartMiddleware {
+class DailyPartResourceMiddleware {
   verifyFields(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
     try {
-      dailyPartDto.parse(request.body);
+      dailyPartResourceMO.parse(request.body);
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(
@@ -21,18 +20,17 @@ class DailyPartMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
-
   verifyFieldsUpdate(
     request: express.Request,
     response: express.Response,
     nextFunction: express.NextFunction
   ) {
     try {
-      dailyPartUpdateDto.parse(request.body);
+      dailyPartResourceUpdateMO.parse(request.body);
       nextFunction();
-    } catch {
+    } catch (error) {
       const result = httpResponse.BadRequestException(
-        "Error al validar campos para actualizar el Parte Diario"
+        "Error al validar campos "
       );
       response.status(result.statusCode).send(result);
     }
@@ -56,6 +54,7 @@ class DailyPartMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
+
   verifyHeadersFieldsIdProject(
     request: express.Request,
     response: express.Response,
@@ -76,4 +75,4 @@ class DailyPartMiddleware {
   }
 }
 
-export const dailyPartMiddleware = new DailyPartMiddleware();
+export const dailyPartResourceMiddleware = new DailyPartResourceMiddleware();

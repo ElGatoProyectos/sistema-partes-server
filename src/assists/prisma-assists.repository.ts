@@ -125,6 +125,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     project_id: number
   ): Promise<{ assists: any[]; total: number }> {
     let filters: any = {};
+    const filtersIds: { id?: { in: number[] } } = {}; // Inicializamos filters vacío
     const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
     if (data.queryParams.search) {
@@ -165,10 +166,13 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         );
       const detailsComboMO = detailsCombo.payload as detalle_combo_mo[];
       idsWorkforces = detailsComboMO.map((detail) => detail.mo_id);
+      filtersIds.id = {
+        in: idsWorkforces,
+      };
     }
-
     console.log("tiene los ids " + idsWorkforces);
-
+    console.log("ahora esto asi esta lleno ");
+    console.log(filtersIds);
     // const detailsDailyPartMO = await prisma.parteDiarioMO.findMany({
     //   where: {
     //     proyecto_id: project_id,
@@ -187,7 +191,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         mano_obra_id: {
           in: idsWorkforces,
         },
-        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
+        asistencia: E_Asistencia_BD.A,
         ManoObra: {
           ...filters,
         },
@@ -204,17 +208,13 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       skip,
       take: data.queryParams.limit,
     });
-    console.log(assists);
     const total = await prisma.asistencia.count({
       where: {
         proyecto_id: project_id,
-        // mano_obra_id: {
-        //   notIn: ids,
-        // },
         mano_obra_id: {
           in: idsWorkforces,
         },
-        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
+        asistencia: E_Asistencia_BD.A,
         fecha: date,
         ManoObra: {
           ...filters,
@@ -235,8 +235,9 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
           " " +
           ManoObra.apellido_paterno,
         categoria: CategoriaObrero?.nombre ? CategoriaObrero.nombre : null,
-        origen: OrigenObrero?.nombre ? CategoriaObrero?.nombre : null,
+        origen: OrigenObrero?.nombre ? OrigenObrero?.nombre : null,
         puesto: TipoObrero?.nombre ? TipoObrero?.nombre : null,
+        estado_asignacion: ResData.estado_asignacion,
       };
     });
 

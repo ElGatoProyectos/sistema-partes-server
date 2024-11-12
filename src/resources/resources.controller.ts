@@ -84,6 +84,31 @@ class ResourceController {
     const result = await resourceService.findAll(paginationOptions, project_id);
     response.status(result.statusCode).json(result);
   }
+  async allResourcesForDailyPart(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    const project_id = request.get("project-id") as string;
+    const category = request.query.category as string;
+    const search = request.query.search as string;
+    const daily_part_id = Number(request.params.id);
+    let paginationOptions: T_FindAllResource = {
+      queryParams: {
+        page: page,
+        limit: limit,
+        category: category,
+        search: search,
+      },
+    };
+    const result = await resourceService.findAllForDailyPart(
+      paginationOptions,
+      project_id,
+      daily_part_id
+    );
+    response.status(result.statusCode).json(result);
+  }
 
   async findById(request: express.Request, response: express.Response) {
     const resource_id = Number(request.params.id);

@@ -367,9 +367,12 @@ class WorkforceValidation {
     }
   }
 
-  async findManyId(ids: number[]): Promise<T_HttpResponse> {
+  async findManyId(ids: number[], project_id: number): Promise<T_HttpResponse> {
     try {
-      const workforces = await prismaWorkforceRepository.findManyId(ids);
+      const workforces = await prismaWorkforceRepository.findManyId(
+        ids,
+        project_id
+      );
 
       if (workforces.length < ids.length) {
         return httpResponse.NotFoundException(
