@@ -20,4 +20,13 @@ export abstract class ResourcesRepository {
   findByCode(code: string, project_id: number): void {}
 
   updateStatusResource(resource_id: number): void {}
+
+  findManyId(ids: number[], project_id: number): void {}
+
+  findAllIsNotInDailyPartResource(
+    skip: number,
+    data: T_FindAllResource,
+    project_id: number,
+    daily_part_id: number
+  ): void {}
 }

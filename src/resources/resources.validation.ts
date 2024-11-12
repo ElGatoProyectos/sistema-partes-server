@@ -176,6 +176,30 @@ class ResourceValidation {
       );
     }
   }
+
+  async findManyId(ids: number[], project_id: number): Promise<T_HttpResponse> {
+    try {
+      const dailyPartsResources = await prismaResourcesRepository.findManyId(
+        ids,
+        project_id
+      );
+
+      if (dailyPartsResources.length < ids.length) {
+        return httpResponse.NotFoundException(
+          "Un Recurso ingresado no existe en la base de datos"
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Los Recursos ingresados existen, pueden proceguir",
+        dailyPartsResources
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Recursos Ingresados",
+        error
+      );
+    }
+  }
 }
 
 export const resourceValidation = new ResourceValidation();

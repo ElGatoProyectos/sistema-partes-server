@@ -19,7 +19,7 @@ export abstract class WorkforceRepository {
 
   findById(idUser: number): void {}
 
-  findManyId(workforces_id: number[]): void {}
+  findManyId(workforces_id: number[], project_id: number): void {}
 
   createWorkforce(data: I_CreateWorkforceBD): void {}
 

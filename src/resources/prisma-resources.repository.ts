@@ -5,12 +5,21 @@ import {
   I_Resources,
   I_UpdateResourcesBodyValidation,
 } from "./models/resources.interface";
-import { CategoriaRecurso, E_Estado_BD, Recurso } from "@prisma/client";
+import { E_Estado_BD, ParteDiarioRecurso, Recurso } from "@prisma/client";
 import { T_FindAllResource } from "./models/resource.types";
-import { resourseCategoryValidation } from "../resourseCategory/resourseCategory.validation";
-import { contains } from "validator";
 
 class PrismaResourcesRepository implements ResourcesRepository {
+  async findManyId(ids: number[], project_id: number): Promise<Recurso[]> {
+    const dailyPartResource = await prisma.recurso.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        proyecto_id: project_id,
+      },
+    });
+    return dailyPartResource;
+  }
   async createResource(data: I_CreateResourcesBD): Promise<Recurso> {
     const resource = await prisma.recurso.create({
       data,
@@ -105,6 +114,93 @@ class PrismaResourcesRepository implements ResourcesRepository {
         }),
       ]);
     return { resources, total };
+  }
+
+  async findAllIsNotInDailyPartResource(
+    skip: number,
+    data: T_FindAllResource,
+    project_id: number,
+    daily_part_id: number
+  ): Promise<{ resources: any[]; total: number }> {
+    let filtersResource: any = {};
+    let filters: any = {};
+    if (data.queryParams.search) {
+      filtersResource.nombre = data.queryParams.search;
+    }
+
+    if (data.queryParams.category && data.queryParams.category !== "TODOS") {
+      filters.nombre = data.queryParams.category;
+    }
+
+    const detailsDailyPartResources = await prisma.parteDiarioRecurso.findMany({
+      where: {
+        parte_diario_id: daily_part_id,
+        proyecto_id: project_id,
+      },
+    });
+
+    let ids = detailsDailyPartResources.map((detail) => detail.recurso_id);
+
+    const resources = await prisma.recurso.findMany({
+      where: {
+        id: {
+          notIn: ids,
+        },
+        nombre: {
+          contains: filtersResource.nombre,
+        },
+        CategoriaRecurso: {
+          nombre: {
+            contains: filters.nombre,
+          },
+        },
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+      },
+      skip,
+      take: data.queryParams.limit,
+      include: {
+        IndiceUnificado: true,
+        Unidad: true,
+      },
+      omit: {
+        eliminado: true,
+      },
+      orderBy: {
+        codigo: "asc",
+      },
+    });
+
+    const total = await prisma.recurso.count({
+      where: {
+        id: {
+          notIn: ids,
+        },
+        nombre: {
+          contains: filtersResource.nombre,
+        },
+        CategoriaRecurso: {
+          nombre: {
+            contains: filters.nombre,
+          },
+        },
+        eliminado: E_Estado_BD.n,
+        proyecto_id: project_id,
+      },
+    });
+    let resourcesFix: any = [];
+    if (resources.length > 0) {
+      resourcesFix = resources.map((resource) => {
+        const { IndiceUnificado, Unidad, ...resData } = resource;
+        return {
+          codigo: IndiceUnificado.codigo + resData.codigo,
+          "nombre del recurso": resData.nombre,
+          unidad: Unidad.simbolo,
+        };
+      });
+    }
+
+    return { resources: resourcesFix, total };
   }
 
   async findById(resource_id: number): Promise<I_Resources | null> {

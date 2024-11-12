@@ -1,18 +1,20 @@
 import express from "../../config/express.config";
-import { dailyPartMOService } from "./dailyPartMO.service";
+import { dailyPartResourceService } from "./dailyPartResources.service";
+import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 import {
-  I_DailyPartMO,
-  I_UpdateDailyPartBody,
-} from "./models/dailyPartMO.interface";
-import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
+  I_CreateDailyPartResourceBody,
+  I_UpdateDailyPartResourceBody,
+} from "./models/dailyPartResources.interface";
 
-class DailyPartMOController {
+class DailyPartResourceController {
   async create(request: express.Request, response: express.Response) {
-    const data = request.body as I_DailyPartMO;
+    const data = request.body as I_CreateDailyPartResourceBody;
     const project_id = request.get("project-id") as string;
-    const result = await dailyPartMOService.createDailyPartMO(
+    const daily_part_id = Number(request.params.id);
+    const result = await dailyPartResourceService.createDailyPart(
       data,
-      +project_id
+      +project_id,
+      daily_part_id
     );
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -20,16 +22,15 @@ class DailyPartMOController {
       response.status(result.statusCode).json(result);
     }
   }
+
   async update(request: express.Request, response: express.Response) {
-    const data = request.body as I_UpdateDailyPartBody;
+    const data = request.body as I_UpdateDailyPartResourceBody;
+    const daily_part_resource_id = Number(request.params.id);
     const project_id = request.get("project-id") as string;
-    const daily_part_id = request.params.id;
-    const daily_part_mo_id = request.params.idMO;
-    const result = await dailyPartMOService.updateDailyPartMO(
+    const result = await dailyPartResourceService.updateDailyPartResource(
       data,
-      +daily_part_id,
       +project_id,
-      +daily_part_mo_id
+      daily_part_resource_id
     );
     if (!result.success) {
       response.status(result.statusCode).json(result);
@@ -43,13 +44,13 @@ class DailyPartMOController {
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
     const daily_part_id = request.params.id;
-    let paginationOptions: T_FindAllDailyPartMO = {
+    let paginationOptions: T_FindAllDailyPartResource = {
       queryParams: {
         page: page,
         limit: limit,
       },
     };
-    const result = await dailyPartMOService.findAll(
+    const result = await dailyPartResourceService.findAll(
       paginationOptions,
       project_id,
       +daily_part_id
@@ -58,16 +59,19 @@ class DailyPartMOController {
   }
 
   async findById(request: express.Request, response: express.Response) {
-    const id = Number(request.params.id);
-    const result = await dailyPartMOService.findById(id);
+    const daily_part_resource_id = Number(request.params.id);
+    const result = await dailyPartResourceService.findById(
+      daily_part_resource_id
+    );
     response.status(result.statusCode).json(result);
   }
-
   async delete(request: express.Request, response: express.Response) {
-    const id = Number(request.params.id);
-    const result = await dailyPartMOService.delete(id);
+    const daily_part_resource_id = Number(request.params.id);
+    const result = await dailyPartResourceService.deleteDailyPartResource(
+      daily_part_resource_id
+    );
     response.status(result.statusCode).json(result);
   }
 }
 
-export const dailyPartMOController = new DailyPartMOController();
+export const dailyPartResourceController = new DailyPartResourceController();

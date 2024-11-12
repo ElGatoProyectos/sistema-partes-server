@@ -5,6 +5,7 @@ import { resourcesMiddleware } from "./resources.middleware";
 
 const resourceRouter = express.Router();
 const prefix = "/resource";
+const prefixWithDailyPart = "/resource/daily-part";
 
 resourceRouter.post(
   `${prefix}/upload-excel`,
@@ -75,6 +76,27 @@ resourceRouter.get(
     "ASISTENTE_ALMACEN",
   ]),
   resourceController.allResources
+);
+resourceRouter.get(
+  `${prefixWithDailyPart}/:id`,
+  resourcesMiddleware.verifyHeadersFieldsId,
+  resourcesMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+    "MAESTRO_OBRA",
+    "CAPATAZ",
+    "JEFE_GRUPO",
+    "INGENIERO_SSOMMA",
+    "ASISTENTE_SSOMMA",
+    "LOGISTICA",
+    "ASISTENTE_ALMACEN",
+  ]),
+  resourceController.allResourcesForDailyPart
 );
 
 resourceRouter.get(

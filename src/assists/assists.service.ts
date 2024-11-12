@@ -474,7 +474,6 @@ class AssistsService {
         const categoriesWorkforce =
           await categoryWorkforceValidation.findAllWithPagination(project_id);
         const categories = categoriesWorkforce.payload as CategoriaObrero[];
-
         const flag = categories.some(
           (categorie) => categorie.id === +data.queryParams.category
         );
@@ -491,7 +490,7 @@ class AssistsService {
         );
         const combos = comboResponse.payload as Combo[];
         const flag = combos.some(
-          (combo) => combo.id === +data.queryParams.category
+          (combo) => combo.id === +data.queryParams.combo
         );
         if (!flag) {
           return httpResponse.BadRequestException(
@@ -522,7 +521,6 @@ class AssistsService {
         formData
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Asistencia de los presentes",
         error

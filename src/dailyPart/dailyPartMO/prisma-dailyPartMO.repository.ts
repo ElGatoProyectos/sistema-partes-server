@@ -2,16 +2,50 @@ import { DailyPartMORepository } from "./dailyPartMO.repository";
 import prisma from "../../config/prisma.config";
 import { ParteDiarioMO } from "@prisma/client";
 import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
+import { I_UpdateDailyPartMOBD } from "./models/dailyPartMO.interface";
 
 class PrismaDailyPartMORepository implements DailyPartMORepository {
+  async delete(daily_part_mo_id: number) {
+    await prisma.parteDiarioMO.delete({
+      where: {
+        id: daily_part_mo_id,
+      },
+    });
+  }
+  async findById(daily_part_mo_id: number): Promise<ParteDiarioMO | null> {
+    const dailyPartMO = await prisma.parteDiarioMO.findFirst({
+      where: {
+        id: daily_part_mo_id,
+      },
+      include: {
+        ManoObra: true,
+        Proyecto: true,
+      },
+    });
+    return dailyPartMO;
+  }
+  async updateDailyPartMO(
+    data: I_UpdateDailyPartMOBD,
+    daily_part_mo_id: number
+  ): Promise<ParteDiarioMO | null> {
+    const dailyPartMO = await prisma.parteDiarioMO.update({
+      where: {
+        id: daily_part_mo_id,
+      },
+      data: data,
+    });
+    return dailyPartMO;
+  }
   async findAll(
     skip: number,
     data: T_FindAllDailyPartMO,
-    project_id: number
+    project_id: number,
+    daily_part_id: number
   ): Promise<{ dailyPartsMO: any[]; total: number }> {
     const dailyPartsMO = await prisma.parteDiarioMO.findMany({
       where: {
         proyecto_id: project_id,
+        parte_diario_id: daily_part_id,
       },
       include: {
         ManoObra: true,

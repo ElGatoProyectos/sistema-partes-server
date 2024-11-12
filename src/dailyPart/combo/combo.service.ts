@@ -16,7 +16,8 @@ class ComboService {
       }
 
       const workforcesResponse = await workforceValidation.findManyId(
-        data.workforces_id
+        data.workforces_id,
+        project_id
       );
       if (!workforcesResponse.success) {
         return workforcesResponse;

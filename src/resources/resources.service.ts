@@ -21,6 +21,7 @@ import { unitValidation } from "../unit/unit.validation";
 import { T_FindAllResource } from "./models/resource.types";
 import { prismaResourcesRepository } from "./prisma-resources.repository";
 import { ResourseMapper } from "./mappers/resource.mapper";
+import { dailyPartReportValidation } from "../dailyPart/dailyPart.validation";
 
 class ResourceService {
   async createResource(
@@ -411,6 +412,54 @@ class ResourceService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todos los Recursos",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async findAllForDailyPart(
+    data: T_FindAllResource,
+    project_id: string,
+    daily_part_id: number
+  ) {
+    try {
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
+      const projectResponse = await projectValidation.findById(+project_id);
+      if (!projectResponse.success) {
+        return projectResponse;
+      }
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+      const result =
+        await prismaResourcesRepository.findAllIsNotInDailyPartResource(
+          skip,
+          data,
+          +project_id,
+          daily_part_id
+        );
+
+      const { resources, total } = result;
+      const pageCount = Math.ceil(total / data.queryParams.limit);
+      const formData = {
+        total,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: resources,
+      };
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Recursos para el Parte Diario",
+        formData
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Recursos para el Parte diario",
         error
       );
     } finally {
