@@ -124,6 +124,9 @@ class DailyPartResourceService {
       if (!projectResponse.success) {
         return projectResponse;
       }
+      if (!data.queryParams.category) {
+        return httpResponse.BadRequestException("Debe pasar una Categoria");
+      }
       const dailyPartResponse =
         await dailyPartReportValidation.findByIdValidation(daily_part_id);
       if (!dailyPartResponse.success) {
