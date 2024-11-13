@@ -205,12 +205,9 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     });
     const total = await prisma.asistencia.count({
       where: {
-        proyecto_id: project_id,
-        mano_obra_id: {
-          in: idsWorkforces,
-        },
-        asistencia: E_Asistencia_BD.A,
         fecha: date,
+        proyecto_id: project_id,
+        asistencia: E_Asistencia_BD.A,
         ManoObra: {
           ...filters,
           ...filtersIds,

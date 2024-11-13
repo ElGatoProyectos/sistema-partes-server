@@ -44,10 +44,14 @@ class DailyPartResourceController {
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
     const daily_part_id = request.params.id;
+    const category = request.query.category as string;
+    const search = request.query.search as string;
     let paginationOptions: T_FindAllDailyPartResource = {
       queryParams: {
         page: page,
         limit: limit,
+        category: category,
+        search: search,
       },
     };
     const result = await dailyPartResourceService.findAll(

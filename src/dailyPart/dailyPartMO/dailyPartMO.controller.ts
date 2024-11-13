@@ -42,11 +42,13 @@ class DailyPartMOController {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 20;
     const project_id = request.get("project-id") as string;
+    const category = request.query.category as string;
     const daily_part_id = request.params.id;
     let paginationOptions: T_FindAllDailyPartMO = {
       queryParams: {
         page: page,
         limit: limit,
+        category: category,
       },
     };
     const result = await dailyPartMOService.findAll(

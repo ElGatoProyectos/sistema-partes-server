@@ -434,6 +434,9 @@ class ResourceService {
       if (!dailyPartResponse.success) {
         return dailyPartResponse;
       }
+      if (!data.queryParams.category) {
+        return httpResponse.BadRequestException("No ha pasado una Categoria");
+      }
       const result =
         await prismaResourcesRepository.findAllIsNotInDailyPartResource(
           skip,

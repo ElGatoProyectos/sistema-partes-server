@@ -10,7 +10,6 @@ const prefixWithDailyPart = "/daily-part/:id/daily-part-mo";
 dailyPartMORouter.post(
   `${prefix}`,
   dailyPartMOMiddleware.verifyFields,
-  dailyPartMOMiddleware.verifyHeadersFieldsId,
   dailyPartMOMiddleware.verifyHeadersFieldsIdProject,
   //[message] ver roles
   authRoleMiddleware.authorizeRoles([

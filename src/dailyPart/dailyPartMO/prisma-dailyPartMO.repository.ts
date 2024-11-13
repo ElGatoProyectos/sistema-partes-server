@@ -42,10 +42,19 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
     project_id: number,
     daily_part_id: number
   ): Promise<{ dailyPartsMO: any[]; total: number }> {
+    let filters: any = {};
+    if (data.queryParams.category && data.queryParams.category !== "TODOS") {
+      filters.nombre = data.queryParams.category;
+    }
     const dailyPartsMO = await prisma.parteDiarioMO.findMany({
       where: {
         proyecto_id: project_id,
         parte_diario_id: daily_part_id,
+        ManoObra: {
+          CategoriaObrero: {
+            ...filters,
+          },
+        },
       },
       include: {
         ManoObra: true,
@@ -80,6 +89,7 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
 
     return { dailyPartsMO: dailyParts, total };
   }
+
   async findAllWithOutPagination(
     project_id: number,
     daily_part_id: number

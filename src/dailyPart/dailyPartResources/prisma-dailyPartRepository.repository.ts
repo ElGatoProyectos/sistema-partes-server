@@ -18,10 +18,29 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
     project_id: number,
     daily_part_id: number
   ): Promise<{ dailyPartsResources: any[]; total: number }> {
+    let filters: any = {};
+    let filtersResources: any = {};
+    if (data.queryParams.search) {
+      filtersResources.nombre = data.queryParams.search;
+    }
+
+    if (data.queryParams.category && data.queryParams.category !== "TODOS") {
+      filters.nombre = data.queryParams.category;
+    }
     const dailyPartsResources = await prisma.parteDiarioRecurso.findMany({
       where: {
         proyecto_id: project_id,
         parte_diario_id: daily_part_id,
+        Recurso: {
+          nombre: {
+            contains: filtersResources.nombre,
+          },
+          CategoriaRecurso: {
+            nombre: {
+              contains: filters.nombre,
+            },
+          },
+        },
       },
       include: {
         Recurso: {
