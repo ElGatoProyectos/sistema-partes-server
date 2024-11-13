@@ -143,9 +143,9 @@ class PrismaResourcesRepository implements ResourcesRepository {
 
     const resources = await prisma.recurso.findMany({
       where: {
-        id: {
-          notIn: ids,
-        },
+        // id: {
+        //   notIn: ids,
+        // },
         nombre: {
           contains: filtersResource.nombre,
         },
@@ -173,9 +173,9 @@ class PrismaResourcesRepository implements ResourcesRepository {
 
     const total = await prisma.recurso.count({
       where: {
-        id: {
-          notIn: ids,
-        },
+        // id: {
+        //   notIn: ids,
+        // },
         nombre: {
           contains: filtersResource.nombre,
         },
@@ -191,11 +191,15 @@ class PrismaResourcesRepository implements ResourcesRepository {
     let resourcesFix: any = [];
     if (resources.length > 0) {
       resourcesFix = resources.map((resource) => {
+        const flag = ids.includes(resource.id);
         const { IndiceUnificado, Unidad, ...resData } = resource;
         return {
+          id: resource.id,
           codigo: IndiceUnificado.codigo + resData.codigo,
-          "nombre del recurso": resData.nombre,
-          unidad: Unidad.simbolo,
+          nombre: resData.nombre,
+          unidad: Unidad.nombre ? Unidad.nombre : null,
+          unidad_simbolo: Unidad.simbolo ? Unidad.simbolo : null,
+          is_present: flag,
         };
       });
     }
