@@ -25,13 +25,11 @@ class DailyPartResourceController {
 
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_UpdateDailyPartResourceBody;
-    const daily_part_id = Number(request.params.id);
     const daily_part_resource_id = Number(request.params.idResource);
     const project_id = request.get("project-id") as string;
     const result = await dailyPartResourceService.updateDailyPartResource(
       data,
       +project_id,
-      daily_part_id,
       daily_part_resource_id
     );
     if (!result.success) {
