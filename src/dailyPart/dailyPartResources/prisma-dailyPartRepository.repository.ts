@@ -76,9 +76,9 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
       const { Unidad, IndiceUnificado, ...datos } = Recurso;
       return {
         codigo: IndiceUnificado.codigo + ResData.id,
-        "nombre del recurso": Recurso.nombre,
+        nombre_del_recurso: Recurso.nombre,
         unidad: Unidad.simbolo,
-        "cantidad utilizada": ResData.cantidad,
+        cantidad_utilizada: ResData.cantidad,
       };
     });
 
