@@ -470,7 +470,7 @@ class AssistsService {
         return projectResponse;
       }
 
-      if (data.queryParams.category) {
+      if (data.queryParams.category && data.queryParams.category !== "TODOS") {
         const categoriesWorkforce =
           await categoryWorkforceValidation.findAllWithPagination(project_id);
         const categories = categoriesWorkforce.payload as CategoriaObrero[];
