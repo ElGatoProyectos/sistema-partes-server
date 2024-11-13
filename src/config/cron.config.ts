@@ -60,6 +60,9 @@ export async function automaticTask() {
               const assistsFormat = {
                 fecha: newDate,
                 horas: value,
+                hora_parcial: 0,
+                hora_normal: 0,
+                horas_trabajadas: 0,
                 horas_60: 0,
                 horas_100: 0,
                 asistencia: E_Asistencia_BD.F,

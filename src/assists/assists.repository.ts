@@ -43,6 +43,8 @@ export abstract class BankWorkforceRepository {
 
   updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD): void {}
 
+  updateAssists(data: I_UpdateAssitsBD, daily_part_id: number): void {}
+
   updateStatusAssists(assists_id: number): void {}
 
   updateManyStatusAsigned(ids: number[], project_id: number): void {}
