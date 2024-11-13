@@ -58,6 +58,16 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
       where: {
         proyecto_id: project_id,
         parte_diario_id: daily_part_id,
+        Recurso: {
+          nombre: {
+            contains: filtersResources.nombre,
+          },
+          CategoriaRecurso: {
+            nombre: {
+              contains: filters.nombre,
+            },
+          },
+        },
       },
     });
 
