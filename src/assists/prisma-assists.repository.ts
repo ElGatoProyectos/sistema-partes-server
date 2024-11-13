@@ -170,16 +170,10 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         in: idsWorkforces,
       };
     }
-    console.log("tiene los ids " + idsWorkforces);
-    console.log("ahora esto asi esta lleno ");
-    console.log(filtersIds);
-    // const detailsDailyPartMO = await prisma.parteDiarioMO.findMany({
-    //   where: {
-    //     proyecto_id: project_id,
-    //   },
-    // });
-
-    // let ids = detailsDailyPartMO.map((detail) => detail.mano_obra_id);
+    // console.log("tiene los ids " + idsWorkforces);
+    // console.log("ahora esto asi esta lleno ");
+    // console.log(filtersIds);
+    // console.log(date);
 
     const assists = await prisma.asistencia.findMany({
       where: {
@@ -188,12 +182,13 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         // mano_obra_id: {
         //   notIn: ids,
         // },
-        mano_obra_id: {
-          in: idsWorkforces,
-        },
+        // mano_obra_id: {
+        //   in: idsWorkforces,
+        // },
         asistencia: E_Asistencia_BD.A,
         ManoObra: {
           ...filters,
+          ...filtersIds,
         },
       },
       include: {
@@ -218,6 +213,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         fecha: date,
         ManoObra: {
           ...filters,
+          ...filtersIds,
         },
       },
     });
