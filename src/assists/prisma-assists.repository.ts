@@ -3,6 +3,7 @@ import { BankWorkforceRepository } from "./assists.repository";
 import {
   I_AssistsWorkforce,
   I_CreateAssistsWorkforceBD,
+  I_UpdateAssitsBD,
 } from "./models/assists.interface";
 import {
   EstadoAsistenciaCounts,
@@ -23,6 +24,18 @@ import { weekValidation } from "../week/week.validation";
 import { comboValidation } from "../dailyPart/combo/combo.validation";
 
 class PrismaAssistsRepository implements BankWorkforceRepository {
+  async updateAssists(
+    data: I_UpdateAssitsBD,
+    daily_part_id: number
+  ): Promise<Asistencia | null> {
+    const updateAssists = await prisma.asistencia.update({
+      where: {
+        id: daily_part_id,
+      },
+      data: data,
+    });
+    return updateAssists;
+  }
   async updateManyStatusAsigned(ids: number[], project_id: number) {
     const date = new Date();
     date.setUTCHours(0, 0, 0, 0);

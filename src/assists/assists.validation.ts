@@ -1,4 +1,5 @@
 import { httpResponse, T_HttpResponse } from "../common/http.response";
+import { I_UpdateAssitsBD } from "./models/assists.interface";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
 
 class AssistsWorkforceValidation {
@@ -73,6 +74,27 @@ class AssistsWorkforceValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar la Asistencia",
+        error
+      );
+    }
+  }
+  async updateAssists(
+    data: I_UpdateAssitsBD,
+    daily_part_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const assistsUpdate = await prismaAssistsRepository.updateAssists(
+        data,
+        daily_part_id
+      );
+
+      return httpResponse.SuccessResponse(
+        "Asistencia actualizada correctamente",
+        assistsUpdate
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al modificar la Asistencia ",
         error
       );
     }
