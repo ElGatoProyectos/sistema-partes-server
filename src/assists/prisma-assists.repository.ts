@@ -154,7 +154,7 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       }
     }
 
-    if (data.queryParams.category) {
+    if (data.queryParams.category && data.queryParams.category !== "TODOS") {
       filters.categoria_obrero_id = +data.queryParams.category;
     }
 
