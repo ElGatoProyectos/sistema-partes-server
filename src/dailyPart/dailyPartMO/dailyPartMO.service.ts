@@ -151,20 +151,18 @@ class DailyPartMOService {
         const assists = assistsResponse.payload as Asistencia;
 
         //  const assistsFormat={
-        //   fecha               :  dailyPart.fecha
-        //   horas               Float
-        //   horas_trabajadas    Float?                 @default(0)
-        //   hora_parcial        Float?                 @default(0)
-        //   hora_normal         Float?                 @default(0)
-        //   horas_60            Float?                 @default(0)
-        //   horas_100           Float?                 @default(0)
-        //   estado_asignacion   E_Estado_Asistencia_BD @default(FALTA)
-        //   asistencia          E_Asistencia_BD        @default(F)
-        //   horas_extras_estado E_Estado_BD?           @default(n)
-        //   fecha_creacion      DateTime               @default(now())
-        //   eliminado           E_Estado_BD            @default(n)
-        //   mano_obra_id        Int
-        //   proyecto_id         Int
+        //   fecha               :  assists.fecha,
+        //   horas               : assists.horas,
+        //   horas_trabajadas    : assists.horas_trabajadas,
+        //   hora_parcial        : assists.hora_parcial,
+        //   hora_normal         : assists.hora_normal,
+        //   horas_60            : assists.horas_60,
+        //   horas_100           : assists.horas_100,
+        //   estado_asignacion   : assists.estado_asignacion,
+        //   asistencia          : assists.asistencia,
+        //   horas_extras_estado : assists.horas_extras_estado,
+        //   mano_obra_id        : assits.mano_obra_id,
+        //   proyecto_id         : assits.projec
         //  }
       }
 

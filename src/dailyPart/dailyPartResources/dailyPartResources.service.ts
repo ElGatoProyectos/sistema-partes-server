@@ -1,3 +1,4 @@
+import { ParteDiarioRecurso } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import { projectValidation } from "../../project/project.validation";
@@ -61,7 +62,6 @@ class DailyPartResourceService {
   async updateDailyPartResource(
     data: I_UpdateDailyPartResourceBody,
     project_id: number,
-    daily_part_id: number,
     daily_part_resource_id: number
   ): Promise<T_HttpResponse> {
     try {
@@ -72,19 +72,15 @@ class DailyPartResourceService {
         );
       }
 
-      const dailyPartResponse =
-        await dailyPartReportValidation.findByIdValidation(daily_part_id);
-
-      if (!dailyPartResponse.success) {
-        return dailyPartResponse;
-      }
-
       const dailyPartResourceResponse =
         await dailyPartResourceValidation.findById(daily_part_resource_id);
 
       if (!dailyPartResourceResponse.success) {
         return dailyPartResourceResponse;
       }
+
+      const dailyPartResource =
+        dailyPartResourceResponse.payload as ParteDiarioRecurso;
 
       const resourceResponse = await resourceValidation.findById(
         data.resource_id
@@ -95,7 +91,7 @@ class DailyPartResourceService {
       }
 
       const dailyPartResouceFormat = {
-        parte_diario_id: daily_part_id,
+        parte_diario_id: dailyPartResource.parte_diario_id,
         recurso_id: data.resource_id,
         cantidad: data.amount,
         proyecto_id: project_id,
