@@ -14,12 +14,13 @@ import path from "path";
 import appRootPath from "app-root-path";
 import sharp from "sharp";
 import validator from "validator";
+import fs from "fs/promises";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
 class DailyPartPhotosController {
-  create = async (request: express.Request, response: express.Response) => {
+  put = async (request: express.Request, response: express.Response) => {
     //[note] es muy bueno manejar esto así si vienen varias fotos ya q lo estaba haciendo individual y era mucho código
     upload.fields([
       { name: DailyPartPhotoOneMulterFile.field, maxCount: 1 },
@@ -170,6 +171,119 @@ class DailyPartPhotosController {
         }
       }
     });
+  };
+
+  deleteImage = async (
+    request: express.Request,
+    response: express.Response
+  ) => {
+    try {
+      const daily_part_id = request.params.id;
+
+      const number_photo = request.params.number;
+
+      const rolsPermitted = [
+        "ADMIN",
+        "USER",
+        "CONTROL_COSTOS",
+        "ASISTENTE_CONTROL_COSTOS",
+        "INGENIERO_PRODUCCION",
+        "ASISTENTE_PRODUCCION",
+      ];
+      const responseValidate = authService.authorizeRolesService(
+        request.get("Authorization") as string,
+        rolsPermitted
+      );
+
+      if (!responseValidate?.success) {
+        return response.status(401).json(responseValidate);
+      } else {
+        if (
+          !validator.isNumeric(daily_part_id) ||
+          !validator.isNumeric(number_photo)
+        ) {
+          const customError = httpResponse.BadRequestException(
+            "El id del Parte Diario o del número de la foto debe ser numérico"
+          );
+          response.status(customError.statusCode).json(customError);
+        } else {
+          const dailyPartResponse =
+            await dailyPartReportValidation.findByIdValidation(+daily_part_id);
+          if (!dailyPartResponse.success) {
+            return response
+              .status(dailyPartResponse.statusCode)
+              .json(dailyPartResponse);
+          }
+
+          const dailyPart = dailyPartResponse.payload as ParteDiario;
+          let fileName = "";
+          let filePath = "";
+          let direction = "";
+          if (Number(number_photo) === 1) {
+            direction = path.join(
+              appRootPath.path,
+              "static",
+              DailyPartPhotoOneMulterFile.folder
+            );
+            fileName = `${dailyPart.id}_photo_${number_photo}.png`;
+            filePath = path.join(direction, fileName);
+          } else if (Number(number_photo) === 2) {
+            direction = path.join(
+              appRootPath.path,
+              "static",
+              DailyPartPhotoTwoMulterFile.folder
+            );
+            fileName = `${dailyPart.id}_photo_${number_photo}.png`;
+            filePath = path.join(direction, fileName);
+          } else if (Number(number_photo) === 3) {
+            direction = path.join(
+              appRootPath.path,
+              "static",
+              DailyPartPhotoThreeMulterFile.folder
+            );
+            fileName = `${dailyPart.id}_photo_${number_photo}.png`;
+            filePath = path.join(direction, fileName);
+          } else if (Number(number_photo) === 4) {
+            direction = path.join(
+              appRootPath.path,
+              "static",
+              DailyPartPhotoFourMulterFile.folder
+            );
+            fileName = `${dailyPart.id}_photo_${number_photo}.png`;
+            filePath = path.join(direction, fileName);
+          } else {
+            const customError = httpResponse.NotFoundException(
+              "El número ingresado del campo foto no es válido"
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+
+          try {
+            await fs.access(filePath);
+
+            // Eliminar el archivo
+            await fs.unlink(filePath);
+
+            response.status(200).json({
+              success: true,
+              message: "Imagen eliminada correctamente",
+            });
+          } catch (err) {
+            const customError = httpResponse.NotFoundException(
+              "La imagen no existe o ya fue eliminada",
+              err
+            );
+            response.status(customError.statusCode).json(customError);
+          }
+        }
+      }
+    } catch (error) {
+      const customError = httpResponse.BadRequestException(
+        "Error al intentar eliminar la imagen del Parte Diario",
+        error
+      );
+      response.status(customError.statusCode).json(customError);
+    }
   };
 }
 
