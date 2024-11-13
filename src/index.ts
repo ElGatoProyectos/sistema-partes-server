@@ -39,6 +39,7 @@ import riskDailyPartRouter from "./dailyPart/riskDailyPart/riskDailyPart.init";
 import dailyPartMORouter from "./dailyPart/dailyPartMO/dailyPartMO.init";
 import comboRouter from "./dailyPart/combo/combo.init";
 import dailyPartResourceRouter from "./dailyPart/dailyPartResources/dailyPartResources.init";
+import dailyPartPhotosRouter from "./dailyPart/photos/dailyPartPhotos.init";
 
 const globalPrefix = "/api";
 
@@ -85,6 +86,7 @@ app.use(globalPrefix, riskDailyPartRouter);
 app.use(globalPrefix, dailyPartMORouter);
 app.use(globalPrefix, comboRouter);
 app.use(globalPrefix, dailyPartResourceRouter);
+app.use(globalPrefix, dailyPartPhotosRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);
