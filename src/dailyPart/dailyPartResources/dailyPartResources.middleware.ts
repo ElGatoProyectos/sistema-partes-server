@@ -54,6 +54,24 @@ class DailyPartResourceMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
+  verifyHeadersFieldsIdResource(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      const id = request.params.idResource;
+      if (!validator.isNumeric(id)) {
+        throw new Error("El id debe ser numérico");
+      }
+      nextFunction();
+    } catch {
+      const result = httpResponse.BadRequestException(
+        "Error al validar el header"
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
 
   verifyHeadersFieldsIdProject(
     request: express.Request,

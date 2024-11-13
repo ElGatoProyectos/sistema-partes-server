@@ -25,8 +25,9 @@ dailyPartResourceRouter.post(
   dailyPartResourceController.create
 );
 dailyPartResourceRouter.put(
-  `${prefixOfThisArchive}/:id`,
+  `${prefixOfThisArchiveWithDailyPart}/:idResource`,
   dailyPartResourceMiddleware.verifyHeadersFieldsId,
+  dailyPartResourceMiddleware.verifyHeadersFieldsIdResource,
   dailyPartResourceMiddleware.verifyHeadersFieldsIdProject,
   dailyPartResourceMiddleware.verifyFieldsUpdate,
   //[message]ver roles

@@ -61,6 +61,7 @@ class DailyPartResourceService {
   async updateDailyPartResource(
     data: I_UpdateDailyPartResourceBody,
     project_id: number,
+    daily_part_id: number,
     daily_part_resource_id: number
   ): Promise<T_HttpResponse> {
     try {
@@ -69,6 +70,13 @@ class DailyPartResourceService {
         return httpResponse.BadRequestException(
           "No se puede crear el Parte Diario con el id del Proyecto proporcionado"
         );
+      }
+
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
+
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
       }
 
       const dailyPartResourceResponse =
@@ -87,7 +95,7 @@ class DailyPartResourceService {
       }
 
       const dailyPartResouceFormat = {
-        parte_diario_id: daily_part_resource_id,
+        parte_diario_id: daily_part_id,
         recurso_id: data.resource_id,
         cantidad: data.amount,
         proyecto_id: project_id,

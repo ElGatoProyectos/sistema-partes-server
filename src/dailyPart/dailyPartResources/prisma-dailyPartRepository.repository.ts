@@ -80,6 +80,7 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
         nombre_del_recurso: Recurso.nombre,
         unidad: Unidad.simbolo,
         cantidad_utilizada: ResData.cantidad,
+        recurso_id: Recurso.id,
       };
     });
 
