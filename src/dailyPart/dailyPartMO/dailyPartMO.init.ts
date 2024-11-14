@@ -26,6 +26,7 @@ dailyPartMORouter.put(
   `${prefixWithDailyPart}/:idMO`,
   dailyPartMOMiddleware.verifyFieldsUpdate,
   dailyPartMOMiddleware.verifyHeadersFieldsId,
+  dailyPartMOMiddleware.verifyHeadersFieldsIdMO,
   dailyPartMOMiddleware.verifyHeadersFieldsIdProject,
   //[message] ver roles
   authRoleMiddleware.authorizeRoles([

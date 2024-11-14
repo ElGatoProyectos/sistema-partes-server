@@ -25,6 +25,7 @@ class DailyPartMOController {
     const project_id = request.get("project-id") as string;
     const daily_part_id = request.params.id;
     const daily_part_mo_id = request.params.idMO;
+
     const result = await dailyPartMOService.updateDailyPartMO(
       data,
       +daily_part_id,

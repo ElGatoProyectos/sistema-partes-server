@@ -1,5 +1,6 @@
 import {
   Asistencia,
+  E_Asistencia_BD,
   E_Estado_Asistencia_BD,
   ParteDiario,
   ParteDiarioMO,
@@ -142,29 +143,7 @@ class DailyPartMOService {
           daily_part_mo_id
         );
 
-      if (dailyPart.fecha) {
-        const date = dailyPart.fecha;
-        date?.setUTCHours(0, 0, 0, 0);
-        const assistsResponse = await assistsWorkforceValidation.findByDate(
-          date
-        );
-        const assists = assistsResponse.payload as Asistencia;
-
-        //  const assistsFormat={
-        //   fecha               :  assists.fecha,
-        //   horas               : assists.horas,
-        //   horas_trabajadas    : assists.horas_trabajadas,
-        //   hora_parcial        : assists.hora_parcial,
-        //   hora_normal         : assists.hora_normal,
-        //   horas_60            : assists.horas_60,
-        //   horas_100           : assists.horas_100,
-        //   estado_asignacion   : assists.estado_asignacion,
-        //   asistencia          : assists.asistencia,
-        //   horas_extras_estado : assists.horas_extras_estado,
-        //   mano_obra_id        : assits.mano_obra_id,
-        //   proyecto_id         : assits.projec
-        //  }
-      }
+      await this.updateAssistsIfValid(dailyPart, dailyPartMO, data);
 
       return httpResponse.SuccessResponse(
         "Parte Diario con Mano fue modificado correctamente",
@@ -176,6 +155,53 @@ class DailyPartMOService {
         error
       );
     }
+  }
+
+  async updateAssistsIfValid(
+    dailyPart: ParteDiario,
+    dailyPartMO: ParteDiarioMO,
+    data: I_UpdateDailyPartBody
+  ) {
+    if (
+      dailyPart.fecha === null ||
+      dailyPartMO.hora_parcial === null ||
+      dailyPartMO.hora_normal === null ||
+      dailyPartMO.hora_60 === null ||
+      dailyPartMO.hora_100 === null
+    ) {
+      return;
+    }
+    const date = dailyPart.fecha;
+    date.setUTCHours(0, 0, 0, 0);
+    const assistsResponse = await assistsWorkforceValidation.findByDate(date);
+    const assists = assistsResponse.payload as Asistencia;
+
+    const hp =
+      (assists.hora_parcial || 0) +
+      data.hora_parcial -
+      dailyPartMO.hora_parcial;
+    const hn =
+      (assists.hora_normal || 0) + data.hora_normal - dailyPartMO.hora_normal;
+    const h60 = (assists.horas_60 || 0) + data.hora_60 - dailyPartMO.hora_60;
+    const h100 =
+      (assists.horas_100 || 0) + data.hora_100 - dailyPartMO.hora_100;
+    const horas_trabajadas = hp + hn + h60 + h100;
+    const assistsFormat = {
+      fecha: assists.fecha,
+      horas: assists.horas,
+      horas_trabajadas,
+      hora_parcial: hp,
+      hora_normal: hn,
+      horas_60: h60,
+      horas_100: h100,
+      estado_asignacion: assists.estado_asignacion,
+      asistencia: assists.asistencia,
+      horas_extras_estado: assists.horas_extras_estado,
+      mano_obra_id: assists.mano_obra_id,
+      proyecto_id: assists.proyecto_id,
+    };
+
+    await assistsWorkforceValidation.updateAssists(assistsFormat, assists.id);
   }
 
   async findAll(
@@ -256,6 +282,101 @@ class DailyPartMOService {
       if (!dailyPartMOResponse.success) {
         return dailyPartMOResponse;
       }
+      const dailyPartMO = dailyPartMOResponse.payload as ParteDiarioMO;
+
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(
+          dailyPartMO.parte_diario_id
+        );
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (dailyPart.fecha) {
+        const date = dailyPart.fecha;
+        date?.setUTCHours(0, 0, 0, 0);
+        const assistsResponse = await assistsWorkforceValidation.findByDate(
+          date
+        );
+
+        if (!assistsResponse.success) {
+          return httpResponse.BadRequestException(
+            "No se encontró la asistencia del día "
+          );
+        }
+        const assists = assistsResponse.payload as Asistencia;
+        let hp = 0;
+        if (
+          dailyPartMO.hora_parcial &&
+          dailyPartMO.hora_parcial != null &&
+          assists.hora_parcial
+        ) {
+          hp = assists.hora_parcial - dailyPartMO.hora_parcial;
+        }
+        let hn = 0;
+        if (
+          dailyPartMO.hora_normal &&
+          dailyPartMO.hora_normal != null &&
+          assists.hora_normal
+        ) {
+          hn = assists.hora_normal - dailyPartMO.hora_normal;
+        }
+        let h60 = 0;
+        if (
+          dailyPartMO.hora_60 &&
+          dailyPartMO.hora_60 != null &&
+          assists.horas_60
+        ) {
+          h60 = assists.horas_60 - dailyPartMO.hora_60;
+        }
+        let h100 = 0;
+        if (
+          dailyPartMO.hora_100 &&
+          dailyPartMO.hora_100 != null &&
+          assists.horas_100
+        ) {
+          h100 = assists.horas_100 - dailyPartMO.hora_100;
+        }
+        const horas_trabajadas = hp + hn + h60 + h100;
+
+        let assistsFormat = {
+          fecha: assists.fecha,
+          horas: assists.horas,
+          horas_trabajadas: horas_trabajadas,
+          hora_parcial: hp,
+          hora_normal: hn,
+          horas_60: h60,
+          horas_100: h100,
+          estado_asignacion: assists.estado_asignacion,
+          asistencia: assists.asistencia,
+          horas_extras_estado: assists.horas_extras_estado,
+          mano_obra_id: assists.mano_obra_id,
+          proyecto_id: assists.proyecto_id,
+        };
+
+        const dailyPartsResponseMO =
+          await dailyPartMOValidation.findAllForWorkforceIdAndDate(
+            dailyPartMO.mano_obra_id,
+            dailyPart.fecha
+          );
+
+        const dailyPartsMO = dailyPartsResponseMO.payload as ParteDiarioMO[];
+        const cuantity = dailyPartsMO.length - 1;
+        if (cuantity == 1) {
+          assistsFormat.estado_asignacion = E_Estado_Asistencia_BD.ASIGNADO;
+        } else if (cuantity == 0) {
+          assistsFormat.estado_asignacion = E_Estado_Asistencia_BD.NO_ASIGNADO;
+          assistsFormat.asistencia = E_Asistencia_BD.A;
+        }
+
+        await assistsWorkforceValidation.updateAssists(
+          assistsFormat,
+          assists.id
+        );
+      }
+
       await prismaDailyPartMORepository.delete(daily_part_mo_id);
 
       return httpResponse.SuccessResponse(
@@ -263,7 +384,7 @@ class DailyPartMOService {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al eliminar Parte Diario de la Mano de Obra",
+        "Error al eliminar Mano de Obra del Parte Diario",
         error
       );
     }

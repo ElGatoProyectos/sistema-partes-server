@@ -315,20 +315,8 @@ class DailyPartService {
     }
   }
 
-  private createSuccessResponse(result: any, queryParams: any): T_HttpResponse {
-    const { assistsConverter, total } = result;
-    const pageCount = Math.ceil(total / queryParams.limit);
-    const formData = {
-      total,
-      page: queryParams.page,
-      limit: queryParams.limit,
-      pageCount,
-      data: assistsConverter,
-    };
-    return httpResponse.SuccessResponse(
-      "Éxito al traer todas las Asistencias ya que existen",
-      formData
-    );
+  async informationOfTheDailyPart() {
+    // const detai
   }
 }
 export const dailyPartService = new DailyPartService();

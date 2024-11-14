@@ -5,6 +5,20 @@ import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 import { I_UpdateDailyPartMOBD } from "./models/dailyPartMO.interface";
 
 class PrismaDailyPartMORepository implements DailyPartMORepository {
+  async findAllWithOutPaginationForIdMO(
+    workforce_id: number,
+    date: Date
+  ): Promise<ParteDiarioMO[] | null> {
+    const dateNew = date;
+    dateNew.setUTCHours(0, 0, 0, 0);
+    const dailyPartsMo = await prisma.parteDiarioMO.findMany({
+      where: {
+        mano_obra_id: workforce_id,
+        fecha_creacion: date,
+      },
+    });
+    return dailyPartsMo;
+  }
   async delete(daily_part_mo_id: number) {
     await prisma.parteDiarioMO.delete({
       where: {

@@ -21,4 +21,6 @@ export abstract class DailyPartMORepository {
   findById(daily_part_mo_id: number): void {}
 
   delete(daily_part_mo_id: number): void {}
+
+  findAllWithOutPaginationForIdMO(workforce_id: number, date: Date): void {}
 }

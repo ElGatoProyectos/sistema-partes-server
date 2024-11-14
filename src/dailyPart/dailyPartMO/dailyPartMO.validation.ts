@@ -66,6 +66,28 @@ class DailyPartMOValidation {
       );
     }
   }
+  async findAllForWorkforceIdAndDate(
+    workforce_id: number,
+    date: Date
+  ): Promise<T_HttpResponse> {
+    try {
+      const dailyPartsMO =
+        await prismaDailyPartMORepository.findAllWithOutPaginationForIdMO(
+          workforce_id,
+          date
+        );
+
+      return httpResponse.SuccessResponse(
+        "Los Partes Diarios de la Mano de Obra fue encontrado",
+        dailyPartsMO
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Partes Diarios de la Mano de Obra",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartMOValidation = new DailyPartMOValidation();
