@@ -40,6 +40,14 @@ class DailyPartController {
     const result = await dailyPartService.findById(id);
     response.status(result.statusCode).json(result);
   }
+  async findByInformation(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const id = Number(request.params.id);
+    const result = await dailyPartService.informationOfTheDailyPart(id);
+    response.status(result.statusCode).json(result);
+  }
 
   async allForJob(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;

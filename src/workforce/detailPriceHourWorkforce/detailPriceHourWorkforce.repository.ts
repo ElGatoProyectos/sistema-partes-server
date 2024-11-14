@@ -14,4 +14,6 @@ export abstract class DetailPriceHoueWorkforceRepository {
     price_hour_id: number,
     data: I_UpdateDetailPriceHourWorkforceBD[]
   ): void {}
+
+  findByIdPriceHourMO(price_hour_id: number): void {}
 }

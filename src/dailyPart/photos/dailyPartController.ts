@@ -15,6 +15,7 @@ import appRootPath from "app-root-path";
 import sharp from "sharp";
 import validator from "validator";
 import fs from "fs/promises";
+import { protoService } from "./photos.service";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -283,6 +284,21 @@ class DailyPartPhotosController {
         error
       );
       response.status(customError.statusCode).json(customError);
+    }
+  };
+
+  findImage = async (request: express.Request, response: express.Response) => {
+    const daily_part_id = request.params.id;
+    const number = request.params.numberPhoto;
+    const dailyPartResponse = await protoService.findIdImage(
+      +daily_part_id,
+      +number
+    );
+    if (typeof dailyPartResponse.payload === "string") {
+      fs.readFile(dailyPartResponse.payload);
+      response.sendFile(dailyPartResponse.payload);
+    } else {
+      response.status(dailyPartResponse.statusCode).json(dailyPartResponse);
     }
   };
 }

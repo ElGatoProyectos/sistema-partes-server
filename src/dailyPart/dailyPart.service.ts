@@ -5,9 +5,12 @@ import {
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
 import {
+  DetallePrecioHoraMO,
+  DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
+  PrecioHoraMO,
   Trabajo,
 } from "@prisma/client";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
@@ -27,6 +30,11 @@ import {
 import validator from "validator";
 import { assistsWorkforceValidation } from "../assists/assists.validation";
 import { dailyPartMOValidation } from "./dailyPartMO/dailyPartMO.validation";
+import { departureJobValidation } from "../departure/departure-job/departureJob.validation";
+import { I_DetailDepartureJob } from "../departure/departure-job/models/departureJob.interface";
+import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
+import { priceHourWorkforceValidation } from "../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
+import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
 
 class DailyPartService {
   async createDailyPart(
@@ -315,8 +323,76 @@ class DailyPartService {
     }
   }
 
-  async informationOfTheDailyPart() {
-    // const detai
+  async informationOfTheDailyPart(daily_part_id: number) {
+    try {
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
+      const detailsJobDepartureResponse =
+        await departureJobValidation.findAllWithOutPaginationForJob(
+          dailyPart.trabajo_id
+        );
+      const detailsJobDeparture =
+        (await detailsJobDepartureResponse.payload) as I_DetailDepartureJob[];
+      let sumaMetadoPorPrecio = 0;
+      let sumaManoObra = 0;
+      if (detailsJobDeparture.length > 0) {
+        detailsJobDeparture.map((detail) => {
+          sumaMetadoPorPrecio +=
+            detail.metrado_utilizado * detail.Partida.precio;
+
+          sumaManoObra +=
+            detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
+        });
+      }
+      if (!dailyPart.fecha) {
+        return httpResponse.BadRequestException(
+          "El Parte Diario no tiene fecha para buscar en la tabla"
+        );
+      }
+      const priceHourResponse = await priceHourWorkforceValidation.findByDate(
+        dailyPart.fecha
+      );
+      let sumaMO = 0;
+      let detailsPriceHourMO;
+      const dailyPartMoResponse =
+        await dailyPartMOValidation.findAllWithOutPagination(
+          dailyPart.proyecto_id,
+          dailyPart.id
+        );
+      let dailyPartMO;
+      if (priceHourResponse.success && dailyPartMoResponse.success) {
+        const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
+        dailyPartMO = dailyPartMoResponse.payload as I_DailyPartBody[];
+        if (dailyPartMO.length > 0) {
+          const detailsPriceHourMOResponse =
+            await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+              priceHourMO.id
+            );
+          detailsPriceHourMO =
+            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO;
+          // dailyPartMO.forEach((item) => {
+          //   if()
+          //   console.log(item.ManoObra.CategoriaObrero.id);
+          // });
+        }
+      }
+
+      return httpResponse.SuccessResponse(
+        "Se trajo la informacion ",
+        dailyPartMO
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Partes Diarios",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 }
 export const dailyPartService = new DailyPartService();

@@ -113,6 +113,13 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
         proyecto_id: project_id,
         parte_diario_id: daily_part_id,
       },
+      include: {
+        ManoObra: {
+          include: {
+            CategoriaObrero: true,
+          },
+        },
+      },
     });
     return dailyParts;
   }

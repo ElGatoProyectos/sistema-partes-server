@@ -23,6 +23,23 @@ class DetailPriceHourWorkforceValidation {
       );
     }
   }
+  async findAllByIdPriceHour(price_hour_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail =
+        await prismaDetailPriceHourWorkforceRepository.findByIdPriceHourMO(
+          price_hour_id
+        );
+      return httpResponse.SuccessResponse(
+        "Los Detalle Precio Hora Mano Obra por el id pasado fue encontrado con éxito",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Detalle Precio Hora Mano Obra por el id pasado",
+        error
+      );
+    }
+  }
 }
 
 export const detailPriceHourWorkforceValidation =
