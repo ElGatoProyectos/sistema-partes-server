@@ -73,5 +73,16 @@ dailyPartRouter.get(
   ]),
   dailyPartController.findById
 );
+dailyPartRouter.get(
+  `${prefix}/:id/information`,
+  dailyPartMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
+  dailyPartController.findByInformation
+);
 
 export default dailyPartRouter;

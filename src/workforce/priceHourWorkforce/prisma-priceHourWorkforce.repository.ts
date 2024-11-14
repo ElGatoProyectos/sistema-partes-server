@@ -72,6 +72,18 @@ class PrismaPriceHourWorkforceRepository implements PriceHourRepository {
     });
     return priceHourMO;
   }
+
+  async findByDate(date: Date): Promise<PrecioHoraMO | null> {
+    const dateNew = date;
+    dateNew.setUTCHours(0, 0, 0, 0);
+    const priceHourMO = await prisma.precioHoraMO.findFirst({
+      where: {
+        fecha_inicio: { lte: dateNew },
+        fecha_fin: { gte: dateNew },
+      },
+    });
+    return priceHourMO;
+  }
 }
 
 export const prismaPriceHourWorkforceRepository =

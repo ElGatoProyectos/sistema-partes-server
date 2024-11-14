@@ -15,6 +15,10 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       where: {
         trabajo_id: job_id,
       },
+      include: {
+        Trabajo: true,
+        Partida: true,
+      },
     });
     return details;
   }

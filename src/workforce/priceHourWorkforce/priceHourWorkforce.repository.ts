@@ -19,4 +19,6 @@ export abstract class PriceHourRepository {
   ): void {}
 
   findById(price_hour_id: number): void {}
+
+  findByDate(date: Date): void {}
 }

@@ -17,3 +17,29 @@ export interface I_UpdateDailyPartBody {
   hora_60: number;
   hora_100: number;
 }
+
+export interface I_CategoriaObrero {
+  id: number;
+  nombre: string;
+  fecha_creacion: Date;
+  eliminado: string;
+  proyecto_id: number;
+}
+
+export interface I_Mano {
+  CategoriaObrero: I_CategoriaObrero;
+}
+
+export interface I_DailyPartBody {
+  hora_inicio: number;
+  hora_fin: number;
+  hora_parcial: number;
+  hora_normal: number;
+  hora_60: number;
+  hora_100: number;
+  parte_diario_id: number;
+  mano_obra_id: number;
+  fecha_creacion: Date;
+  proyecto_id: number;
+  ManoObra: I_Mano;
+}

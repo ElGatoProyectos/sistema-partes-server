@@ -9,6 +9,16 @@ import {
 class PrismaDetailPriceHourWorkforceRepository
   implements DetailPriceHoueWorkforceRepository
 {
+  async findByIdPriceHourMO(
+    price_hour_id: number
+  ): Promise<DetallePrecioHoraMO[] | null> {
+    const details = await prisma.detallePrecioHoraMO.findMany({
+      where: {
+        precio_hora_mo_id: price_hour_id,
+      },
+    });
+    return details;
+  }
   async updateDetailPriceHourWorkforce(
     price_hour_id: number,
     data: I_UpdateDetailPriceHourWorkforceBD[]
