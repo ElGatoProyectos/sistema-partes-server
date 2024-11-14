@@ -20,6 +20,7 @@ export abstract class DepartureJobRepository {
     data: T_FindAllDepartureJob,
     project_id: number
   ): void {}
+  findAllWithOutPaginationForJob(job_id: number): void {}
   findAllForJob(
     skip: number,
     data: T_FindAllWork,

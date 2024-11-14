@@ -1,8 +1,6 @@
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
-import { jobValidation } from "../../job/job.validation";
 import { I_DepartureJobExcel } from "./models/departureJob.interface";
 import { Partida, Trabajo } from "@prisma/client";
-import { departureValidation } from "../departure.validation";
 import { prismaDepartureJobRepository } from "./prisma-departure-job.repository";
 
 class DepartureJobValidation {
@@ -331,6 +329,26 @@ class DepartureJobValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar los Detalles Trabajo Partida por el id del Proyecto",
+        error
+      );
+    }
+  }
+  async findAllWithOutPaginationForJob(
+    job_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const details =
+        await prismaDepartureJobRepository.findAllWithOutPaginationForJob(
+          job_id
+        );
+
+      return httpResponse.SuccessResponse(
+        "Los Detalles Trabajo Partida por el id del Trabajo fue encontrado con éxito",
+        details
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Detalles Trabajo Partida por el id del Trabajo",
         error
       );
     }
