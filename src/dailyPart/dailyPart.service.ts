@@ -338,13 +338,13 @@ class DailyPartService {
       const detailsJobDeparture =
         (await detailsJobDepartureResponse.payload) as I_DetailDepartureJob[];
       let sumaMetadoPorPrecio = 0;
-      let sumaManoObra = 0;
+      let sumaManoObraBBDD = 0;
       if (detailsJobDeparture.length > 0) {
         detailsJobDeparture.map((detail) => {
           sumaMetadoPorPrecio +=
             detail.metrado_utilizado * detail.Partida.precio;
 
-          sumaManoObra +=
+          sumaManoObraBBDD +=
             detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
         });
       }
@@ -356,8 +356,8 @@ class DailyPartService {
       const priceHourResponse = await priceHourWorkforceValidation.findByDate(
         dailyPart.fecha
       );
-      let sumaMO = 0;
-      let detailsPriceHourMO;
+      let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
+      let sumaRealCategoryMO = 0;
       const dailyPartMoResponse =
         await dailyPartMOValidation.findAllWithOutPagination(
           dailyPart.proyecto_id,
@@ -373,17 +373,37 @@ class DailyPartService {
               priceHourMO.id
             );
           detailsPriceHourMO =
-            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO;
-          // dailyPartMO.forEach((item) => {
-          //   if()
-          //   console.log(item.ManoObra.CategoriaObrero.id);
-          // });
+            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+          dailyPartMO.forEach((item) => {
+            if (item.ManoObra.CategoriaObrero) {
+              const categoriaId = item.ManoObra.CategoriaObrero.id;
+
+              const detail = detailsPriceHourMO.find(
+                (detail) => detail.categoria_obrero_id === categoriaId
+              );
+              if (detail) {
+                sumaRealCategoryMO +=
+                  detail.hora_normal * item.hora_normal +
+                  detail.hora_extra_60 * item.hora_60 +
+                  detail.hora_extra_100 * item.hora_100;
+              }
+            }
+          });
         }
       }
 
+      const diferenciaBBOfReal = sumaManoObraBBDD - sumaRealCategoryMO;
+
+      const resultFormat = {
+        costo_produccion: sumaMetadoPorPrecio,
+        costo_produccion_mo: sumaManoObraBBDD,
+        costo_real_mo: sumaRealCategoryMO,
+        diferencia_mo: diferenciaBBOfReal,
+      };
+
       return httpResponse.SuccessResponse(
-        "Se trajo la informacion ",
-        dailyPartMO
+        "Se trajo con éxito la informacion del Parte Diario",
+        resultFormat
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

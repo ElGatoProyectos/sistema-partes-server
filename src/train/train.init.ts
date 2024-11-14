@@ -19,6 +19,18 @@ trainRouter.get(
   ]),
   trainController.allTrains
 );
+trainRouter.get(
+  `${prefix}/excel`,
+  // authRoleMiddleware.authorizeRoles([
+  //   "ADMIN",
+  //   "USER",
+  //   "CONTROL_COSTOS",
+  //   "ASISTENTE_CONTROL_COSTOS",
+  //   "INGENIERO_PRODUCCION",
+  //   "ASISTENTE_PRODUCCION",
+  // ]),
+  trainController.exportExcel
+);
 
 trainRouter.get(
   `${prefix}/:id`,

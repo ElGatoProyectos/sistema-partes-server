@@ -5,7 +5,6 @@ import { T_FindAllWorkforce } from "./models/workforce.types";
 import { I_UpdateWorkforceBody } from "./models/workforce.interface";
 import * as ExcelJS from "exceljs";
 import prisma from "../config/prisma.config";
-import { httpResponse } from "../common/http.response";
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
 
@@ -106,32 +105,73 @@ class WorkforceController {
     response.status(result.statusCode).json(result);
   }
   async exportExcel(request: express.Request, response: express.Response) {
-    const project_id = request.get("project-id") as string;
-    const data = await prisma.manoObra.findMany();
-    console.log(data);
+    const data = await prisma.manoObra.findMany({
+      include: {
+        TipoObrero: true,
+        CategoriaObrero: true,
+        OrigenObrero: true,
+        EspecialidadObra: true,
+      },
+    });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("TestExportXLS");
     worksheet.columns = [
-      { header: "NOMBRE", key: "name", width: 30 },
-      { header: "APELLIDO MATERNO", key: "mother", width: 30 },
-      { header: "APELLIDO PATERNO", key: "father", width: 30 },
+      { header: "DNI", key: "documento_identidad", width: 15 },
+      { header: "NOMBRES", key: "nombre_completo", width: 30 },
+      { header: "APELLIDO MATERNO", key: "apellido_materno", width: 30 },
+      { header: "APELLIDO PATERNO", key: "apellido_paterno", width: 30 },
+      { header: "TIPO", key: "tipo_obrero", width: 20 },
+      { header: "ORIGEN", key: "origen_obrero", width: 20 },
+      { header: "GENERO", key: "genero", width: 20 },
+      { header: "ESTADO CIVIL", key: "estado_civil", width: 15 },
+      { header: "CATEGORIA", key: "categoria_obrero", width: 20 },
+      { header: "ESPECIALIDAD", key: "especialidad_obra", width: 20 },
+      { header: "INGRESO", key: "fecha_inicio", width: 15 },
+      { header: "CESE", key: "fecha_cese", width: 15 },
+      { header: "ESTADO", key: "estado", width: 15 },
+      { header: "CELULAR", key: "telefono", width: 15 },
+      { header: "DIRECCION", key: "direccion", width: 30 },
+      { header: "LUGAR DE NACIMIENTO", key: "lugar_nacimiento", width: 30 },
+      { header: "CORREO", key: "correo", width: 30 },
     ];
     worksheet.getRow(1).eachCell((cell) => {
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "93c5fd" },
+        fgColor: { argb: "244062" },
       };
       cell.font = {
         bold: true,
+        color: { argb: "FFFFFF" },
       };
     });
     data.forEach((user) => {
-      worksheet.addRow({
-        name: user.nombre_completo,
-        mother: user.apellido_materno,
-        father: user.apellido_paterno,
+      const row = worksheet.addRow({
+        documento_identidad: user.documento_identidad,
+        nombre_completo: user.nombre_completo,
+        apellido_materno: user.apellido_materno,
+        apellido_paterno: user.apellido_paterno,
+        tipo_obrero: user.TipoObrero ? user.TipoObrero.nombre : "",
+        origen_obrero: user.OrigenObrero ? user.OrigenObrero.nombre : "",
+        genero: user.genero,
+        estado_civil: user.estado_civil,
+        categoria_obrero: user.CategoriaObrero
+          ? user.CategoriaObrero.nombre
+          : "",
+        especialidad_obra: user.EspecialidadObra
+          ? user.EspecialidadObra.nombre
+          : "",
+        fecha_inicio: user.fecha_inicio,
+        fecha_cese: user.fecha_cese,
+        estado: user.estado,
+        telefono: user.telefono,
+        direccion: user.direccion,
+        lugar_nacimiento: user.lugar_nacimiento,
+        correo: user.email_personal,
       });
+      row.getCell("documento_identidad").numFmt = "@";
+      row.getCell("fecha_inicio").numFmt = "dd/mm/yyyy";
+      row.getCell("fecha_cese").numFmt = "dd/mm/yyyy";
     });
     const buffer = await workbook.xlsx.writeBuffer();
     response

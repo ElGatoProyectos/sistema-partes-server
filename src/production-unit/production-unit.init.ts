@@ -35,6 +35,18 @@ prouductionUnitRouter.get(
   productionUnitController.findAll
 );
 prouductionUnitRouter.get(
+  `${prefix}/excel`,
+  // authRoleMiddleware.authorizeRoles([
+  //   "ADMIN",
+  //   "USER",
+  //   "CONTROL_COSTOS",
+  //   "ASISTENTE_CONTROL_COSTOS",
+  //   "INGENIERO_PRODUCCION",
+  //   "ASISTENTE_PRODUCCION",
+  // ]),
+  productionUnitController.exportExcel
+);
+prouductionUnitRouter.get(
   `${prefix}/search`,
   authRoleMiddleware.authorizeRoles([
     "ADMIN",

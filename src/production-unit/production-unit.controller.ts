@@ -19,6 +19,8 @@ import { I_UpdateProductionUnitBody } from "./models/production-unit.interface";
 import validator from "validator";
 import { T_FindAllUp } from "./models/up.types";
 import { projectValidation } from "../project/project.validation";
+import * as ExcelJS from "exceljs";
+import prisma from "../config/prisma.config";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -479,6 +481,45 @@ class ProductionUnitController {
       }
     );
   };
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.unidadProduccion.findMany({});
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      { header: "CODIGO", key: "id", width: 15 },
+      { header: "NOMBRE", key: "nombre", width: 40 },
+      { header: "NOTA", key: "nota", width: 30 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((up) => {
+      const row = worksheet.addRow({
+        id: up.codigo,
+        nombre: up.nombre,
+        nota: up.nota,
+      });
+      // Asegura que la columna de "CODIGO" se trate como texto
+      row.getCell("id").numFmt = "@";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header(
+        "Content-Disposition",
+        "attachment; filename=unidadesDeProduccion.xlsx"
+      )
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
+  }
 }
 
 export const productionUnitController = new ProductionUnitController();

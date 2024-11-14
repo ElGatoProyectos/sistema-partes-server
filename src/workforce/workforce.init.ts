@@ -61,8 +61,15 @@ workforceRouter.get(
 
 workforceRouter.get(
   `${prefix}/excel`,
-  // workforceMiddleware.verifyHeadersFieldsIdProject,
-  // authRoleMiddleware.authAdminUser,
+  // authRoleMiddleware.authorizeRoles([
+  //   "ADMIN",
+  //   "USER",
+  //   "CONTROL_COSTOS",
+  //   "ASISTENTE_CONTROL_COSTOS",
+  //   "INGENIERO_PRODUCCION",
+  //   "ASISTENTE_PRODUCCION",
+  //   "ADMINISTRACION_OBRA",
+  // ]),
   workforceController.exportExcel
 );
 
