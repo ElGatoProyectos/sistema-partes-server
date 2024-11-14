@@ -1,3 +1,4 @@
+import { trainDto } from "./dto/train.dto";
 import express from "../config/express.config";
 import { trainService } from "./train.service";
 import {
@@ -6,6 +7,8 @@ import {
 } from "./models/production-unit.interface";
 import multer from "multer";
 import { T_FindAllTrain } from "./models/train.types";
+import prisma from "../config/prisma.config";
+import * as ExcelJS from "exceljs";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -91,6 +94,41 @@ class TrainController {
       }
     });
   };
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.tren.findMany({});
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      { header: "ID-TREN", key: "id", width: 15 },
+      { header: "TREN", key: "tren", width: 40 },
+      { header: "NOTA", key: "nota", width: 30 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((train) => {
+      const row = worksheet.addRow({
+        id: train.codigo,
+        tren: train.nombre,
+        nota: train.nota,
+      });
+      row.getCell("id").numFmt = "@";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header("Content-Disposition", "attachment; filename=trenes.xlsx")
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
+  }
 }
 
 export const trainController = new TrainController();
