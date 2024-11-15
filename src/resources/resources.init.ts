@@ -78,6 +78,11 @@ resourceRouter.get(
   resourceController.allResources
 );
 resourceRouter.get(
+  `${prefix}/excel`,
+
+  resourceController.exportExcel
+);
+resourceRouter.get(
   `${prefixWithDailyPart}/:id`,
   resourcesMiddleware.verifyHeadersFieldsId,
   resourcesMiddleware.verifyHeadersFieldsIdProject,

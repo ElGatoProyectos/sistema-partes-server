@@ -8,6 +8,8 @@ import {
   I_CreateDepartureBody,
   I_UpdateDepartureBody,
 } from "./models/departure.interface";
+import * as ExcelJS from "exceljs";
+import prisma from "../config/prisma.config";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -112,6 +114,71 @@ class DepartureController {
       +project_id
     );
     response.status(result.statusCode).json(result);
+  }
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.partida.findMany({
+      include: {
+        Unidad: true,
+      },
+      orderBy: { id_interno: "asc" },
+    });
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      { header: "ID-PARTIDA", key: "id", width: 15 },
+      { header: "ITEM", key: "item", width: 20 },
+      { header: "PARTIDA", key: "partida", width: 80 },
+      { header: "UNI", key: "uni", width: 20 },
+      { header: "METRADO", key: "metrado", width: 20 },
+      { header: "PRECIO", key: "precio", width: 20 },
+      { header: "MANO DE OBRA UNITARIO", key: "manoObra", width: 35 },
+      { header: "MATERIAL UNITARIO", key: "materialUnitario", width: 20 },
+      { header: "EQUIPO UNITARIO", key: "equipoUnitario", width: 20 },
+      {
+        header: "SUBCONTRATA - VARIOS UNITARIO",
+        key: "subcontrata",
+        width: 35,
+      },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((departure) => {
+      const row = worksheet.addRow({
+        id: departure.id_interno,
+        item: departure.item,
+        partida: departure.partida,
+        uni: departure.Unidad?.simbolo,
+        metrado: departure.metrado_inicial,
+        precio: departure.precio,
+        manoObra: departure.mano_de_obra_unitaria,
+        materialUnitario: departure.material_unitario,
+        equipoUnitario: departure.equipo_unitario,
+        subcontrata: departure.subcontrata_varios,
+      });
+      row.getCell("id").numFmt = "@";
+      row.getCell("item").numFmt = "@";
+      row.getCell("metrado").numFmt = "@";
+      row.getCell("precio").numFmt = "@";
+      row.getCell("manoObra").numFmt = "@";
+      row.getCell("materialUnitario").numFmt = "@";
+      row.getCell("equipoUnitario").numFmt = "@";
+      row.getCell("subcontrata").numFmt = "@";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header("Content-Disposition", "attachment; filename=partidas.xlsx")
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
   }
 }
 

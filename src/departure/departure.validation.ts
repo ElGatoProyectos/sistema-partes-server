@@ -2,14 +2,15 @@ import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
 import { I_DepartureExcel } from "./models/departure.interface";
 import { unitValidation } from "../unit/unit.validation";
-import { Unidad } from "@prisma/client";
+import { Partida, Unidad } from "@prisma/client";
 
 class DepartureValidation {
   async updateDeparture(
-    departure_id: number,
+    departure: Partida,
     data: I_DepartureExcel,
     usuario_id: number,
-    project_id: number
+    project_id: number,
+    units: Unidad[]
   ): Promise<T_HttpResponse> {
     try {
       let resultado;
@@ -20,38 +21,52 @@ class DepartureValidation {
         id_interno: data["ID-PARTIDA"] ? String(data["ID-PARTIDA"].trim()) : "",
         item: data.ITEM || "",
         partida: data.PARTIDA || "",
-        metrado_inicial: data.METRADO,
-        metrado_total: data.METRADO,
-        precio: +data.PRECIO,
+        metrado_inicial: parseInt(data.METRADO) || 0,
+        metrado_total: parseInt(data.METRADO) || 0,
+        precio: parseInt(data.PRECIO) || 0,
         parcial: data.METRADO && data.PRECIO ? resultado : 0,
-        mano_de_obra_unitaria: 0,
-        material_unitario: 0,
-        equipo_unitario: 0,
-        subcontrata_varios: 0,
+        mano_de_obra_unitaria: data["MANO DE OBRA UNITARIO"]
+          ? data["MANO DE OBRA UNITARIO"]
+          : departure.mano_de_obra_unitaria,
+        material_unitario: data["MATERIAL UNITARIO"]
+          ? data["MATERIAL UNITARIO"]
+          : departure.material_unitario,
+        equipo_unitario: data["EQUIPO UNITARIO"]
+          ? data["EQUIPO UNITARIO"]
+          : departure.equipo_unitario,
+        subcontrata_varios: data["SUBCONTRATA - VARIOS UNITARIO"]
+          ? data["SUBCONTRATA - VARIOS UNITARIO"]
+          : departure.subcontrata_varios,
         usuario_id: usuario_id,
         proyecto_id: project_id,
       };
-      if (data.UNI) {
-        const unitResponse = await unitValidation.findBySymbol(
-          data.UNI.trim(),
-          project_id
-        );
-        const unit = unitResponse.payload as Unidad;
-        departureFormat.unidad_id = unit.id;
+      if (data.UNI && data.UNI.trim() !== "") {
+        // const unitResponse = await unitValidation.findBySymbol(
+        //   data.UNI.trim(),
+        //   project_id
+        // );
+        // const unit = unitResponse.payload as Unidad;
+        // departureFormat.unidad_id = unit.id;
+
+        const unit = units.find((unit) => {
+          return unit.simbolo?.toUpperCase() === data.UNI.toUpperCase();
+        });
+
+        departureFormat.unidad_id = unit ? unit.id : null;
       }
 
       const responseUnifiedIndex =
         await prismaDepartureRepository.updateDeparture(
           departureFormat,
-          departure_id
+          departure.id
         );
       return httpResponse.SuccessResponse(
-        "Unidad modificada correctamente",
+        "Partida modificada correctamente",
         responseUnifiedIndex
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al modificar la Unidad",
+        "Error al modificar la Partida",
         error
       );
     }

@@ -483,7 +483,9 @@ class ProductionUnitController {
   };
 
   async exportExcel(request: express.Request, response: express.Response) {
-    const data = await prisma.unidadProduccion.findMany({});
+    const data = await prisma.unidadProduccion.findMany({
+      orderBy: { codigo: "asc" },
+    });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("TestExportXLS");
     worksheet.columns = [

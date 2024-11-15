@@ -318,8 +318,8 @@ class ResourceService {
       let resource;
 
       for (const item of sheetToJson) {
-        resourceResponse = await resourceValidation.findByNameValidation(
-          String(item["NOMBRE DEL RECURSO"].trim()),
+        resourceResponse = await resourceValidation.findByCodeValidation(
+          item.CODIGO,
           project_id
         );
         if (resourceResponse.success) {
@@ -360,7 +360,7 @@ class ResourceService {
             data: {
               codigo: formattedCodigo,
               nombre: item["NOMBRE DEL RECURSO"],
-              precio: item.PRECIO ? parseInt(item.PRECIO) : null,
+              precio: item.PRECIO ? parseInt(item.PRECIO) : 0,
               unidad_id: unit.id,
               proyecto_id: project_id,
               id_unificado: unifiedIndex.id,

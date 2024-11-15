@@ -21,14 +21,14 @@ trainRouter.get(
 );
 trainRouter.get(
   `${prefix}/excel`,
-  // authRoleMiddleware.authorizeRoles([
-  //   "ADMIN",
-  //   "USER",
-  //   "CONTROL_COSTOS",
-  //   "ASISTENTE_CONTROL_COSTOS",
-  //   "INGENIERO_PRODUCCION",
-  //   "ASISTENTE_PRODUCCION",
-  // ]),
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
   trainController.exportExcel
 );
 

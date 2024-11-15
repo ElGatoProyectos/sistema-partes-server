@@ -58,6 +58,19 @@ departureRouter.get(
 );
 
 departureRouter.get(
+  `${prefix}/excel`,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  departureController.exportExcel
+);
+
+departureRouter.get(
   `${prefix}/:id`,
   departureMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authorizeRoles([

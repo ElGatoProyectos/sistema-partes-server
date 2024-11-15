@@ -31,6 +31,18 @@ jobRouter.get(
   ]),
   jobController.allJobs
 );
+jobRouter.get(
+  `${prefix}/excel`,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  jobController.exportExcel
+);
 
 jobRouter.delete(
   `${prefix}/:id`,

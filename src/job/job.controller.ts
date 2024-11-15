@@ -4,6 +4,8 @@ import multer from "multer";
 import { I_CreateJobBody, I_UpdateJobBody } from "./models/job.interface";
 import { jobService } from "./job.service";
 import { T_FindAllJob } from "./models/job.types";
+import * as ExcelJS from "exceljs";
+import prisma from "../config/prisma.config";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -97,6 +99,57 @@ class JobController {
       }
     });
   };
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.trabajo.findMany({
+      include: {
+        Tren: true,
+        UnidadProduccion: true,
+      },
+      orderBy: { codigo: "asc" },
+    });
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      { header: "ID-TRABAJO", key: "id", width: 15 },
+      { header: "TRABAJOS", key: "trabajos", width: 40 },
+      { header: "TREN", key: "tren", width: 20 },
+      { header: "UNIDAD DE PRODUCCION", key: "unidadProduccion", width: 30 },
+      { header: "INICIO", key: "inicio", width: 20 },
+      { header: "FINALIZA", key: "finaliza", width: 20 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((job) => {
+      const row = worksheet.addRow({
+        id: job.codigo,
+        trabajos: job.nombre,
+        tren: job.Tren.codigo,
+        unidadProduccion: job.UnidadProduccion.codigo,
+        inicio: job.fecha_inicio,
+        finaliza: job.fecha_finalizacion,
+      });
+      row.getCell("id").numFmt = "@";
+      row.getCell("tren").numFmt = "@";
+      row.getCell("unidadProduccion").numFmt = "@";
+      row.getCell("inicio").numFmt = "dd/mm/yyyy";
+      row.getCell("finaliza").numFmt = "dd/mm/yyyy";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header("Content-Disposition", "attachment; filename=trabajos.xlsx")
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
+  }
 }
 
 export const jobController = new JobController();
