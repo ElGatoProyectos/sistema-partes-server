@@ -59,6 +59,18 @@ departureJobRouter.get(
   departureJobMiddleware.verifyHeadersFieldsIdProject,
   departureJobController.allDetailsDepartureJob
 );
+departureJobRouter.get(
+  `${prefix}/excel`,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  departureJobController.exportExcel
+);
 
 //[note] esto es una api para dentro de  parte diario
 //[note] el id es del parte diario

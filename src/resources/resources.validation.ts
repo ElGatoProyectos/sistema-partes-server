@@ -45,7 +45,7 @@ class ResourceValidation {
       const resourceFormat = {
         codigo: formattedCodigo,
         nombre: data["NOMBRE DEL RECURSO"],
-        precio: data.PRECIO ? parseInt(data.PRECIO) : null,
+        precio: data.PRECIO ? parseInt(data.PRECIO) : 0,
         unidad_id: unit.id,
         proyecto_id: project_id,
         id_unificado: unifiedIndex.id,

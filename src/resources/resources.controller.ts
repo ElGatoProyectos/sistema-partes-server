@@ -6,6 +6,8 @@ import {
   I_CreateResourcesBody,
   I_UpdateResourcesBody,
 } from "./models/resources.interface";
+import * as ExcelJS from "exceljs";
+import prisma from "../config/prisma.config";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -120,6 +122,63 @@ class ResourceController {
     const resource_id = Number(request.params.id);
     const result = await resourceService.updateStatusResource(resource_id);
     response.status(result.statusCode).json(result);
+  }
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.recurso.findMany({
+      include: {
+        Unidad: true,
+        CategoriaRecurso: true,
+        IndiceUnificado: true,
+      },
+      orderBy: { codigo: "asc" },
+    });
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      {
+        header: "NOMBRE INDICE UNIFICADO",
+        key: "nombreIndiceUnificado",
+        width: 30,
+      },
+      { header: "CODIGO", key: "codigo", width: 20 },
+      { header: "NOMBRE DEL RECURSO", key: "nombreRecurso", width: 50 },
+      { header: "UNIDAD", key: "unidad", width: 20 },
+      { header: "NOMBRE CATEGORIA RECURSO", key: "nombreCategoria", width: 40 },
+      { header: "PRECIO", key: "precio", width: 20 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((resource) => {
+      const row = worksheet.addRow({
+        nombreIndiceUnificado: resource.IndiceUnificado.nombre,
+        codigo: resource.codigo,
+        nombreRecurso: resource.nombre,
+        unidad: resource.Unidad.simbolo,
+        nombreCategoria: resource.CategoriaRecurso.nombre,
+        precio: resource.precio,
+      });
+      row.getCell("nombreIndiceUnificado").numFmt = "@";
+      row.getCell("codigo").numFmt = "@";
+      row.getCell("nombreRecurso").numFmt = "@";
+      row.getCell("unidad").numFmt = "@";
+      row.getCell("nombreCategoria").numFmt = "@";
+      row.getCell("precio").numFmt = "@";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header("Content-Disposition", "attachment; filename=recursos.xlsx")
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
   }
 }
 

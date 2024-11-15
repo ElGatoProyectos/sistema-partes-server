@@ -459,7 +459,7 @@ class DepartureService {
             if (previousCodigo !== null && codigo <= previousCodigo) {
               errorNumber++;
               // errorMessages.push(index + 1);
-              errorRows.push(index);
+              errorRows.push(index + 1);
             }
 
             previousCodigo = codigo;
@@ -542,16 +542,19 @@ class DepartureService {
           //   String(item["ID-PARTIDA"].trim()),
           //   project_id
           // );
-          if (departureFind && departureFind.id !== undefined) {
+          if (departureFind) {
             await departureValidation.updateDeparture(
-              departureFind.id,
+              departureFind,
               item,
               userResponse.id,
-              responseProject.id
+              responseProject.id,
+              units
             );
           } else {
             const unit = units.find((unit) => {
-              return unit.simbolo === item.UNI;
+              if (item.UNI) {
+                return unit.simbolo?.toUpperCase() === item.UNI.toUpperCase();
+              }
             });
             // const unitResponse = await unitValidation.findBySymbol(
             //   String(item.UNI),
@@ -584,7 +587,7 @@ class DepartureService {
                 ? +item["SUBCONTRATA - VARIOS UNITARIO"]
                 : 0,
               usuario_id: userResponse.id,
-              unidad_id: item.UNI ? unit?.id ?? null : null,
+              unidad_id: item.UNI ? unit?.id : null,
               proyecto_id: project_id,
             };
             await prisma.partida.create({

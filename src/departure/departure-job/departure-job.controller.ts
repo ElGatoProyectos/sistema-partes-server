@@ -7,6 +7,8 @@ import {
   I_DepartureJob,
   I_DepartureJobUpdate,
 } from "./models/departureJob.interface";
+import * as ExcelJS from "exceljs";
+import prisma from "../../config/prisma.config";
 
 const storage = multer.memoryStorage();
 const upload: any = multer({ storage: storage });
@@ -129,6 +131,63 @@ class DepartureJobController {
       }
     });
   };
+
+  async exportExcel(request: express.Request, response: express.Response) {
+    const data = await prisma.detalleTrabajoPartida.findMany({
+      include: {
+        Trabajo: true,
+        Partida: true,
+      },
+      orderBy: {
+        Trabajo: {
+          codigo: "asc",
+        },
+      },
+    });
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TestExportXLS");
+    worksheet.columns = [
+      {
+        header: "ID-TRABAJO",
+        key: "idTrabajo",
+        width: 20,
+      },
+      { header: "TRABAJOS", key: "trabajos", width: 40 },
+      { header: "PARTIDA", key: "partida", width: 80 },
+      { header: "METRADO", key: "metrado", width: 20 },
+    ];
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "244062" },
+      };
+      cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF" },
+      };
+    });
+    data.forEach((detail) => {
+      const row = worksheet.addRow({
+        idTrabajo: detail.Trabajo.codigo,
+        trabajos: detail.Trabajo.nombre,
+        partida: detail.Partida.id_interno + "  " + detail.Partida.partida,
+        metrado: detail.metrado_utilizado,
+      });
+      row.getCell("idTrabajo").numFmt = "@";
+      row.getCell("trabajos").numFmt = "@";
+      row.getCell("partida").numFmt = "@";
+      row.getCell("metrado").numFmt = "@";
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    response
+      .header(
+        "Content-Disposition",
+        "attachment; filename=trabajosPartidas.xlsx"
+      )
+      .type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      .end(buffer);
+  }
 }
 
 export const departureJobController = new DepartureJobController();
