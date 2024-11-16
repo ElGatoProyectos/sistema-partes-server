@@ -26,11 +26,13 @@ import { comboValidation } from "../dailyPart/combo/combo.validation";
 class PrismaAssistsRepository implements BankWorkforceRepository {
   async updateAssists(
     data: I_UpdateAssitsBD,
-    daily_part_id: number
+    assists_id: number,
+    workforce_id: number
   ): Promise<Asistencia | null> {
     const updateAssists = await prisma.asistencia.update({
       where: {
-        id: daily_part_id,
+        id: assists_id,
+        mano_obra_id: workforce_id,
       },
       data: data,
     });
@@ -288,20 +290,36 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     return assists;
   }
   async findByDate(date: Date): Promise<Asistencia | null> {
-    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+    // const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+    // const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+    const dateNew = date;
+    dateNew.setUTCHours(0, 0, 0, 0);
 
     const assists = await prisma.asistencia.findFirst({
       where: {
-        fecha: {
-          gte: startOfDay, // Fecha mayor o igual al inicio del día
-          lte: endOfDay, // Fecha menor o igual al fin del día
-        },
+        fecha: dateNew,
         eliminado: E_Estado_BD.n,
       },
     });
     return assists;
   }
+  async findByDateAndWorkforce(
+    date: Date,
+    workforce_id: number
+  ): Promise<Asistencia | null> {
+    const dateNew = date;
+    date.setUTCHours(0, 0, 0, 0);
+
+    const assists = await prisma.asistencia.findFirst({
+      where: {
+        fecha: dateNew,
+        mano_obra_id: workforce_id,
+        eliminado: E_Estado_BD.n,
+      },
+    });
+    return assists;
+  }
+
   async findByIdMoAndDate(mano_obra_id: number): Promise<Asistencia | null> {
     const date = new Date();
     // const peruOffset = -5 * 60;

@@ -39,6 +39,32 @@ class AssistsWorkforceValidation {
       );
     }
   }
+  async findByDateAndWorkforce(
+    date: Date,
+    workforce_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.findByDateAndWorkforce(
+        date,
+        workforce_id
+      );
+      if (!assists) {
+        return httpResponse.NotFoundException(
+          "No se encontró Asistencia para esa fecha con ese trabajador"
+        );
+      }
+
+      return httpResponse.SuccessResponse(
+        "Asistencia con ese trabajador encontrada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia con ese trabajador",
+        error
+      );
+    }
+  }
 
   async findByDateAndMO(mano_obra_id: number): Promise<T_HttpResponse> {
     try {
@@ -80,12 +106,14 @@ class AssistsWorkforceValidation {
   }
   async updateAssists(
     data: I_UpdateAssitsBD,
-    daily_part_id: number
+    assists_id: number,
+    workforce_id: number
   ): Promise<T_HttpResponse> {
     try {
       const assistsUpdate = await prismaAssistsRepository.updateAssists(
         data,
-        daily_part_id
+        assists_id,
+        workforce_id
       );
 
       return httpResponse.SuccessResponse(

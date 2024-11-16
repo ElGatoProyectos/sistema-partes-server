@@ -174,21 +174,24 @@ class DailyPartMOService {
     }
     const date = dailyPart.fecha;
     date.setUTCHours(0, 0, 0, 0);
-    console.log(date);
-    const assistsResponse = await assistsWorkforceValidation.findByDate(date);
+    const assistsResponse =
+      await assistsWorkforceValidation.findByDateAndWorkforce(
+        date,
+        dailyPartMO.mano_obra_id
+      );
     if (!assistsResponse.success) {
       return assistsResponse;
     }
     const assists = assistsResponse.payload as Asistencia;
-    // console.log(data);
-    // console.log(
-    //   "resutado 0 de hacer  asistencia hora parcial " +
-    //     (assists.hora_parcial || 0) +
-    //     "DATA HORA PARCIAL " +
-    //     data.hora_parcial +
-    //     " parte diario mo " +
-    //     dailyPartMO.hora_parcial
-    // );
+    console.log(data);
+    console.log(
+      "resutado 0 de hacer  asistencia hora parcial " +
+        (assists.hora_parcial || 0) +
+        "DATA HORA PARCIAL " +
+        data.hora_parcial +
+        " parte diario mo " +
+        dailyPartMO.hora_parcial
+    );
     let hp = 0;
     if (
       assists.hora_parcial !== undefined &&
@@ -242,7 +245,11 @@ class DailyPartMOService {
       proyecto_id: assists.proyecto_id,
     };
 
-    await assistsWorkforceValidation.updateAssists(assistsFormat, assists.id);
+    await assistsWorkforceValidation.updateAssists(
+      assistsFormat,
+      assists.id,
+      dailyPartMO.mano_obra_id
+    );
   }
 
   async findAll(
@@ -338,9 +345,11 @@ class DailyPartMOService {
       if (dailyPart.fecha) {
         const date = dailyPart.fecha;
         date?.setUTCHours(0, 0, 0, 0);
-        const assistsResponse = await assistsWorkforceValidation.findByDate(
-          date
-        );
+        const assistsResponse =
+          await assistsWorkforceValidation.findByDateAndWorkforce(
+            date,
+            dailyPartMO.mano_obra_id
+          );
 
         if (!assistsResponse.success) {
           return httpResponse.BadRequestException(
@@ -414,7 +423,8 @@ class DailyPartMOService {
 
         await assistsWorkforceValidation.updateAssists(
           assistsFormat,
-          assists.id
+          assists.id,
+          dailyPartMO.mano_obra_id
         );
       }
 

@@ -28,6 +28,8 @@ export abstract class BankWorkforceRepository {
 
   findByDate(date: Date): void {}
 
+  findByDateAndWorkforce(date: Date, workforce_id: number): void {}
+
   findAllByWeek(
     skip: number,
     data: T_FindAllWeekAssists,
@@ -43,7 +45,11 @@ export abstract class BankWorkforceRepository {
 
   updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD): void {}
 
-  updateAssists(data: I_UpdateAssitsBD, daily_part_id: number): void {}
+  updateAssists(
+    data: I_UpdateAssitsBD,
+    daily_part_id: number,
+    workforce_id: number
+  ): void {}
 
   updateStatusAssists(assists_id: number): void {}
 

@@ -8,6 +8,7 @@ import {
   T_FindAllDailyPart,
   T_FindAllDailyPartForJob,
 } from "./models/dailyPart.types";
+import { reportService } from "./dailyPartPdf/report.service";
 
 class DailyPartController {
   async create(request: express.Request, response: express.Response) {
@@ -38,6 +39,11 @@ class DailyPartController {
   async findById(request: express.Request, response: express.Response) {
     const id = Number(request.params.id);
     const result = await dailyPartService.findById(id);
+    response.status(result.statusCode).json(result);
+  }
+  async findReport(request: express.Request, response: express.Response) {
+    const id = Number(request.params.id);
+    const result = await reportService.crearInforme(id);
     response.status(result.statusCode).json(result);
   }
   async findByInformation(
