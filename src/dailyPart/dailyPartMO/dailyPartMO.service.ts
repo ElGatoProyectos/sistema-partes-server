@@ -150,6 +150,7 @@ class DailyPartMOService {
         updateDailyPartMO
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Parte Diario MO",
         error
@@ -173,18 +174,58 @@ class DailyPartMOService {
     }
     const date = dailyPart.fecha;
     date.setUTCHours(0, 0, 0, 0);
+    console.log(date);
     const assistsResponse = await assistsWorkforceValidation.findByDate(date);
+    if (!assistsResponse.success) {
+      return assistsResponse;
+    }
     const assists = assistsResponse.payload as Asistencia;
+    // console.log(data);
+    // console.log(
+    //   "resutado 0 de hacer  asistencia hora parcial " +
+    //     (assists.hora_parcial || 0) +
+    //     "DATA HORA PARCIAL " +
+    //     data.hora_parcial +
+    //     " parte diario mo " +
+    //     dailyPartMO.hora_parcial
+    // );
+    let hp = 0;
+    if (
+      assists.hora_parcial !== undefined &&
+      assists.hora_parcial !== null &&
+      dailyPartMO.hora_parcial !== undefined &&
+      dailyPartMO.hora_parcial !== null
+    ) {
+      hp = assists.hora_parcial + data.hora_parcial - dailyPartMO.hora_parcial;
+    }
+    let hn = 0;
+    if (
+      assists.hora_normal !== undefined &&
+      assists.hora_normal !== null &&
+      dailyPartMO.hora_normal !== undefined &&
+      dailyPartMO.hora_normal !== null
+    ) {
+      hn = assists.hora_normal + data.hora_normal - dailyPartMO.hora_normal;
+    }
+    let h60 = 0;
+    if (
+      assists.horas_60 !== undefined &&
+      assists.horas_60 !== null &&
+      dailyPartMO.hora_60 !== undefined &&
+      dailyPartMO.hora_60 !== null
+    ) {
+      h60 = assists.horas_60 + data.hora_60 - dailyPartMO.hora_60;
+    }
+    let h100 = 0;
+    if (
+      assists.horas_100 !== undefined &&
+      assists.horas_100 !== null &&
+      dailyPartMO.hora_100 !== undefined &&
+      dailyPartMO.hora_100 !== null
+    ) {
+      h100 = assists.horas_100 + data.hora_100 - dailyPartMO.hora_100;
+    }
 
-    const hp =
-      (assists.hora_parcial || 0) +
-      data.hora_parcial -
-      dailyPartMO.hora_parcial;
-    const hn =
-      (assists.hora_normal || 0) + data.hora_normal - dailyPartMO.hora_normal;
-    const h60 = (assists.horas_60 || 0) + data.hora_60 - dailyPartMO.hora_60;
-    const h100 =
-      (assists.horas_100 || 0) + data.hora_100 - dailyPartMO.hora_100;
     const horas_trabajadas = hp + hn + h60 + h100;
     const assistsFormat = {
       fecha: assists.fecha,
