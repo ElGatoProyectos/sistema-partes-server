@@ -386,16 +386,20 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       );
       const week = weekResponse.payload as Semana;
       filters.fecha = {
-        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
-        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+        // gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        // lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+        gte: week.fecha_inicio,
+        lte: week.fecha_fin,
       };
     }
     if (data.queryParams.date) {
       filters.fecha = {
-        gte: new Date(new Date(data.queryParams.date).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
-        lte: new Date(
-          new Date(data.queryParams.date).setHours(23, 59, 59, 999)
-        ),
+        // gte: new Date(new Date(data.queryParams.date).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        // lte: new Date(
+        //   new Date(data.queryParams.date).setHours(23, 59, 59, 999)
+        // ),
+        gte: new Date(new Date(data.queryParams.date).setUTCHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
+        lte: new Date(new Date(data.queryParams.date).setUTCHours(0, 0, 0, 0)),
       };
       if (data.queryParams.search) {
         filtersName.nombre_completo = {
@@ -407,14 +411,15 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
         filters.estado_asignacion = result;
       }
     }
+
     if (data.queryParams.week && data.queryParams.date) {
       const weekResponse = await weekValidation.findByCode(
         data.queryParams.week
       );
       const week = weekResponse.payload as Semana;
       filters.fecha = {
-        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
-        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+        gte: week.fecha_inicio,
+        lte: week.fecha_fin,
       };
       if (data.queryParams.search) {
         filtersName.nombre_completo = {
@@ -485,8 +490,8 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     const weekResponse = await weekValidation.findByDate(date);
     const week = weekResponse.payload as Semana;
     filters.fecha = {
-      gte: week.fecha_inicio, // Mayor o igual a la fecha de inicio
-      lte: week.fecha_fin, // Fin del día
+      gte: week.fecha_inicio,
+      lte: week.fecha_fin,
     };
     let filtersName: any = {};
     if (data.queryParams.week) {
@@ -495,8 +500,8 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       );
       const week = weekResponse.payload as Semana;
       filters.fecha = {
-        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)), // Mayor o igual a la fecha de inicio
-        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)), // Fin del día
+        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)),
+        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)),
       };
     }
     if (data.queryParams.search) {
