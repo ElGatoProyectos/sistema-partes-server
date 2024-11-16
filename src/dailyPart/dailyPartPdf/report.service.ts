@@ -1,37 +1,28 @@
 import { TemplateHtmlInforme } from "../../../static/templates/template-html";
 import { TemplateHtmlInformeParteDiario } from "../../../static/templates/template-informe-html";
+import { httpResponse } from "../../common/http.response";
 import { DailyPartPdfService } from "./dailyPartPdf.service";
 
 const pdfService = new DailyPartPdfService();
 
 export class ReportService {
-  async crearInforme() {
+  async crearInforme(daily_part_id: number) {
     try {
-      // AQUI COLOCARIAS EL ID DEL USUARIO ACTUAL
-      const id = "1";
       const user_id = 1;
+      const dailyString = String(daily_part_id);
+      pdfService.deleteImages(user_id, dailyString);
 
-      pdfService.deleteImages(user_id, id);
+      await pdfService.createImage(user_id, dailyString, {});
 
-      await pdfService.createImage(user_id, id, {});
+      const template = TemplateHtmlInforme(user_id, dailyString);
 
-      const template = TemplateHtmlInforme(user_id, id);
+      await pdfService.createPdf(template, dailyString, user_id);
 
-      await pdfService.createPdf(template, id, user_id);
-
-      return {
-        success: true,
-        message: "Error",
-        payload: {
-          id,
-          user_id,
-        },
-      };
+      return httpResponse.SuccessResponse("Éxito al hacer el Reporte");
     } catch (error) {
-      return {
-        success: false,
-        message: "Error al crear informe",
-      };
+      return httpResponse.BadRequestException(
+        "Hubo un error en crear el Reporte"
+      );
     }
   }
 
@@ -63,3 +54,5 @@ export class ReportService {
     }
   }
 }
+
+export const reportService = new ReportService();
