@@ -2,11 +2,23 @@ import { DetalleParteDiarioFoto } from "@prisma/client";
 import { DailyPartPhotoRepository } from "./dailyPartPhotos.repository";
 import {
   I_CreateDetailPhotosBD,
+  I_CreateDetailPhotosBody,
   I_UpdateDetailPhotosBD,
+  ResponseDetailPhotosBody,
 } from "./models/dailyPart.interface";
 import prisma from "../../config/prisma.config";
 
 class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
+  async findComentaryOfDetail(
+    daily_part_id: number
+  ): Promise<DetalleParteDiarioFoto | null> {
+    const detail = prisma.detalleParteDiarioFoto.findFirst({
+      where: {
+        parte_diario_id: daily_part_id,
+      },
+    });
+    return detail;
+  }
   async createDailyPartPhotos(
     data: I_CreateDetailPhotosBD
   ): Promise<DetalleParteDiarioFoto | null> {
@@ -29,13 +41,20 @@ class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
   }
   async findByDetailForDailyPart(
     daily_part_id: number
-  ): Promise<DetalleParteDiarioFoto | null> {
+  ): Promise<ResponseDetailPhotosBody | null> {
     const detail = await prisma.detalleParteDiarioFoto.findFirst({
       where: {
         parte_diario_id: daily_part_id,
       },
     });
-    return detail;
+    return {
+      comentary_one: detail?.comentario_uno ? detail?.comentario_uno : "",
+      comentary_two: detail?.comentario_dos ? detail?.comentario_dos : "",
+      comentary_three: detail?.comentario_tres ? detail?.comentario_tres : "",
+      comentary_four: detail?.comentario_cuatro
+        ? detail?.comentario_cuatro
+        : "",
+    };
   }
 }
 

@@ -179,6 +179,7 @@ class PrismaDailyPartRepository implements DailyPartRepository {
             eliminado: true,
           },
         },
+        Trabajo: true,
       },
       omit: {
         codigo: true,
@@ -192,10 +193,11 @@ class PrismaDailyPartRepository implements DailyPartRepository {
 
     if (!dailyPart) return null;
 
-    const { RiesgoParteDiario, ...rest } = dailyPart;
+    const { RiesgoParteDiario, Trabajo, ...rest } = dailyPart;
     return {
       ...rest,
       restriccion: RiesgoParteDiario,
+      nombre_trabajo: Trabajo.nombre,
     };
   }
 

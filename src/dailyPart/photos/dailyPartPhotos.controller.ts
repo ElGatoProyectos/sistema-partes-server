@@ -303,6 +303,15 @@ class DailyPartPhotosController {
       response.status(dailyPartResponse.statusCode).json(dailyPartResponse);
     }
   };
+
+  async findAllComentaryOfDetail(
+    request: express.Request,
+    response: express.Response
+  ) {
+    const id = Number(request.params.id);
+    const result = await dailyPartPhotoService.findComentaryOfDetail(id);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const dailyPartPhotosController = new DailyPartPhotosController();

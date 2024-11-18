@@ -62,4 +62,5 @@ export interface I_DailyPartId
     | "RiesgoParteDiario"
   > {
   restriccion: I_RiskDailyPart | null;
+  nombre_trabajo: string;
 }

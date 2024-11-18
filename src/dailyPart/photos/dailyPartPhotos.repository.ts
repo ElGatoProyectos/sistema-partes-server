@@ -12,4 +12,6 @@ export abstract class DailyPartPhotoRepository {
   ): void {}
 
   findByDetailForDailyPart(daily_part_id: number): void {}
+
+  findComentaryOfDetail(daily_part_id: number): void {}
 }
