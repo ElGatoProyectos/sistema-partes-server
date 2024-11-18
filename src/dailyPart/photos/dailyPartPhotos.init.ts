@@ -7,6 +7,11 @@ const prefix = "/daily-part/:id/photos";
 
 dailyPartPhotosRouter.put(`${prefix}`, dailyPartPhotosController.put);
 dailyPartPhotosRouter.get(
+  `${prefix}`,
+  photoMiddleware.verifyHeadersFieldsId,
+  dailyPartPhotosController.findAllComentaryOfDetail
+);
+dailyPartPhotosRouter.get(
   `${prefix}/:numberPhoto`,
   photoMiddleware.verifyHeadersFieldsId,
   photoMiddleware.verifyHeadersFieldsNumberPhoto,

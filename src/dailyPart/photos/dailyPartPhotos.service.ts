@@ -12,6 +12,7 @@ import {
 } from "./models/dailyPart.interface";
 import { prismaDailyPartPhotoRepository } from "./prisma-dailyPartPhotos.repository";
 import { dailyPartPhotoValidation } from "./dailyPartPhotos.validation";
+import { prismaDailyPartRepository } from "../prisma-dailyPart.repository";
 
 class DailyPartPhotoService {
   async updateDetailDailyPartPhoto(
@@ -113,6 +114,31 @@ class DailyPartPhotoService {
       );
     } finally {
       await prisma.$disconnect;
+    }
+  }
+
+  async findComentaryOfDetail(daily_part_id: number): Promise<T_HttpResponse> {
+    try {
+      const dailyPart = await prismaDailyPartRepository.findById(daily_part_id);
+      if (!dailyPart) {
+        return httpResponse.NotFoundException(
+          "El Parte Diario no fue encontrado",
+          dailyPart
+        );
+      }
+      const detail =
+        await prismaDailyPartPhotoRepository.findByDetailForDailyPart(
+          daily_part_id
+        );
+      return httpResponse.SuccessResponse(
+        "El Detalle Parte Diario Foto fue encontrado",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Parte Diario Foto",
+        error
+      );
     }
   }
 }
