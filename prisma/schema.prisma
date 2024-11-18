@@ -781,29 +781,40 @@ model Asistencia {
 
 //[success] actual
 model ParteDiario {
-  id                     Int                   @id @default(autoincrement())
+  id                     Int                      @id @default(autoincrement())
   codigo                 String
   nombre                 String //
-  fecha                  DateTime?             @db.Date()
+  fecha                  DateTime?                @db.Date()
   etapa                  E_Etapa_Parte_Diario?
   jornada                String?
-  fecha_creacion         DateTime              @default(now())
+  fecha_creacion         DateTime                 @default(now())
   hora_inicio            String?
   hora_fin               String?
-  descripcion_actividad  String?               @db.Text()
-  nota                   String?               @db.Text()
+  descripcion_actividad  String?                  @db.Text()
+  nota                   String?                  @db.Text()
   distanciamiento        E_Estado_BD?
   protocolo_ingreso      E_Estado_BD?
   protocolo_salida       E_Estado_BD?
-  eliminado              E_Estado_BD           @default(n)
+  eliminado              E_Estado_BD              @default(n)
   riesto_parte_diario_id Int?
   trabajo_id             Int
   proyecto_id            Int
-  Proyecto               Proyecto              @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
-  RiesgoParteDiario      RiesgoParteDiario?    @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
-  Trabajo                Trabajo               @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
+  Proyecto               Proyecto                 @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  RiesgoParteDiario      RiesgoParteDiario?       @relation(fields: [riesto_parte_diario_id], references: [id], onDelete: Cascade)
+  Trabajo                Trabajo                  @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
   ParteDiarioMo          ParteDiarioMO[]
   ParteDiarioRecurso     ParteDiarioRecurso[]
+  DetalleParteDiarioFoto DetalleParteDiarioFoto[]
+}
+
+model DetalleParteDiarioFoto {
+  id                Int         @id @default(autoincrement())
+  comentario_uno    String?
+  comentario_dos    String?
+  comentario_tres   String?
+  comentario_cuatro String?
+  parte_diario_id   Int
+  ParteDiario       ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
 }
 
 //[success] actual

@@ -9,6 +9,12 @@ import {
   T_FindAllDailyPartForJob,
 } from "./models/dailyPart.types";
 import { reportService } from "./dailyPartPdf/report.service";
+import { authService } from "../auth/auth.service";
+import { httpResponse } from "../common/http.response";
+import path from "path";
+import appRootPath from "app-root-path";
+import { Request, Response } from "express";
+import fs from "fs";
 
 class DailyPartController {
   async create(request: express.Request, response: express.Response) {
@@ -43,8 +49,51 @@ class DailyPartController {
   }
   async findReport(request: express.Request, response: express.Response) {
     const id = Number(request.params.id);
-    const result = await reportService.crearInforme(id);
-    response.status(result.statusCode).json(result);
+
+    // const result = await reportService.crearInforme(id, "hola");
+    // response.status(result.statusCode).json(result);
+
+    const result: any = await reportService.crearInforme(id, "hola");
+
+    if (result.success && result.payload) {
+      let filePath = "";
+      filePath = path.join(
+        appRootPath.path,
+        "static",
+        "reports",
+        `informe-${result.payload.user_id}-${result.payload.id}.pdf`
+      );
+
+      if (fs.existsSync(filePath)) {
+        const stat = fs.statSync(filePath);
+        response.setHeader("Content-Length", stat.size);
+        response.setHeader("Content-Type", "application/pdf");
+        response.setHeader(
+          "Content-Disposition",
+          `attachment; filename="informe-diario.pdf"`
+        );
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(response);
+      } else {
+        response
+          .status(404)
+          .json({ success: false, message: "Archivo no encontrado" });
+      }
+    } else {
+      response.json(response);
+    }
+
+    // const tokenWithBearer = request.headers.authorization;
+    // if (tokenWithBearer) {
+    //   const result = await reportService.crearInforme(id, tokenWithBearer);
+    //   response.status(result.statusCode).json(result);
+    // } else {
+    //   const result = httpResponse.UnauthorizedException(
+    //     "Error en la autenticacion para hacer el reporte"
+    //   );
+    //   response.status(result.statusCode).json(result);
+    // }
   }
   async findByInformation(
     request: express.Request,

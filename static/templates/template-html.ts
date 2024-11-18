@@ -1,14 +1,92 @@
+import { DetalleTrabajoPartida } from "@prisma/client";
 import path from "path";
 import fs from "fs";
+import appRootPath from "app-root-path";
+import { ProjectMulterProperties } from "../../src/project/models/project.constant";
+import { I_DailyPart } from "../../src/dailyPart/models/dailyPart.interface";
+import prisma from "../../src/config/prisma.config";
 
-export const TemplateHtmlInforme = (user_id: number, id: string) => {
-  const imagePath = path.resolve(
-    __dirname,
-    "/static/charts/chart-" + user_id + "-" + id + ".png"
+export const TemplateHtmlInforme = async (
+  user_id: number,
+  id: string,
+  daily_part: I_DailyPart
+) => {
+  const imagePath = path.join(
+    appRootPath.path,
+    "static",
+    "charts",
+    `chart-${user_id}-${id}.png`
   );
   const base64Image = fs.readFileSync(imagePath).toString("base64");
   const base64Type = `data:image/png;base64,${base64Image}`;
-  // <img src="${base64Type}" alt="Chart Image" />
+
+  const imagePathProject = path.join(
+    appRootPath.path,
+    "static",
+    ProjectMulterProperties.folder,
+    ProjectMulterProperties.folder + "_" + daily_part.proyecto_id + ".png"
+  );
+  const base64ImageProject = fs
+    .readFileSync(imagePathProject)
+    .toString("base64");
+  const base64TypeProject = `data:image/png;base64,${base64ImageProject}`;
+
+  const details = await prisma.detalleTrabajoPartida.findMany({
+    where: {
+      trabajo_id: daily_part.trabajo_id,
+    },
+    include: {
+      Trabajo: {
+        include: {
+          UnidadProduccion: true,
+        },
+      },
+      Partida: {
+        include: {
+          Unidad: true,
+        },
+      },
+    },
+  });
+
+  const tableRowsJobs = details
+    .map((detail) => {
+      return `
+        <tr>
+          <td>${detail.Trabajo?.codigo || "N/A"}</td>
+          <td>${detail.Trabajo?.nombre || "N/A"}</td>
+          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+        </tr>
+      `;
+    })
+    .join("");
+  const tableRowsDetailsJobs = details
+    .map((detail) => {
+      return `
+        <tr>
+          <td>${detail.Trabajo?.codigo || "N/A"}</td>
+          <td>${detail.Trabajo?.nombre || "N/A"}</td>
+          <td>${detail.Trabajo?.costo_equipo || "N/A"}</td>
+          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+        </tr>
+      `;
+    })
+    .join("");
+  const tableRowsDetailsDepartures = details
+    .map((detail) => {
+      return `
+        <tr>
+          <td>${detail.Partida?.item || "N/A"}</td>
+          <td>${detail.Partida?.partida || "N/A"}</td>
+          <td>${detail.Partida?.Unidad?.simbolo || "N/A"}</td>
+          <td>${detail.metrado_utilizado || "N/A"}</td>
+          <td>$${detail.Partida.precio || "N/A"}</td>
+          <td>$${detail.Partida.parcial || "N/A"}</td>
+        </tr>
+      `;
+    })
+    .join("");
 
   return `
   
@@ -50,7 +128,7 @@ export const TemplateHtmlInforme = (user_id: number, id: string) => {
     <table class="table" border="1">
         <tr>
           <td rowspan="2">
-            <img width="200" src="https://img.freepik.com/vector-premium/diseno-logotipo-minimalista-cualquier-empresa-negocios-marca-corporativa_1253202-77511.jpg?semt=ais_hybrid" alt="Chart Image" />
+            <img width="200" src="${base64TypeProject}" alt="Chart Image" />
           </td>
           <td><strong>INFORME DE PRODUCCIÓN</strong></td>
           <td><strong>Fecha</strong></td>
@@ -84,24 +162,7 @@ export const TemplateHtmlInforme = (user_id: number, id: string) => {
           <td><span>ACTIVIDADES</span></td>
           <td><span>UNIDAD DE PRODUCCIÓN</span></td>
         </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>Colocación De Acero En Columnas</td>
-          <td>Bloque A</td>
-        </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>Colocación De Acero En Columnas</td>
-          <td>Bloque A</td>
-        </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>Colocación De Acero En Columnas</td>
-          <td>Bloque A</td>
-        </tr>
+         ${tableRowsJobs}
       </table>
 
       <br />
@@ -123,24 +184,7 @@ export const TemplateHtmlInforme = (user_id: number, id: string) => {
           <td><span>COSTO DE PRODUCCION</span></td>
           <td><span>UNIDAD DE PRODUCCION</span></td>
         </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>S/. 3500.00</td>
-          <td>Bloque A</td>
-        </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>S/. 3500.00</td>
-          <td>Bloque A</td>
-        </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero – Bloque A</td>
-          <td>S/. 3500.00</td>
-          <td>Bloque A</td>
-        </tr>
+         ${tableRowsDetailsJobs}
       </table>
       <br />
       <br />
@@ -163,14 +207,7 @@ export const TemplateHtmlInforme = (user_id: number, id: string) => {
           <td><span>COSTO UNITARIO</span></td>
           <td><span>PARCIAL</span></td>
         </tr>
-        <tr>
-          <td>01.01</td>
-          <td>Acero En Columnas</td>
-          <td>Kg</td>
-          <td>800</td>
-          <td>S/ 5.07</td>
-          <td>S/. 4056.00</td>
-        </tr>
+       ${tableRowsDetailsDepartures}
       </table>
 
       <br />
