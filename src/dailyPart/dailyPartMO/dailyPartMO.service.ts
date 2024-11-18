@@ -80,9 +80,9 @@ class DailyPartMOService {
         project_id
       );
 
-      if (idsMOAsigned.length > 0) {
+      if (idsMOInStateAssigned.length > 0) {
         await assistsWorkforceValidation.updateManyAsignedX2(
-          idsMOAsigned,
+          idsMOInStateAssigned,
           project_id
         );
       }
