@@ -24,4 +24,6 @@ export abstract class DepartureRepository {
   codeMoreHigh(project_id: number): void {}
 
   isLastId(project_id: number): void {}
+
+  updateMetradoTotal(departure_id: number, total: number): void {}
 }

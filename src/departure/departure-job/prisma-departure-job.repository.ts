@@ -8,6 +8,16 @@ import {
 import { I_DetailDepartureJob } from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
+  async findAllWithOutPaginationForDeparture(
+    departure_id: number
+  ): Promise<DetalleTrabajoPartida[] | null> {
+    const details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        partida_id: departure_id,
+      },
+    });
+    return details;
+  }
   async findAllWithOutPaginationForJob(
     job_id: number
   ): Promise<DetalleTrabajoPartida[] | null> {
@@ -78,6 +88,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       total,
     };
   }
+
   async findAllWithOutPagination(
     project_id: number
   ): Promise<DetalleTrabajoPartida[] | null> {

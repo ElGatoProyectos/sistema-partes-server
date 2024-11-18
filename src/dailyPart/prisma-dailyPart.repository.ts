@@ -14,6 +14,30 @@ import {
 import { converToDate } from "../common/utils/date";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
+  // const data = ids.map((id) => ({
+  //   parte_diario_id: daily_part_id,
+  //   recurso_id: id,
+  //   cantidad: 0,
+  //   proyecto_id: project_id,
+  // }));
+
+  // await prisma.parteDiarioRecurso.createMany({
+  //   data: data,
+  // });
+
+  async findAllForDate(): Promise<ParteDiario[] | null> {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    const dailyParts = await prisma.parteDiario.findMany({
+      where: {
+        fecha: date,
+      },
+      include: {
+        Trabajo: true,
+      },
+    });
+    return dailyParts;
+  }
   async findAllForProject(
     skip: number,
     data: T_FindAllDailyPart,

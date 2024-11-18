@@ -36,4 +36,6 @@ export abstract class DailyPartRepository {
     data: T_FindAllDailyPart,
     project_id: number
   ): void {}
+
+  findAllForDate(): void {}
 }

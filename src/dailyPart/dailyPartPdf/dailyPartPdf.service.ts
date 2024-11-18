@@ -25,7 +25,7 @@ export class DailyPartPdfService {
     return options;
   }
 
-  async createImage(user_id: number, id: string, data: any) {
+  async createImage(user_id: number) {
     const chart = new QuickChart();
     //[note] como lo vamos a crear y configurar del gráfico
     chart
@@ -55,7 +55,7 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "charts",
-      `chart-${user_id}-${id}.png`
+      `chart-${user_id}.png`
     );
     //[note] Guarda el buffer binario en el sistema de archivos
     fs.writeFileSync(direction, imageBuffer);
@@ -63,9 +63,9 @@ export class DailyPartPdfService {
 
   //[message] crean diferentes templates los próximos métodos
 
-  async createPdf(template: string, id: string, user_id: number) {
+  async createPdf(template: string, user_id: number) {
     //[note] hacemos esto para eliminar que no haya pdfs duplicados
-    this.deletePdfs(user_id, id);
+    this.deletePdfs(user_id);
 
     //[note] abajo inicias puppeter y abris un navegador para empezar a generarlo
     const options = this.createOptionSandBox();
@@ -95,13 +95,13 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "reports",
-      `informe-${user_id}-${id}.pdf`
+      `informe-${user_id}.pdf`
     );
     await fs.promises.writeFile(direction, pdfBuffer);
   }
 
-  async createPdfPD(template: string, id: string, user_id: number) {
-    this.deletePdfsPD(user_id, id);
+  async createPdfPD(template: string, user_id: number) {
+    this.deletePdfsPD(user_id);
 
     const options = this.createOptionSandBox();
 
@@ -123,12 +123,12 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "reports-pd",
-      `informe-${user_id}-${id}.pdf`
+      `informe-${user_id}.pdf`
     );
     await fs.promises.writeFile(direction, pdfBuffer);
   }
 
-  deletePdfs(user_id: number, currentId: string) {
+  deletePdfs(user_id: number) {
     const directory = path.join(appRootPath.path, "static", "reports");
     // const directory = path.resolve(__dirname, "static/reports");
 
@@ -140,11 +140,12 @@ export class DailyPartPdfService {
 
       files.forEach((file) => {
         // Verificar si el archivo es un PDF y corresponde al user_id
-        const userPrefix = `informe-${user_id}-`;
+        // const userPrefix = `informe-${user_id}-`;
+        const userPrefix = `informe-`;
         if (
           file.endsWith(".pdf") &&
           file.startsWith(userPrefix) &&
-          !file.includes(currentId)
+          !file.includes(String(user_id))
         ) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
@@ -159,7 +160,7 @@ export class DailyPartPdfService {
     });
   }
 
-  deletePdfsPD(user_id: number, currentId: string) {
+  deletePdfsPD(user_id: number) {
     const directory = path.join(appRootPath.path, "static", "reports-pd");
     // const directory = path.resolve(__dirname, "reports-pd");
 
@@ -171,11 +172,12 @@ export class DailyPartPdfService {
 
       files.forEach((file) => {
         // Verificar si el archivo es un PDF y corresponde al user_id
-        const userPrefix = `informe-${user_id}-`;
+        // const userPrefix = `informe-${user_id}-`;
+        const userPrefix = `informe-`;
         if (
           file.endsWith(".pdf") &&
           file.startsWith(userPrefix) &&
-          !file.includes(currentId)
+          !file.includes(String(user_id))
         ) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
@@ -190,7 +192,7 @@ export class DailyPartPdfService {
     });
   }
 
-  deleteImages(user_id: number, currentId: string) {
+  deleteImages(user_id: number) {
     const directory = path.join(appRootPath.path, "static", "charts");
     // const directory = path.resolve(__dirname, "charts");
     fs.readdir(directory, (err, files) => {
@@ -201,8 +203,9 @@ export class DailyPartPdfService {
 
       files.forEach((file) => {
         // Verificar si el archivo pertenece al user_id y no es la imagen actual
-        const userPrefix = `chart-${user_id}-`;
-        if (file.startsWith(userPrefix) && !file.includes(currentId)) {
+        // const userPrefix = `chart-${user_id}-`;
+        const userPrefix = `chart-`;
+        if (file.startsWith(userPrefix) && !file.includes(String(user_id))) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
             if (err) {

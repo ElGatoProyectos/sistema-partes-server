@@ -1,21 +1,24 @@
-import { DetalleTrabajoPartida } from "@prisma/client";
+import { DetalleTrabajoPartida, ParteDiario, Proyecto } from "@prisma/client";
 import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "../../src/project/models/project.constant";
-import { I_DailyPart } from "../../src/dailyPart/models/dailyPart.interface";
 import prisma from "../../src/config/prisma.config";
+import { dailyPartReportValidation } from "../../src/dailyPart/dailyPart.validation";
+import {
+  I_DailyPart,
+  I_ParteDiario,
+} from "../../src/dailyPart/models/dailyPart.interface";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
-  id: string,
-  daily_part: I_DailyPart
+  project: Proyecto
 ) => {
   const imagePath = path.join(
     appRootPath.path,
     "static",
     "charts",
-    `chart-${user_id}-${id}.png`
+    `chart-${user_id}.png`
   );
   const base64Image = fs.readFileSync(imagePath).toString("base64");
   const base64Type = `data:image/png;base64,${base64Image}`;
@@ -24,16 +27,26 @@ export const TemplateHtmlInforme = async (
     appRootPath.path,
     "static",
     ProjectMulterProperties.folder,
-    ProjectMulterProperties.folder + "_" + daily_part.proyecto_id + ".png"
+    ProjectMulterProperties.folder + "_" + project.id + ".png"
   );
   const base64ImageProject = fs
     .readFileSync(imagePathProject)
     .toString("base64");
   const base64TypeProject = `data:image/png;base64,${base64ImageProject}`;
 
+  const dailyPartsResponse =
+    await dailyPartReportValidation.findByDateAllDailyPart();
+
+  const dailyParts = dailyPartsResponse.payload as I_ParteDiario[];
+
+  const idsJob = dailyParts.map((dailyPart) => dailyPart.trabajo_id);
+  // const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.);
+
   const details = await prisma.detalleTrabajoPartida.findMany({
     where: {
-      trabajo_id: daily_part.trabajo_id,
+      trabajo_id: {
+        in: idsJob,
+      },
     },
     include: {
       Trabajo: {
@@ -49,11 +62,33 @@ export const TemplateHtmlInforme = async (
     },
   });
 
-  const tableRowsJobs = details
+  // const detailsMO = await prisma.parteDiarioMO.findMany({
+  //   where: {
+  //    ParteDiario:{
+  //     id:{
+  //       in:
+  //     }
+  //    }
+  //   },
+  //   include: {
+  //     Trabajo: {
+  //       include: {
+  //         UnidadProduccion: true,
+  //       },
+  //     },
+  //     Partida: {
+  //       include: {
+  //         Unidad: true,
+  //       },
+  //     },
+  //   },
+  // });
+  //[note] acá muestro los partes diarios del día
+  const dailyPartsToday = dailyParts
     .map((detail) => {
       return `
         <tr>
-          <td>${detail.Trabajo?.codigo || "N/A"}</td>
+          <td>${detail.Trabajo.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
           <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
           <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
@@ -61,7 +96,8 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  const tableRowsDetailsJobs = details
+  //[note] acá el monto trabajo
+  const detailsForJob = details
     .map((detail) => {
       return `
         <tr>
@@ -73,6 +109,7 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
+  //[note] acá las partidas del día
   const tableRowsDetailsDepartures = details
     .map((detail) => {
       return `
@@ -162,7 +199,7 @@ export const TemplateHtmlInforme = async (
           <td><span>ACTIVIDADES</span></td>
           <td><span>UNIDAD DE PRODUCCIÓN</span></td>
         </tr>
-         ${tableRowsJobs}
+         ${dailyPartsToday}
       </table>
 
       <br />
@@ -184,7 +221,7 @@ export const TemplateHtmlInforme = async (
           <td><span>COSTO DE PRODUCCION</span></td>
           <td><span>UNIDAD DE PRODUCCION</span></td>
         </tr>
-         ${tableRowsDetailsJobs}
+         ${detailsForJob}
       </table>
       <br />
       <br />

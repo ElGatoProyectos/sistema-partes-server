@@ -1,4 +1,4 @@
-import { Trabajo } from "@prisma/client";
+import { Trabajo, UnidadProduccion } from "@prisma/client";
 
 export interface I_CreateJobBD
   extends Omit<
@@ -55,6 +55,12 @@ export interface I_JobExcel {
   MO: string;
   EQ: string;
   HE: string;
+}
+
+export interface I_Trabajo {
+  codigo: string;
+  nombre: string;
+  UnidadProduccion: UnidadProduccion;
 }
 
 // export interface I_CreateJobBody2

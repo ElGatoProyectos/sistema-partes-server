@@ -48,12 +48,13 @@ class DailyPartController {
     response.status(result.statusCode).json(result);
   }
   async findReport(request: express.Request, response: express.Response) {
-    const id = Number(request.params.id);
+    // const id = Number(request.params.id);
+    const project_id = request.get("project-id") as string;
 
     // const result = await reportService.crearInforme(id, "hola");
     // response.status(result.statusCode).json(result);
 
-    const result: any = await reportService.crearInforme(id, "hola");
+    const result: any = await reportService.crearInforme(1, project_id);
 
     if (result.success && result.payload) {
       let filePath = "";

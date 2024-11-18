@@ -21,12 +21,14 @@ export abstract class DepartureJobRepository {
     project_id: number
   ): void {}
   findAllWithOutPaginationForJob(job_id: number): void {}
+  findAllWithOutPaginationForDeparture(departure_id: number): void {}
   findAllForJob(
     skip: number,
     data: T_FindAllWork,
     project_id: number,
     job_id: number
   ): void {}
+
   findAllWithPaginationForDetail(
     skip: number,
     data: T_FindAllDepartureJob,
