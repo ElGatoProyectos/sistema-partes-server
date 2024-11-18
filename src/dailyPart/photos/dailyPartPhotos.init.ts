@@ -1,6 +1,6 @@
 import express from "../../config/express.config";
-import { photoMiddleware } from "./dailyPart.middlware";
-import { dailyPartPhotosController } from "./dailyPartController";
+import { photoMiddleware } from "./dailyPartPhotos.middlware";
+import { dailyPartPhotosController } from "./dailyPartPhotos.controller";
 
 const dailyPartPhotosRouter = express.Router();
 const prefix = "/daily-part/:id/photos";

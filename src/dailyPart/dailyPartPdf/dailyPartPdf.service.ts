@@ -54,7 +54,8 @@ export class DailyPartPdfService {
     direction = path.join(
       appRootPath.path,
       "static",
-      `charts/chart-${user_id}-${id}.png`
+      "charts",
+      `chart-${user_id}-${id}.png`
     );
     //[note] Guarda el buffer binario en el sistema de archivos
     fs.writeFileSync(direction, imageBuffer);
@@ -88,13 +89,13 @@ export class DailyPartPdfService {
     });
 
     await browser.close();
-
     //[note] acá es a donde lo vamos a guardar
     let direction = "";
     direction = path.join(
       appRootPath.path,
       "static",
-      `reports/informe-${user_id}-${id}.pdf`
+      "reports",
+      `informe-${user_id}-${id}.pdf`
     );
     await fs.promises.writeFile(direction, pdfBuffer);
   }
@@ -117,15 +118,19 @@ export class DailyPartPdfService {
     });
 
     await browser.close();
-
-    await fs.promises.writeFile(
-      "reports-pd/informe-" + user_id + "-" + id + ".pdf",
-      pdfBuffer
+    let direction = "";
+    direction = path.join(
+      appRootPath.path,
+      "static",
+      "reports-pd",
+      `informe-${user_id}-${id}.pdf`
     );
+    await fs.promises.writeFile(direction, pdfBuffer);
   }
 
   deletePdfs(user_id: number, currentId: string) {
-    const directory = path.resolve(__dirname, "static/reports");
+    const directory = path.join(appRootPath.path, "static", "reports");
+    // const directory = path.resolve(__dirname, "static/reports");
 
     fs.readdir(directory, (err, files) => {
       if (err) {
@@ -155,7 +160,8 @@ export class DailyPartPdfService {
   }
 
   deletePdfsPD(user_id: number, currentId: string) {
-    const directory = path.resolve(__dirname, "reports-pd");
+    const directory = path.join(appRootPath.path, "static", "reports-pd");
+    // const directory = path.resolve(__dirname, "reports-pd");
 
     fs.readdir(directory, (err, files) => {
       if (err) {
@@ -185,8 +191,8 @@ export class DailyPartPdfService {
   }
 
   deleteImages(user_id: number, currentId: string) {
-    const directory = path.resolve(__dirname, "charts");
-
+    const directory = path.join(appRootPath.path, "static", "charts");
+    // const directory = path.resolve(__dirname, "charts");
     fs.readdir(directory, (err, files) => {
       if (err) {
         console.error("Error al leer el directorio charts:", err);

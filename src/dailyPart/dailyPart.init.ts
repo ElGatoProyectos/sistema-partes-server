@@ -22,19 +22,6 @@ dailyPartRouter.post(
   dailyPartController.create
 );
 dailyPartRouter.get(
-  `${prefix}`,
-  dailyPartMiddleware.verifyHeadersFieldsIdProject,
-  authRoleMiddleware.authorizeRoles([
-    "ADMIN",
-    "USER",
-    "CONTROL_COSTOS",
-    "ASISTENTE_CONTROL_COSTOS",
-    "INGENIERO_PRODUCCION",
-    "ASISTENTE_PRODUCCION",
-  ]),
-  dailyPartController.all
-);
-dailyPartRouter.get(
   `${prefixWithReport}`,
   dailyPartMiddleware.verifyHeadersFieldsId,
   // authRoleMiddleware.authorizeRoles([
@@ -47,6 +34,20 @@ dailyPartRouter.get(
   // ]),
   dailyPartController.findReport
 );
+dailyPartRouter.get(
+  `${prefix}`,
+  dailyPartMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  dailyPartController.all
+);
+
 dailyPartRouter.get(
   `${prefix}/work/:id`,
   dailyPartMiddleware.verifyHeadersFieldsId,
