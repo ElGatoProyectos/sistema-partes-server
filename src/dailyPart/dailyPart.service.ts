@@ -35,6 +35,7 @@ import { I_DetailDepartureJob } from "../departure/departure-job/models/departur
 import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { priceHourWorkforceValidation } from "../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
+import { prismaDailyPartDepartureRepository } from "./dailyPartDeparture/prisma-dailyPartDeparture.repository";
 
 class DailyPartService {
   async createDailyPart(
@@ -74,6 +75,22 @@ class DailyPartService {
       const responseDailyPart = await prismaDailyPartRepository.createDailyPart(
         dailyPartFormat
       );
+
+      const detailDepartureJobResponse =
+        await departureJobValidation.findAllWithOutPaginationForJob(job.id);
+
+      const detailDepartureJob =
+        detailDepartureJobResponse.payload as DetalleTrabajoPartida[];
+
+      if (detailDepartureJob.length > 0 && responseDailyPart) {
+        const ids_departures = detailDepartureJob.map(
+          (detail) => detail.partida_id
+        );
+        await prismaDailyPartDepartureRepository.createDailyPartDeparture(
+          ids_departures,
+          responseDailyPart.id
+        );
+      }
 
       return httpResponse.CreatedResponse(
         "Parte Diario creado correctamente",

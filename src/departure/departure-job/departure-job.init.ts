@@ -74,6 +74,7 @@ departureJobRouter.get(
 
 //[note] esto es una api para dentro de  parte diario
 //[note] el id es del parte diario
+//[note] esto ya no se usa
 departureJobRouter.get(
   `${prefixWithIdJob}`,
   authRoleMiddleware.authorizeRoles([

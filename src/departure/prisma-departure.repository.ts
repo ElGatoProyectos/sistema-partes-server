@@ -9,6 +9,20 @@ import { T_FindAllDeparture } from "./models/departure.types";
 import prisma from "../config/prisma.config";
 
 class PrismaDepartureRepository implements DepartureRepository {
+  async updateMetradoTotal(
+    departure_id: number,
+    total: number
+  ): Promise<Partida | null> {
+    const departure = await prisma.partida.update({
+      where: {
+        id: departure_id,
+      },
+      data: {
+        metrado_total: total,
+      },
+    });
+    return departure;
+  }
   async findAllWithOutPagination(
     project_id: number
   ): Promise<Partida[] | null> {

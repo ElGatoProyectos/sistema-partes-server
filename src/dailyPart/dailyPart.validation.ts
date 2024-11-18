@@ -113,6 +113,20 @@ class DailyPartReportValidation {
       );
     }
   }
+  async findByDateAllDailyPart(): Promise<T_HttpResponse> {
+    try {
+      const dailyParts = await prismaDailyPartRepository.findAllForDate();
+      return httpResponse.SuccessResponse(
+        "Los Partes Diarios del Día fueron encontrado correctamente",
+        dailyParts
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer los Partes Diarios del día",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartReportValidation = new DailyPartReportValidation();

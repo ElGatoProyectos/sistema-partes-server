@@ -1,7 +1,6 @@
 import { httpResponse, T_HttpResponse } from "../common/http.response";
 import { prismaDepartureRepository } from "./prisma-departure.repository";
 import { I_DepartureExcel } from "./models/departure.interface";
-import { unitValidation } from "../unit/unit.validation";
 import { Partida, Unidad } from "@prisma/client";
 
 class DepartureValidation {
@@ -181,6 +180,32 @@ class DepartureValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al buscar código de la Partida",
+        error
+      );
+    }
+  }
+  async updateDepartureMetradoTotal(
+    departure_id: number,
+    total: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const departure = await prismaDepartureRepository.updateMetradoTotal(
+        departure_id,
+        total
+      );
+      if (!departure) {
+        return httpResponse.NotFoundException(
+          "No se pudo actualizar con el nuevo metrado ",
+          departure
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "Metrado Total actualizado con éxito",
+        departure
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al editar la partida con su nuevo metrado total",
         error
       );
     }

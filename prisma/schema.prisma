@@ -636,6 +636,7 @@ model Partida {
   ReportePartida        ReportePartida[]
   Proyecto              Proyecto                @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   DetalleTrabajoPartida DetalleTrabajoPartida[]
+  ParteDiarioPartida    ParteDiarioPartida[]
 }
 
 //[success] actual
@@ -805,6 +806,16 @@ model ParteDiario {
   ParteDiarioMo          ParteDiarioMO[]
   ParteDiarioRecurso     ParteDiarioRecurso[]
   DetalleParteDiarioFoto DetalleParteDiarioFoto[]
+  ParteDiarioPartida     ParteDiarioPartida[]
+}
+
+model ParteDiarioPartida {
+  id                 Int         @id @default(autoincrement())
+  parte_diario_id    Int
+  partida_id         Int
+  cantidad_utilizada Float
+  Partida            Partida     @relation(fields: [partida_id], references: [id], onDelete: Cascade)
+  ParteDiario        ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
 }
 
 model DetalleParteDiarioFoto {
