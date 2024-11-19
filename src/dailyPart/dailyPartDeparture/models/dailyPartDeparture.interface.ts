@@ -5,7 +5,7 @@ export interface UpdateDailyPartDeparture
   extends Omit<ParteDiarioPartida, "id"> {}
 
 export interface I_DailyPartDepartureBody {
-  cuantity_used: number;
+  quantity_used: number;
 }
 
 export interface I_DailyPartDeparture {

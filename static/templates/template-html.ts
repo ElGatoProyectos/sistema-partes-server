@@ -1,4 +1,10 @@
-import { DetalleTrabajoPartida, ParteDiario, Proyecto } from "@prisma/client";
+import {
+  DetallePrecioHoraMO,
+  DetalleTrabajoPartida,
+  ParteDiario,
+  PrecioHoraMO,
+  Proyecto,
+} from "@prisma/client";
 import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
@@ -9,6 +15,8 @@ import {
   I_DailyPart,
   I_ParteDiario,
 } from "../../src/dailyPart/models/dailyPart.interface";
+import { priceHourWorkforceValidation } from "../../src/workforce/priceHourWorkforce/priceHourWorkforce.valdation";
+import { detailPriceHourWorkforceValidation } from "../../src/workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
@@ -40,7 +48,7 @@ export const TemplateHtmlInforme = async (
   const dailyParts = dailyPartsResponse.payload as I_ParteDiario[];
 
   const idsJob = dailyParts.map((dailyPart) => dailyPart.trabajo_id);
-  // const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.);
+  const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.id);
 
   const details = await prisma.detalleTrabajoPartida.findMany({
     where: {
@@ -62,27 +70,17 @@ export const TemplateHtmlInforme = async (
     },
   });
 
-  // const detailsMO = await prisma.parteDiarioMO.findMany({
-  //   where: {
-  //    ParteDiario:{
-  //     id:{
-  //       in:
-  //     }
-  //    }
-  //   },
-  //   include: {
-  //     Trabajo: {
-  //       include: {
-  //         UnidadProduccion: true,
-  //       },
-  //     },
-  //     Partida: {
-  //       include: {
-  //         Unidad: true,
-  //       },
-  //     },
-  //   },
-  // });
+  let productionForDay = 0;
+  let totalProductionWorkforce = 0;
+  if (details.length > 0) {
+    details.map((detail) => {
+      productionForDay += detail.metrado_utilizado * detail.Partida.precio;
+
+      totalProductionWorkforce +=
+        detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
+    });
+  }
+
   //[note] acá muestro los partes diarios del día
   const dailyPartsToday = dailyParts
     .map((detail) => {
@@ -90,7 +88,7 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>${detail.Trabajo.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
-          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+          <td>${detail.nombre || "N/A"}</td>
           <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
         </tr>
       `;
@@ -103,23 +101,147 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>${detail.Trabajo?.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
-          <td>${detail.Trabajo?.costo_equipo || "N/A"}</td>
+          <td>${detail.Trabajo?.costo_partida || "N/A"}</td>
           <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
         </tr>
       `;
     })
     .join("");
+
   //[note] acá las partidas del día
-  const tableRowsDetailsDepartures = details
+  const detailsDailyPartDeparture = await prisma.parteDiarioPartida.findMany({
+    where: {
+      ParteDiario: {
+        id: {
+          in: idsDailyPart,
+        },
+      },
+    },
+    include: {
+      Partida: {
+        include: {
+          Unidad: true,
+        },
+      },
+    },
+  });
+  const tableRowsDetailsDepartures = detailsDailyPartDeparture
     .map((detail) => {
       return `
         <tr>
           <td>${detail.Partida?.item || "N/A"}</td>
           <td>${detail.Partida?.partida || "N/A"}</td>
           <td>${detail.Partida?.Unidad?.simbolo || "N/A"}</td>
-          <td>${detail.metrado_utilizado || "N/A"}</td>
+          <td>${detail.cantidad_utilizada || "N/A"}</td>
           <td>$${detail.Partida.precio || "N/A"}</td>
           <td>$${detail.Partida.parcial || "N/A"}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  //[note] buscamos el personal del día que esta en el Parte Diario
+  const dailyPartWorkforce = await prisma.parteDiarioMO.findMany({
+    where: {
+      ParteDiario: {
+        id: {
+          in: idsDailyPart,
+        },
+      },
+    },
+    include: {
+      ManoObra: {
+        include: {
+          CategoriaObrero: true,
+        },
+      },
+    },
+  });
+
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  let workforces: any = [];
+  const priceHourResponse = await priceHourWorkforceValidation.findByDate(date);
+  let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
+  let totalRealWorkforceProduction = 0;
+  if (priceHourResponse.success && dailyPartWorkforce.length > 0) {
+    const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
+    const detailsPriceHourMOResponse =
+      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+        priceHourMO.id
+      );
+    detailsPriceHourMO =
+      detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+    dailyPartWorkforce.forEach((workforce) => {
+      if (workforce.ManoObra.CategoriaObrero) {
+        const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+
+        const detail = detailsPriceHourMO.find(
+          (detail) => detail.categoria_obrero_id === categoriaId
+        );
+
+        if (
+          detail &&
+          workforce.hora_60 &&
+          workforce.hora_100 &&
+          workforce.hora_normal
+        ) {
+          let sumaCategoryMO = 0;
+          totalProductionWorkforce +=
+            detail.hora_normal * workforce.hora_normal +
+            detail.hora_extra_60 * workforce.hora_60 +
+            detail.hora_extra_100 * workforce.hora_100;
+          sumaCategoryMO =
+            detail.hora_normal * workforce.hora_normal +
+            detail.hora_extra_60 * workforce.hora_60 +
+            detail.hora_extra_100 * workforce.hora_100;
+          //[note] si está todo bien vamos a hacer agregarlo
+          workforces.push({
+            codigo: workforce.ManoObra.codigo,
+            dni: workforce.ManoObra.documento_identidad,
+            nombre_completo:
+              workforce.ManoObra.nombre_completo +
+              workforce.ManoObra.apellido_materno +
+              workforce.ManoObra.apellido_paterno,
+            hora_normal: workforce.hora_normal,
+            hora_60: workforce.hora_60,
+            hora_100: workforce.hora_100,
+            costo_diario: sumaCategoryMO,
+          });
+        }
+      }
+    });
+  }
+
+  if (!priceHourResponse.success && dailyPartWorkforce.length > 0) {
+    //[note] esto lo hago por las dudas de que no haya cargado la tabla salarial o no haya una de acuerdo al día que lo imprime
+    dailyPartWorkforce.forEach((workforce) => {
+      workforces.push({
+        codigo: workforce.ManoObra.codigo,
+        dni: workforce.ManoObra.documento_identidad,
+        nombre_completo:
+          workforce.ManoObra.nombre_completo +
+          workforce.ManoObra.apellido_materno +
+          workforce.ManoObra.apellido_paterno,
+        hora_normal: workforce.hora_normal,
+        hora_60: workforce.hora_60,
+        hora_100: workforce.hora_100,
+        costo_diario: 0,
+      });
+    });
+  }
+
+  const tablaWorkfoces = workforces
+    .map((detail: any) => {
+      return `
+        <tr>
+          <td>${detail.codigo}</td>
+          <td>${detail.dni}</td>
+          <td>${detail.nombre_completo}</td>
+          <td>${detail.hora_normal}</td>
+          <td>$${detail.hora_60}</td>
+          <td>$${detail.hora_100}</td>
+          <td>$${detail.costo_diario}</td>
         </tr>
       `;
     })
@@ -269,15 +391,7 @@ export const TemplateHtmlInforme = async (
           <td><span>HORA EXTRA 100%</span></td>
           <td><span>COSTO DIARIO</span></td>
         </tr>
-        <tr>
-          <td>01</td>
-          <td>43429343</td>
-          <td>Dionisio Alejandro Bravo Ardela</td>
-          <td>8.5</td>
-          <td>2.0</td>
-          <td>1.0</td>
-          <td>S/. 150.00</td>
-        </tr>
+        ${tablaWorkfoces}
       </table>
       <br />
       <br />
@@ -300,10 +414,10 @@ export const TemplateHtmlInforme = async (
           <td><span>Desviación</span></td>
         </tr>
         <tr>
-          <td>S/. 2500.00</td>
-          <td>S/. 800.00</td>
-          <td>S/. 900.00</td>
-          <td style="color:red"">S/. -100.00</td>
+          <td>S/. ${productionForDay}</td>
+          <td>S/. ${totalProductionWorkforce}</td>
+          <td>S/. ${totalProductionWorkforce}</td>
+           ${formatCurrency(totalProductionWorkforce)}
         </tr>
       </table>
 
@@ -448,3 +562,10 @@ export const TemplateHtmlInforme_Header = () => {
 </html>
 `;
 };
+
+function formatCurrency(value: number): string {
+  const formattedValue = `S/. ${value.toFixed(2)}`;
+  return value < 0
+    ? `<td style="color:red">${formattedValue}</td>`
+    : `<td>${formattedValue}</td>`;
+}
