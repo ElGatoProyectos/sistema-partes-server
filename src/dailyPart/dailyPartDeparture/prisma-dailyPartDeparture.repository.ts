@@ -125,7 +125,7 @@ class PrismaDailyPartDepartureRepository
         parte_diario_partida_id: ResData.id,
         codigo: Partida.item,
         partida: Partida.partida,
-        unidad: Unidad?.nombre ? Unidad?.nombre : null,
+        unidad: Unidad?.simbolo ? Unidad?.simbolo : null,
         cantidad_utilizada: ResData.cantidad_utilizada,
       };
     });

@@ -42,7 +42,7 @@ class DailyPartDepartureService {
 
       const detail = detailResponse.payload as DetalleTrabajoPartida;
 
-      if (data.cuantity_used > detail.metrado_utilizado) {
+      if (data.quantity_used > detail.metrado_utilizado) {
         return httpResponse.BadRequestException(
           "La cantidad ingresada es superior a la establecida"
         );
@@ -51,7 +51,7 @@ class DailyPartDepartureService {
       const dailyPartDepartureFormat = {
         parte_diario_id: dailyPartDeparture.ParteDiario.id,
         partida_id: dailyPartDeparture.partida_id,
-        cantidad_utilizada: data.cuantity_used,
+        cantidad_utilizada: data.quantity_used,
       };
 
       const responseDailyPartDeparture =
