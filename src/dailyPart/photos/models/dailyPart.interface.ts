@@ -23,6 +23,7 @@ export interface I_CreateDetailPhotosBody {
   comentary_four?: string;
 }
 export interface ResponseDetailPhotosBody {
+  id?: number | null;
   comentary_one?: string | null;
   comentary_two?: string | null;
   comentary_three?: string | null;

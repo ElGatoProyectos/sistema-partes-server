@@ -6,11 +6,9 @@ import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
 class DailyPartDepartureController {
   async update(request: express.Request, response: express.Response) {
     const data = request.body as I_DailyPartDepartureBody;
-    const daily_part_id = Number(request.params.id);
     const daily_part_departure_id = Number(request.params.idDeparture);
     const result = await dailyPartDepartureService.updateDailyPartDeparture(
       data,
-      daily_part_id,
       daily_part_departure_id
     );
     if (!result.success) {

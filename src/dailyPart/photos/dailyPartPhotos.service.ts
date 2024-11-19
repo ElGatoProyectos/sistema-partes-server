@@ -40,7 +40,11 @@ class DailyPartPhotoService {
       const detailDailyPartPhotoResponse =
         await dailyPartPhotoValidation.findByIdValidation(daily_part_id);
 
-      if (detailDailyPartPhotoResponse.success) {
+      const detailDailyPartPhoto =
+        detailDailyPartPhotoResponse.payload as DetalleParteDiarioFoto;
+
+      if (detailDailyPartPhoto.id != null) {
+        console.log("entro a update");
         const detailDailyPartPhoto =
           detailDailyPartPhotoResponse.payload as DetalleParteDiarioFoto;
 
@@ -55,6 +59,7 @@ class DailyPartPhotoService {
           responseDailyPartPhotoUpdate
         );
       }
+      console.log("entro a crear");
 
       const responseDailyPartPhoto =
         await prismaDailyPartPhotoRepository.createDailyPartPhotos(
@@ -66,6 +71,7 @@ class DailyPartPhotoService {
         responseDailyPartPhoto
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al crear o modificar el Detalle Parte Diario Foto",
         error

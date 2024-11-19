@@ -22,9 +22,12 @@ class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
   async createDailyPartPhotos(
     data: I_CreateDetailPhotosBD
   ): Promise<DetalleParteDiarioFoto | null> {
+    console.log("------------");
+    console.log(data);
     const detail = await prisma.detalleParteDiarioFoto.create({
       data: data,
     });
+    console.log(detail);
     return detail;
   }
   async updateDailyPartPhotos(
@@ -48,6 +51,7 @@ class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
       },
     });
     return {
+      id: detail?.id ? detail.id : null,
       comentary_one: detail?.comentario_uno ? detail?.comentario_uno : "",
       comentary_two: detail?.comentario_dos ? detail?.comentario_dos : "",
       comentary_three: detail?.comentario_tres ? detail?.comentario_tres : "",
