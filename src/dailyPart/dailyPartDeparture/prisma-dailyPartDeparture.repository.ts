@@ -53,7 +53,11 @@ class PrismaDailyPartDepartureRepository
         id: daily_part_departure_id,
       },
       include: {
-        ParteDiario: true,
+        ParteDiario: {
+          include: {
+            Trabajo: true,
+          },
+        },
         Partida: true,
       },
     });
@@ -118,7 +122,7 @@ class PrismaDailyPartDepartureRepository
       const { Trabajo, ...data } = ParteDiario;
       const { Unidad } = Partida;
       return {
-        id: ResData.id,
+        parte_diario_partida_id: ResData.id,
         codigo: Partida.item,
         partida: Partida.partida,
         unidad: Unidad?.nombre ? Unidad?.nombre : null,

@@ -4,26 +4,20 @@ import prisma from "../../config/prisma.config";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import { I_DailyPart } from "../models/dailyPart.interface";
 import { dailyPartDepartureValidation } from "./dailyPartDeparture.validation";
-import { I_DailyPartDepartureBody } from "./models/dailyPartDeparture.interface";
+import {
+  I_DailyPartDeparture,
+  I_DailyPartDepartureBody,
+} from "./models/dailyPartDeparture.interface";
 import { prismaDailyPartDepartureRepository } from "./prisma-dailyPartDeparture.repository";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
 import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
-import { prismaDepartureJobRepository } from "../../departure/departure-job/prisma-departure-job.repository";
 
 class DailyPartDepartureService {
   async updateDailyPartDeparture(
     data: I_DailyPartDepartureBody,
-    daily_part_id: number,
     daily_part_departure_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const dailyPartResponse =
-        await dailyPartReportValidation.findByIdValidation(daily_part_id);
-      if (!dailyPartResponse.success) {
-        return dailyPartResponse;
-      }
-      const dailyPart = dailyPartResponse.payload as I_DailyPart;
-
       const dailyPartDepartureResponse =
         await dailyPartDepartureValidation.findByIdValidation(
           daily_part_departure_id
@@ -34,12 +28,12 @@ class DailyPartDepartureService {
       }
 
       const dailyPartDeparture =
-        dailyPartDepartureResponse.payload as ParteDiarioPartida;
+        dailyPartDepartureResponse.payload as I_DailyPartDeparture;
 
       const detailResponse =
         await departureJobValidation.findByForDepartureAndJob(
           dailyPartDeparture.partida_id,
-          dailyPart.Trabajo.id
+          dailyPartDeparture.ParteDiario.Trabajo.id
         );
 
       if (!detailResponse.success) {
@@ -55,7 +49,7 @@ class DailyPartDepartureService {
       }
 
       const dailyPartDepartureFormat = {
-        parte_diario_id: dailyPart.id,
+        parte_diario_id: dailyPartDeparture.ParteDiario.id,
         partida_id: dailyPartDeparture.partida_id,
         cantidad_utilizada: data.cuantity_used,
       };

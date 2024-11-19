@@ -4,7 +4,7 @@ import { dailyPartDepartureController } from "./dailyPartDeparture.controller";
 import { dailyPartDepartureMiddleware } from "./dailyPartDeparture.middleware";
 
 const dailyPartDepartureRouter = express.Router();
-const prefix = "/daily-part/:id/daily-part-departure";
+const prefix = "/daily-part-departure";
 const prefixDetail = "/daily-part/departure";
 const prefixWithDailyPartAndDetail = "/daily-part/:id/departure";
 
@@ -38,7 +38,6 @@ dailyPartDepartureRouter.get(
 
 dailyPartDepartureRouter.put(
   `${prefix}/:idDeparture`,
-  dailyPartDepartureMiddleware.verifyHeadersFieldsId,
   dailyPartDepartureMiddleware.verifyHeadersFieldsIdDeparture,
   authRoleMiddleware.authorizeRoles([
     "ADMIN",

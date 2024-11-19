@@ -51,64 +51,33 @@ class DepartureJobService {
 
       const departure = departureResponse.payload as Partida;
 
-      const detailsResponse =
-        await departureJobValidation.findAllWithOutPaginationForDeparture(
-          departure.id
-        );
-
-      const details = detailsResponse.payload as DetalleTrabajoPartida[];
-      let totalOld = 0;
-      if (details.length > 0) {
-        details.forEach((detail) => {
-          totalOld += detail.metrado_utilizado;
-        });
-        const totalMoreNewValore = totalOld + data.metrado;
-
-        if (totalMoreNewValore > departure.metrado_inicial) {
-          return httpResponse.BadRequestException(
-            "No puede colocar más métrado del que tiene la partida"
-          );
-        }
-      }
-
-      const detailFind = await departureJobValidation.findByForDepartureAndJob(
-        departure.id,
-        job.id
-      );
-      const detail = detailFind.payload as DetalleTrabajoPartida;
-      if (detailFind.success) {
-        const newMetrado = detail.metrado_utilizado + data.metrado;
-        const result = newMetrado > departure.metrado_total;
-        if (result) {
-          return httpResponse.BadRequestException(
-            "Se encontró un Detalle con el mismo Trabajo y Partida pero con esta última suma supera el metrado de la Partida"
-          );
-        }
-      }
-
       let additionMetradoPrice = 0;
       const resultadoMetradoPrecio = data.metrado * departure.precio;
 
       additionMetradoPrice = resultadoMetradoPrecio + job.costo_partida;
 
       let additionMetradoCostOfLabor = 0;
+
       const resultMetadoCostOfLabor =
         data.metrado * departure.mano_de_obra_unitaria;
       additionMetradoCostOfLabor =
         resultMetadoCostOfLabor + job.costo_mano_obra;
 
       let addtionMetadoMaterialCost = 0;
+
       const resultMetradoMaterialCost =
         data.metrado * departure.material_unitario;
       addtionMetadoMaterialCost =
         resultMetradoMaterialCost + job.costo_material;
 
       let addtionMetradoJobEquipment = 0;
+
       const resultMetradoJobEquipment =
         data.metrado * departure.equipo_unitario;
       addtionMetradoJobEquipment = resultMetradoJobEquipment + job.costo_equipo;
 
       let addtionMetradoJobSeveral = 0;
+
       const resultMetradoJobSeveral =
         data.metrado * departure.subcontrata_varios;
       addtionMetradoJobSeveral = resultMetradoJobSeveral + job.costo_varios;
@@ -122,39 +91,58 @@ class DepartureJobService {
         costo_varios: addtionMetradoJobSeveral,
       };
 
-      const jobUpdateResponse = await jobValidation.updateJob(
-        jobFormat,
-        job.id
-      );
-      if (!jobUpdateResponse.success) {
-        return httpResponse.BadRequestException(
-          "Hubo un problema para modificar el Trabajo de acuerdo a la Partida"
+      const detailFindResponse =
+        await departureJobValidation.findByForDepartureAndJob(
+          departure.id,
+          job.id
         );
-      }
-      const total = departure.metrado_total - data.metrado;
 
-      const updateDepartureResponse =
+      const detailFind = detailFindResponse.payload as DetalleTrabajoPartida;
+
+      let total = 0;
+
+      if (detailFindResponse.success) {
+        const newMetrado = detailFind.metrado_utilizado + data.metrado;
+        if (data.metrado > departure.metrado_total) {
+          return httpResponse.BadRequestException(
+            "Se encontró un Detalle con el mismo Trabajo y Partida pero se supera el metrado de la Partida"
+          );
+        }
+        const updateDetail =
+          await prismaDepartureJobRepository.updateDetailDepartureJob(
+            detailFind.id,
+            departure.id,
+            newMetrado
+          );
+        //[note] actualizamos el metrado total de la Partida del Detalle Existente
+        total = departure.metrado_total - data.metrado;
         await departureValidation.updateDepartureMetradoTotal(
           departure.id,
           total
         );
 
-      if (!updateDepartureResponse.success) {
-        return updateDepartureResponse;
-      }
-      if (detailFind.success) {
-        const newMetrado = detail.metrado_utilizado + data.metrado;
-        const updateDetail =
-          await prismaDepartureJobRepository.updateDetailDepartureJob(
-            detail.id,
-            departure.id,
-            newMetrado
-          );
+        await jobValidation.updateJob(jobFormat, job.id);
+
         return httpResponse.SuccessResponse(
           `Al existir un Detalle Trabajo-Partida, se ha actualizado con éxito el mismo`,
           updateDetail
         );
       }
+
+      if (data.metrado > departure.metrado_total) {
+        return httpResponse.BadRequestException(
+          "El metrado ingresado supera al de la Partida"
+        );
+      }
+
+      await jobValidation.updateJob(jobFormat, job.id);
+
+      total = departure.metrado_total - data.metrado;
+      //[note] actualizamos el metrado total de la Partida
+      await departureValidation.updateDepartureMetradoTotal(
+        departure.id,
+        total
+      );
 
       const departureJob =
         await departureJobValidation.createDetailDepartureJob(
@@ -209,7 +197,6 @@ class DepartureJobService {
         detail.trabajo_id === detailExist.trabajo_id &&
         detail.metrado_utilizado === data.metrado
       ) {
-        console.log("nada cambio");
         // return await this.updateNewDepartureJob(detail, departure, data);
         return httpResponse.SuccessResponse(
           "Detalle Trabajo-Partida editado con éxito",
@@ -221,7 +208,6 @@ class DepartureJobService {
         detailExist.partida_id != detail.partida_id &&
         detail.trabajo_id == detailExist.trabajo_id
       ) {
-        console.log("vamos a otro");
         //[note] acá edita uno existencial
         return await this.updateExistingDepartureJob(
           detail,
@@ -230,9 +216,8 @@ class DepartureJobService {
           data.metrado
         );
       } else {
-        console.log("editamos el mismo");
         //[note] acá edito el mismo
-        return await this.updateNewDepartureJob(detail, departure, data);
+        return await this.updateOldDepartureJob(detail, departure, data);
       }
     } catch (error) {
       return httpResponse.InternalServerErrorException(
@@ -244,72 +229,37 @@ class DepartureJobService {
     }
   }
 
-  private async getDetailJobById(detail_id: number): Promise<T_HttpResponse> {
-    return await departureJobValidation.findById(detail_id);
-  }
-
-  private async getDepartureById(
-    departure_id: number
-  ): Promise<T_HttpResponse> {
-    return await departureValidation.findById(departure_id);
-  }
-
-  private async checkExistingDepartureJob(
-    departure_id: number,
-    trabajo_id: number
-  ): Promise<T_HttpResponse> {
-    return await departureJobValidation.findByForDepartureAndJob(
-      departure_id,
-      trabajo_id
-    );
-  }
-
   private async updateExistingDepartureJob(
     detail: I_DepartureJobBBDD,
     existsDetail: I_DepartureJobBBDD,
-    departure: Partida,
+    departureNew: Partida,
     metrado: number
   ): Promise<T_HttpResponse> {
-    const newMetrado = existsDetail.metrado_utilizado + metrado;
-
-    const detailsResponse =
-      await departureJobValidation.findAllWithOutPaginationForDeparture(
-        departure.id
+    if (metrado > departureNew.metrado_total) {
+      return httpResponse.BadRequestException(
+        "El metrado supera al de la Nueva Partida"
       );
-
-    const details = detailsResponse.payload as DetalleTrabajoPartida[];
-    let totalOld = 0;
-    if (details.length > 0) {
-      details.forEach((detail) => {
-        totalOld += detail.metrado_utilizado;
-      });
-      let totalMoreNewValore =
-        totalOld + existsDetail.metrado_utilizado - metrado;
-      if (totalMoreNewValore > departure.metrado_inicial) {
-        return httpResponse.BadRequestException(
-          "No puede colocar más métrado del que tiene la partida"
-        );
-      }
     }
-    //[note] aca multiplicas
+
+    //[note] aca multiplicamos
     const oldMetradoPrecio =
-      existsDetail.metrado_utilizado * departure.precio +
+      existsDetail.metrado_utilizado * departureNew.precio +
       existsDetail.Trabajo.costo_partida;
     const oldMetadoCostOfLabor =
-      existsDetail.metrado_utilizado * departure.mano_de_obra_unitaria +
+      existsDetail.metrado_utilizado * departureNew.mano_de_obra_unitaria +
       existsDetail.Trabajo.costo_mano_obra;
     const oldMetradoMaterialCost =
-      existsDetail.metrado_utilizado * departure.material_unitario +
+      existsDetail.metrado_utilizado * departureNew.material_unitario +
       existsDetail.Trabajo.costo_material;
     const oldMetradoJobEquipment =
-      existsDetail.metrado_utilizado * departure.equipo_unitario +
+      existsDetail.metrado_utilizado * departureNew.equipo_unitario +
       existsDetail.Trabajo.costo_equipo;
     const oldMetradoJobSeveral =
-      existsDetail.metrado_utilizado * departure.subcontrata_varios +
+      existsDetail.metrado_utilizado * departureNew.subcontrata_varios +
       existsDetail.Trabajo.costo_varios;
 
     const newMetradoPrecio =
-      metrado * departure.precio + existsDetail.Trabajo.costo_partida;
+      metrado * departureNew.precio + existsDetail.Trabajo.costo_partida;
 
     if (newMetradoPrecio < oldMetradoPrecio) {
       return httpResponse.BadRequestException(
@@ -318,7 +268,7 @@ class DepartureJobService {
     }
 
     const newMetadoCostOfLabor =
-      metrado * departure.mano_de_obra_unitaria +
+      metrado * departureNew.mano_de_obra_unitaria +
       existsDetail.Trabajo.costo_mano_obra;
 
     if (newMetadoCostOfLabor < oldMetadoCostOfLabor) {
@@ -327,7 +277,7 @@ class DepartureJobService {
       );
     }
     const newMetradoMaterialCost =
-      metrado * departure.material_unitario +
+      metrado * departureNew.material_unitario +
       existsDetail.Trabajo.costo_material;
     if (newMetradoMaterialCost < oldMetradoMaterialCost) {
       return httpResponse.BadRequestException(
@@ -335,14 +285,15 @@ class DepartureJobService {
       );
     }
     const newMetradoJobEquipment =
-      metrado * departure.equipo_unitario + existsDetail.Trabajo.costo_equipo;
+      metrado * departureNew.equipo_unitario +
+      existsDetail.Trabajo.costo_equipo;
     if (newMetradoJobEquipment < oldMetradoJobEquipment) {
       return httpResponse.BadRequestException(
         `Metrado del trabajo destino insuficiente para el costo de Equipo`
       );
     }
     const newMetradoJobSeveral =
-      metrado * departure.subcontrata_varios +
+      metrado * departureNew.subcontrata_varios +
       existsDetail.Trabajo.costo_varios;
     if (newMetradoJobSeveral < oldMetradoJobSeveral) {
       return httpResponse.BadRequestException(
@@ -350,40 +301,41 @@ class DepartureJobService {
       );
     }
 
-    const jobFormat = this.calculateJobCosts(existsDetail, departure, metrado);
+    //[note]acá calculamos los nuevos costos del Trabajo
+
+    const jobFormat = this.calculateJobCosts(
+      existsDetail,
+      departureNew,
+      metrado
+    );
     await jobValidation.updateJob(jobFormat, existsDetail.Trabajo.id);
-    //[note] acá le restamos a la nueva partida
-    const total = detail.Partida.metrado_total + detail.metrado_utilizado;
+    //[note] acá le sumamos al Detalle de la vieja partida
+    const addtotal = detail.Partida.metrado_total + detail.metrado_utilizado;
 
-    const updateDepartureResponse =
-      await departureValidation.updateDepartureMetradoTotal(
-        departure.id,
-        total
-      );
+    await departureValidation.updateDepartureMetradoTotal(
+      detail.Partida.id,
+      addtotal
+    );
 
-    if (!updateDepartureResponse.success) {
-      return updateDepartureResponse;
-    }
-    //[note]acá le sumamos lo q perdió por esa partida
-    const addTotal = departure.metrado_total - metrado;
+    //[note]acá le restamos a la nueva partida
+    const subtractTotal = departureNew.metrado_total - metrado;
 
-    const updateAddDepartureResponse =
-      await departureValidation.updateDepartureMetradoTotal(
-        departure.id,
-        total
-      );
+    await departureValidation.updateDepartureMetradoTotal(
+      departureNew.id,
+      subtractTotal
+    );
 
-    if (!updateAddDepartureResponse.success) {
-      return updateAddDepartureResponse;
-    }
+    //[note] acá actualizamos el valor del metrado utilizado
+    const newMetrado = existsDetail.metrado_utilizado + metrado;
 
     const updateDetail =
       await prismaDepartureJobRepository.updateDetailDepartureJob(
         existsDetail.id,
-        departure.id,
+        departureNew.id,
         newMetrado
       );
 
+    //[note] acá eliminamos el detalle viejo
     await prismaDepartureJobRepository.deleteDetailDepartureJob(detail.id);
     return httpResponse.SuccessResponse(
       "Ya habia un Detalle Trabajo Partida con la Partida que pasaste por lo que esa fue editada",
@@ -391,34 +343,19 @@ class DepartureJobService {
     );
   }
 
-  private async updateNewDepartureJob(
+  private async updateOldDepartureJob(
     detail: I_DepartureJobBBDD,
     departure: Partida,
     data: I_DepartureJobUpdate
   ): Promise<T_HttpResponse> {
-    let detailsResponse: any;
-    let details: any[];
-    let totalOld = 0;
-
     if (detail.partida_id != departure.id) {
-      detailsResponse =
-        await departureJobValidation.findAllWithOutPaginationForDeparture(
-          detail.partida_id
+      if (data.metrado > departure.metrado_total) {
+        return httpResponse.BadRequestException(
+          "El metrado supera al metrado disponible de la nueva Partida"
         );
-
-      details = detailsResponse.payload as DetalleTrabajoPartida[];
-      if (details.length > 0) {
-        details.forEach((detail) => {
-          totalOld += detail.metrado_utilizado;
-        });
-        let totalMoreNewValore = totalOld + data.metrado;
-
-        if (totalMoreNewValore > departure.metrado_inicial) {
-          return httpResponse.BadRequestException(
-            "No puede colocar más métrado del que tiene la partida"
-          );
-        }
       }
+
+      //[note] acá le restamos al metrado total de la nueva Partida
       const newtotal = departure.metrado_total - data.metrado;
 
       await departureValidation.updateDepartureMetradoTotal(
@@ -426,45 +363,57 @@ class DepartureJobService {
         newtotal
       );
 
-      const updateOldMetradoAddOldMetrado =
+      //[note] acá le sumamos al metrado total de la vieja Partida
+      const updateMetradoOldDeparture =
         detail.Partida.metrado_total + detail.metrado_utilizado;
 
       await departureValidation.updateDepartureMetradoTotal(
         detail.Partida.id,
-        updateOldMetradoAddOldMetrado
+        updateMetradoOldDeparture
       );
     } else {
-      detailsResponse =
+      if (data.metrado > detail.Partida.metrado_total) {
+        return httpResponse.BadRequestException(
+          "El metrado supera al de la Partida"
+        );
+      }
+      let totalOld = 0;
+      const detailsResponse =
         await departureJobValidation.findAllWithOutPaginationForDeparture(
-          departure.id
+          detail.partida_id
         );
 
-      details = detailsResponse.payload as DetalleTrabajoPartida[];
+      const details = detailsResponse.payload as DetalleTrabajoPartida[];
 
       if (details.length > 0) {
-        details.forEach((detail) => {
-          totalOld += detail.metrado_utilizado;
+        details.forEach((detailFind) => {
+          if (detailFind.id != detail.id) {
+            totalOld += detail.metrado_utilizado;
+          }
         });
-        let totalMoreNewValore =
-          totalOld + detail.metrado_utilizado - data.metrado;
+
+        let totalMoreNewValore = totalOld + data.metrado;
         if (totalMoreNewValore > departure.metrado_inicial) {
           return httpResponse.BadRequestException(
             "No puede colocar más métrado del que tiene la partida"
           );
         }
       }
-      const total =
-        departure.metrado_total + detail.metrado_utilizado - data.metrado;
-
-      const updateDepartureResponse =
-        await departureValidation.updateDepartureMetradoTotal(
-          departure.id,
-          total
-        );
-
-      if (!updateDepartureResponse.success) {
-        return updateDepartureResponse;
+      let total = 0;
+      if (data.metrado > detail.metrado_utilizado) {
+        const subtotal = data.metrado - detail.metrado_utilizado;
+        total = detail.Partida.metrado_total - subtotal;
+      } else {
+        const subtotal = detail.metrado_utilizado - data.metrado;
+        total = detail.Partida.metrado_total + subtotal;
       }
+
+      //[note] acá sacamos el cálculo del nuevao metrado total de acuerdo a la diferencia del nuevo con el viejo
+
+      await departureValidation.updateDepartureMetradoTotal(
+        departure.id,
+        total
+      );
     }
 
     const jobFormat = this.calculateNewJobCosts(
@@ -557,6 +506,26 @@ class DepartureJobService {
         aditionMetradoJobSeveral -
         subtractMetradoJobSeveral,
     };
+  }
+
+  private async getDetailJobById(detail_id: number): Promise<T_HttpResponse> {
+    return await departureJobValidation.findById(detail_id);
+  }
+
+  private async getDepartureById(
+    departure_id: number
+  ): Promise<T_HttpResponse> {
+    return await departureValidation.findById(departure_id);
+  }
+
+  private async checkExistingDepartureJob(
+    departure_id: number,
+    trabajo_id: number
+  ): Promise<T_HttpResponse> {
+    return await departureJobValidation.findByForDepartureAndJob(
+      departure_id,
+      trabajo_id
+    );
   }
 
   async updateStatusDepartureJob(
