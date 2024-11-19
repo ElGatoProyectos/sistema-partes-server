@@ -103,7 +103,7 @@ class PrismaDailyPartDepartureRepository
       take: data.queryParams.limit,
     });
 
-    const total = await prisma.detalleTrabajoPartida.count({
+    const total = await prisma.parteDiarioPartida.count({
       where: {
         Partida: {
           id: {
@@ -118,6 +118,7 @@ class PrismaDailyPartDepartureRepository
       const { Trabajo, ...data } = ParteDiario;
       const { Unidad } = Partida;
       return {
+        id: ResData.id,
         codigo: Partida.item,
         partida: Partida.partida,
         unidad: Unidad?.nombre ? Unidad?.nombre : null,
