@@ -38,4 +38,6 @@ export abstract class DailyPartRepository {
   ): void {}
 
   findAllForDate(): void {}
+
+  findAllForIds(ids: number[]): void {}
 }

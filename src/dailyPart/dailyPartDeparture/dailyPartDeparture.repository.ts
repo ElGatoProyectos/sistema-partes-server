@@ -25,4 +25,6 @@ export abstract class DailyPartDepartureRepository {
     data: T_FindAllDailyPartDeparture,
     ids: number[]
   ): void {}
+
+  findAllWithOutPaginationForidsDailyPart(idsDailyPart: number[]): void {}
 }

@@ -373,6 +373,26 @@ class DepartureJobValidation {
       );
     }
   }
+  async findAllWithOutPaginationForIdsJob(
+    idsJob: number[]
+  ): Promise<T_HttpResponse> {
+    try {
+      const details =
+        await prismaDepartureJobRepository.findAllWithOutPaginationForIdsJob(
+          idsJob
+        );
+
+      return httpResponse.SuccessResponse(
+        "Los Detalles Trabajo Partida por los ids de los Trabajos fueron encontrados con éxito",
+        details
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Detalles Trabajo Partida por los ids de los Trabajos",
+        error
+      );
+    }
+  }
 }
 
 export const departureJobValidation = new DepartureJobValidation();

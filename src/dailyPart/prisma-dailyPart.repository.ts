@@ -5,6 +5,7 @@ import {
   I_CreateDailyPartBD,
   I_DailyPart,
   I_DailyPartId,
+  I_ParteDiario,
   I_UpdateDailyPartBD,
 } from "./models/dailyPart.interface";
 import {
@@ -14,18 +15,32 @@ import {
 import { converToDate } from "../common/utils/date";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
-  // const data = ids.map((id) => ({
-  //   parte_diario_id: daily_part_id,
-  //   recurso_id: id,
-  //   cantidad: 0,
-  //   proyecto_id: project_id,
-  // }));
+  async findAllForIds(ids: number[]): Promise<I_ParteDiario[] | null> {
+    const dailyParts = await prisma.parteDiario.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      include: {
+        Trabajo: {
+          include: {
+            UnidadProduccion: true,
+          },
+        },
+        RiesgoParteDiario: {
+          omit: {
+            eliminado: true,
+            proyecto_id: true,
+            fecha_creacion: true,
+          },
+        },
+      },
+    });
+    return dailyParts;
+  }
 
-  // await prisma.parteDiarioRecurso.createMany({
-  //   data: data,
-  // });
-
-  async findAllForDate(): Promise<ParteDiario[] | null> {
+  async findAllForDate(): Promise<I_ParteDiario[] | null> {
     const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
     const dailyParts = await prisma.parteDiario.findMany({
@@ -33,7 +48,12 @@ class PrismaDailyPartRepository implements DailyPartRepository {
         fecha: date,
       },
       include: {
-        Trabajo: true,
+        Trabajo: {
+          include: {
+            UnidadProduccion: true,
+          },
+        },
+        RiesgoParteDiario: true,
       },
     });
     return dailyParts;

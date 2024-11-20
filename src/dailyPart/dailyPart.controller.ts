@@ -48,13 +48,13 @@ class DailyPartController {
     response.status(result.statusCode).json(result);
   }
   async findReport(request: express.Request, response: express.Response) {
-    // const id = Number(request.params.id);
+    const id = Number(request.params.id);
     const project_id = request.get("project-id") as string;
 
     // const result = await reportService.crearInforme(id, "hola");
     // response.status(result.statusCode).json(result);
 
-    const result: any = await reportService.crearInforme(1, project_id);
+    const result: any = await reportService.crearInforme(1, String(id));
 
     if (result.success && result.payload) {
       let filePath = "";
@@ -62,7 +62,7 @@ class DailyPartController {
         appRootPath.path,
         "static",
         "reports",
-        `informe-${result.payload.user_id}-${result.payload.id}.pdf`
+        `informe-${result.payload.user_id}.pdf`
       );
 
       if (fs.existsSync(filePath)) {
@@ -82,7 +82,7 @@ class DailyPartController {
           .json({ success: false, message: "Archivo no encontrado" });
       }
     } else {
-      response.json(response);
+      response.json(result);
     }
 
     // const tokenWithBearer = request.headers.authorization;

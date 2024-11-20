@@ -73,7 +73,6 @@ export class DailyPartPdfService {
     //[note] inicia un nagegador con las opciones definidas
     const browser = await puppeteer.launch(options);
 
-    //[note] crea una nueva pestaña en el navegador
     const page = await browser.newPage();
 
     //[note] Rellena la página con el HTML proporcionado en template
@@ -89,7 +88,6 @@ export class DailyPartPdfService {
     });
 
     await browser.close();
-    //[note] acá es a donde lo vamos a guardar
     let direction = "";
     direction = path.join(
       appRootPath.path,

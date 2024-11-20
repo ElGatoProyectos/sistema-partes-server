@@ -127,6 +127,24 @@ class DailyPartReportValidation {
       );
     }
   }
+  async findAllForIdsDailyPart(
+    ids_dailys_parts: number[]
+  ): Promise<T_HttpResponse> {
+    try {
+      const daily_parts = await prismaDailyPartRepository.findAllForIds(
+        ids_dailys_parts
+      );
+      return httpResponse.SuccessResponse(
+        "Los Partes Diarios por determinados ids fueron encontrados correctamente",
+        daily_parts
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer los Partes Diarios por determinados ids",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartReportValidation = new DailyPartReportValidation();

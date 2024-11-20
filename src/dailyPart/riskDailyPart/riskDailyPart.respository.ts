@@ -11,4 +11,5 @@ export abstract class RiskDailyPartRepository {
   ): void {}
   findById(risk_daily_part: number): void {}
   updateStateRiskDailyPart(risk_daily_part: number): void {}
+
 }

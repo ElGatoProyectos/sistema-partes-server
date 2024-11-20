@@ -21,6 +21,7 @@ export abstract class DepartureJobRepository {
     project_id: number
   ): void {}
   findAllWithOutPaginationForJob(job_id: number): void {}
+  findAllWithOutPaginationForIdsJob(idsJobs: number[]): void {}
   findAllWithOutPaginationForDeparture(departure_id: number): void {}
   findAllForJob(
     skip: number,

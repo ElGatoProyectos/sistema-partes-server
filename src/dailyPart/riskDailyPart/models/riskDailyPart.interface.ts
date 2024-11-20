@@ -26,3 +26,9 @@ export interface I_RiskDailyPartForId {
   estado: E_Estado_Riesgo_BD | null;
   riesgo: E_Riesgo_BD | null;
 }
+export interface I_RiskDailyPartForPdf {
+  id: number;
+  descripcion: string;
+  estado: E_Estado_Riesgo_BD;
+  riesgo: E_Riesgo_BD;
+}

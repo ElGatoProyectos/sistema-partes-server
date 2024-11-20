@@ -1,5 +1,9 @@
 import { ParteDiarioPartida } from "@prisma/client";
 import { I_DailyPart } from "../../models/dailyPart.interface";
+import {
+  I_DepartureForPdf,
+  I_DepartureJobForPdf,
+} from "../../../departure/departure-job/models/departureJob.interface";
 
 export interface UpdateDailyPartDeparture
   extends Omit<ParteDiarioPartida, "id"> {}
@@ -14,4 +18,9 @@ export interface I_DailyPartDeparture {
   partida_id: number;
   cantidad_utilizada: number;
   ParteDiario: I_DailyPart;
+}
+export interface I_DailyPartDepartureForPdf {
+  id: number;
+  cantidad_utilizada: number;
+  Partida: I_DepartureForPdf;
 }
