@@ -518,8 +518,8 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       );
       const week = weekResponse.payload as Semana;
       filters.fecha = {
-        gte: new Date(new Date(week.fecha_inicio).setHours(0, 0, 0, 0)),
-        lte: new Date(new Date(week.fecha_fin).setHours(23, 59, 59, 999)),
+        gte: week.fecha_inicio,
+        lte: week.fecha_fin,
       };
     }
     if (data.queryParams.search) {

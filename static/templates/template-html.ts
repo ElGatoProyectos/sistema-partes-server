@@ -1,7 +1,7 @@
 import {
   DetallePrecioHoraMO,
-  DetalleTrabajoPartida,
   ParteDiario,
+  ParteDiarioPartida,
   PrecioHoraMO,
   Proyecto,
 } from "@prisma/client";
@@ -9,19 +9,28 @@ import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "../../src/project/models/project.constant";
-import prisma from "../../src/config/prisma.config";
-import { dailyPartReportValidation } from "../../src/dailyPart/dailyPart.validation";
 import {
   I_DailyPart,
   I_ParteDiario,
 } from "../../src/dailyPart/models/dailyPart.interface";
-import { priceHourWorkforceValidation } from "../../src/workforce/priceHourWorkforce/priceHourWorkforce.valdation";
-import { detailPriceHourWorkforceValidation } from "../../src/workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
+import { I_DepartureJobForPdf } from "../../src/departure/departure-job/models/departureJob.interface";
+import { I_DailyPartDepartureForPdf } from "../../src/dailyPart/dailyPartDeparture/models/dailyPartDeparture.interface";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
-  project: Proyecto
+  project: Proyecto,
+  daily_parts: I_ParteDiario[],
+  detailsDepartureJob: I_DepartureJobForPdf[],
+  dailysPartsDeparture: I_DailyPartDepartureForPdf[],
+  workforces: any[],
+  restrictions: I_ParteDiario[],
+  date: Date,
+  productionForDay: number,
+  totalProductionWorkforce: number,
+  totalRealWorkforceProduction: number,
+  desviacion: number
 ) => {
+  console.log("esta dentro");
   const imagePath = path.join(
     appRootPath.path,
     "static",
@@ -41,61 +50,22 @@ export const TemplateHtmlInforme = async (
     .readFileSync(imagePathProject)
     .toString("base64");
   const base64TypeProject = `data:image/png;base64,${base64ImageProject}`;
-
-  const dailyPartsResponse =
-    await dailyPartReportValidation.findByDateAllDailyPart();
-
-  const dailyParts = dailyPartsResponse.payload as I_ParteDiario[];
-
-  const idsJob = dailyParts.map((dailyPart) => dailyPart.trabajo_id);
-  const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.id);
-
-  const details = await prisma.detalleTrabajoPartida.findMany({
-    where: {
-      trabajo_id: {
-        in: idsJob,
-      },
-    },
-    include: {
-      Trabajo: {
-        include: {
-          UnidadProduccion: true,
-        },
-      },
-      Partida: {
-        include: {
-          Unidad: true,
-        },
-      },
-    },
-  });
-
-  let productionForDay = 0;
-  let totalProductionWorkforce = 0;
-  if (details.length > 0) {
-    details.map((detail) => {
-      productionForDay += detail.metrado_utilizado * detail.Partida.precio;
-
-      totalProductionWorkforce +=
-        detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
-    });
-  }
-
-  //[note] acá muestro los partes diarios del día
-  const dailyPartsToday = dailyParts
+  const dailyPartsToday = daily_parts
     .map((detail) => {
       return `
         <tr>
           <td>${detail.Trabajo.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
           <td>${detail.nombre || "N/A"}</td>
-          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+         <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+         
         </tr>
       `;
     })
     .join("");
-  //[note] acá el monto trabajo
-  const detailsForJob = details
+  console.log(dailyPartsToday);
+  console.log("paso partes diario");
+  const detailsForJob = detailsDepartureJob
     .map((detail) => {
       return `
         <tr>
@@ -107,25 +77,8 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-
-  //[note] acá las partidas del día
-  const detailsDailyPartDeparture = await prisma.parteDiarioPartida.findMany({
-    where: {
-      ParteDiario: {
-        id: {
-          in: idsDailyPart,
-        },
-      },
-    },
-    include: {
-      Partida: {
-        include: {
-          Unidad: true,
-        },
-      },
-    },
-  });
-  const tableRowsDetailsDepartures = detailsDailyPartDeparture
+  console.log("paso detalle trabajo partida");
+  const tableRowsDetailsDepartures = dailysPartsDeparture
     .map((detail) => {
       return `
         <tr>
@@ -139,98 +92,7 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-
-  //[note] buscamos el personal del día que esta en el Parte Diario
-  const dailyPartWorkforce = await prisma.parteDiarioMO.findMany({
-    where: {
-      ParteDiario: {
-        id: {
-          in: idsDailyPart,
-        },
-      },
-    },
-    include: {
-      ManoObra: {
-        include: {
-          CategoriaObrero: true,
-        },
-      },
-    },
-  });
-
-  const date = new Date();
-  date.setUTCHours(0, 0, 0, 0);
-  let workforces: any = [];
-  const priceHourResponse = await priceHourWorkforceValidation.findByDate(date);
-  let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
-  let totalRealWorkforceProduction = 0;
-  if (priceHourResponse.success && dailyPartWorkforce.length > 0) {
-    const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-    const detailsPriceHourMOResponse =
-      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-        priceHourMO.id
-      );
-    detailsPriceHourMO =
-      detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
-    dailyPartWorkforce.forEach((workforce) => {
-      if (workforce.ManoObra.CategoriaObrero) {
-        const categoriaId = workforce.ManoObra.CategoriaObrero.id;
-
-        const detail = detailsPriceHourMO.find(
-          (detail) => detail.categoria_obrero_id === categoriaId
-        );
-
-        if (
-          detail &&
-          workforce.hora_60 &&
-          workforce.hora_100 &&
-          workforce.hora_normal
-        ) {
-          let sumaCategoryMO = 0;
-          totalProductionWorkforce +=
-            detail.hora_normal * workforce.hora_normal +
-            detail.hora_extra_60 * workforce.hora_60 +
-            detail.hora_extra_100 * workforce.hora_100;
-          sumaCategoryMO =
-            detail.hora_normal * workforce.hora_normal +
-            detail.hora_extra_60 * workforce.hora_60 +
-            detail.hora_extra_100 * workforce.hora_100;
-          //[note] si está todo bien vamos a hacer agregarlo
-          workforces.push({
-            codigo: workforce.ManoObra.codigo,
-            dni: workforce.ManoObra.documento_identidad,
-            nombre_completo:
-              workforce.ManoObra.nombre_completo +
-              workforce.ManoObra.apellido_materno +
-              workforce.ManoObra.apellido_paterno,
-            hora_normal: workforce.hora_normal,
-            hora_60: workforce.hora_60,
-            hora_100: workforce.hora_100,
-            costo_diario: sumaCategoryMO,
-          });
-        }
-      }
-    });
-  }
-
-  if (!priceHourResponse.success && dailyPartWorkforce.length > 0) {
-    //[note] esto lo hago por las dudas de que no haya cargado la tabla salarial o no haya una de acuerdo al día que lo imprime
-    dailyPartWorkforce.forEach((workforce) => {
-      workforces.push({
-        codigo: workforce.ManoObra.codigo,
-        dni: workforce.ManoObra.documento_identidad,
-        nombre_completo:
-          workforce.ManoObra.nombre_completo +
-          workforce.ManoObra.apellido_materno +
-          workforce.ManoObra.apellido_paterno,
-        hora_normal: workforce.hora_normal,
-        hora_60: workforce.hora_60,
-        hora_100: workforce.hora_100,
-        costo_diario: 0,
-      });
-    });
-  }
-
+  console.log("paso parte diario partida");
   const tablaWorkfoces = workforces
     .map((detail: any) => {
       return `
@@ -246,7 +108,62 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
+  console.log("paso mano de obra");
 
+  const restrictionsToTheDay = restrictions
+    .map((detail: any) => {
+      return `
+        <tr>
+          <td>${detail.Trabajo.codigo}</td>
+          <td>${detail.Trabajo.nombre}</td>
+          <td>${detail.descripcion}</td>
+          <td>${detail.estado}</td>
+          <td>$${detail.riesgo}</td>
+        </tr>
+      `;
+    })
+    .join("");
+  console.log("paso restricciones");
+
+  // let direction = path.join(appRootPath.path, "static", "daiyPartPhotos");
+  // let numbersPhotos = [1, 2, 3, 4];
+
+  // const files = await fs.promises.readdir(direction);
+
+  // const counts: Record<string, number> = {};
+
+  // files.forEach((file) => {
+  //   const match = file.match(/^(\d+)_photo_(\d+)/);
+  //   if (match) {
+  //     const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+  //     const prefixNumber = parseInt(prefix, 10);
+  //     const suffixNumber = parseInt(suffix, 10);
+
+  //     // Verifica si ambos números están en sus respectivos arrays
+  //     if (
+  //       idsDailyPart.includes(prefixNumber) &&
+  //       numbersPhotos.includes(suffixNumber)
+  //     ) {
+  //       const key = `${prefix}_photo_${suffix}`;
+  //       counts[key] = (counts[key] || 0) + 1;
+  //     }
+  //   }
+  // });
+  console.log("llego al final");
+
+  const valuesAssists: { [key: number]: String } = {
+    0: "Domingo",
+    1: "Lunes",
+    2: "Martes",
+    3: "Miécoles",
+    4: "Jueves",
+    5: "Viernes",
+    6: "Sábado",
+  };
+  const resultValue = valuesAssists[date.getDay()];
+  const day = date.getUTCDate();
+  const month = date.getUTCMonth() + 1;
+  const year = date.getUTCFullYear();
   return `
   
   <!DOCTYPE html>
@@ -294,11 +211,9 @@ export const TemplateHtmlInforme = async (
         </tr>
         <tr>
           <td>
-            Obra: Saldo de obra mejoramiento del servicio de educación inicial
-            en la I.E. villa continental, distrito de Cayma-provincia de
-            Cayma-Región Arequipa.
+            ${project.nombre_completo}
           </td>
-          <td>Lunes 19/08/2024</td>
+          <td>${resultValue} ${day}/${month}/${year}</td>
         </tr>
       </table>
     <br />
@@ -416,8 +331,8 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>S/. ${productionForDay}</td>
           <td>S/. ${totalProductionWorkforce}</td>
-          <td>S/. ${totalProductionWorkforce}</td>
-           ${formatCurrency(totalProductionWorkforce)}
+          <td>S/. ${totalRealWorkforceProduction}</td>
+           ${formatCurrency(desviacion)}
         </tr>
       </table>
 
@@ -443,14 +358,7 @@ export const TemplateHtmlInforme = async (
             RIESGO</span></td>
 
         </tr>
-        <tr>
-          <td>001</td>
-          <td>Acero -Bloque A</td>
-          <td>El Acero Llego en la tarde y personal estuvo parado. Por
-            3 horas</td>
-          <td>Solucionado</td>
-          <td>Medio</td>
-        </tr>
+         ${restrictionsToTheDay}
       </table>
 
 

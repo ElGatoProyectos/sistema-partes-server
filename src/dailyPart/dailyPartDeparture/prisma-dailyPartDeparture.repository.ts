@@ -1,12 +1,40 @@
 import { ParteDiario, ParteDiarioPartida } from "@prisma/client";
 import prisma from "../../config/prisma.config";
 import { DailyPartDepartureRepository } from "./dailyPartDeparture.repository";
-import { UpdateDailyPartDeparture } from "./models/dailyPartDeparture.interface";
+import {
+  I_DailyPartDepartureForPdf,
+  UpdateDailyPartDeparture,
+} from "./models/dailyPartDeparture.interface";
 import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
 
 class PrismaDailyPartDepartureRepository
   implements DailyPartDepartureRepository
 {
+  async findAllWithOutPaginationForidsDailyPart(
+    idsDailyPart: number[]
+  ): Promise<I_DailyPartDepartureForPdf[] | null> {
+    const detailsDailyPartDeparture = await prisma.parteDiarioPartida.findMany({
+      where: {
+        ParteDiario: {
+          id: {
+            in: idsDailyPart,
+          },
+        },
+      },
+      include: {
+        Partida: {
+          include: {
+            Unidad: true,
+          },
+        },
+      },
+      omit: {
+        parte_diario_id: true,
+        partida_id: true,
+      },
+    });
+    return detailsDailyPartDeparture;
+  }
   async findAllForDailyPart(
     daily_part_id: number
   ): Promise<ParteDiarioPartida[] | null> {

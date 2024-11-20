@@ -5,9 +5,36 @@ import {
   T_FindAllDepartureJob,
   T_FindAllWork,
 } from "./models/departure-job.types";
-import { I_DetailDepartureJob } from "./models/departureJob.interface";
+import {
+  I_DepartureJobForPdf,
+  I_DetailDepartureJob,
+} from "./models/departureJob.interface";
 
 class PrismaDepartureJobRepository implements DepartureJobRepository {
+  async findAllWithOutPaginationForIdsJob(
+    idsJobs: number[]
+  ): Promise<I_DepartureJobForPdf[] | null> {
+    const details = await prisma.detalleTrabajoPartida.findMany({
+      where: {
+        trabajo_id: {
+          in: idsJobs,
+        },
+      },
+      include: {
+        Trabajo: {
+          include: {
+            UnidadProduccion: true,
+          },
+        },
+        Partida: {
+          include: {
+            Unidad: true,
+          },
+        },
+      },
+    });
+    return details;
+  }
   async findAllWithOutPaginationForDeparture(
     departure_id: number
   ): Promise<DetalleTrabajoPartida[] | null> {

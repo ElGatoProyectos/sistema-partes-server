@@ -1,5 +1,9 @@
-import { ParteDiario, Trabajo } from "@prisma/client";
-import { I_RiskDailyPart } from "../riskDailyPart/models/riskDailyPart.interface";
+import { ParteDiario, RiesgoParteDiario, Trabajo } from "@prisma/client";
+import {
+  I_RiskDailyPart,
+  I_RiskDailyPartForId,
+  I_RiskDailyPartForPdf,
+} from "../riskDailyPart/models/riskDailyPart.interface";
 import { I_Trabajo } from "../../job/models/job.interface";
 
 export interface I_CreateDailyPartBD
@@ -53,6 +57,7 @@ export interface I_DailyPart extends ParteDiario {
 }
 export interface I_ParteDiario extends ParteDiario {
   Trabajo: I_Trabajo;
+  RiesgoParteDiario: I_RiskDailyPartForId | null;
 }
 
 export interface I_DailyPartId

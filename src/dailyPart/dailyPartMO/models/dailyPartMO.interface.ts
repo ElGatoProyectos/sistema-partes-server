@@ -1,4 +1,5 @@
 import { ParteDiarioMO } from "@prisma/client";
+import { I_JobAndCategoryWorkforce } from "../../../job/models/job.interface";
 
 export interface I_UpdateDailyPartMOBD
   extends Omit<
@@ -28,6 +29,9 @@ export interface I_CategoriaObrero {
 
 export interface I_Mano {
   CategoriaObrero: I_CategoriaObrero;
+}
+export interface I_DailyPartWorkforce extends ParteDiarioMO {
+  ManoObra: I_JobAndCategoryWorkforce;
 }
 
 export interface I_DailyPartBody {

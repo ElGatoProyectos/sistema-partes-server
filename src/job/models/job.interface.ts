@@ -1,4 +1,9 @@
-import { Trabajo, UnidadProduccion } from "@prisma/client";
+import {
+  CategoriaObrero,
+  ManoObra,
+  Trabajo,
+  UnidadProduccion,
+} from "@prisma/client";
 
 export interface I_CreateJobBD
   extends Omit<
@@ -61,6 +66,15 @@ export interface I_Trabajo {
   codigo: string;
   nombre: string;
   UnidadProduccion: UnidadProduccion;
+}
+export interface I_TrabajoForPdf {
+  codigo: string;
+  nombre: string;
+  costo_partida: number;
+  UnidadProduccion: UnidadProduccion;
+}
+export interface I_JobAndCategoryWorkforce extends ManoObra {
+  CategoriaObrero: CategoriaObrero | null;
 }
 
 // export interface I_CreateJobBody2

@@ -1,4 +1,10 @@
-import { DetalleTrabajoPartida, Partida, Trabajo } from "@prisma/client";
+import {
+  DetalleTrabajoPartida,
+  Partida,
+  Trabajo,
+  Unidad,
+} from "@prisma/client";
+import { I_TrabajoForPdf } from "../../../job/models/job.interface";
 
 export interface I_DepartureJobExcel {
   "ID-TRABAJO": string;
@@ -50,4 +56,17 @@ export interface existsDetailWorkDeparture {
   trabajo_id: number;
   partida_id: number;
   metrado_utilizado: number;
+}
+
+export interface I_DepartureJobForPdf {
+  id: number;
+  trabajo_id: number;
+  partida_id: number;
+  metrado_utilizado: number;
+  Partida: Partida;
+  Trabajo: I_TrabajoForPdf;
+}
+
+export interface I_DepartureForPdf extends Partida {
+  Unidad: Unidad | null;
 }

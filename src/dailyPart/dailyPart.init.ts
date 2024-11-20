@@ -6,7 +6,7 @@ import { authRoleMiddleware } from "../auth/middlewares/auth-role.middleware";
 
 const dailyPartRouter = express.Router();
 const prefix = "/daily-part";
-const prefixWithReport = "/daily-part/report-production";
+const prefixWithReport = "/daily-part/report-production/project-id";
 
 dailyPartRouter.post(
   `${prefix}`,
@@ -22,8 +22,8 @@ dailyPartRouter.post(
   dailyPartController.create
 );
 dailyPartRouter.get(
-  `${prefixWithReport}`,
-  dailyPartMiddleware.verifyHeadersFieldsIdProject,
+  `${prefixWithReport}/:id`,
+  // dailyPartMiddleware.verifyHeadersFieldsIdProject,
   // authRoleMiddleware.authorizeRoles([
   //   "ADMIN",
   //   "USER",
