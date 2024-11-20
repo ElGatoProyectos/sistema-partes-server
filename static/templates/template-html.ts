@@ -56,14 +56,13 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>${detail.Trabajo.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
-          <td>${detail.nombre || "N/A"}</td>
+          <td>${detail.descripcion_actividad || "N/A"}</td>
          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
          
         </tr>
       `;
     })
     .join("");
-  console.log(dailyPartsToday);
   console.log("paso partes diario");
   const detailsForJob = detailsDepartureJob
     .map((detail) => {
@@ -93,6 +92,7 @@ export const TemplateHtmlInforme = async (
     })
     .join("");
   console.log("paso parte diario partida");
+  console.log(workforces);
   const tablaWorkfoces = workforces
     .map((detail: any) => {
       return `

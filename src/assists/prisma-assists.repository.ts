@@ -548,13 +548,27 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
       }
     }
 
+    const workforces = await prisma.manoObra.findMany({
+      where: {
+        proyecto_id: project_id,
+        ...filtersName,
+      },
+      skip,
+      take: data.queryParams.limit,
+    });
+
+    const workforceIds = workforces.map((mo) => mo.id);
+
     const assists = await prisma.asistencia.findMany({
       where: {
         ...filters,
         eliminado: E_Estado_BD.n,
         proyecto_id: project_id,
         ManoObra: {
-          ...filtersName,
+          // ...filtersName,
+          id: {
+            in: workforceIds,
+          },
         },
       },
       include: {
@@ -564,10 +578,16 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
           },
         },
       },
-      skip,
-      take: data.queryParams.limit,
+      // skip,
+      // take: data.queryParams.limit,
       omit: {
         eliminado: true,
+      },
+    });
+
+    const workforcesMO = await prisma.manoObra.findMany({
+      where: {
+        proyecto_id: project_id,
       },
     });
 
