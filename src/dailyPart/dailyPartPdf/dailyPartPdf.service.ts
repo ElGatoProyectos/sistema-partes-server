@@ -4,6 +4,12 @@ import path from "path";
 import appRootPath from "app-root-path";
 //[note] genera gráficos en forma de imagen
 import QuickChart from "quickchart-js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { converToDate } from "../../common/utils/date";
+import { weekValidation } from "../../week/week.validation";
+import { Semana } from "@prisma/client";
+import { dailyPartReportValidation } from "../dailyPart.validation";
+import { I_ParteDiario } from "../models/dailyPart.interface";
 export class DailyPartPdfService {
   createOptionSandBox() {
     let options = {};
@@ -25,23 +31,107 @@ export class DailyPartPdfService {
     return options;
   }
 
-  async createImage(user_id: number) {
+  async createImage(user_id: number, date: string) {
+    const dateNew = converToDate(date);
+    dateNew.setUTCHours(0, 0, 0, 0);
+    const dateWeekResponse = await weekValidation.findByDate(dateNew);
+    const week = dateWeekResponse.payload as Semana;
+    const inicio = week.fecha_inicio;
+    const fin = week.fecha_fin;
+    const fechas: string[] = [];
+    for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
+      fechas.push(new Date(d).toISOString().slice(0, 10));
+    }
+    const dailyPartsResponse =
+      await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
     const chart = new QuickChart();
-    //[note] como lo vamos a crear y configurar del gráfico
+
+    const dailysPart = dailyPartsResponse.payload as I_ParteDiario[];
+
+    const total = [0, 0, 0, 0, 0, 0];
+
+    dailysPart.forEach((element) => {
+      const elementDate = element.fecha
+        ? element.fecha.toISOString().slice(0, 10)
+        : "";
+      // Buscamos la posición de la fecha en el array `fechas`
+      const index = fechas.indexOf(elementDate);
+
+      if (index !== -1) {
+        // Si la fecha existe en el array `fechas`, sumamos el valor deseado
+        total[index] += element.Trabajo?.costo_partida || 0;
+      }
+    });
+    console.log(total);
+    const data1 = dailysPart[0].Trabajo.costo_partida;
+    const data2 = dailysPart[1].Trabajo.costo_partida;
+    const data3 = dailysPart[2].Trabajo.costo_partida;
+    const data4 = dailysPart[3].Trabajo.costo_partida;
+    const data5 = dailysPart[4].Trabajo.costo_partida;
+    const data6 = dailysPart[5].Trabajo.costo_partida;
+    const data7 = dailysPart[6].Trabajo.costo_partida;
+
     chart
       .setConfig({
         type: "line",
         data: {
-          labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo"],
+          labels: [
+            fechas[0],
+            fechas[1],
+            fechas[2],
+            fechas[3],
+            fechas[4],
+            fechas[5],
+            fechas[6],
+          ],
           datasets: [
             {
-              label: "Parte Diario",
-              data: [30, 20, 40, 50, 60],
+              label: "Producción",
+              data: [data1, data2, data3, data4, data5, data6, data7],
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               borderColor: "rgba(75, 192, 192, 1)",
-              borderWidth: 1,
+              borderWidth: 2,
+              pointBackgroundColor: "#0074D9",
+              pointBorderColor: "#fff",
+              pointRadius: 5,
+              fill: false,
             },
           ],
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: true,
+              position: "bottom", // Mueve la leyenda hacia abajo
+            },
+            datalabels: {
+              align: "top",
+              anchor: "end",
+              formatter: (value) =>
+                `S/ ${value.toLocaleString("es-PE", {
+                  minimumFractionDigits: 2,
+                })}`,
+              color: "#000",
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "Fecha",
+              },
+              offset: true, // Añadir un pequeño desplazamiento al inicio y al final del eje x
+              ticks: {
+                align: "start", // Alinea las etiquetas del eje x al principio del espacio del tick
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: "Producción (S/)",
+              },
+            },
+          },
         },
       })
       .setWidth(800)

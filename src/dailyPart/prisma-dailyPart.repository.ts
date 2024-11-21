@@ -58,6 +58,31 @@ class PrismaDailyPartRepository implements DailyPartRepository {
     });
     return dailyParts;
   }
+  async findAllForDateSend(dates: string[]): Promise<I_ParteDiario[] | null> {
+    const normalizedDates = dates.map((date) => {
+      const d = converToDate(date);
+      d.setUTCHours(0, 0, 0, 0);
+      return d;
+    });
+    console.log("------------.sd");
+    console.log(normalizedDates);
+    const dailyParts = await prisma.parteDiario.findMany({
+      where: {
+        fecha: {
+          in: normalizedDates,
+        },
+      },
+      include: {
+        Trabajo: {
+          include: {
+            UnidadProduccion: true,
+          },
+        },
+        RiesgoParteDiario: true,
+      },
+    });
+    return dailyParts;
+  }
   async findAllForProject(
     skip: number,
     data: T_FindAllDailyPart,
@@ -121,7 +146,7 @@ class PrismaDailyPartRepository implements DailyPartRepository {
         nombre: item.nombre,
         trabajo: ResData.nombre,
         tren: Tren.nombre,
-        actividad: item.descripcion_actividad,
+        actividad: item.descripcion_actividad ? item.descripcion_actividad : "",
         fecha: item.fecha,
       };
     });

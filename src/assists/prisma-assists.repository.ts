@@ -38,70 +38,87 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
     });
     return updateAssists;
   }
-  async updateManyStatusAsigned(ids: number[], project_id: number) {
-    const date = new Date();
-    date.setUTCHours(0, 0, 0, 0);
-    // await Promise.all(
-    //   ids.map(async (id) => {
-    //     await prisma.asistencia.updateMany({
-    //       where: {
-    //         fecha: date,
-    //         proyecto_id: project_id,
-    //       },
-    //       data: {
-    //         estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
-    //       },
-    //     });
-    //   })
-    // );
-    await prisma.asistencia.updateMany({
-      where: {
-        fecha: date,
-        proyecto_id: project_id,
-        mano_obra_id: { in: ids },
-      },
-      data: {
-        estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
-      },
-    });
+  async updateManyStatusAsigned(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ) {
+    if (date) {
+      const dateNew = date;
+      dateNew.setUTCHours(0, 0, 0, 0);
+      // await Promise.all(
+      //   ids.map(async (id) => {
+      //     await prisma.asistencia.updateMany({
+      //       where: {
+      //         fecha: date,
+      //         proyecto_id: project_id,
+      //       },
+      //       data: {
+      //         estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
+      //       },
+      //     });
+      //   })
+      // );
+      await prisma.asistencia.updateMany({
+        where: {
+          fecha: dateNew,
+          proyecto_id: project_id,
+          mano_obra_id: { in: ids },
+        },
+        data: {
+          estado_asignacion: E_Estado_Asistencia_BD.ASIGNADO,
+        },
+      });
+    }
   }
-  async updateManyStatusAsignedX2(ids: number[], project_id: number) {
-    const date = new Date();
-    date.setUTCHours(0, 0, 0, 0);
-    await prisma.asistencia.updateMany({
-      where: {
-        fecha: date,
-        proyecto_id: project_id,
-        mano_obra_id: { in: ids },
-      },
-      data: {
-        estado_asignacion: E_Estado_Asistencia_BD.DOBLEMENTE_ASIGNADO,
-      },
-    });
+  async updateManyStatusAsignedX2(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ) {
+    if (date) {
+      const dateNew = date;
+      dateNew.setUTCHours(0, 0, 0, 0);
+      await prisma.asistencia.updateMany({
+        where: {
+          fecha: dateNew,
+          proyecto_id: project_id,
+          mano_obra_id: { in: ids },
+        },
+        data: {
+          estado_asignacion: E_Estado_Asistencia_BD.DOBLEMENTE_ASIGNADO,
+        },
+      });
+    }
   }
-  async updateManyStatusNotAsigned(ids: number[], project_id: number) {
-    const date = new Date();
-    date.setUTCHours(0, 0, 0, 0);
+  async updateManyStatusNotAsigned(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ) {
+    if (date) {
+      const datenew = date;
+      datenew.setUTCHours(0, 0, 0, 0);
 
-    await prisma.asistencia.updateMany({
-      where: {
-        fecha: date,
-        proyecto_id: project_id,
-        mano_obra_id: { in: ids },
-      },
-      data: {
-        estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
-      },
-    });
+      await prisma.asistencia.updateMany({
+        where: {
+          fecha: datenew,
+          proyecto_id: project_id,
+          mano_obra_id: { in: ids },
+        },
+        data: {
+          estado_asignacion: E_Estado_Asistencia_BD.NO_ASIGNADO,
+        },
+      });
+    }
   }
   async findAllWithOutPagination(
     project_id: number
   ): Promise<Asistencia[] | null> {
-    const date = new Date();
-    date.setUTCHours(0, 0, 0, 0);
+    // const date = new Date();
+    // date.setUTCHours(0, 0, 0, 0);
     const asssits = await prisma.asistencia.findMany({
       where: {
-        fecha: date,
         proyecto_id: project_id,
       },
     });

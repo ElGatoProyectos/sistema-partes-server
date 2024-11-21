@@ -74,3 +74,7 @@ export interface I_DailyPartId
   restriccion: I_RiskDailyPart | null;
   nombre_trabajo: string;
 }
+
+export interface I_DailyPartPdf {
+  date: string;
+}

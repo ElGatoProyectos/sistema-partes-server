@@ -1,4 +1,5 @@
 import {
+  DetalleParteDiarioFoto,
   DetallePrecioHoraMO,
   DetalleTrabajoPartida,
   ParteDiario,
@@ -24,11 +25,12 @@ import { I_DailyPartWorkforce } from "../dailyPartMO/models/dailyPartMO.interfac
 import { I_DailyPartDepartureForPdf } from "../dailyPartDeparture/models/dailyPartDeparture.interface";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
+import { dailyPartPhotoValidation } from "../photos/dailyPartPhotos.validation";
 
 const pdfService = new DailyPartPdfService();
 
 export class ReportService {
-  async crearInforme(daily_part_id: number, project_id: string) {
+  async crearInforme(user_login: number, project_id: string, fecha: string) {
     try {
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
@@ -46,7 +48,7 @@ export class ReportService {
 
       pdfService.deleteImages(user_id);
 
-      await pdfService.createImage(user_id);
+      await pdfService.createImage(user_id, fecha);
 
       //[note] acá comenzamos el proceso de buscar los datos
       const dailyPartsResponse =
@@ -57,11 +59,9 @@ export class ReportService {
       const idsJob = dailyParts.map((dailyPart) => dailyPart.trabajo_id);
       const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.id);
 
-      console.log("paso los ids");
       const detailsDepartureJobsResponse =
         await departureJobValidation.findAllWithOutPaginationForIdsJob(idsJob);
 
-      console.log("llego a departure job");
       const detailsDepartureJob =
         detailsDepartureJobsResponse.payload as I_DepartureJobForPdf[];
       let totalProductionWorkforce = 0;
@@ -69,6 +69,14 @@ export class ReportService {
       let productionForDay = 0;
       if (detailsDepartureJob.length > 0) {
         detailsDepartureJob.map((detail) => {
+          // console.log(
+          //   "la multiplicacion del id " +
+          //     detail.id +
+          //     " del metrado utilizado que es " +
+          //     detail.metrado_utilizado +
+          //     " por el precio de la partida " +
+          //     detail.Partida.precio
+          // );
           productionForDay += detail.metrado_utilizado * detail.Partida.precio;
 
           totalProductionWorkforce +=
@@ -76,7 +84,6 @@ export class ReportService {
         });
       }
 
-      console.log("llego a buscar partes diarios partida");
       const dailysPartDepartureResponse =
         await dailyPartDepartureValidation.findAllForIdsDailyPart(idsDailyPart);
 
@@ -88,7 +95,6 @@ export class ReportService {
 
       const dailysPartsWorkforce =
         dailyPartWokrforceResponse.payload as I_DailyPartWorkforce[];
-
       const dailyPartsWithRestrictionsResponse =
         await dailyPartReportValidation.findAllForIdsDailyPart(idsDailyPart);
       const dailyPartsWithRestrictions =
@@ -103,6 +109,7 @@ export class ReportService {
       let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
       let totalRealWorkforceProduction = 0;
       if (dailysPartsWorkforce.length > 0) {
+        console.log("-----entro a llenar --------");
         const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
         const detailsPriceHourMOResponse =
           await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
@@ -117,13 +124,13 @@ export class ReportService {
             const detail = detailsPriceHourMO.find(
               (detail) => detail.categoria_obrero_id === categoriaId
             );
-
             if (
               detail &&
-              workforce.hora_60 &&
-              workforce.hora_100 &&
-              workforce.hora_normal
+              workforce.hora_60 != null &&
+              workforce.hora_100 != null &&
+              workforce.hora_normal != null
             ) {
+              console.log("entro a cargar");
               let sumaCategoryMO = 0;
               totalRealWorkforceProduction +=
                 detail.hora_normal * workforce.hora_normal +
@@ -152,6 +159,7 @@ export class ReportService {
       }
 
       if (!priceHourResponse.success && dailysPartsWorkforce.length > 0) {
+        console.log("--------entro a llenar otra cosa----------");
         //[note] esto lo hago por las dudas de que no haya cargado la tabla salarial o no haya una de acuerdo al día que lo imprime
         dailysPartsWorkforce.forEach((workforce) => {
           workforces.push({
@@ -169,8 +177,14 @@ export class ReportService {
         });
       }
 
-      const desviacion =
+      const desviation =
         totalProductionWorkforce - totalRealWorkforceProduction;
+
+      const dailyPartComentaryResponse =
+        await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPart);
+
+      const dailyPartComentary =
+        dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
 
       console.log("llego al crear template");
       const template = await TemplateHtmlInforme(
@@ -179,13 +193,15 @@ export class ReportService {
         dailyParts,
         detailsDepartureJob,
         dailysPartsDeparture,
-        dailysPartsWorkforce,
+        workforces,
         dailyPartsWithRestrictions,
         date,
         productionForDay,
         totalProductionWorkforce,
         totalRealWorkforceProduction,
-        desviacion
+        desviation,
+        idsDailyPart,
+        dailyPartComentary
       );
 
       console.log("llego al crear pdf");
@@ -201,6 +217,7 @@ export class ReportService {
         },
       };
     } catch (error) {
+      console.log(error);
       return {
         success: false,
         message: "Error al crear informe",

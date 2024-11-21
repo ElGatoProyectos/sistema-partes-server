@@ -1,10 +1,4 @@
-import {
-  DetallePrecioHoraMO,
-  ParteDiario,
-  ParteDiarioPartida,
-  PrecioHoraMO,
-  Proyecto,
-} from "@prisma/client";
+import { DetalleParteDiarioFoto, Proyecto } from "@prisma/client";
 import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
@@ -28,7 +22,9 @@ export const TemplateHtmlInforme = async (
   productionForDay: number,
   totalProductionWorkforce: number,
   totalRealWorkforceProduction: number,
-  desviacion: number
+  desviacion: number,
+  idsDailyPart: number[],
+  dailyPartComentary: DetalleParteDiarioFoto[]
 ) => {
   console.log("esta dentro");
   const imagePath = path.join(
@@ -70,7 +66,9 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>${detail.Trabajo?.codigo || "N/A"}</td>
           <td>${detail.Trabajo?.nombre || "N/A"}</td>
-          <td>${detail.Trabajo?.costo_partida || "N/A"}</td>
+          <td>S/. ${formatNumberToDecimal(
+            detail.Trabajo?.costo_partida || 0
+          )}</td>
           <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
         </tr>
       `;
@@ -84,15 +82,14 @@ export const TemplateHtmlInforme = async (
           <td>${detail.Partida?.item || "N/A"}</td>
           <td>${detail.Partida?.partida || "N/A"}</td>
           <td>${detail.Partida?.Unidad?.simbolo || "N/A"}</td>
-          <td>${detail.cantidad_utilizada || "N/A"}</td>
-          <td>$${detail.Partida.precio || "N/A"}</td>
-          <td>$${detail.Partida.parcial || "N/A"}</td>
+          <td>${detail.cantidad_utilizada || 0}</td>
+          <td>S/. ${formatNumberToDecimal(detail.Partida.precio || 0)}</td>
+          <td>S/. ${formatNumberToDecimal(detail.Partida.parcial || 0)}</td>
         </tr>
       `;
     })
     .join("");
   console.log("paso parte diario partida");
-  console.log(workforces);
   const tablaWorkfoces = workforces
     .map((detail: any) => {
       return `
@@ -101,54 +98,191 @@ export const TemplateHtmlInforme = async (
           <td>${detail.dni}</td>
           <td>${detail.nombre_completo}</td>
           <td>${detail.hora_normal}</td>
-          <td>$${detail.hora_60}</td>
-          <td>$${detail.hora_100}</td>
-          <td>$${detail.costo_diario}</td>
+          <td>${detail.hora_60}</td>
+          <td>${detail.hora_100}</td>
+           <td>S/. ${formatNumberToDecimal(detail.costo_diario || 0)}</td>
         </tr>
       `;
     })
     .join("");
   console.log("paso mano de obra");
-
   const restrictionsToTheDay = restrictions
     .map((detail: any) => {
       return `
         <tr>
           <td>${detail.Trabajo.codigo}</td>
           <td>${detail.Trabajo.nombre}</td>
-          <td>${detail.descripcion}</td>
-          <td>${detail.estado}</td>
-          <td>$${detail.riesgo}</td>
+          <td>${detail.RiesgoParteDiario?.descripcion || ""}</td>
+          <td>${detail.RiesgoParteDiario?.estado || ""}</td>
+          <td>${detail.RiesgoParteDiario?.riesgo || ""}</td>
         </tr>
       `;
     })
     .join("");
   console.log("paso restricciones");
 
-  // let direction = path.join(appRootPath.path, "static", "daiyPartPhotos");
-  // let numbersPhotos = [1, 2, 3, 4];
+  let direction = path.join(appRootPath.path, "static", "dailyPartPhotos");
+  let numbersPhotos = [1, 2, 3, 4];
+  let numbersPhotosOnlyOne = [1];
+  let numbersPhotosOnlyTwo = [1, 2];
 
-  // const files = await fs.promises.readdir(direction);
+  const files = await fs.promises.readdir(direction);
 
-  // const counts: Record<string, number> = {};
+  const counts: Record<string, number> = {};
 
-  // files.forEach((file) => {
-  //   const match = file.match(/^(\d+)_photo_(\d+)/);
-  //   if (match) {
-  //     const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
-  //     const prefixNumber = parseInt(prefix, 10);
-  //     const suffixNumber = parseInt(suffix, 10);
+  let idsDailyParts = [1, 2, 3];
 
-  //     // Verifica si ambos números están en sus respectivos arrays
-  //     if (
-  //       idsDailyPart.includes(prefixNumber) &&
-  //       numbersPhotos.includes(suffixNumber)
-  //     ) {
-  //       const key = `${prefix}_photo_${suffix}`;
-  //       counts[key] = (counts[key] || 0) + 1;
-  //     }
-  //   }
-  // });
+  // //[note] acá diria si hay menos de 8
+  if (idsDailyParts.length === 3) {
+    files.forEach((file) => {
+      const match = file.match(/^(\d+)_photo_(\d+)/);
+      if (match) {
+        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const prefixNumber = parseInt(prefix, 10);
+        const suffixNumber = parseInt(suffix, 10);
+
+        // Verifica si ambos números están en sus respectivos arrays
+        if (
+          idsDailyPart.includes(prefixNumber) &&
+          numbersPhotos.includes(suffixNumber)
+        ) {
+          const key = `${prefix}_photo_${suffix}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      }
+    });
+  }
+
+  //[note] aca diria si hay 8
+  if (idsDailyParts.length === 4) {
+    console.log("entro al solo es 1");
+    files.forEach((file) => {
+      const match = file.match(/^(\d+)_photo_(\d+)/);
+      if (match) {
+        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const prefixNumber = parseInt(prefix, 10);
+        const suffixNumber = parseInt(suffix, 10);
+
+        // Verifica si ambos números están en sus respectivos arrays
+        if (
+          idsDailyPart.includes(prefixNumber) &&
+          numbersPhotosOnlyTwo.includes(suffixNumber)
+        ) {
+          const key = `${prefix}_photo_${suffix}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      }
+    });
+  }
+
+  //[note] acá diria si hay más de 20
+  if (idsDailyParts.length > 5) {
+    console.log("entro al es mas 3 ");
+    files.forEach((file) => {
+      const match = file.match(/^(\d+)_photo_(\d+)/);
+      if (match) {
+        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const prefixNumber = parseInt(prefix, 10);
+        const suffixNumber = parseInt(suffix, 10);
+
+        // Verifica si ambos números están en sus respectivos arrays
+        if (
+          idsDailyPart.includes(prefixNumber) &&
+          numbersPhotosOnlyOne.includes(suffixNumber)
+        ) {
+          const key = `${prefix}_photo_${suffix}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      }
+    });
+  }
+
+  const photos = Object.keys(counts);
+  const fotosConExtension = photos.map((photo) => `${photo}.png`);
+
+  // const imagesHtml = files
+  //   .filter((file) => file.match(/^(\d+)_photo_(\d+)/)) // Filtrar solo las fotos con el patrón correcto
+  //   .map((file) => {
+  //     const imagePath = path.join(direction, file);
+  //     const base64Image = fs.readFileSync(imagePath).toString("base64");
+  //     const base64Type = `data:image/png;base64,${base64Image}`;
+
+  //     // Crear una etiqueta <img> para cada imagen
+  //     return `<img src="${base64Type}" alt="${file}" style="width: 200px; height: auto; margin: 10px;" />`;
+  //   })
+  //   .join("");
+
+  const getComentario = (photoName: string) => {
+    const match = photoName.match(/^(\d+)_photo_(\d+)$/);
+    if (!match) return null;
+
+    const parteDiarioId = parseInt(match[1], 10); // Primer número
+    const comentarioIndex = parseInt(match[2], 10); // Segundo número
+
+    // Buscar el objeto correspondiente en el array de comentarios
+    const parteDiario = dailyPartComentary.find(
+      (item) => item.parte_diario_id === parteDiarioId
+    );
+
+    if (!parteDiario) return null; // No se encontró el parte diario
+
+    // Devolver el comentario correspondiente según el índice
+    switch (comentarioIndex) {
+      case 1:
+        return parteDiario.comentario_uno;
+      case 2:
+        return parteDiario.comentario_dos;
+      case 3:
+        return parteDiario.comentario_tres;
+      case 4:
+        return parteDiario.comentario_cuatro;
+      default:
+        return null; // Índice no válido
+    }
+  };
+
+  const imagesHtml = `
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+    ${fotosConExtension
+      .filter((file) => file.match(/^(\d+)_photo_(\d+)/))
+      .map((file, index) => {
+        const imagePath = path.join(direction, file);
+        const base64Image = fs.readFileSync(imagePath).toString("base64");
+        const base64Type = `data:image/png;base64,${base64Image}`;
+
+        // Obtener el número de la foto
+        const photoNumber = index + 1;
+
+        // Eliminar la extensión del archivo para obtener solo el nombre (sin .png)
+        const fileName = path.parse(file).name;
+
+        // Obtener el comentario para la foto
+        const comentario =
+          getComentario(fileName) ||
+          `Foto ${photoNumber}: Sin comentario disponible`;
+
+        // Crear el HTML para cada celda de la tabla
+        return `
+          <td style="width: 50%; padding: 10px; text-align: center; border: 1px solid #ddd;">
+            <p style="font-size: 14px; font-weight: bold; margin: 5px 0;">Foto ${photoNumber}: ${comentario}</p>
+            <img src="${base64Type}" alt="${file}" style="width: 100%; height: 200px; object-fit: cover; border: 1px solid #ccc;" />
+          </td>
+        `;
+      })
+      .reduce((rows: string[], cellHtml, index) => {
+        if (index % 2 === 0) {
+          rows.push(
+            `<tr><table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tr>${cellHtml}`
+          );
+        } else {
+          rows[rows.length - 1] += `${cellHtml}</tr></table></tr>`;
+        }
+        return rows;
+      }, [])
+      .join("")}
+  </table>
+`;
+
   console.log("llego al final");
 
   const valuesAssists: { [key: number]: String } = {
@@ -329,10 +463,12 @@ export const TemplateHtmlInforme = async (
           <td><span>Desviación</span></td>
         </tr>
         <tr>
-          <td>S/. ${productionForDay}</td>
-          <td>S/. ${totalProductionWorkforce}</td>
-          <td>S/. ${totalRealWorkforceProduction}</td>
-           ${formatCurrency(desviacion)}
+          <td>S/. ${formatNumberToDecimal(productionForDay || 0)}</td>
+          <td>S/. ${formatNumberToDecimal(totalProductionWorkforce || 0)}</td>
+          <td>S/. ${formatNumberToDecimal(
+            totalRealWorkforceProduction || 0
+          )}</td>
+           <td>S/. ${formatNumberToDecimal(desviacion || 0)}</td>
         </tr>
       </table>
 
@@ -376,24 +512,8 @@ export const TemplateHtmlInforme = async (
         </tr>
       </table>
       <table class="table" border >
-        <tr>
-          <td align="left">Foto 01: Colocación Acero</td>
-          <td align="left">Foto 02: Colocación Acero</td>
-        </tr>
-        <tr>
-          <td style="height: 200px;"></td>
-          <td></td>
-
-        </tr>
-        <tr>
-          <td align="left">Foto 03: Colocación Acero</td>
-          <td align="left">Foto 04: Colocación Acero</td>
-        </tr>
-        <tr>
-          <td style="height: 200px;"></td>
-          <td></td>
-
-        </tr>
+      ${imagesHtml}
+        
       </table>
 
       <table>
@@ -476,4 +596,15 @@ function formatCurrency(value: number): string {
   return value < 0
     ? `<td style="color:red">${formattedValue}</td>`
     : `<td>${formattedValue}</td>`;
+}
+
+export function formatNumberToDecimal(number: number) {
+  if (number === 0) {
+    return "-";
+  } else {
+    return number.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
 }

@@ -129,12 +129,14 @@ class AssistsWorkforceValidation {
   }
   async updateManyAsigned(
     ids: number[],
-    project_id: number
+    project_id: number,
+    date: Date | null
   ): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.updateManyStatusAsigned(
         ids,
-        project_id
+        project_id,
+        date
       );
 
       return httpResponse.SuccessResponse(
@@ -150,12 +152,14 @@ class AssistsWorkforceValidation {
   }
   async updateManyAsignedX2(
     ids: number[],
-    project_id: number
+    project_id: number,
+    date: Date | null
   ): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.updateManyStatusAsignedX2(
         ids,
-        project_id
+        project_id,
+        date
       );
 
       return httpResponse.SuccessResponse(
@@ -171,12 +175,14 @@ class AssistsWorkforceValidation {
   }
   async updateManyNotAsigned(
     ids: number[],
-    project_id: number
+    project_id: number,
+    date: Date | null
   ): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.updateManyStatusNotAsigned(
         ids,
-        project_id
+        project_id,
+        date
       );
 
       return httpResponse.SuccessResponse(
