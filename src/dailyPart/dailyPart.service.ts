@@ -164,7 +164,8 @@ class DailyPartService {
 
         await assistsWorkforceValidation.updateManyNotAsigned(
           idsMO,
-          project_id
+          project_id,
+          dailyPart.fecha
         );
       }
 

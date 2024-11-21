@@ -54,7 +54,9 @@ class DailyPartController {
     // const result = await reportService.crearInforme(id, "hola");
     // response.status(result.statusCode).json(result);
 
-    const result: any = await reportService.crearInforme(1, String(id));
+    const date = "2024-11-24";
+
+    const result: any = await reportService.crearInforme(1, String(id), date);
 
     if (result.success && result.payload) {
       let filePath = "";

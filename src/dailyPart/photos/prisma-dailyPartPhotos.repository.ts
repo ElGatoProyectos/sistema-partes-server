@@ -9,6 +9,20 @@ import {
 import prisma from "../../config/prisma.config";
 
 class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
+  async findAllForIdsDailyPart(
+    idsDailyPart: number[]
+  ): Promise<DetalleParteDiarioFoto[] | null> {
+    const details = await prisma.detalleParteDiarioFoto.findMany({
+      where: {
+        ParteDiario: {
+          id: {
+            in: idsDailyPart,
+          },
+        },
+      },
+    });
+    return details;
+  }
   async findComentaryOfDetail(
     daily_part_id: number
   ): Promise<DetalleParteDiarioFoto | null> {

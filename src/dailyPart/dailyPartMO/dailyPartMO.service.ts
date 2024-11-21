@@ -58,7 +58,8 @@ class DailyPartMOService {
       const idsMOAsigned = assists
         .filter(
           (assist) =>
-            assist.estado_asignacion === E_Estado_Asistencia_BD.ASIGNADO
+            assist.estado_asignacion === E_Estado_Asistencia_BD.ASIGNADO &&
+            assist.fecha.getTime() === dailyPart.fecha?.getTime()
         )
         .map((assist) => assist.mano_obra_id);
 
@@ -75,15 +76,18 @@ class DailyPartMOService {
         project_id,
         dailyPart.id
       );
+
       await assistsWorkforceValidation.updateManyAsigned(
         data.workforces_id,
-        project_id
+        project_id,
+        dailyPart.fecha
       );
 
       if (idsMOInStateAssigned.length > 0) {
         await assistsWorkforceValidation.updateManyAsignedX2(
           idsMOInStateAssigned,
-          project_id
+          project_id,
+          dailyPart.fecha
         );
       }
 
@@ -150,7 +154,6 @@ class DailyPartMOService {
         updateDailyPartMO
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Parte Diario MO",
         error
@@ -183,15 +186,14 @@ class DailyPartMOService {
       return assistsResponse;
     }
     const assists = assistsResponse.payload as Asistencia;
-    console.log(data);
-    console.log(
-      "resutado 0 de hacer  asistencia hora parcial " +
-        (assists.hora_parcial || 0) +
-        "DATA HORA PARCIAL " +
-        data.hora_parcial +
-        " parte diario mo " +
-        dailyPartMO.hora_parcial
-    );
+    // console.log(
+    //   "resutado 0 de hacer  asistencia hora parcial " +
+    //     (assists.hora_parcial || 0) +
+    //     "DATA HORA PARCIAL " +
+    //     data.hora_parcial +
+    //     " parte diario mo " +
+    //     dailyPartMO.hora_parcial
+    // );
     let hp = 0;
     if (
       assists.hora_parcial !== undefined &&

@@ -39,5 +39,7 @@ export abstract class DailyPartRepository {
 
   findAllForDate(): void {}
 
+  findAllForDateSend(dates: string[]): void {}
+
   findAllForIds(ids: number[]): void {}
 }

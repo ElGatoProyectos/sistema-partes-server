@@ -53,11 +53,23 @@ export abstract class BankWorkforceRepository {
 
   updateStatusAssists(assists_id: number): void {}
 
-  updateManyStatusAsigned(ids: number[], project_id: number): void {}
+  updateManyStatusAsigned(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ): void {}
 
-  updateManyStatusAsignedX2(ids: number[], project_id: number): void {}
+  updateManyStatusAsignedX2(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ): void {}
 
-  updateManyStatusNotAsigned(ids: number[], project_id: number): void {}
+  updateManyStatusNotAsigned(
+    ids: number[],
+    project_id: number,
+    date: Date | null
+  ): void {}
 
   findDatesByLegend(project_id: number): void {}
 }

@@ -25,6 +25,26 @@ class DailyPartPhotoValidation {
       );
     }
   }
+  async findAllForIdsDailyParts(
+    idsDailyPart: number[]
+  ): Promise<T_HttpResponse> {
+    try {
+      const dailyPart =
+        await prismaDailyPartPhotoRepository.findAllForIdsDailyPart(
+          idsDailyPart
+        );
+
+      return httpResponse.SuccessResponse(
+        "El Detalle Parte Diario Foto por los ids de los Partes Diarios fueron encontrados",
+        dailyPart
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Parte Diario Foto por los ids de los Partes Diarios fueron encontrados",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartPhotoValidation = new DailyPartPhotoValidation();

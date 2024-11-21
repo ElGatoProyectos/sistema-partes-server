@@ -65,6 +65,11 @@ export interface I_JobExcel {
 export interface I_Trabajo {
   codigo: string;
   nombre: string;
+  costo_partida: number;
+  costo_mano_obra: number;
+  costo_material: number;
+  costo_equipo: number;
+  costo_varios: number;
   UnidadProduccion: UnidadProduccion;
 }
 export interface I_TrabajoForPdf {

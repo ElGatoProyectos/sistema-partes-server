@@ -832,7 +832,7 @@ class DepartureJobService {
 
       if (error > 0) {
         return httpResponse.BadRequestException(
-          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA, UNIDAD y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
+          `Error al leer el archivo. Los campos ID-TRABAJO, PARTIDA y METRADO son obligatorios. Fallo en las siguientes filas: ${errorRows.join(
             ", "
           )}`
         );

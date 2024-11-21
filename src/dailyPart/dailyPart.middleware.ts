@@ -21,6 +21,21 @@ class DailyPartMiddleware {
       response.status(result.statusCode).send(result);
     }
   }
+  verifyFieldsPdf(
+    request: express.Request,
+    response: express.Response,
+    nextFunction: express.NextFunction
+  ) {
+    try {
+      dailyPartDto.parse(request.body);
+      nextFunction();
+    } catch (error) {
+      const result = httpResponse.BadRequestException(
+        "Error al validar campos "
+      );
+      response.status(result.statusCode).send(result);
+    }
+  }
 
   verifyFieldsUpdate(
     request: express.Request,

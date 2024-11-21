@@ -14,4 +14,6 @@ export abstract class DailyPartPhotoRepository {
   findByDetailForDailyPart(daily_part_id: number): void {}
 
   findComentaryOfDetail(daily_part_id: number): void {}
+
+  findAllForIdsDailyPart(idsDailyPart: number[]): void {}
 }
