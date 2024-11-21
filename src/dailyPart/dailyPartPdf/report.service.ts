@@ -6,6 +6,7 @@ import {
   ParteDiarioPartida,
   PrecioHoraMO,
   Proyecto,
+  Semana,
   Usuario,
 } from "@prisma/client";
 import { TemplateHtmlInforme } from "../../../static/templates/template-html";
@@ -26,6 +27,7 @@ import { I_DailyPartDepartureForPdf } from "../dailyPartDeparture/models/dailyPa
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { dailyPartPhotoValidation } from "../photos/dailyPartPhotos.validation";
+import { weekValidation } from "../../week/week.validation";
 
 const pdfService = new DailyPartPdfService();
 
@@ -47,8 +49,24 @@ export class ReportService {
       const user_id = 1;
 
       pdfService.deleteImages(user_id);
+      //[note] acá preparo el terreno para crear la imagen
+      const date = new Date();
+      date.setUTCHours(0, 0, 0, 0);
+      const dateWeekResponse = await weekValidation.findByDate(date);
+      const week = dateWeekResponse.payload as Semana;
 
-      await pdfService.createImage(user_id, fecha);
+      const inicio = week.fecha_inicio;
+      const fin = week.fecha_fin;
+      const fechas: string[] = [];
+      for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
+        fechas.push(new Date(d).toISOString().slice(0, 10));
+      }
+      const dailyPartsResponseSend =
+        await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
+
+      const dailysPart = dailyPartsResponseSend.payload as I_ParteDiario[];
+
+      await pdfService.createImage(user_id, week, dailysPart, fechas);
 
       //[note] acá comenzamos el proceso de buscar los datos
       const dailyPartsResponse =
@@ -100,8 +118,6 @@ export class ReportService {
       const dailyPartsWithRestrictions =
         dailyPartsWithRestrictionsResponse.payload as I_ParteDiario[];
 
-      const date = new Date();
-      date.setUTCHours(0, 0, 0, 0);
       let workforces: any = [];
       const priceHourResponse = await priceHourWorkforceValidation.findByDate(
         date
