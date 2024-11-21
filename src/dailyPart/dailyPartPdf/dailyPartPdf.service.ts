@@ -48,7 +48,7 @@ export class DailyPartPdfService {
 
     const dailysPart = dailyPartsResponse.payload as I_ParteDiario[];
 
-    const total = [0, 0, 0, 0, 0, 0];
+    const total = [0, 0, 0, 0, 0, 0, 0];
 
     dailysPart.forEach((element) => {
       const elementDate = element.fecha
@@ -62,14 +62,7 @@ export class DailyPartPdfService {
         total[index] += element.Trabajo?.costo_partida || 0;
       }
     });
-    console.log(total);
-    const data1 = dailysPart[0].Trabajo.costo_partida;
-    const data2 = dailysPart[1].Trabajo.costo_partida;
-    const data3 = dailysPart[2].Trabajo.costo_partida;
-    const data4 = dailysPart[3].Trabajo.costo_partida;
-    const data5 = dailysPart[4].Trabajo.costo_partida;
-    const data6 = dailysPart[5].Trabajo.costo_partida;
-    const data7 = dailysPart[6].Trabajo.costo_partida;
+   
 
     chart
       .setConfig({
@@ -87,7 +80,7 @@ export class DailyPartPdfService {
           datasets: [
             {
               label: "Producción",
-              data: [data1, data2, data3, data4, data5, data6, data7],
+              data: [total[0], total[1], total[2], total[3], total[4], total[5], total[6]],
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               borderColor: "rgba(75, 192, 192, 1)",
               borderWidth: 2,
