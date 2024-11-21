@@ -31,22 +31,13 @@ export class DailyPartPdfService {
     return options;
   }
 
-  async createImage(user_id: number, date: string) {
-    const dateNew = converToDate(date);
-    dateNew.setUTCHours(0, 0, 0, 0);
-    const dateWeekResponse = await weekValidation.findByDate(dateNew);
-    const week = dateWeekResponse.payload as Semana;
-    const inicio = week.fecha_inicio;
-    const fin = week.fecha_fin;
-    const fechas: string[] = [];
-    for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
-      fechas.push(new Date(d).toISOString().slice(0, 10));
-    }
-    const dailyPartsResponse =
-      await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
+  async createImage(
+    user_id: number,
+    week: Semana,
+    dailysPart: I_ParteDiario[],
+    fechas: string[]
+  ) {
     const chart = new QuickChart();
-
-    const dailysPart = dailyPartsResponse.payload as I_ParteDiario[];
 
     const total = [0, 0, 0, 0, 0, 0, 0];
 
@@ -62,7 +53,6 @@ export class DailyPartPdfService {
         total[index] += element.Trabajo?.costo_partida || 0;
       }
     });
-   
 
     chart
       .setConfig({
@@ -80,7 +70,15 @@ export class DailyPartPdfService {
           datasets: [
             {
               label: "Producción",
-              data: [total[0], total[1], total[2], total[3], total[4], total[5], total[6]],
+              data: [
+                total[0],
+                total[1],
+                total[2],
+                total[3],
+                total[4],
+                total[5],
+                total[6],
+              ],
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               borderColor: "rgba(75, 192, 192, 1)",
               borderWidth: 2,

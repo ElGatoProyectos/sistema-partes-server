@@ -294,6 +294,7 @@ export const TemplateHtmlInforme = async (
     5: "Viernes",
     6: "Sábado",
   };
+  console.log("numero del dia " + date.getDay());
   const resultValue = valuesAssists[date.getDay()];
   const day = date.getUTCDate();
   const month = date.getUTCMonth() + 1;

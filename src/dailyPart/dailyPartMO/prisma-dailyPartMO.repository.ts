@@ -104,6 +104,12 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
     const total = await prisma.parteDiarioMO.count({
       where: {
         proyecto_id: project_id,
+        parte_diario_id: daily_part_id,
+        ManoObra: {
+          CategoriaObrero: {
+            ...filters,
+          },
+        },
       },
     });
 
