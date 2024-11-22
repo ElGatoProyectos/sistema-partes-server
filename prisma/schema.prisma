@@ -563,6 +563,7 @@ model Proyecto {
   DetalleIngenieroProduccionManoObra DetalleIngenieroProduccionMaestroObra[]
   DetalleManoObraCapataz             DetalleMaestroObraCapataz[]
   DetalleCapatazJefeGrupo            DetalleCapatazJefeGrupo[]
+  ResporteAvanceTren                 ResporteAvanceTren[]
 }
 
 model Combo {
@@ -597,19 +598,20 @@ model UnidadProduccion {
 
 //[success] actual
 model Tren {
-  id             Int           @id @default(autoincrement())
-  codigo         String
-  nombre         String
-  nota           String?       @db.Text()
-  operario       Int
-  oficial        Int
-  peon           Int
-  fecha_creacion DateTime      @default(now())
-  eliminado      E_Estado_BD   @default(n)
-  proyecto_id    Int
-  ReporteTren    ReporteTren[]
-  Trabajo        Trabajo[]
-  Proyecto       Proyecto      @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  id                 Int                  @id @default(autoincrement())
+  codigo             String
+  nombre             String
+  nota               String?              @db.Text()
+  operario           Int
+  oficial            Int
+  peon               Int
+  fecha_creacion     DateTime             @default(now())
+  eliminado          E_Estado_BD          @default(n)
+  proyecto_id        Int
+  ReporteTren        ReporteTren[]
+  Trabajo            Trabajo[]
+  Proyecto           Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  ResporteAvanceTren ResporteAvanceTren[]
 }
 
 //[success] actual
@@ -807,6 +809,7 @@ model ParteDiario {
   ParteDiarioRecurso     ParteDiarioRecurso[]
   DetalleParteDiarioFoto DetalleParteDiarioFoto[]
   ParteDiarioPartida     ParteDiarioPartida[]
+  ResporteAvanceTren     ResporteAvanceTren[]
 }
 
 model ParteDiarioPartida {
@@ -933,4 +936,27 @@ model ReportePartida {
   Partida        Partida  @relation(fields: [partida_id], references: [id], onDelete: Cascade)
   proyecto_id    Int
   Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+}
+
+model ResporteAvanceTren {
+  id                 Int         @id @default(autoincrement())
+  tren_id            Int
+  parte_diario_id    Int
+  costo_total        Int
+  ejecutado_anterior Int
+  ejecutado_actual   Int
+  saldo              Int
+  lunes              Int
+  martes             Int
+  miercoles          Int
+  jueves             Int
+  viernes            Int
+  sabado             Int
+  domingo            Int
+  parcial            Int
+  semana_id          Int
+  proyecto_id        Int
+  ParteDiario        ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
+  Tren               Tren        @relation(fields: [tren_id], references: [id], onDelete: Cascade)
+  Proyecto           Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }

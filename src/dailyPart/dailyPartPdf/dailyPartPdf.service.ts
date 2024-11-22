@@ -141,9 +141,9 @@ export class DailyPartPdfService {
   async createImageForTripleChart(
     user_id: number,
     dailysPart: I_ParteDiario[],
-    dailyPartWorkforce: I_DailyPartWorkforce[],
+    dailyPartWorkforce: I_DailyPartWorkforce[] = [],
     fechas: string[],
-    detailsPriceHourMO: DetallePrecioHoraMO[]
+    detailsPriceHourMO: DetallePrecioHoraMO[] = []
   ) {
     const chart = new QuickChart();
 
@@ -153,42 +153,45 @@ export class DailyPartPdfService {
 
     const desviationForDay = [0, 0, 0, 0, 0, 0, 0];
 
-    dailysPart.forEach((dailyPart) => {
-      let totalRealWorkforceProduction = 0;
+    if (dailyPartWorkforce.length > 0 && detailsPriceHourMO.length > 0) {
+      dailysPart.forEach((dailyPart) => {
+        let totalRealWorkforceProduction = 0;
 
-      const elementDate = dailyPart.fecha
-        ? dailyPart.fecha.toISOString().slice(0, 10)
-        : "";
+        const elementDate = dailyPart.fecha
+          ? dailyPart.fecha.toISOString().slice(0, 10)
+          : "";
 
-      //[note] acá tengo el día  donde voy a llenar
-      const index = fechas.indexOf(elementDate);
+        //[note] acá tengo el día  donde voy a llenar
+        const index = fechas.indexOf(elementDate);
 
-      //[note] acá tengo los trabajadores del día del Parte Diario
-      const workforcesForDailyPart = dailyPartWorkforce.filter(
-        (workforce) => workforce.parte_diario_id === dailyPart.id
-      );
+        //[note] acá tengo los trabajadores del día del Parte Diario
+        const workforcesForDailyPart = dailyPartWorkforce.filter(
+          (workforce) => workforce.parte_diario_id === dailyPart.id
+        );
 
-      workforcesForDailyPart.forEach((workforce) => {
-        const detail = detailsPriceHourMO.find((detail) => {
-          return (
-            workforce.ManoObra.CategoriaObrero?.id ===
-            detail.categoria_obrero_id
-          );
+        workforcesForDailyPart.forEach((workforce) => {
+          const detail = detailsPriceHourMO.find((detail) => {
+            return (
+              workforce.ManoObra.CategoriaObrero?.id ===
+              detail.categoria_obrero_id
+            );
+          });
+
+          totalRealWorkforceProduction +=
+            (detail?.hora_normal ?? 0) * (workforce?.hora_normal ?? 0) +
+            (detail?.hora_extra_60 ?? 0) * (workforce?.hora_60 ?? 0) +
+            (detail?.hora_extra_100 ?? 0) * (workforce?.hora_100 ?? 0);
         });
 
-        totalRealWorkforceProduction +=
-          (detail?.hora_normal ?? 0) * (workforce?.hora_normal ?? 0) +
-          (detail?.hora_extra_60 ?? 0) * (workforce?.hora_60 ?? 0) +
-          (detail?.hora_extra_100 ?? 0) * (workforce?.hora_100 ?? 0);
+        //[note] acá ya tengo el costo de la Partida del día
+        if (index !== -1) {
+          // total[index] += dailyPart.Trabajo?.costo_partida || 0;
+          totalWorforcesForDay[index] +=
+            dailyPart.Trabajo?.costo_mano_obra || 0;
+          totalRealWorforcesForDay[index] += totalRealWorkforceProduction;
+        }
       });
-
-      //[note] acá ya tengo el costo de la Partida del día
-      if (index !== -1) {
-        // total[index] += dailyPart.Trabajo?.costo_partida || 0;
-        totalWorforcesForDay[index] += dailyPart.Trabajo?.costo_mano_obra || 0;
-        totalRealWorforcesForDay[index] += totalRealWorkforceProduction;
-      }
-    });
+    }
 
     for (let index = 0; index < desviationForDay.length; index++) {
       desviationForDay[index] =
