@@ -65,17 +65,31 @@ export class ReportService {
       const date = converToDate(data.date);
       date.setUTCHours(0, 0, 0, 0);
       const dateWeekResponse = await weekValidation.findByDate(date);
-      if (dateWeekResponse.success) {
+      const week = dateWeekResponse.payload as Semana;
+
+      const inicio = week.fecha_inicio;
+      const fin = week.fecha_fin;
+      const fechas: string[] = [];
+      for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
+        fechas.push(new Date(d).toISOString().slice(0, 10));
+      }
+      const dailyPartsResponseSend =
+        await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
+      if (dailyPartsResponseSend.success) {
+        const dailysPartWeek =
+          dailyPartsResponseSend.payload as I_ParteDiario[];
+
         return await this.ifDateIsPresentInBBDD(
-          dateWeekResponse,
+          dailysPartWeek,
+          fechas,
           date,
           user_id,
           project
         );
       } else {
+        await this.ifDateIsNotPresent(user_id, project, date);
       }
     } catch (error) {
-      console.log(error);
       return {
         success: false,
         message: "Error al crear informe",
@@ -111,25 +125,13 @@ export class ReportService {
     }
   }
   async ifDateIsPresentInBBDD(
-    dateWeekResponse: T_HttpResponse,
+    dailysPartWeek: I_ParteDiario[],
+    fechas: string[],
     date: Date,
     user_id: number,
     project: Proyecto
   ) {
-    const week = dateWeekResponse.payload as Semana;
-
-    const inicio = week.fecha_inicio;
-    const fin = week.fecha_fin;
-    const fechas: string[] = [];
-    for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
-      fechas.push(new Date(d).toISOString().slice(0, 10));
-    }
-    const dailyPartsResponseSend =
-      await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
-
     //[note] acá tenes todos los partes diarios de la semana
-    const dailysPartWeek = dailyPartsResponseSend.payload as I_ParteDiario[];
-
     const idsDailyPartWeek = dailysPartWeek.map((dailyPart) => dailyPart.id);
 
     //[note] acá saco los partes diarios del dia
@@ -192,30 +194,16 @@ export class ReportService {
     });
 
     let priceHourResponse = await priceHourWorkforceValidation.findByDate(date);
-
-    const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-    const detailsPriceHourMOResponse =
-      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-        priceHourMO.id
-      );
+    let detailsPriceHourMOResponse: any = [];
     let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
 
-    detailsPriceHourMO =
-      detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
-
-    //[message] creamos la imagen que tiene 3 lineas
-    await pdfService.createImageForTripleChart(
-      user_id,
-      dailysPartWeek,
-      dailysPartsWorkforce,
-      fechas,
-      detailsPriceHourMO
-    );
-
-    let workforces: any = [];
-
-    let totalRealWorkforceProduction = 0;
+    const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
     if (workforcesToday.length > 0 && priceHourResponse.success) {
+      detailsPriceHourMOResponse =
+        await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+          priceHourMO.id
+        );
+
       workforcesToday.forEach((workforce) => {
         if (workforce.ManoObra.CategoriaObrero) {
           const categoriaId = workforce.ManoObra.CategoriaObrero.id;
@@ -273,6 +261,23 @@ export class ReportService {
         });
       });
     }
+
+    detailsPriceHourMO = detailsPriceHourMOResponse.payload as
+      | DetallePrecioHoraMO[]
+      | [];
+
+    //[message] creamos la imagen que tiene 3 lineas
+    await pdfService.createImageForTripleChart(
+      user_id,
+      dailysPartWeek,
+      dailysPartsWorkforce,
+      fechas,
+      detailsPriceHourMO
+    );
+
+    let workforces: any = [];
+
+    let totalRealWorkforceProduction = 0;
 
     const desviation = totalProductionWorkforce - totalRealWorkforceProduction;
 

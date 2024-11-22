@@ -248,7 +248,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       skip,
       take: data.queryParams.limit,
       orderBy: {
-        nombre: "asc",
+        id: "desc",
       },
     });
     total = await prisma.trabajo.count({
