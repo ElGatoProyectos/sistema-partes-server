@@ -1,6 +1,7 @@
 import express from "../config/express.config";
 import {
   I_DailyPartCreateBody,
+  I_DailyPartPdf,
   I_DailyPartUpdateBody,
 } from "./models/dailyPart.interface";
 import { dailyPartService } from "./dailyPart.service";
@@ -48,15 +49,20 @@ class DailyPartController {
     response.status(result.statusCode).json(result);
   }
   async findReport(request: express.Request, response: express.Response) {
-    const id = Number(request.params.id);
     const project_id = request.get("project-id") as string;
 
-    // const result = await reportService.crearInforme(id, "hola");
-    // response.status(result.statusCode).json(result);
-
-    const date = "2024-11-24";
-
-    const result: any = await reportService.crearInforme(1, String(id), date);
+    const data = request.body as I_DailyPartPdf;
+    const tokenWithBearer = request.headers.authorization;
+    if (!tokenWithBearer) {
+      return httpResponse.BadRequestException(
+        "No se encontró el token para poder proseguir"
+      );
+    }
+    const result: any = await reportService.crearInforme(
+      tokenWithBearer,
+      project_id,
+      data
+    );
 
     if (result.success && result.payload) {
       let filePath = "";
@@ -86,17 +92,6 @@ class DailyPartController {
     } else {
       response.json(result);
     }
-
-    // const tokenWithBearer = request.headers.authorization;
-    // if (tokenWithBearer) {
-    //   const result = await reportService.crearInforme(id, tokenWithBearer);
-    //   response.status(result.statusCode).json(result);
-    // } else {
-    //   const result = httpResponse.UnauthorizedException(
-    //     "Error en la autenticacion para hacer el reporte"
-    //   );
-    //   response.status(result.statusCode).json(result);
-    // }
   }
   async findByInformation(
     request: express.Request,

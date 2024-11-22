@@ -326,7 +326,6 @@ class PrismaAssistsRepository implements BankWorkforceRepository {
   ): Promise<Asistencia | null> {
     const dateNew = date;
     date.setUTCHours(0, 0, 0, 0);
-
     const assists = await prisma.asistencia.findFirst({
       where: {
         fecha: dateNew,

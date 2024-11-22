@@ -2,6 +2,7 @@ import {
   Asistencia,
   E_Asistencia_BD,
   E_Estado_Asistencia_BD,
+  E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
 } from "@prisma/client";
@@ -35,6 +36,15 @@ class DailyPartMOService {
       }
 
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const workforcesResponse = await workforceValidation.findManyId(
         data.workforces_id,
@@ -121,6 +131,15 @@ class DailyPartMOService {
       }
 
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const dailyPartMOResponse = await dailyPartMOValidation.findById(
         daily_part_mo_id
@@ -343,6 +362,15 @@ class DailyPartMOService {
       }
 
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       if (dailyPart.fecha) {
         const date = dailyPart.fecha;

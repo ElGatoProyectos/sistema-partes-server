@@ -1,4 +1,8 @@
-import { ParteDiarioRecurso } from "@prisma/client";
+import {
+  E_Etapa_Parte_Diario,
+  ParteDiario,
+  ParteDiarioRecurso,
+} from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import { projectValidation } from "../../project/project.validation";
@@ -8,6 +12,7 @@ import { dailyPartResourceValidation } from "./dailyPartResources.validation";
 import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 import {
   I_CreateDailyPartResourceBody,
+  I_DailyPartResource,
   I_UpdateDailyPartResourceBody,
 } from "./models/dailyPartResources.interface";
 import { prismaDailyPartResourceRepository } from "./prisma-dailyPartRepository.repository";
@@ -31,6 +36,17 @@ class DailyPartResourceService {
 
       if (!dailyPartResponse.success) {
         return dailyPartResponse;
+      }
+
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
       }
 
       const resourcesIdsResponse = await resourceValidation.findManyId(
@@ -80,7 +96,17 @@ class DailyPartResourceService {
       }
 
       const dailyPartResource =
-        dailyPartResourceResponse.payload as ParteDiarioRecurso;
+        dailyPartResourceResponse.payload as I_DailyPartResource;
+
+      if (
+        dailyPartResource.ParteDiario.etapa ===
+          E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPartResource.ParteDiario.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const resourceResponse = await resourceValidation.findById(
         data.resource_id
@@ -177,6 +203,19 @@ class DailyPartResourceService {
 
       if (!dailyPartResourceResponse.success) {
         return dailyPartResourceResponse;
+      }
+
+      const dailyPartResource =
+        dailyPartResourceResponse.payload as I_DailyPartResource;
+
+      if (
+        dailyPartResource.ParteDiario.etapa ===
+          E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPartResource.ParteDiario.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
       }
 
       await prismaDailyPartResourceRepository.delete(daily_part_resource_id);

@@ -1,7 +1,10 @@
 import { ParteDiarioRecurso } from "@prisma/client";
 import prisma from "../../config/prisma.config";
 import { DailyPartResourceRepository } from "./dailyPartResources.repository";
-import { I_UpdateDailyPartResourcesBD } from "./models/dailyPartResources.interface";
+import {
+  I_DailyPartResource,
+  I_UpdateDailyPartResourcesBD,
+} from "./models/dailyPartResources.interface";
 import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 
 class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
@@ -88,7 +91,7 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
   }
   async findById(
     daily_part_resource_id: number
-  ): Promise<ParteDiarioRecurso | null> {
+  ): Promise<I_DailyPartResource | null> {
     const dailyPartResource = await prisma.parteDiarioRecurso.findFirst({
       where: {
         id: daily_part_resource_id,
@@ -100,6 +103,7 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
             IndiceUnificado: true,
           },
         },
+        ParteDiario: true,
       },
     });
     return dailyPartResource;

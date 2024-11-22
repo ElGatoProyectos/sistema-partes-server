@@ -4,6 +4,7 @@ import validator from "validator";
 import { dailyPartDto } from "./dto/dailyPart.dto";
 import { httpResponse } from "../common/http.response";
 import { dailyPartUpdateDto } from "./dto/dailyPartUpdate.dto";
+import { dailyPartPdfDto } from "./dto/dailyPartPdf.dto";
 
 class DailyPartMiddleware {
   verifyFields(
@@ -27,7 +28,7 @@ class DailyPartMiddleware {
     nextFunction: express.NextFunction
   ) {
     try {
-      dailyPartDto.parse(request.body);
+      dailyPartPdfDto.parse(request.body);
       nextFunction();
     } catch (error) {
       const result = httpResponse.BadRequestException(

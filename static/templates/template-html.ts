@@ -3,30 +3,26 @@ import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "../../src/project/models/project.constant";
-import {
-  I_DailyPart,
-  I_ParteDiario,
-} from "../../src/dailyPart/models/dailyPart.interface";
+import { I_ParteDiario } from "../../src/dailyPart/models/dailyPart.interface";
 import { I_DepartureJobForPdf } from "../../src/departure/departure-job/models/departureJob.interface";
 import { I_DailyPartDepartureForPdf } from "../../src/dailyPart/dailyPartDeparture/models/dailyPartDeparture.interface";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
   project: Proyecto,
-  daily_parts: I_ParteDiario[],
-  detailsDepartureJob: I_DepartureJobForPdf[],
-  dailysPartsDeparture: I_DailyPartDepartureForPdf[],
-  workforces: any[],
-  restrictions: I_ParteDiario[],
+  daily_parts: I_ParteDiario[] = [],
+  detailsDepartureJob: I_DepartureJobForPdf[] = [],
+  dailysPartsDeparture: I_DailyPartDepartureForPdf[] = [],
+  workforces: any[] = [],
   date: Date,
   productionForDay: number,
   totalProductionWorkforce: number,
   totalRealWorkforceProduction: number,
   desviacion: number,
-  idsDailyPart: number[],
-  dailyPartComentary: DetalleParteDiarioFoto[]
+  idsDailyPartWeek: number[] = [],
+  dailyPartComentary: DetalleParteDiarioFoto[] = []
 ) => {
-  console.log("esta dentro");
+  //[message] acá busco la imagen con sólo una línea
   const imagePath = path.join(
     appRootPath.path,
     "static",
@@ -35,6 +31,15 @@ export const TemplateHtmlInforme = async (
   );
   const base64Image = fs.readFileSync(imagePath).toString("base64");
   const base64Type = `data:image/png;base64,${base64Image}`;
+  //[message] acá busco la imagen con 3 líneas
+  const imagePathTriple = path.join(
+    appRootPath.path,
+    "static",
+    "chartsTriple",
+    `chart-triple-${user_id}.png`
+  );
+  const base64ImageTriple = fs.readFileSync(imagePathTriple).toString("base64");
+  const base64TypeTriple = `data:image/png;base64,${base64ImageTriple}`;
 
   const imagePathProject = path.join(
     appRootPath.path,
@@ -59,7 +64,6 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  console.log("paso partes diario");
   const detailsForJob = detailsDepartureJob
     .map((detail) => {
       return `
@@ -74,7 +78,6 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  console.log("paso detalle trabajo partida");
   const tableRowsDetailsDepartures = dailysPartsDeparture
     .map((detail) => {
       return `
@@ -89,7 +92,6 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  console.log("paso parte diario partida");
   const tablaWorkfoces = workforces
     .map((detail: any) => {
       return `
@@ -105,21 +107,21 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  console.log("paso mano de obra");
-  const restrictionsToTheDay = restrictions
+  const restrictionsToTheDay = daily_parts
     .map((detail: any) => {
-      return `
-        <tr>
-          <td>${detail.Trabajo.codigo}</td>
-          <td>${detail.Trabajo.nombre}</td>
-          <td>${detail.RiesgoParteDiario?.descripcion || ""}</td>
-          <td>${detail.RiesgoParteDiario?.estado || ""}</td>
-          <td>${detail.RiesgoParteDiario?.riesgo || ""}</td>
-        </tr>
-      `;
+      if (detail.RiesgoParteDiario) {
+        return `
+          <tr>
+            <td>${detail.Trabajo.codigo}</td>
+            <td>${detail.Trabajo.nombre}</td>
+            <td>${detail.RiesgoParteDiario.descripcion || ""}</td>
+            <td>${detail.RiesgoParteDiario.estado || ""}</td>
+            <td>${detail.RiesgoParteDiario.riesgo || ""}</td>
+          </tr>
+        `;
+      }
     })
     .join("");
-  console.log("paso restricciones");
 
   let direction = path.join(appRootPath.path, "static", "dailyPartPhotos");
   let numbersPhotos = [1, 2, 3, 4];
@@ -130,20 +132,17 @@ export const TemplateHtmlInforme = async (
 
   const counts: Record<string, number> = {};
 
-  let idsDailyParts = [1, 2, 3];
-
-  // //[note] acá diria si hay menos de 8
-  if (idsDailyParts.length === 3) {
+  //[message] acá me fijo cuantas fotos voy a mostrar de acuerdo a la cantidad de partes diarios q ha habido en la semana
+  if (idsDailyPartWeek.length < 8) {
     files.forEach((file) => {
       const match = file.match(/^(\d+)_photo_(\d+)/);
       if (match) {
-        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const [_, prefix, suffix] = match;
         const prefixNumber = parseInt(prefix, 10);
         const suffixNumber = parseInt(suffix, 10);
 
-        // Verifica si ambos números están en sus respectivos arrays
         if (
-          idsDailyPart.includes(prefixNumber) &&
+          idsDailyPartWeek.includes(prefixNumber) &&
           numbersPhotos.includes(suffixNumber)
         ) {
           const key = `${prefix}_photo_${suffix}`;
@@ -153,19 +152,16 @@ export const TemplateHtmlInforme = async (
     });
   }
 
-  //[note] aca diria si hay 8
-  if (idsDailyParts.length === 4) {
-    console.log("entro al solo es 1");
+  if (idsDailyPartWeek.length === 8) {
     files.forEach((file) => {
       const match = file.match(/^(\d+)_photo_(\d+)/);
       if (match) {
-        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const [_, prefix, suffix] = match;
         const prefixNumber = parseInt(prefix, 10);
         const suffixNumber = parseInt(suffix, 10);
 
-        // Verifica si ambos números están en sus respectivos arrays
         if (
-          idsDailyPart.includes(prefixNumber) &&
+          idsDailyPartWeek.includes(prefixNumber) &&
           numbersPhotosOnlyTwo.includes(suffixNumber)
         ) {
           const key = `${prefix}_photo_${suffix}`;
@@ -175,19 +171,16 @@ export const TemplateHtmlInforme = async (
     });
   }
 
-  //[note] acá diria si hay más de 20
-  if (idsDailyParts.length > 5) {
-    console.log("entro al es mas 3 ");
+  if (idsDailyPartWeek.length > 20) {
     files.forEach((file) => {
       const match = file.match(/^(\d+)_photo_(\d+)/);
       if (match) {
-        const [_, prefix, suffix] = match; // Obtiene el número antes y después de 'photo'
+        const [_, prefix, suffix] = match;
         const prefixNumber = parseInt(prefix, 10);
         const suffixNumber = parseInt(suffix, 10);
 
-        // Verifica si ambos números están en sus respectivos arrays
         if (
-          idsDailyPart.includes(prefixNumber) &&
+          idsDailyPartWeek.includes(prefixNumber) &&
           numbersPhotosOnlyOne.includes(suffixNumber)
         ) {
           const key = `${prefix}_photo_${suffix}`;
@@ -216,17 +209,15 @@ export const TemplateHtmlInforme = async (
     const match = photoName.match(/^(\d+)_photo_(\d+)$/);
     if (!match) return null;
 
-    const parteDiarioId = parseInt(match[1], 10); // Primer número
-    const comentarioIndex = parseInt(match[2], 10); // Segundo número
+    const parteDiarioId = parseInt(match[1], 10);
+    const comentarioIndex = parseInt(match[2], 10);
 
-    // Buscar el objeto correspondiente en el array de comentarios
     const parteDiario = dailyPartComentary.find(
       (item) => item.parte_diario_id === parteDiarioId
     );
 
-    if (!parteDiario) return null; // No se encontró el parte diario
+    if (!parteDiario) return null;
 
-    // Devolver el comentario correspondiente según el índice
     switch (comentarioIndex) {
       case 1:
         return parteDiario.comentario_uno;
@@ -237,7 +228,7 @@ export const TemplateHtmlInforme = async (
       case 4:
         return parteDiario.comentario_cuatro;
       default:
-        return null; // Índice no válido
+        return null;
     }
   };
 
@@ -283,8 +274,6 @@ export const TemplateHtmlInforme = async (
   </table>
 `;
 
-  console.log("llego al final");
-
   const valuesAssists: { [key: number]: String } = {
     0: "Domingo",
     1: "Lunes",
@@ -294,8 +283,7 @@ export const TemplateHtmlInforme = async (
     5: "Viernes",
     6: "Sábado",
   };
-  console.log("numero del dia " + date.getDay());
-  const resultValue = valuesAssists[date.getDay()];
+  const resultValue = valuesAssists[date.getUTCDay()];
   const day = date.getUTCDate();
   const month = date.getUTCMonth() + 1;
   const year = date.getUTCFullYear();
@@ -360,7 +348,7 @@ export const TemplateHtmlInforme = async (
       <table>
         <tr>
           <td colspan="4" align="left">
-            <strong> I). Trabajo y Actividades el 25/08/2024: </strong>
+            <strong> I). Trabajo y Actividades el ${day}/${month}/${year}: </strong>
           </td>
         </tr>
       </table>
@@ -382,7 +370,7 @@ export const TemplateHtmlInforme = async (
       <table>
         <tr>
           <td colspan="4" align="left">
-            <strong> II). Trabajo y Costo De Producción 25/08/2024: </strong>
+            <strong> II). Trabajo y Costo De Producción ${day}/${month}/${year}: </strong>
           </td>
         </tr>
       </table>
@@ -521,6 +509,7 @@ export const TemplateHtmlInforme = async (
         <tr>
           <td>
               <img src="${base64Type}" alt="Chart Image" />
+              <img src="${base64TypeTriple}" alt="Chart Image" />
           
           </td>
         </tr>

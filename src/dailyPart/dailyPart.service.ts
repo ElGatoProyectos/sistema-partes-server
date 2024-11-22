@@ -124,6 +124,15 @@ class DailyPartService {
       }
       const dailyPart = dailyPartResponse.payload as I_DailyPart;
 
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
+
       const distancingValue = valueBooleanState(data.distanciamiento);
       const entranceValue = valueBooleanState(data.protocolo_ingreso);
       const exitValue = valueBooleanState(data.protocolo_salida);
