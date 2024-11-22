@@ -1,4 +1,8 @@
-import { DetalleParteDiarioFoto, ParteDiario } from "@prisma/client";
+import {
+  DetalleParteDiarioFoto,
+  E_Etapa_Parte_Diario,
+  ParteDiario,
+} from "@prisma/client";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import appRootPath from "app-root-path";
 import { DailyPartPhotoTwoMulterFile } from "./models/photos-contant";
@@ -26,6 +30,17 @@ class DailyPartPhotoService {
         return httpResponse.NotFoundException(
           "El Parte Diario no fue encontrado en el cración/actulización de la Restricción",
           dailyPartResponse.payload
+        );
+      }
+
+      const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
         );
       }
 

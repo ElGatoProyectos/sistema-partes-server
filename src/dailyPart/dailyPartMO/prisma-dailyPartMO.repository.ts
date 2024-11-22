@@ -131,7 +131,7 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
       };
     });
 
-    return { dailyPartsMO: dailyParts, total };
+    return { dailyPartsMO: dailyParts, total: dailyParts.length };
   }
 
   async findAllWithOutPagination(

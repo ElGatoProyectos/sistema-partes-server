@@ -12,10 +12,14 @@ import {
 import { TemplateHtmlInforme } from "../../../static/templates/template-html";
 import { TemplateHtmlInformeParteDiario } from "../../../static/templates/template-informe-html";
 import { jwtService } from "../../auth/jwt.service";
-import { httpResponse } from "../../common/http.response";
+import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { DailyPartPdfService } from "./dailyPartPdf.service";
 import { dailyPartReportValidation } from "../dailyPart.validation";
-import { I_DailyPart, I_ParteDiario } from "../models/dailyPart.interface";
+import {
+  I_DailyPart,
+  I_DailyPartPdf,
+  I_ParteDiario,
+} from "../models/dailyPart.interface";
 import { projectValidation } from "../../project/project.validation";
 import prisma from "../../config/prisma.config";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
@@ -28,210 +32,48 @@ import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { dailyPartPhotoValidation } from "../photos/dailyPartPhotos.validation";
 import { weekValidation } from "../../week/week.validation";
+import { converToDate } from "../../common/utils/date";
 
 const pdfService = new DailyPartPdfService();
 
 export class ReportService {
-  async crearInforme(user_login: number, project_id: string, fecha: string) {
+  async crearInforme(
+    tokenWithBearer: string,
+    project_id: string,
+    data: I_DailyPartPdf
+  ) {
     try {
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
         return httpResponse.BadRequestException(
-          "No se puede crear el Tren con el id del Proyecto proporcionado"
+          "No se puede crear el Reporte con el id del Proyecto proporcionado"
         );
       }
       const project = resultIdProject.payload as Proyecto;
-      // const userTokenResponse = await jwtService.getUserFromToken(
-      //   tokenWithBearer
-      // );
-      // if (!userTokenResponse) return userTokenResponse;
-      // const userResponse = userTokenResponse.payload as Usuario;
-      const user_id = 1;
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+      const user_id = userResponse.id;
 
+      //[message] borramos imagen que si tiene el usuario que solo tiene una linea del pdf
       pdfService.deleteImages(user_id);
+      //[message] borramos imagen que si tiene el usuario que solo tiene 3 lineas del pdf
+      pdfService.deleteImageTripleCharts(user_id);
       //[note] acá preparo el terreno para crear la imagen
-      const date = new Date();
+      const date = converToDate(data.date);
       date.setUTCHours(0, 0, 0, 0);
       const dateWeekResponse = await weekValidation.findByDate(date);
-      const week = dateWeekResponse.payload as Semana;
-
-      const inicio = week.fecha_inicio;
-      const fin = week.fecha_fin;
-      const fechas: string[] = [];
-      for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
-        fechas.push(new Date(d).toISOString().slice(0, 10));
-      }
-      const dailyPartsResponseSend =
-        await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
-
-      const dailysPart = dailyPartsResponseSend.payload as I_ParteDiario[];
-
-      await pdfService.createImage(user_id, week, dailysPart, fechas);
-
-      //[note] acá comenzamos el proceso de buscar los datos
-      const dailyPartsResponse =
-        await dailyPartReportValidation.findByDateAllDailyPart();
-
-      const dailyParts = dailyPartsResponse.payload as I_ParteDiario[];
-
-      const idsJob = dailyParts.map((dailyPart) => dailyPart.trabajo_id);
-      const idsDailyPart = dailyParts.map((dailyPart) => dailyPart.id);
-
-      const detailsDepartureJobsResponse =
-        await departureJobValidation.findAllWithOutPaginationForIdsJob(idsJob);
-
-      const detailsDepartureJob =
-        detailsDepartureJobsResponse.payload as I_DepartureJobForPdf[];
-      let totalProductionWorkforce = 0;
-
-      let productionForDay = 0;
-      if (detailsDepartureJob.length > 0) {
-        detailsDepartureJob.map((detail) => {
-          // console.log(
-          //   "la multiplicacion del id " +
-          //     detail.id +
-          //     " del metrado utilizado que es " +
-          //     detail.metrado_utilizado +
-          //     " por el precio de la partida " +
-          //     detail.Partida.precio
-          // );
-          productionForDay += detail.metrado_utilizado * detail.Partida.precio;
-
-          totalProductionWorkforce +=
-            detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
-        });
-      }
-
-      const dailysPartDepartureResponse =
-        await dailyPartDepartureValidation.findAllForIdsDailyPart(idsDailyPart);
-
-      const dailysPartsDeparture =
-        (await dailysPartDepartureResponse.payload) as I_DailyPartDepartureForPdf[];
-
-      const dailyPartWokrforceResponse =
-        await dailyPartMOValidation.findAllForIdsDailysParts(idsDailyPart);
-
-      const dailysPartsWorkforce =
-        dailyPartWokrforceResponse.payload as I_DailyPartWorkforce[];
-      const dailyPartsWithRestrictionsResponse =
-        await dailyPartReportValidation.findAllForIdsDailyPart(idsDailyPart);
-      const dailyPartsWithRestrictions =
-        dailyPartsWithRestrictionsResponse.payload as I_ParteDiario[];
-
-      let workforces: any = [];
-      const priceHourResponse = await priceHourWorkforceValidation.findByDate(
-        date
-      );
-      let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
-      let totalRealWorkforceProduction = 0;
-      if (dailysPartsWorkforce.length > 0) {
-        console.log("-----entro a llenar --------");
-        const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-        const detailsPriceHourMOResponse =
-          await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-            priceHourMO.id
-          );
-        detailsPriceHourMO =
-          detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
-        dailysPartsWorkforce.forEach((workforce) => {
-          if (workforce.ManoObra.CategoriaObrero) {
-            const categoriaId = workforce.ManoObra.CategoriaObrero.id;
-
-            const detail = detailsPriceHourMO.find(
-              (detail) => detail.categoria_obrero_id === categoriaId
-            );
-            if (
-              detail &&
-              workforce.hora_60 != null &&
-              workforce.hora_100 != null &&
-              workforce.hora_normal != null
-            ) {
-              console.log("entro a cargar");
-              let sumaCategoryMO = 0;
-              totalRealWorkforceProduction +=
-                detail.hora_normal * workforce.hora_normal +
-                detail.hora_extra_60 * workforce.hora_60 +
-                detail.hora_extra_100 * workforce.hora_100;
-              sumaCategoryMO =
-                detail.hora_normal * workforce.hora_normal +
-                detail.hora_extra_60 * workforce.hora_60 +
-                detail.hora_extra_100 * workforce.hora_100;
-              //[note] si está todo bien vamos a hacer agregarlo
-              workforces.push({
-                codigo: workforce.ManoObra.codigo,
-                dni: workforce.ManoObra.documento_identidad,
-                nombre_completo:
-                  workforce.ManoObra.nombre_completo +
-                  workforce.ManoObra.apellido_materno +
-                  workforce.ManoObra.apellido_paterno,
-                hora_normal: workforce.hora_normal,
-                hora_60: workforce.hora_60,
-                hora_100: workforce.hora_100,
-                costo_diario: sumaCategoryMO,
-              });
-            }
-          }
-        });
-      }
-
-      if (!priceHourResponse.success && dailysPartsWorkforce.length > 0) {
-        console.log("--------entro a llenar otra cosa----------");
-        //[note] esto lo hago por las dudas de que no haya cargado la tabla salarial o no haya una de acuerdo al día que lo imprime
-        dailysPartsWorkforce.forEach((workforce) => {
-          workforces.push({
-            codigo: workforce.ManoObra.codigo,
-            dni: workforce.ManoObra.documento_identidad,
-            nombre_completo:
-              workforce.ManoObra.nombre_completo +
-              workforce.ManoObra.apellido_materno +
-              workforce.ManoObra.apellido_paterno,
-            hora_normal: workforce.hora_normal,
-            hora_60: workforce.hora_60,
-            hora_100: workforce.hora_100,
-            costo_diario: 0,
-          });
-        });
-      }
-
-      const desviation =
-        totalProductionWorkforce - totalRealWorkforceProduction;
-
-      const dailyPartComentaryResponse =
-        await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPart);
-
-      const dailyPartComentary =
-        dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
-
-      console.log("llego al crear template");
-      const template = await TemplateHtmlInforme(
-        user_id,
-        project,
-        dailyParts,
-        detailsDepartureJob,
-        dailysPartsDeparture,
-        workforces,
-        dailyPartsWithRestrictions,
-        date,
-        productionForDay,
-        totalProductionWorkforce,
-        totalRealWorkforceProduction,
-        desviation,
-        idsDailyPart,
-        dailyPartComentary
-      );
-
-      console.log("llego al crear pdf");
-
-      await pdfService.createPdf(template, user_id);
-
-      return {
-        success: true,
-        message: "Error",
-        payload: {
-          id: user_id,
+      if (dateWeekResponse.success) {
+        return await this.ifDateIsPresentInBBDD(
+          dateWeekResponse,
+          date,
           user_id,
-        },
-      };
+          project
+        );
+      } else {
+      }
     } catch (error) {
       console.log(error);
       return {
@@ -267,6 +109,226 @@ export class ReportService {
         message: "Error al crear informe",
       };
     }
+  }
+  async ifDateIsPresentInBBDD(
+    dateWeekResponse: T_HttpResponse,
+    date: Date,
+    user_id: number,
+    project: Proyecto
+  ) {
+    const week = dateWeekResponse.payload as Semana;
+
+    const inicio = week.fecha_inicio;
+    const fin = week.fecha_fin;
+    const fechas: string[] = [];
+    for (let d = inicio; d <= fin; d.setDate(d.getDate() + 1)) {
+      fechas.push(new Date(d).toISOString().slice(0, 10));
+    }
+    const dailyPartsResponseSend =
+      await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
+
+    //[note] acá tenes todos los partes diarios de la semana
+    const dailysPartWeek = dailyPartsResponseSend.payload as I_ParteDiario[];
+
+    const idsDailyPartWeek = dailysPartWeek.map((dailyPart) => dailyPart.id);
+
+    //[note] acá saco los partes diarios del dia
+    const dailyParts = dailysPartWeek.filter(
+      (dailyPart) => dailyPart.fecha?.getTime() === date.getTime()
+    );
+
+    const dailyPartsIdToday = dailyParts.map((dailyPart) => dailyPart.id);
+
+    //[message] creamos la imagen del primer gráfico
+    await pdfService.createImage(user_id, dailysPartWeek, fechas);
+
+    //[note] acá comenzamos el proceso de buscar los datos
+
+    const idsJob = dailysPartWeek
+      .filter((dailyPart) => dailyPart.fecha?.getTime() === date.getTime())
+      .map((dailyPart) => dailyPart.trabajo_id);
+
+    const detailsDepartureJobsResponse =
+      await departureJobValidation.findAllWithOutPaginationForIdsJob(idsJob);
+    const detailsDepartureJob =
+      detailsDepartureJobsResponse.payload as I_DepartureJobForPdf[];
+
+    let totalProductionWorkforce = 0;
+
+    let productionForDay = 0;
+    if (detailsDepartureJob.length > 0) {
+      detailsDepartureJob.map((detail) => {
+        productionForDay += detail.metrado_utilizado * detail.Partida.precio;
+
+        totalProductionWorkforce +=
+          detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
+      });
+    }
+
+    //[note] busco las partidas del Trabajo
+    const dailysPartDepartureResponse =
+      await dailyPartDepartureValidation.findAllForIdsDailyPart(
+        dailyPartsIdToday
+      );
+
+    const dailysPartsDeparture =
+      dailysPartDepartureResponse.payload as I_DailyPartDepartureForPdf[];
+
+    //[note] acá busco la mano de obra de la semana
+    const dailyPartWokrforceResponse =
+      await dailyPartMOValidation.findAllForIdsDailysParts(idsDailyPartWeek);
+
+    const dailysPartsWorkforce =
+      dailyPartWokrforceResponse.payload as I_DailyPartWorkforce[];
+
+    //[note] acá busco la mano de obra de hoy
+    let workforcesToday: I_DailyPartWorkforce[] = [];
+    dailyParts.forEach((dailyPart) => {
+      const workforces = dailysPartsWorkforce.filter((workforce) => {
+        return workforce.parte_diario_id === dailyPart.id;
+      });
+
+      workforcesToday = workforcesToday.concat(workforces);
+    });
+
+    let priceHourResponse = await priceHourWorkforceValidation.findByDate(date);
+
+    const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
+    const detailsPriceHourMOResponse =
+      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+        priceHourMO.id
+      );
+    let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
+
+    detailsPriceHourMO =
+      detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+
+    //[message] creamos la imagen que tiene 3 lineas
+    await pdfService.createImageForTripleChart(
+      user_id,
+      dailysPartWeek,
+      dailysPartsWorkforce,
+      fechas,
+      detailsPriceHourMO
+    );
+
+    let workforces: any = [];
+
+    let totalRealWorkforceProduction = 0;
+    if (workforcesToday.length > 0 && priceHourResponse.success) {
+      workforcesToday.forEach((workforce) => {
+        if (workforce.ManoObra.CategoriaObrero) {
+          const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+
+          const detail = detailsPriceHourMO.find(
+            (detail) => detail.categoria_obrero_id === categoriaId
+          );
+          if (
+            detail &&
+            workforce.hora_60 != null &&
+            workforce.hora_100 != null &&
+            workforce.hora_normal != null
+          ) {
+            let sumaCategoryMOForDay = 0;
+            totalRealWorkforceProduction +=
+              detail.hora_normal * workforce.hora_normal +
+              detail.hora_extra_60 * workforce.hora_60 +
+              detail.hora_extra_100 * workforce.hora_100;
+            sumaCategoryMOForDay =
+              detail.hora_normal * workforce.hora_normal +
+              detail.hora_extra_60 * workforce.hora_60 +
+              detail.hora_extra_100 * workforce.hora_100;
+            //[note] si está todo bien vamos a hacer agregarlo
+            workforces.push({
+              codigo: workforce.ManoObra.codigo,
+              dni: workforce.ManoObra.documento_identidad,
+              nombre_completo:
+                workforce.ManoObra.nombre_completo +
+                workforce.ManoObra.apellido_materno +
+                workforce.ManoObra.apellido_paterno,
+              hora_normal: workforce.hora_normal,
+              hora_60: workforce.hora_60,
+              hora_100: workforce.hora_100,
+              costo_diario: sumaCategoryMOForDay,
+            });
+          }
+        }
+      });
+    }
+
+    if (!priceHourResponse.success && workforcesToday.length > 0) {
+      //[note] esto lo hago por las dudas de que no haya cargado la tabla salarial o no haya una de acuerdo al día que lo imprime
+      workforcesToday.forEach((workforce) => {
+        workforces.push({
+          codigo: workforce.ManoObra.codigo,
+          dni: workforce.ManoObra.documento_identidad,
+          nombre_completo:
+            workforce.ManoObra.nombre_completo +
+            workforce.ManoObra.apellido_materno +
+            workforce.ManoObra.apellido_paterno,
+          hora_normal: workforce.hora_normal,
+          hora_60: workforce.hora_60,
+          hora_100: workforce.hora_100,
+          costo_diario: 0,
+        });
+      });
+    }
+
+    const desviation = totalProductionWorkforce - totalRealWorkforceProduction;
+
+    const dailyPartComentaryResponse =
+      await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPartWeek);
+
+    const dailyPartComentary =
+      dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
+
+    //[message] creamos el template dle gráfico
+    const template = await TemplateHtmlInforme(
+      user_id,
+      project,
+      dailyParts,
+      detailsDepartureJob,
+      dailysPartsDeparture,
+      workforces,
+      date,
+      productionForDay,
+      totalProductionWorkforce,
+      totalRealWorkforceProduction,
+      desviation,
+      idsDailyPartWeek,
+      dailyPartComentary
+    );
+
+    //[message]creamos el pdf
+
+    await pdfService.createPdf(template, user_id);
+
+    return {
+      success: true,
+      message: "Error",
+      payload: {
+        id: user_id,
+        user_id,
+      },
+    };
+  }
+  async ifDateIsNotPresent(user_id: number, project: Proyecto, date: Date) {
+    const template = await TemplateHtmlInforme(
+      user_id,
+      project,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      date,
+      0,
+      0,
+      0,
+      0,
+      undefined,
+      undefined
+    );
+    await pdfService.createPdf(template, user_id);
   }
 }
 

@@ -5,11 +5,9 @@ import appRootPath from "app-root-path";
 //[note] genera gráficos en forma de imagen
 import QuickChart from "quickchart-js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { converToDate } from "../../common/utils/date";
-import { weekValidation } from "../../week/week.validation";
-import { Semana } from "@prisma/client";
-import { dailyPartReportValidation } from "../dailyPart.validation";
+import { DetallePrecioHoraMO, Semana } from "@prisma/client";
 import { I_ParteDiario } from "../models/dailyPart.interface";
+import { I_DailyPartWorkforce } from "../dailyPartMO/models/dailyPartMO.interface";
 export class DailyPartPdfService {
   createOptionSandBox() {
     let options = {};
@@ -33,7 +31,6 @@ export class DailyPartPdfService {
 
   async createImage(
     user_id: number,
-    week: Semana,
     dailysPart: I_ParteDiario[],
     fechas: string[]
   ) {
@@ -102,7 +99,7 @@ export class DailyPartPdfService {
                 `S/ ${value.toLocaleString("es-PE", {
                   minimumFractionDigits: 2,
                 })}`,
-              color: "#000",
+              color: "rgba(75, 192, 192, 0.2)",
             },
           },
           scales: {
@@ -137,6 +134,171 @@ export class DailyPartPdfService {
       "static",
       "charts",
       `chart-${user_id}.png`
+    );
+    //[note] Guarda el buffer binario en el sistema de archivos
+    fs.writeFileSync(direction, imageBuffer);
+  }
+  async createImageForTripleChart(
+    user_id: number,
+    dailysPart: I_ParteDiario[],
+    dailyPartWorkforce: I_DailyPartWorkforce[],
+    fechas: string[],
+    detailsPriceHourMO: DetallePrecioHoraMO[]
+  ) {
+    const chart = new QuickChart();
+
+    const totalWorforcesForDay = [0, 0, 0, 0, 0, 0, 0];
+
+    const totalRealWorforcesForDay = [0, 0, 0, 0, 0, 0, 0];
+
+    const desviationForDay = [0, 0, 0, 0, 0, 0, 0];
+
+    dailysPart.forEach((dailyPart) => {
+      let totalRealWorkforceProduction = 0;
+
+      const elementDate = dailyPart.fecha
+        ? dailyPart.fecha.toISOString().slice(0, 10)
+        : "";
+
+      //[note] acá tengo el día  donde voy a llenar
+      const index = fechas.indexOf(elementDate);
+
+      //[note] acá tengo los trabajadores del día del Parte Diario
+      const workforcesForDailyPart = dailyPartWorkforce.filter(
+        (workforce) => workforce.parte_diario_id === dailyPart.id
+      );
+
+      workforcesForDailyPart.forEach((workforce) => {
+        const detail = detailsPriceHourMO.find((detail) => {
+          return (
+            workforce.ManoObra.CategoriaObrero?.id ===
+            detail.categoria_obrero_id
+          );
+        });
+
+        totalRealWorkforceProduction +=
+          (detail?.hora_normal ?? 0) * (workforce?.hora_normal ?? 0) +
+          (detail?.hora_extra_60 ?? 0) * (workforce?.hora_60 ?? 0) +
+          (detail?.hora_extra_100 ?? 0) * (workforce?.hora_100 ?? 0);
+      });
+
+      //[note] acá ya tengo el costo de la Partida del día
+      if (index !== -1) {
+        // total[index] += dailyPart.Trabajo?.costo_partida || 0;
+        totalWorforcesForDay[index] += dailyPart.Trabajo?.costo_mano_obra || 0;
+        totalRealWorforcesForDay[index] += totalRealWorkforceProduction;
+      }
+    });
+
+    for (let index = 0; index < desviationForDay.length; index++) {
+      desviationForDay[index] =
+        totalWorforcesForDay[index] - totalRealWorforcesForDay[index];
+    }
+
+    chart
+      .setConfig({
+        type: "line",
+        data: {
+          labels: fechas,
+          datasets: [
+            {
+              label: "Mano de Obra",
+              data: totalWorforcesForDay,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 2,
+              pointBackgroundColor: "#0074D9",
+              pointBorderColor: "#fff",
+              pointRadius: 5,
+              fill: false,
+            },
+            {
+              label: "Mano de Obra Real",
+              data: totalRealWorforcesForDay,
+              backgroundColor: "rgba(255, 165, 0, 0.2)",
+              borderColor: "rgba(255, 165, 0, 1)",
+              borderWidth: 2,
+              pointBackgroundColor: "#FF851B",
+              pointBorderColor: "#fff",
+              pointRadius: 5,
+              fill: false,
+            },
+            {
+              label: "Desviación",
+              data: desviationForDay,
+              backgroundColor: "rgba(0, 128, 0, 0.2)",
+              borderColor: "rgba(0, 128, 0, 1)",
+              borderWidth: 2,
+              pointBackgroundColor: "#2ECC40",
+              pointBorderColor: "#fff",
+              pointRadius: 5,
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: true,
+              position: "bottom",
+            },
+            datalabels: {
+              formatter: (value, context) => {
+                return `S/ ${value.toLocaleString("es-PE", {
+                  minimumFractionDigits: 2,
+                })}`;
+              },
+              align: "top",
+              anchor: "end",
+              offset: (context) => {
+                const datasetIndex = context.datasetIndex;
+                if (datasetIndex === 0) return 10; // Desplaza arriba
+                if (datasetIndex === 1) return 0; // Desplaza abajo
+                if (datasetIndex === 2) return 0; // Más abajo
+                return 0;
+              },
+              color: (context) => {
+                const datasetIndex = context.datasetIndex;
+                if (datasetIndex === 0) return "rgba(75, 192, 192, 1)"; // Azul (Mano de Obra)
+                if (datasetIndex === 1) return "rgba(255, 165, 0, 1)"; // Naranja (Mano de Obra Real)
+                if (datasetIndex === 2) return "rgba(0, 128, 0, 1)"; // Verde (Desviación)
+                return "#000"; // Color por defecto
+              },
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "Fecha",
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: "Producción (S/)",
+              },
+              min: 0,
+              max: 15000,
+              ticks: {
+                stepSize: 2000,
+              },
+            },
+          },
+        },
+      })
+      .setWidth(800)
+      .setHeight(600);
+
+    // const url = chart.getUrl();
+    //[note]  Genera la imagen como un buffer binario, que es útil para manipular o guardar archivos.
+    const imageBuffer = await chart.toBinary();
+    let direction = "";
+    direction = path.join(
+      appRootPath.path,
+      "static",
+      "chartsTriple",
+      `chart-triple-${user_id}.png`
     );
     //[note] Guarda el buffer binario en el sistema de archivos
     fs.writeFileSync(direction, imageBuffer);
@@ -213,7 +375,6 @@ export class DailyPartPdfService {
 
     fs.readdir(directory, (err, files) => {
       if (err) {
-        console.error("Error leyendo la carpeta:", err);
         return;
       }
 
@@ -245,7 +406,6 @@ export class DailyPartPdfService {
 
     fs.readdir(directory, (err, files) => {
       if (err) {
-        console.error("Error leyendo la carpeta:", err);
         return;
       }
 
@@ -276,7 +436,6 @@ export class DailyPartPdfService {
     // const directory = path.resolve(__dirname, "charts");
     fs.readdir(directory, (err, files) => {
       if (err) {
-        console.error("Error al leer el directorio charts:", err);
         return;
       }
 
@@ -284,6 +443,31 @@ export class DailyPartPdfService {
         // Verificar si el archivo pertenece al user_id y no es la imagen actual
         // const userPrefix = `chart-${user_id}-`;
         const userPrefix = `chart-`;
+        if (file.startsWith(userPrefix) && !file.includes(String(user_id))) {
+          const filePath = path.join(directory, file);
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              // console.error(`Error eliminando el archivo ${file}:`, err);
+            } else {
+              // console.log(`Archivo eliminado: ${file}`);
+            }
+          });
+        }
+      });
+    });
+  }
+  deleteImageTripleCharts(user_id: number) {
+    const directory = path.join(appRootPath.path, "static", "chartsTriple");
+    // const directory = path.resolve(__dirname, "charts");
+    fs.readdir(directory, (err, files) => {
+      if (err) {
+        return;
+      }
+
+      files.forEach((file) => {
+        // Verificar si el archivo pertenece al user_id y no es la imagen actual
+        // const userPrefix = `chart-${user_id}-`;
+        const userPrefix = `chart-triple-`;
         if (file.startsWith(userPrefix) && !file.includes(String(user_id))) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {

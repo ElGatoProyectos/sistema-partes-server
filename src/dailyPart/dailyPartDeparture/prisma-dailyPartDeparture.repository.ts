@@ -109,15 +109,11 @@ class PrismaDailyPartDepartureRepository
   async findAllForDailyPartDeparture(
     skip: number,
     data: T_FindAllDailyPartDeparture,
-    ids: number[]
+    daily_part_id: number
   ): Promise<{ details: any[]; total: number }> {
     const details = await prisma.parteDiarioPartida.findMany({
       where: {
-        Partida: {
-          id: {
-            in: ids,
-          },
-        },
+        parte_diario_id: daily_part_id,
       },
       include: {
         ParteDiario: {
@@ -137,11 +133,7 @@ class PrismaDailyPartDepartureRepository
 
     const total = await prisma.parteDiarioPartida.count({
       where: {
-        Partida: {
-          id: {
-            in: ids,
-          },
-        },
+        parte_diario_id: daily_part_id,
       },
     });
 

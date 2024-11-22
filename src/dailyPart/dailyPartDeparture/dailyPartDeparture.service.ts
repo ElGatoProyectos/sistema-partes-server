@@ -1,4 +1,8 @@
-import { DetalleTrabajoPartida, ParteDiarioPartida } from "@prisma/client";
+import {
+  DetalleTrabajoPartida,
+  E_Etapa_Parte_Diario,
+  ParteDiarioPartida,
+} from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import { dailyPartReportValidation } from "../dailyPart.validation";
@@ -29,6 +33,16 @@ class DailyPartDepartureService {
 
       const dailyPartDeparture =
         dailyPartDepartureResponse.payload as I_DailyPartDeparture;
+
+      if (
+        dailyPartDeparture.ParteDiario.etapa ===
+          E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPartDeparture.ParteDiario.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const detailResponse =
         await departureJobValidation.findByForDepartureAndJob(
@@ -112,35 +126,35 @@ class DailyPartDepartureService {
       }
       const dailyPart = dailyPartResponse.payload as I_DailyPart;
 
-      const detailsResponse =
-        await dailyPartDepartureValidation.findAllForDailyPart(dailyPart.id);
+      // const detailsResponse =
+      //   await dailyPartDepartureValidation.findAllForDailyPart(dailyPart.id);
 
-      const detailsDailyPartDeparture =
-        detailsResponse.payload as ParteDiarioPartida[];
+      // const detailsDailyPartDeparture =
+      //   detailsResponse.payload as ParteDiarioPartida[];
 
-      if (detailsDailyPartDeparture.length == 0) {
-        const formData = {
-          total: 0,
-          page: data.queryParams.page,
-          limit: data.queryParams.limit,
-          pageCount: 1,
-          data: [],
-        };
-        return httpResponse.SuccessResponse(
-          "Éxito al traer todos los Trabajos y sus Partidas de acuerdo al Trabajo que se ha pasado",
-          formData
-        );
-      }
+      // if (detailsDailyPartDeparture.length == 0) {
+      //   const formData = {
+      //     total: 0,
+      //     page: data.queryParams.page,
+      //     limit: data.queryParams.limit,
+      //     pageCount: 1,
+      //     data: [],
+      //   };
+      //   return httpResponse.SuccessResponse(
+      //     "Éxito al traer todos los Trabajos y sus Partidas de acuerdo al Parte Diario que se ha pasado",
+      //     formData
+      //   );
+      // }
 
-      const idsDepartures = detailsDailyPartDeparture.map(
-        (detail) => detail.partida_id
-      );
+      // const idsDepartures = detailsDailyPartDeparture.map(
+      //   (detail) => detail.partida_id
+      // );
 
       const result =
         await prismaDailyPartDepartureRepository.findAllForDailyPartDeparture(
           skip,
           data,
-          idsDepartures
+          dailyPart.id
         );
 
       const { details, total } = result;
@@ -155,12 +169,12 @@ class DailyPartDepartureService {
         data: details,
       };
       return httpResponse.SuccessResponse(
-        "Éxito al traer todos los Trabajos y sus Partidas de acuerdo a las Partidas que se han pasado",
+        "Éxito al traer todos los Trabajos y sus Partidas de acuerdo al Parte Diario que se ha pasado",
         formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todas los Trabajos y sus Partidas de acuerdo a las Partidas que se han pasado",
+        "Error al traer todas los Trabajos y sus Partidas de acuerdo al Parte Diario que se ha pasado",
         error
       );
     } finally {

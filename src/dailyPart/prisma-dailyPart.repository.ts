@@ -64,8 +64,6 @@ class PrismaDailyPartRepository implements DailyPartRepository {
       d.setUTCHours(0, 0, 0, 0);
       return d;
     });
-    console.log("------------.sd");
-    console.log(normalizedDates);
     const dailyParts = await prisma.parteDiario.findMany({
       where: {
         fecha: {

@@ -5,6 +5,7 @@ import { projectValidation } from "../../project/project.validation";
 import { prismaRiskDailyPartRepository } from "./prisma-riskDailyPart.repository";
 import {
   E_Estado_Riesgo_BD,
+  E_Etapa_Parte_Diario,
   E_Riesgo_BD,
   ParteDiario,
   RiesgoParteDiario,
@@ -30,6 +31,15 @@ class RiskDailyPartService {
       }
 
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const resultIdProject = await projectValidation.findById(project_id);
       if (!resultIdProject.success) {
@@ -153,6 +163,16 @@ class RiskDailyPartService {
         return dailyPartResponse;
       }
       const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (
+        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
+
       await dailyPartReportValidation.updateDailyPartForRisk(
         dailyPart.id,
         null
