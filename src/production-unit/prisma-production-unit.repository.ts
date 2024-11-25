@@ -126,7 +126,7 @@ class PrimsaProductionUnitRepository implements ProudctionUnitRepository {
             eliminado: true,
           },
           orderBy: {
-            codigo: "asc",
+            codigo: "desc",
           },
         }),
         prisma.unidadProduccion.count({

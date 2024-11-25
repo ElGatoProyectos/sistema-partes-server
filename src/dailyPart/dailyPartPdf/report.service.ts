@@ -97,15 +97,31 @@ export class ReportService {
     }
   }
 
-  async createInformeParteDiario() {
+  async createInformeParteDiario(daily_part_id:number,tokenWithBearer:string,project_id:string) {
     try {
-      // AQUI COLOCARIAS EL ID DEL USUARIO ACTUAL
-      const id = "1";
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede crear el Reporte con el id del Proyecto proporcionado"
+        );
+      }
+      const project = resultIdProject.payload as Proyecto;
+      const userTokenResponse = await jwtService.getUserFromToken(
+        tokenWithBearer
+      );
+      if (!userTokenResponse) return userTokenResponse;
+      const userResponse = userTokenResponse.payload as Usuario;
+      const dailyPartResponse =
+      await dailyPartReportValidation.findByIdValidation(daily_part_id);
+    if (!dailyPartResponse.success) {
+      return dailyPartResponse;
+    }
+    const dailyPart = dailyPartResponse.payload as I_DailyPart;
       const user_id = 1;
 
       pdfService.deleteImages(user_id);
 
-      const template = TemplateHtmlInformeParteDiario(user_id, id);
+      const template = TemplateHtmlInformeParteDiario(user_id, dailyPart.id,project,dailyPart);
 
       await pdfService.createPdfPD(template, user_id);
 
@@ -113,7 +129,7 @@ export class ReportService {
         success: true,
         message: "Error",
         payload: {
-          id,
+          id:dailyPart.id,
           user_id,
         },
       };

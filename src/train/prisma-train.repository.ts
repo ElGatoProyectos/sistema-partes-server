@@ -90,7 +90,7 @@ class PrismaTrainRepository implements TrainRepository {
           eliminado: true,
         },
         orderBy: {
-          codigo: "asc",
+          codigo: "desc",
         },
       }),
       prisma.tren.count({

@@ -374,7 +374,11 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
 
       skip,
       take: data.queryParams.limit,
-
+      orderBy: {
+        Trabajo: {
+          codigo: 'asc', 
+        },
+      },
       include: {
         Trabajo: true,
         Partida: true,

@@ -85,7 +85,7 @@ class PrismaDepartureRepository implements DepartureRepository {
             eliminado: true,
           },
           orderBy: {
-            id_interno: "asc",
+            id_interno: "desc",
           },
         }),
         prisma.partida.count({

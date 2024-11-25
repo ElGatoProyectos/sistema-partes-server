@@ -1,6 +1,7 @@
 import { T_FindAll } from "../common/models/pagination.types";
 import express from "../config/express.config";
 import { I_CreateRolBody } from "./models/rol.interfaces";
+import { T_FindAllRol } from "./models/rol.types";
 import { rolService } from "./rol.service";
 
 class RolController {
@@ -21,7 +22,13 @@ class RolController {
   }
 
   async allRoles(request: express.Request, response: express.Response) {
-    const result = await rolService.findAll();
+    const isOrder = request.query.isOrder as string;
+    let paginationOptions: T_FindAllRol = {
+      queryParams: {
+        isOrder: isOrder,
+      },
+    };
+    const result = await rolService.findAll(paginationOptions);
     response.status(result.statusCode).json(result);
   }
 }
