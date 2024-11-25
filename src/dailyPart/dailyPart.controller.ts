@@ -93,6 +93,47 @@ class DailyPartController {
       response.json(result);
     }
   }
+  async createReportForId(request: express.Request, response: express.Response) {
+    const daily_part_id = Number(request.params.id);
+    const tokenWithBearer = request.headers.authorization;
+    const project_id = request.get("project-id") as string;
+    if (!tokenWithBearer) {
+      return httpResponse.BadRequestException(
+        "No se encontró el token para poder proseguir"
+      );
+    }
+    const result:any = await reportService.createInformeParteDiario(daily_part_id,tokenWithBearer,project_id);
+
+    if (result.success && result.payload) {
+      
+      let filePath = "";
+      filePath = path.join(
+        appRootPath.path,
+        "static",
+        "reports-pd",
+        `informe-${result.payload.user_id}-${result.payload.user_id}.pdf`
+      );
+
+      if (fs.existsSync(filePath)) {
+        const stat = fs.statSync(filePath);
+        response.setHeader("Content-Length", stat.size);
+        response.setHeader("Content-Type", "application/pdf");
+        response.setHeader(
+          "Content-Disposition",
+          `attachment; filename="informe-parte-diario.pdf"`
+        );
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(response);
+      } else {
+        response
+          .status(404)
+          .json({ success: false, message: "Archivo no encontrado" });
+      }
+    } else {
+      response.json(result);
+    }
+  }
   async findByInformation(
     request: express.Request,
     response: express.Response

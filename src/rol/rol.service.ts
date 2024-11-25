@@ -2,11 +2,20 @@ import { httpResponse, T_HttpResponse } from "../common/http.response";
 import prisma from "../config/prisma.config";
 import { prismaRolRepository } from "./prisma-rol.repository";
 import { I_CreateRolBD } from "./models/rol.interfaces";
+import { T_FindAllRol } from "./models/rol.types";
 
 class RolService {
-  async findAll(): Promise<T_HttpResponse> {
+  async findAll(data: T_FindAllRol): Promise<T_HttpResponse> {
     try {
-      const result = await prismaRolRepository.findAll();
+      
+      if(data.queryParams.isOrder){
+        if (data.queryParams.isOrder !== "true" && data.queryParams.isOrder !== "false"){
+          return httpResponse.BadRequestException(
+            "El orden ingresado no es válido",
+          );
+        }
+      }
+      const result = await prismaRolRepository.findAll(data);
 
       return httpResponse.SuccessResponse(
         "Éxito al traer todos los roles",

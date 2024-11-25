@@ -1,7 +1,8 @@
 import { I_CreateRolBD } from "./models/rol.interfaces";
+import { T_FindAllRol } from "./models/rol.types";
 
 export abstract class RolRepository {
-  findAll(): void {}
+  findAll(data:T_FindAllRol): void {}
 
   findById(idRol: number): void {}
 

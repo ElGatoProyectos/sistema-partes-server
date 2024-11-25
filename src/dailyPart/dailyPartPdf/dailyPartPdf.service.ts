@@ -354,7 +354,6 @@ export class DailyPartPdfService {
 
     await page.setContent(template, { waitUntil: "networkidle0" });
 
-    // Generate the PDF
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,

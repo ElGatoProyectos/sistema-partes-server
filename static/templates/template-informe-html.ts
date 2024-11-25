@@ -1,4 +1,7 @@
-export function TemplateHtmlInformeParteDiario(user_id: number, id: string) {
+import { Proyecto } from "@prisma/client";
+import { I_DailyPart } from "../../src/dailyPart/models/dailyPart.interface";
+
+export function TemplateHtmlInformeParteDiario(user_id: number, ids: number,project:Proyecto,dailyPart:I_DailyPart) {
   return `
   <!DOCTYPE html>
 <html lang="en">
@@ -56,9 +59,7 @@ export function TemplateHtmlInformeParteDiario(user_id: number, id: string) {
         <tr>
           <td style="min-width: 120px">PROYECTO</td>
           <td colspan="9">
-            SALDO DE OBRA MEJORAMIENTO DEL SERVICIO DE EDUCACION INICIAL EN LA
-            I.E. VILLA CONTINENTAL, DISTRITO DE CAYMA-PROVINCIA DE CAYMA-REGION
-            AREQUIPA
+           ${project.nombre_completo}
           </td>
         </tr>
         <tr>

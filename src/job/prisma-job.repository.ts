@@ -190,7 +190,7 @@ class PrismaJobRepository implements JobRepository {
           eliminado: true,
         },
         orderBy: {
-          codigo: "asc",
+          codigo: "desc",
         },
         include: {
           Tren: true,
