@@ -7,6 +7,24 @@ import {
 import prisma from "../../config/prisma.config";
 
 class PrismaDetailWeekProjectRepository implements DetailWeekProjectRepository {
+  async findByDateAndProject(date: Date, project_id: number): Promise<DetalleSemanaProyecto | null> {
+    const dateNew= date;
+    dateNew.setUTCHours(0,0,0,0);
+    const detail= await prisma.detalleSemanaProyecto.findFirst({
+      where:{
+       proyecto_id:project_id,
+       Semana:{
+        fecha_inicio: {
+          lte: dateNew, 
+        },
+        fecha_fin: {
+          gte: dateNew,
+        },
+       }
+      }
+    })
+    return detail;
+  }
   async findAllForYear(date: Date): Promise<DetalleSemanaProyecto[] | null> {
     const year = date.getFullYear();
     const startOfYear = new Date(year, 0, 1);

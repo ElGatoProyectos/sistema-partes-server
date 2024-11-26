@@ -203,7 +203,7 @@ class TrainService {
           "El Tren que quiere eliminar no es el último"
         );
       }
-      const reportTrain = await trainReportValidation.findById(idTrain);
+      const reportTrain = await trainReportValidation.findByIdTrain(idTrain);
       if (reportTrain.success) {
         return httpResponse.BadRequestException(
           "Tiene una relación el Tren con un Reporte por lo que no se puede eliminar"

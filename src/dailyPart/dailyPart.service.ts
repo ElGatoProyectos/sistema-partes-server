@@ -6,6 +6,7 @@ import {
 import { dailyPartReportValidation } from "./dailyPart.validation";
 import {
   DetallePrecioHoraMO,
+  DetalleSemanaProyecto,
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
   ParteDiario,
@@ -36,6 +37,8 @@ import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHour
 import { priceHourWorkforceValidation } from "../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
 import { prismaDailyPartDepartureRepository } from "./dailyPartDeparture/prisma-dailyPartDeparture.repository";
+import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWeekProject.validation";
+import { trainReportValidation } from "../train/trainReport/trainReport.validation";
 
 class DailyPartService {
   async createDailyPart(
@@ -90,6 +93,30 @@ class DailyPartService {
           ids_departures,
           responseDailyPart.id
         );
+        const detailWeekProjectResponse= await detailWeekProjectValidation.findByDateAndProject(date,project_id)
+        if(detailWeekProjectResponse.success){
+          const detailWeekReponse= detailWeekProjectResponse.payload as DetalleSemanaProyecto;
+          const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(job.tren_id,detailWeekReponse.semana_id)
+          if(!reportTrainResponse.success){
+            const reportTrainFormat={
+              tren_id            : job.tren_id,
+              costo_total        :0,
+              ejecutado_anterior :0,
+              ejecutado_actual   :0,
+              lunes              :0,
+              martes             :0,
+              miercoles          :0,
+              jueves             :0,
+              viernes            :0,
+              sabado             :0,
+              domingo            :0,
+              parcial            :0,
+              semana_id          :detailWeekReponse.semana_id
+            }
+            await trainReportValidation.create(reportTrainFormat)
+          }
+         
+        }
       }
 
       return httpResponse.CreatedResponse(
