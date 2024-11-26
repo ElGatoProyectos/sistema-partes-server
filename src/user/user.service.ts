@@ -884,7 +884,7 @@ class UserService {
             usuario_id
           );
         if (DetailProductionEngineerMasterBuilderResponse.success) {
-          return httpResponse.SuccessResponse(
+          return httpResponse.BadRequestException(
             "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
           );
         }
@@ -893,7 +893,7 @@ class UserService {
             usuario_id
           );
         if (DetailMasterBuilderForeman.success) {
-          return httpResponse.SuccessResponse(
+          return httpResponse.BadRequestException(
             "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
           );
         }
@@ -902,7 +902,7 @@ class UserService {
             usuario_id
           );
         if (DetailForemanGroupLeader.success) {
-          return httpResponse.SuccessResponse(
+          return httpResponse.BadRequestException(
             "No se le puede cambiar el Rol ya que tiene un asignamiento en el Proyecto"
           );
         }

@@ -73,6 +73,10 @@ class DailyPartDepartureService {
           dailyPartDepartureFormat,
           dailyPartDeparture.id
         );
+      
+      const totalAdd=dailyPartDeparture.Partida.precio * data.quantity_used;
+      
+      
       return httpResponse.SuccessResponse(
         "Parte Diario Partida modificado correctamente",
         responseDailyPartDeparture

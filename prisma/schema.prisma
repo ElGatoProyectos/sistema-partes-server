@@ -229,6 +229,7 @@ model Semana {
   fecha_inicio          DateTime
   fecha_fin             DateTime
   DetalleSemanaProyecto DetalleSemanaProyecto[]
+  ResporteAvanceTren ResporteAvanceTren[]
 }
 
 model DetalleSemanaProyecto {
@@ -546,7 +547,6 @@ model Proyecto {
   Unidad                             Unidad[]
   Asistencia                         Asistencia[]
   PrecioHoraMO                       PrecioHoraMO[]
-  ReporteTren                        ReporteTren[]
   ReportePartida                     ReportePartida[]
   CategoriaObrero                    CategoriaObrero[]
   TipoObrero                         TipoObrero[]
@@ -563,7 +563,6 @@ model Proyecto {
   DetalleIngenieroProduccionManoObra DetalleIngenieroProduccionMaestroObra[]
   DetalleManoObraCapataz             DetalleMaestroObraCapataz[]
   DetalleCapatazJefeGrupo            DetalleCapatazJefeGrupo[]
-  ResporteAvanceTren                 ResporteAvanceTren[]
 }
 
 model Combo {
@@ -608,7 +607,6 @@ model Tren {
   fecha_creacion     DateTime             @default(now())
   eliminado          E_Estado_BD          @default(n)
   proyecto_id        Int
-  ReporteTren        ReporteTren[]
   Trabajo            Trabajo[]
   Proyecto           Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
   ResporteAvanceTren ResporteAvanceTren[]
@@ -809,7 +807,7 @@ model ParteDiario {
   ParteDiarioRecurso     ParteDiarioRecurso[]
   DetalleParteDiarioFoto DetalleParteDiarioFoto[]
   ParteDiarioPartida     ParteDiarioPartida[]
-  ResporteAvanceTren     ResporteAvanceTren[]
+ 
 }
 
 model ParteDiarioPartida {
@@ -900,29 +898,7 @@ model DetallePrecioHoraMO {
   CategoriaObrero     CategoriaObrero @relation(fields: [categoria_obrero_id], references: [id])
 }
 
-//[success] actual
-model ReporteTren {
-  id             Int      @id @default(autoincrement())
-  costo_total    Float
-  costo_anterior Float
-  costo_actual   Float
-  costo_parcial  Float
-  saldo          Float?   @default(0)
-  lunes          Float?   @default(0)
-  martes         Float?   @default(0)
-  miercoles      Float?   @default(0)
-  jueves         Float?   @default(0)
-  viernes        Float?   @default(0)
-  sabado         Float?   @default(0)
-  domingo        Float?   @default(0)
-  fecha_inicio   DateTime @db.Date()
-  fecha_fin      DateTime @db.Date()
-  fecha_creacion DateTime @default(now())
-  tren_id        Int
-  Tren           Tren     @relation(fields: [tren_id], references: [id], onDelete: Cascade)
-  proyecto_id    Int
-  Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
-}
+
 
 //[success] actual
 model ReportePartida {
@@ -941,11 +917,9 @@ model ReportePartida {
 model ResporteAvanceTren {
   id                 Int         @id @default(autoincrement())
   tren_id            Int
-  parte_diario_id    Int
   costo_total        Int
   ejecutado_anterior Int
   ejecutado_actual   Int
-  saldo              Int
   lunes              Int
   martes             Int
   miercoles          Int
@@ -955,8 +929,6 @@ model ResporteAvanceTren {
   domingo            Int
   parcial            Int
   semana_id          Int
-  proyecto_id        Int
-  ParteDiario        ParteDiario @relation(fields: [parte_diario_id], references: [id], onDelete: Cascade)
   Tren               Tren        @relation(fields: [tren_id], references: [id], onDelete: Cascade)
-  Proyecto           Proyecto    @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
+  Semana       Semana  @relation(fields: [ semana_id], references: [id])
 }

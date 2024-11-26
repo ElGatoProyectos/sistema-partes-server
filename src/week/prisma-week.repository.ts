@@ -3,6 +3,7 @@ import { WeekRepository } from "./week.repository";
 import { Semana } from "@prisma/client";
 
 class PrismaWeekRepository implements WeekRepository {
+  
   async findAllForYear(year: number): Promise<Semana[] | null> {
     //[note] no se ocupe esto comentado ya que sino me trae las primera semana del proximo año ya q son los últimos días del año
     // const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);

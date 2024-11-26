@@ -3,6 +3,28 @@ import { prismaDetailWeekProjectRepository } from "./prisma-detailWeekProject.re
 import { I_UpdateDetailWeekProject } from "./models/detailWeekProject.interface";
 
 class DetailWeekProjectValidation {
+  async findByDateAndProject(date:Date,project_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaDetailWeekProjectRepository.findByDateAndProject(
+        date,project_id
+      );
+      if (!detail) {
+        return httpResponse.NotFoundException(
+          "El Detalle Semana Proyecto fue no fue encontrado por la fecha y el Proyecto",
+          detail
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El Detalle Semana Proyecto fue encontrado por la fecha y el Proyecto",
+        detail
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el Detalle Semana Proyecto por la fecha y el Proyecto",
+        error
+      );
+    }
+  }
   async findByIdProject(project_id: number): Promise<T_HttpResponse> {
     try {
       const detail = await prismaDetailWeekProjectRepository.findByIdProject(
