@@ -18,9 +18,18 @@ export interface I_DailyPartDeparture {
   partida_id: number;
   cantidad_utilizada: number;
   ParteDiario: I_DailyPart;
+  Partida: I_DepartureForPdf;
 }
 export interface I_DailyPartDepartureForPdf {
   id: number;
   cantidad_utilizada: number;
   Partida: I_DepartureForPdf;
+}
+
+export interface I_DailyPartDepartureForId {
+  item: string | undefined ;
+  partida: string | undefined; 
+  unidad: string | undefined;
+  cantidad_programada: number | undefined;
+  cantidad_utilizada: number | undefined;
 }

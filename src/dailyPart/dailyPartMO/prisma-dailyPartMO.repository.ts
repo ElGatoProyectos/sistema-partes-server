@@ -4,10 +4,27 @@ import { ParteDiarioMO } from "@prisma/client";
 import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 import {
   I_DailyPartWorkforce,
+  I_DailyPartWorkforcePdf,
   I_UpdateDailyPartMOBD,
 } from "./models/dailyPartMO.interface";
 
 class PrismaDailyPartMORepository implements DailyPartMORepository {
+  async findAllWithOutPaginationForIdDailysPart(daily_part_id: number): Promise<I_DailyPartWorkforcePdf[] | null> {
+    const dailyPartWorkforce = await prisma.parteDiarioMO.findMany({
+      where: {
+       parte_diario_id:daily_part_id
+      },
+      include: {
+        ManoObra: {
+          include: {
+            CategoriaObrero: true,
+            Unidad:true
+          },
+        },
+      },
+    });
+    return dailyPartWorkforce;
+  }
   async findAllWithOutPaginationForIdsDailysParts(
     idsDailyParts: number[]
   ): Promise<I_DailyPartWorkforce[] | null> {

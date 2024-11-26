@@ -1,6 +1,5 @@
 import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 import {
-  I_CreateDailyPartResourcesBD,
   I_UpdateDailyPartResourcesBD,
 } from "./models/dailyPartResources.interface";
 
@@ -26,4 +25,6 @@ export abstract class DailyPartResourceRepository {
   ): void {}
 
   delete(daily_part_resource_id: number): void {}
+
+  findAllWithOutPaginationForDailyPart(daily_part_id:number):void{}
 }

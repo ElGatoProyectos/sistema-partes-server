@@ -2,6 +2,8 @@ import {
   CategoriaObrero,
   ManoObra,
   Trabajo,
+  Tren,
+  Unidad,
   UnidadProduccion,
 } from "@prisma/client";
 
@@ -72,6 +74,17 @@ export interface I_Trabajo {
   costo_varios: number;
   UnidadProduccion: UnidadProduccion;
 }
+export interface I_TrabajoPdf {
+  codigo: string;
+  nombre: string;
+  costo_partida: number;
+  costo_mano_obra: number;
+  costo_material: number;
+  costo_equipo: number;
+  costo_varios: number;
+  UnidadProduccion: UnidadProduccion;
+  Tren:Tren
+}
 export interface I_TrabajoForPdf {
   codigo: string;
   nombre: string;
@@ -80,6 +93,10 @@ export interface I_TrabajoForPdf {
 }
 export interface I_JobAndCategoryWorkforce extends ManoObra {
   CategoriaObrero: CategoriaObrero | null;
+}
+export interface I_JobAndCategoryWorkforceForPdf extends ManoObra {
+  CategoriaObrero: CategoriaObrero | null;
+  Unidad: Unidad | null
 }
 
 // export interface I_CreateJobBody2

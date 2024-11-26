@@ -226,7 +226,12 @@ class PrismaDailyPartRepository implements DailyPartRepository {
         id: daily_part_id,
       },
       include: {
-        Trabajo: true,
+        Trabajo: {
+          include:{
+            Tren:true,
+            UnidadProduccion:true
+          }
+        },
       },
     });
 

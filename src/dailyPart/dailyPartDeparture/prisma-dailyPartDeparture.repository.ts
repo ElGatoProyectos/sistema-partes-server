@@ -37,11 +37,18 @@ class PrismaDailyPartDepartureRepository
   }
   async findAllForDailyPart(
     daily_part_id: number
-  ): Promise<ParteDiarioPartida[] | null> {
+  ): Promise<I_DailyPartDepartureForPdf[] | null> {
     const details = await prisma.parteDiarioPartida.findMany({
       where: {
         parte_diario_id: daily_part_id,
       },
+      include:{
+        Partida:{
+          include:{
+            Unidad:true
+          }
+        }
+      }
     });
     return details;
   }

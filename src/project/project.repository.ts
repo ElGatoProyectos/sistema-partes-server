@@ -28,4 +28,6 @@ export abstract class ProjectRepository {
   totalProjectsByCompany(company_id: number): void {}
 
   deleteManyFromProyect(proyect_id:number):void{}
+
+  findAllWithOutPagination():void{}
 }

@@ -27,7 +27,7 @@ export const TemplateHtmlInforme = async (
     appRootPath.path,
     "static",
     "charts",
-    `chart-${user_id}.png`
+    `chart-${user_id}-${user_id}.png`
   );
   const base64Image = fs.readFileSync(imagePath).toString("base64");
   const base64Type = `data:image/png;base64,${base64Image}`;
@@ -36,7 +36,7 @@ export const TemplateHtmlInforme = async (
     appRootPath.path,
     "static",
     "chartsTriple",
-    `chart-triple-${user_id}.png`
+    `chart-triple-${user_id}-${user_id}.png`
   );
   const base64ImageTriple = fs.readFileSync(imagePathTriple).toString("base64");
   const base64TypeTriple = `data:image/png;base64,${base64ImageTriple}`;
@@ -327,7 +327,7 @@ export const TemplateHtmlInforme = async (
     <table class="table" border="1">
         <tr>
           <td rowspan="2">
-            <img width="200" src="${base64TypeProject}" alt="Chart Image" />
+            <img width="200" src="${base64TypeProject}" alt="imagen proyecto" />
           </td>
           <td><strong>INFORME DE PRODUCCIÓN</strong></td>
           <td><strong>Fecha</strong></td>
@@ -581,12 +581,7 @@ export const TemplateHtmlInforme_Header = () => {
 `;
 };
 
-function formatCurrency(value: number): string {
-  const formattedValue = `S/. ${value.toFixed(2)}`;
-  return value < 0
-    ? `<td style="color:red">${formattedValue}</td>`
-    : `<td>${formattedValue}</td>`;
-}
+
 
 export function formatNumberToDecimal(number: number) {
   if (number === 0) {

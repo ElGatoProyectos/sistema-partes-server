@@ -43,6 +43,18 @@ class ProjectValidation {
       );
     }
   }
+  async findAllWithOutPagination(): Promise<T_HttpResponse> {
+    try {
+      const total =
+        await prismaProyectoRepository.findAllWithOutPagination();
+      return httpResponse.SuccessResponse("Éxito al traer todos los Proyectos", total);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar todos los Proyetos",
+        error
+      );
+    }
+  }
 }
 
 export const projectValidation = new ProjectValidation();

@@ -133,7 +133,7 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "charts",
-      `chart-${user_id}.png`
+      `chart-${user_id}-${user_id}.png`
     );
     //[note] Guarda el buffer binario en el sistema de archivos
     fs.writeFileSync(direction, imageBuffer);
@@ -301,7 +301,7 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "chartsTriple",
-      `chart-triple-${user_id}.png`
+      `chart-triple-${user_id}-${user_id}.png`
     );
     //[note] Guarda el buffer binario en el sistema de archivos
     fs.writeFileSync(direction, imageBuffer);
@@ -339,13 +339,13 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "reports",
-      `informe-${user_id}.pdf`
+      `informe-${user_id}-${user_id}.pdf`
     );
     await fs.promises.writeFile(direction, pdfBuffer);
   }
 
-  async createPdfPD(template: string, user_id: number) {
-    this.deletePdfsPD(user_id);
+  async createPdfPD(template: string, user_id: number,daily_part_id:number) {
+    this.deletePdfsPD(user_id,daily_part_id);
 
     const options = this.createOptionSandBox();
 
@@ -366,7 +366,7 @@ export class DailyPartPdfService {
       appRootPath.path,
       "static",
       "reports-pd",
-      `informe-${user_id}.pdf`
+      `informe-${user_id}-${daily_part_id}.pdf`
     );
     await fs.promises.writeFile(direction, pdfBuffer);
   }
@@ -383,7 +383,7 @@ export class DailyPartPdfService {
       files.forEach((file) => {
         // Verificar si el archivo es un PDF y corresponde al user_id
         // const userPrefix = `informe-${user_id}-`;
-        const userPrefix = `informe-`;
+        const userPrefix = `informe-${user_id}-`;
         if (
           file.endsWith(".pdf") &&
           file.startsWith(userPrefix) &&
@@ -402,7 +402,7 @@ export class DailyPartPdfService {
     });
   }
 
-  deletePdfsPD(user_id: number) {
+  deletePdfsPD(user_id: number,daily_part_id:number) {
     const directory = path.join(appRootPath.path, "static", "reports-pd");
     // const directory = path.resolve(__dirname, "reports-pd");
 
@@ -414,18 +414,18 @@ export class DailyPartPdfService {
       files.forEach((file) => {
         // Verificar si el archivo es un PDF y corresponde al user_id
         // const userPrefix = `informe-${user_id}-`;
-        const userPrefix = `informe-`;
+        const userPrefix = `informe--${user_id}-`;
         if (
           file.endsWith(".pdf") &&
           file.startsWith(userPrefix) &&
-          !file.includes(String(user_id))
+          !file.includes(String(daily_part_id))
         ) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
             if (err) {
-              // console.error(`Error eliminando el archivo ${file}:`, err);
+              console.error(`Error eliminando el archivo ${file}:`, err);
             } else {
-              // console.log(`Archivo eliminado: ${file}`);
+              console.log(`Archivo eliminado: ${file}`);
             }
           });
         }
@@ -444,14 +444,14 @@ export class DailyPartPdfService {
       files.forEach((file) => {
         // Verificar si el archivo pertenece al user_id y no es la imagen actual
         // const userPrefix = `chart-${user_id}-`;
-        const userPrefix = `chart-`;
+        const userPrefix = `chart-${user_id}-`;
         if (file.startsWith(userPrefix) && !file.includes(String(user_id))) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
             if (err) {
-              // console.error(`Error eliminando el archivo ${file}:`, err);
+              console.error(`Error eliminando el archivo ${file}:`, err);
             } else {
-              // console.log(`Archivo eliminado: ${file}`);
+              console.log(`Archivo eliminado: ${file}`);
             }
           });
         }
@@ -469,14 +469,14 @@ export class DailyPartPdfService {
       files.forEach((file) => {
         // Verificar si el archivo pertenece al user_id y no es la imagen actual
         // const userPrefix = `chart-${user_id}-`;
-        const userPrefix = `chart-triple-`;
+        const userPrefix = `chart-triple-${user_id}-`;
         if (file.startsWith(userPrefix) && !file.includes(String(user_id))) {
           const filePath = path.join(directory, file);
           fs.unlink(filePath, (err) => {
             if (err) {
-              // console.error(`Error eliminando el archivo ${file}:`, err);
+              console.error(`Error eliminando el archivo del gráfico triple linea ${file}:`, err);
             } else {
-              // console.log(`Archivo eliminado: ${file}`);
+              console.log(`Gráfico de triple linea eliminado : ${file}`);
             }
           });
         }
