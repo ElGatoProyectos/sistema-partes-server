@@ -26,9 +26,13 @@ export abstract class BankWorkforceRepository {
 
   findById(assists_id: number): void {}
 
-  findByDate(date: Date): void {}
+  findByDate(date: Date,project_id:number): void {}
 
-  findByDateAndWorkforce(date: Date, workforce_id: number): void {}
+  findAllWithOutPaginationByDate(date: Date): void {}
+
+  findAllWithOutPaginationByDateAndProject(date: Date,project_id:number): void {}
+
+  findByDateAndWorkforce(date: Date, workforce_id: number,project_id:number): void {}
 
   findAllByWeek(
     skip: number,
@@ -37,13 +41,15 @@ export abstract class BankWorkforceRepository {
     week: string
   ): void {}
 
-  findByIdMoAndDate(mano_obra_id: number): void {}
+  findByIdMoAndDate(mano_obra_id: number,project_id:number): void {}
 
   createAssists(data: I_CreateAssistsWorkforceBD): void {}
 
-  updateAssistsPresent(assists_id: number, data: E_Asistencia_BD): void {}
+  createManyAssists(data: I_CreateAssistsWorkforceBD[]): void {}
 
-  updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD): void {}
+  updateAssistsPresent(assists_id: number, data: E_Asistencia_BD,project_id:number): void {}
+
+  updateAssistsNotPresent(assists_id: number, data: E_Asistencia_BD,project_id:number): void {}
 
   updateAssists(
     data: I_UpdateAssitsBD,

@@ -1,9 +1,8 @@
 import {
+  Asistencia,
   DetalleParteDiarioFoto,
   DetallePrecioHoraMO,
   DetalleTrabajoPartida,
-  ParteDiario,
-  ParteDiarioPartida,
   PrecioHoraMO,
   Proyecto,
   Semana,
@@ -16,23 +15,35 @@ import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { DailyPartPdfService } from "./dailyPartPdf.service";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import {
-  I_DailyPart,
   I_DailyPartPdf,
   I_ParteDiario,
+  I_ParteDiarioPdf,
 } from "../models/dailyPart.interface";
 import { projectValidation } from "../../project/project.validation";
-import prisma from "../../config/prisma.config";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
 import { I_DepartureJobForPdf } from "../../departure/departure-job/models/departureJob.interface";
 import { dailyPartDepartureValidation } from "../dailyPartDeparture/dailyPartDeparture.validation";
 import { dailyPartMOValidation } from "../dailyPartMO/dailyPartMO.validation";
-import { I_DailyPartWorkforce } from "../dailyPartMO/models/dailyPartMO.interface";
-import { I_DailyPartDepartureForPdf } from "../dailyPartDeparture/models/dailyPartDeparture.interface";
+import {
+  DailyPartPdf,
+  I_DailyPartWorkforce,
+  I_DailyPartWorkforcePdf,
+} from "../dailyPartMO/models/dailyPartMO.interface";
+import {
+  I_DailyPartDeparture,
+  I_DailyPartDepartureForId,
+  I_DailyPartDepartureForPdf,
+} from "../dailyPartDeparture/models/dailyPartDeparture.interface";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { dailyPartPhotoValidation } from "../photos/dailyPartPhotos.validation";
 import { weekValidation } from "../../week/week.validation";
 import { converToDate } from "../../common/utils/date";
+import { assistsWorkforceValidation } from "../../assists/assists.validation";
+import { dailyPartResourceValidation } from "../dailyPartResources/dailyPartResources.validation";
+import {
+  I_DailyPartResourceForPdf,
+} from "../dailyPartResources/models/dailyPartResources.interface";
 
 const pdfService = new DailyPartPdfService();
 
@@ -53,7 +64,7 @@ export class ReportService {
       const userTokenResponse = await jwtService.getUserFromToken(
         tokenWithBearer
       );
-      if (!userTokenResponse) return userTokenResponse;
+      if (!userTokenResponse.success) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
       const user_id = userResponse.id;
 
@@ -75,6 +86,7 @@ export class ReportService {
       }
       const dailyPartsResponseSend =
         await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
+      
       if (dailyPartsResponseSend.success) {
         const dailysPartWeek =
           dailyPartsResponseSend.payload as I_ParteDiario[];
@@ -90,6 +102,7 @@ export class ReportService {
         await this.ifDateIsNotPresent(user_id, project, date);
       }
     } catch (error) {
+      console.log(error)
       return {
         success: false,
         message: "Error al crear informe",
@@ -97,7 +110,11 @@ export class ReportService {
     }
   }
 
-  async createInformeParteDiario(daily_part_id:number,tokenWithBearer:string,project_id:string) {
+  async createInformeParteDiario(
+    daily_part_id: number,
+    tokenWithBearer: string,
+    project_id: string
+  ) {
     try {
       const resultIdProject = await projectValidation.findById(+project_id);
       if (!resultIdProject.success) {
@@ -112,28 +129,139 @@ export class ReportService {
       if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
       const dailyPartResponse =
-      await dailyPartReportValidation.findByIdValidation(daily_part_id);
-    if (!dailyPartResponse.success) {
-      return dailyPartResponse;
-    }
-    const dailyPart = dailyPartResponse.payload as I_DailyPart;
-      const user_id = 1;
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+      const dailyPart = dailyPartResponse.payload as I_ParteDiarioPdf;
 
-      pdfService.deleteImages(user_id);
+      const detailsDepartureJobResponse =
+        await departureJobValidation.findAllWithOutPaginationForJob(
+          dailyPart.trabajo_id
+        );
 
-      const template = TemplateHtmlInformeParteDiario(user_id, dailyPart.id,project,dailyPart);
+      const detailsDepartureJob =
+        detailsDepartureJobResponse.payload as DetalleTrabajoPartida[];
 
-      await pdfService.createPdfPD(template, user_id);
+      const detailsDailyPartDepartureResponse =
+        await dailyPartDepartureValidation.findAllForDailyPart(dailyPart.id);
+
+      const detailsDailyPartDeparture =
+        detailsDailyPartDepartureResponse.payload as I_DailyPartDeparture[];
+
+      const dailyPartWorkforceResponse =
+        await dailyPartMOValidation.findAllForIdDailyPart(dailyPart.id);
+
+      const dailysPartsWMO =
+        dailyPartWorkforceResponse.payload as I_DailyPartWorkforcePdf[];
+
+      const date = new Date();
+      date.setUTCHours(0, 0, 0, 0);
+
+      const assistsForDateResponse =
+        await assistsWorkforceValidation.findAllWithOutPaginationByDateAndProject(
+          date,
+          project.id
+        );
+      const assistsForDate = assistsForDateResponse.payload as Asistencia[];
+      
+      const details: I_DailyPartDepartureForId[] = detailsDepartureJob.map(
+        (detail) => {
+          const detailDailyPart = detailsDailyPartDeparture.find(
+            (detailDailyPart) =>
+              detailDailyPart.parte_diario_id === dailyPart.id &&
+              detailDailyPart.partida_id === detail.partida_id
+          );
+
+          return {
+            item: detailDailyPart?.Partida.item
+              ? detailDailyPart?.Partida.item
+              : "",
+            partida: detailDailyPart?.Partida.partida
+              ? detailDailyPart?.Partida.partida
+              : "",
+            unidad: detailDailyPart?.Partida.Unidad?.simbolo
+              ? detailDailyPart?.Partida.Unidad?.simbolo
+              : "",
+            cantidad_programada: detail.metrado_utilizado,
+            cantidad_utilizada: detailDailyPart?.cantidad_utilizada,
+          };
+        }
+      );
+
+      const dailyPartMOFind: DailyPartPdf[] = dailysPartsWMO.map(
+        (dailyPartMO) => {
+          const assists = assistsForDate.find(
+            (assists) => assists.mano_obra_id === dailyPartMO.mano_obra_id
+          );
+          return {
+            documento_identidad: dailyPartMO.ManoObra.documento_identidad,
+            nombre_completo:
+              dailyPartMO.ManoObra.nombre_completo +
+              " " +
+              dailyPartMO.ManoObra.apellido_materno +
+              " " +
+              dailyPartMO.ManoObra.apellido_paterno,
+            categoria_obrero:
+              dailyPartMO.ManoObra.CategoriaObrero?.nombre || "",
+            unidad: dailyPartMO.ManoObra.Unidad?.simbolo || "",
+            horas_trabajadas: assists?.horas_trabajadas ?? 0,
+            hora_normal: assists?.hora_normal ?? 0,
+            hora_60: assists?.horas_60 ?? 0,
+            hora_100: assists?.horas_100 ?? 0,
+          };
+        }
+      );
+
+      const dailyPartResourcesResponse =
+        await dailyPartResourceValidation.findAllWithPaginationForDailyPart(
+          dailyPart.id
+        );
+
+      const dailyPartResources =
+        dailyPartResourcesResponse.payload as I_DailyPartResourceForPdf[];
+      const daillyPartResourceMaterials = dailyPartResources.filter(
+        (dailyPart) =>
+          dailyPart.Recurso.CategoriaRecurso.nombre === "Materiales"
+      );
+      const daillyPartResourceTeams = dailyPartResources.filter(
+        (dailyPart) => dailyPart.Recurso.CategoriaRecurso.nombre === "Equipos"
+      );
+      const daillyPartResourceSubcontractors = dailyPartResources.filter(
+        (dailyPart) =>
+          dailyPart.Recurso.CategoriaRecurso.nombre === "Sub-contratas"
+      );
+
+      const detailCommentsResponse= await dailyPartPhotoValidation.findAllForIdDailyPart(dailyPart.id)
+
+      const detailComments= detailCommentsResponse.payload as DetalleParteDiarioFoto[]
+
+      const template = TemplateHtmlInformeParteDiario(
+        userResponse.id,
+        dailyPart.id,
+        project,
+        dailyPart,
+        details,
+        dailyPartMOFind,
+        daillyPartResourceMaterials,
+        daillyPartResourceTeams,
+        daillyPartResourceSubcontractors,
+        detailComments
+      );
+
+      await pdfService.createPdfPD(template, userResponse.id,dailyPart.id);
 
       return {
         success: true,
         message: "Error",
         payload: {
-          id:dailyPart.id,
-          user_id,
+          id: userResponse.id,
+          user_id:userResponse.id,
+          daily_part_id: dailyPart.id
         },
       };
     } catch (error) {
+      console.log(error)
       return {
         success: false,
         message: "Error al crear informe",

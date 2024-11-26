@@ -1,4 +1,4 @@
-import { IndiceUnificado, Recurso, Unidad } from "@prisma/client";
+import { CategoriaRecurso, IndiceUnificado, Recurso, Unidad } from "@prisma/client";
 
 export interface I_CreateResourcesBD
   extends Omit<Recurso, "id" | "fecha_creacion" | "eliminado"> {}
@@ -24,4 +24,9 @@ export interface I_ResourcesExcel {
 export interface I_Recurso extends Recurso {
   Unidad: Unidad;
   IndiceUnificado: IndiceUnificado;
+}
+export interface I_RecursoForPdf extends Recurso {
+  Unidad: Unidad;
+  IndiceUnificado: IndiceUnificado;
+  CategoriaRecurso: CategoriaRecurso
 }

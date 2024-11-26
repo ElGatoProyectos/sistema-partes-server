@@ -20,7 +20,27 @@ class DailyPartPhotoValidation {
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al buscar Parte Diario Foto",
+        "Error al buscar Parte Diario Foto por los ids de los Partes Diarios",
+        error
+      );
+    }
+  }
+  async findAllForIdDailyPart(
+    daily_part_id: number
+  ): Promise<T_HttpResponse> {
+    try {
+      const dailyPart =
+        await prismaDailyPartPhotoRepository.findAllWithOutPaginationForIdDailyPart(
+          daily_part_id
+        );
+
+      return httpResponse.SuccessResponse(
+        "El Detalle Parte Diario Foto por id del Parte Diario",
+        dailyPart
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar Detalle Parte Diario Foto por id del Parte Diario",
         error
       );
     }

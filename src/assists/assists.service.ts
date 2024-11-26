@@ -7,6 +7,7 @@ import {
   E_Asistencia_BD,
   E_Estado_BD,
   ManoObra,
+  Proyecto,
 } from "@prisma/client";
 import { workforceValidation } from "../workforce/workforce.validation";
 import { projectValidation } from "../project/project.validation";
@@ -259,8 +260,10 @@ class AssistsService {
         );
       }
 
+      const project= resultIdProject.payload as Proyecto;
+
       const date = new Date();
-      const verifyDate = await assistsWorkforceValidation.findByDate(date);
+      const verifyDate = await assistsWorkforceValidation.findByDate(date,project.id);
       const workforcesManyResponse =
         await workforceValidation.findAllWithoutPaginationForProject(
           +project_id
@@ -328,7 +331,7 @@ class AssistsService {
       const workforce = workforceResponse.payload as ManoObra;
 
       const assistsResponse = await assistsWorkforceValidation.findByDateAndMO(
-        mano_obra_id
+        mano_obra_id, +project_id
       );
 
       if (!assistsResponse.success) {
@@ -349,12 +352,14 @@ class AssistsService {
       if (resultValue === E_Asistencia_BD.A) {
         updateAssists = await prismaAssistsRepository.updateAssistsPresent(
           assists.id,
-          resultValue
+          resultValue,
+          +project_id
         );
       } else {
         updateAssists = await prismaAssistsRepository.updateAssistsNotPresent(
           assists.id,
-          resultValue
+          resultValue,
+          +project_id
         );
       }
 

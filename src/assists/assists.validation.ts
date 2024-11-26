@@ -1,5 +1,5 @@
 import { httpResponse, T_HttpResponse } from "../common/http.response";
-import { I_UpdateAssitsBD } from "./models/assists.interface";
+import { I_CreateAssistsWorkforceBD, I_UpdateAssitsBD } from "./models/assists.interface";
 import { prismaAssistsRepository } from "./prisma-assists.repository";
 
 class AssistsWorkforceValidation {
@@ -21,9 +21,45 @@ class AssistsWorkforceValidation {
       );
     }
   }
-  async findByDate(date: Date): Promise<T_HttpResponse> {
+  async findByDate(date: Date,project_id:number): Promise<T_HttpResponse> {
     try {
-      const assists = await prismaAssistsRepository.findByDate(date);
+      const assists = await prismaAssistsRepository.findByDate(date,project_id);
+      if (!assists)
+        return httpResponse.NotFoundException(
+          "No se encontró Asistencia para esa fecha"
+        );
+      return httpResponse.SuccessResponse(
+        "Asistencia encontrada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia",
+        error
+      );
+    }
+  }
+  async findAllWithOutPaginationByDate(date: Date): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.findAllWithOutPaginationByDate(date);
+      if (!assists)
+        return httpResponse.NotFoundException(
+          "No se encontró Asistencia para esa fecha"
+        );
+      return httpResponse.SuccessResponse(
+        "Asistencia encontrada con éxito",
+        assists
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar la Asistencia",
+        error
+      );
+    }
+  }
+  async findAllWithOutPaginationByDateAndProject(date: Date,project_id:number): Promise<T_HttpResponse> {
+    try {
+      const assists = await prismaAssistsRepository.findAllWithOutPaginationByDateAndProject(date,project_id);
       if (!assists)
         return httpResponse.NotFoundException(
           "No se encontró Asistencia para esa fecha"
@@ -41,12 +77,14 @@ class AssistsWorkforceValidation {
   }
   async findByDateAndWorkforce(
     date: Date,
-    workforce_id: number
+    workforce_id: number,
+    project_id:number
   ): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.findByDateAndWorkforce(
         date,
-        workforce_id
+        workforce_id,
+        project_id
       );
       if (!assists) {
         return httpResponse.NotFoundException(
@@ -66,10 +104,10 @@ class AssistsWorkforceValidation {
     }
   }
 
-  async findByDateAndMO(mano_obra_id: number): Promise<T_HttpResponse> {
+  async findByDateAndMO(mano_obra_id: number,project_id:number): Promise<T_HttpResponse> {
     try {
       const assists = await prismaAssistsRepository.findByIdMoAndDate(
-        mano_obra_id
+        mano_obra_id,project_id
       );
       if (!assists)
         return httpResponse.NotFoundException(
@@ -196,6 +234,7 @@ class AssistsWorkforceValidation {
       );
     }
   }
+  
 }
 
 export const assistsWorkforceValidation = new AssistsWorkforceValidation();

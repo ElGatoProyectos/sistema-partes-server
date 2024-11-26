@@ -3,11 +3,30 @@ import prisma from "../../config/prisma.config";
 import { DailyPartResourceRepository } from "./dailyPartResources.repository";
 import {
   I_DailyPartResource,
+  I_DailyPartResourceForPdf,
   I_UpdateDailyPartResourcesBD,
 } from "./models/dailyPartResources.interface";
 import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 
 class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
+  async findAllWithOutPaginationForDailyPart(daily_part_id: number): Promise<I_DailyPartResourceForPdf[] | null> {
+    const dailyParts= await prisma.parteDiarioRecurso.findMany({
+      where:{
+        parte_diario_id:daily_part_id
+      },
+      include:{
+        ParteDiario:true,
+        Recurso:{
+          include:{
+            Unidad:true,
+            IndiceUnificado:true,
+            CategoriaRecurso:true
+          }
+        }
+      }
+    })
+    return dailyParts
+  }
   async delete(daily_part_resource_id: number) {
     await prisma.parteDiarioRecurso.delete({
       where: {

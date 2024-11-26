@@ -10,11 +10,9 @@ import {
   T_FindAllDailyPartForJob,
 } from "./models/dailyPart.types";
 import { reportService } from "./dailyPartPdf/report.service";
-import { authService } from "../auth/auth.service";
 import { httpResponse } from "../common/http.response";
 import path from "path";
 import appRootPath from "app-root-path";
-import { Request, Response } from "express";
 import fs from "fs";
 
 class DailyPartController {
@@ -70,7 +68,7 @@ class DailyPartController {
         appRootPath.path,
         "static",
         "reports",
-        `informe-${result.payload.user_id}.pdf`
+        `informe-${result.payload.user_id}-${result.payload.user_id}.pdf`
       );
 
       if (fs.existsSync(filePath)) {
@@ -111,7 +109,7 @@ class DailyPartController {
         appRootPath.path,
         "static",
         "reports-pd",
-        `informe-${result.payload.user_id}-${result.payload.user_id}.pdf`
+        `informe-${result.payload.user_id}-${result.payload.daily_part_id}.pdf`
       );
 
       if (fs.existsSync(filePath)) {

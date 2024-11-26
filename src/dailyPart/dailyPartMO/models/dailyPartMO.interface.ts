@@ -1,5 +1,8 @@
 import { ParteDiarioMO } from "@prisma/client";
-import { I_JobAndCategoryWorkforce } from "../../../job/models/job.interface";
+import {
+  I_JobAndCategoryWorkforce,
+  I_JobAndCategoryWorkforceForPdf,
+} from "../../../job/models/job.interface";
 
 export interface I_UpdateDailyPartMOBD
   extends Omit<
@@ -33,6 +36,9 @@ export interface I_Mano {
 export interface I_DailyPartWorkforce extends ParteDiarioMO {
   ManoObra: I_JobAndCategoryWorkforce;
 }
+export interface I_DailyPartWorkforcePdf extends ParteDiarioMO {
+  ManoObra: I_JobAndCategoryWorkforceForPdf;
+}
 
 export interface I_DailyPartBody {
   hora_inicio: number;
@@ -46,4 +52,15 @@ export interface I_DailyPartBody {
   fecha_creacion: Date;
   proyecto_id: number;
   ManoObra: I_Mano;
+}
+
+export interface DailyPartPdf {
+  documento_identidad: string;
+  nombre_completo: string | undefined;
+  categoria_obrero: string | undefined;
+  unidad: string | undefined;
+  horas_trabajadas: number;
+  hora_normal: number;
+  hora_60: number;
+  hora_100: number;
 }

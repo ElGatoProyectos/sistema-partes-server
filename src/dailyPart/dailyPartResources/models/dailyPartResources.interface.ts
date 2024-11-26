@@ -1,5 +1,5 @@
 import { ParteDiario, ParteDiarioRecurso } from "@prisma/client";
-import { I_Recurso } from "../../../resources/models/resources.interface";
+import { I_Recurso, I_RecursoForPdf } from "../../../resources/models/resources.interface";
 
 export interface I_CreateDailyPartResourcesBD
   extends Omit<ParteDiarioRecurso, "id" | "fecha_creacion"> {}
@@ -17,5 +17,9 @@ export interface I_UpdateDailyPartResourceBody {
 
 export interface I_DailyPartResource extends ParteDiarioRecurso {
   Recurso: I_Recurso;
+  ParteDiario: ParteDiario;
+}
+export interface I_DailyPartResourceForPdf extends ParteDiarioRecurso {
+  Recurso: I_RecursoForPdf;
   ParteDiario: ParteDiario;
 }

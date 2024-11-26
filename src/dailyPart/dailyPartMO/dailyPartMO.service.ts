@@ -199,7 +199,8 @@ class DailyPartMOService {
     const assistsResponse =
       await assistsWorkforceValidation.findByDateAndWorkforce(
         date,
-        dailyPartMO.mano_obra_id
+        dailyPartMO.mano_obra_id,
+        dailyPart.proyecto_id
       );
     if (!assistsResponse.success) {
       return assistsResponse;
@@ -378,7 +379,8 @@ class DailyPartMOService {
         const assistsResponse =
           await assistsWorkforceValidation.findByDateAndWorkforce(
             date,
-            dailyPartMO.mano_obra_id
+            dailyPartMO.mano_obra_id,
+            dailyPart.proyecto_id
           );
 
         if (!assistsResponse.success) {
