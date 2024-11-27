@@ -1,9 +1,49 @@
 import { TrainReportRepository } from "./trainReport.repository";
 import prisma from "../../config/prisma.config";
 import { I_CreateReportTrainBD, I_UpdateReportTrainBD } from "./models/trainReport.interface";
-import { ReporteAvanceTren } from "@prisma/client";
+import { ReporteAvanceTren, Semana } from "@prisma/client";
+import { T_FindAllTrainReport } from "./models/trainReport.types";
+import { weekValidation } from "../../week/week.validation";
 
 class PrismaTrainReportRepository implements TrainReportRepository {
+  async findAll(skip: number, data: T_FindAllTrainReport, project_id: number): Promise<{ reportsTrains: ReporteAvanceTren[]; total: number }> {
+    let filters: any = {};
+    let week:Semana;
+    if (data.queryParams.week) {
+      const weekResponse = await weekValidation.findByCode(
+        data.queryParams.week
+      );
+      week = weekResponse.payload as Semana;
+      filters.semana_id=week.id;
+    }else{
+      const date= new Date()
+      date.setUTCHours(0,0,0,0);
+      const weekResponse=await weekValidation.findByDate(date);
+      week= weekResponse.payload as Semana
+      filters.semana_id=week.id
+    }
+    const [reportsTrains, total]: [ReporteAvanceTren[], number] = await prisma.$transaction([
+      prisma.reporteAvanceTren.findMany({
+        where: {
+          ...filters,
+          Tren:{
+            proyecto_id:project_id
+          }
+        },
+        skip,
+        take: data.queryParams.limit,
+      }),
+      prisma.reporteAvanceTren.count({
+        where: {
+          ...filters,
+          Tren:{
+            proyecto_id:project_id
+          }
+        },
+      }),
+    ]);
+    return { reportsTrains, total };
+  }
   async updateReportsForTrain(report_train_id:number,value: number,field:string): Promise<ReporteAvanceTren | null>  {
     const report= await prisma.reporteAvanceTren.update({
       where:{

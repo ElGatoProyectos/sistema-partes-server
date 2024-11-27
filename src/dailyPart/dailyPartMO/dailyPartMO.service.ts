@@ -1,10 +1,14 @@
 import {
   Asistencia,
+  DetallePrecioHoraMO,
+  DetalleSemanaProyecto,
   E_Asistencia_BD,
   E_Estado_Asistencia_BD,
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
+  PrecioHoraMO,
+  ReporteAvanceTren,
 } from "@prisma/client";
 import { projectValidation } from "../../project/project.validation";
 import { dailyPartReportValidation } from "../dailyPart.validation";
@@ -17,8 +21,14 @@ import { prismaDailyPartMORepository } from "./prisma-dailyPartMO.repository";
 import prisma from "../../config/prisma.config";
 import {
   I_DailyPartMO,
+  I_DailyPartWorkforceId,
   I_UpdateDailyPartBody,
 } from "./models/dailyPartMO.interface";
+import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
+import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
+import { obtenerCampoPorDia } from "../../common/utils/day";
+import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
+import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 
 class DailyPartMOService {
   async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
@@ -118,28 +128,17 @@ class DailyPartMOService {
     daily_part_mo_id: number
   ) {
     try {
-      const projectResponse = await projectValidation.findById(project_id);
+      // const projectResponse = await projectValidation.findById(project_id);
 
-      if (!projectResponse.success) {
-        return projectResponse;
-      }
+      // if (!projectResponse.success) {
+      //   return projectResponse;
+      // }
 
-      const dailyPartResponse =
-        await dailyPartReportValidation.findByIdValidation(daily_part_id);
-      if (!dailyPartResponse.success) {
-        return dailyPartResponse;
-      }
-
-      const dailyPart = dailyPartResponse.payload as ParteDiario;
-
-      if (
-        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
-        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
-      ) {
-        return httpResponse.BadRequestException(
-          "Por la etapa del Parte Diario, no se puede modificar"
-        );
-      }
+      // const dailyPartResponse =
+      //   await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      // if (!dailyPartResponse.success) {
+      //   return dailyPartResponse;
+      // }
 
       const dailyPartMOResponse = await dailyPartMOValidation.findById(
         daily_part_mo_id
@@ -148,14 +147,36 @@ class DailyPartMOService {
         return dailyPartMOResponse;
       }
 
-      const dailyPartMO = dailyPartMOResponse.payload as ParteDiarioMO;
+      const dailyPartMO = dailyPartMOResponse.payload as I_DailyPartWorkforceId;
+
+      // const dailyPart = dailyPartResponse.payload as ParteDiario;
+
+      if (dailyPartMO.ParteDiario.proyecto_id != project_id) {
+        return httpResponse.BadRequestException(
+          "El id ingresado del Proyecto no es igual al del Parte Diario"
+        );
+      }
+      if (dailyPartMO.ParteDiario.id != daily_part_id) {
+        return httpResponse.BadRequestException(
+          "El id ingresado del Parte Diario no es igual al del Parte Diario MO"
+        );
+      }
+
+      if (
+        dailyPartMO.ParteDiario.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPartMO.ParteDiario.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede modificar"
+        );
+      }
 
       const updateDailyPartMOFormat = {
         hora_parcial: data.hora_parcial,
         hora_normal: data.hora_normal,
         hora_60: data.hora_60,
         hora_100: data.hora_100,
-        parte_diario_id: dailyPart.id,
+        parte_diario_id: dailyPartMO.ParteDiario.id,
         mano_obra_id: dailyPartMO.mano_obra_id,
         proyecto_id: project_id,
       };
@@ -166,7 +187,12 @@ class DailyPartMOService {
           daily_part_mo_id
         );
 
-      await this.updateAssistsIfValid(dailyPart, dailyPartMO, data);
+      await this.updateAssistsIfValid(
+        dailyPartMO.ParteDiario,
+        dailyPartMO,
+        data,
+        dailyPartMO.ParteDiario.Trabajo.tren_id
+      );
 
       return httpResponse.SuccessResponse(
         "Parte Diario con Mano fue modificado correctamente",
@@ -182,8 +208,9 @@ class DailyPartMOService {
 
   async updateAssistsIfValid(
     dailyPart: ParteDiario,
-    dailyPartMO: ParteDiarioMO,
-    data: I_UpdateDailyPartBody
+    dailyPartMO: I_DailyPartWorkforceId,
+    data: I_UpdateDailyPartBody,
+    train_id: number
   ) {
     if (
       dailyPart.fecha === null ||
@@ -272,6 +299,58 @@ class DailyPartMOService {
       assists.id,
       dailyPartMO.mano_obra_id
     );
+
+    const detailWeekProjectResponse =
+      await detailWeekProjectValidation.findByDateAndProject(
+        date,
+        dailyPart.proyecto_id
+      );
+
+      
+    if (detailWeekProjectResponse.success) {
+      const detailWeekReponse =
+        detailWeekProjectResponse.payload as DetalleSemanaProyecto;
+      const reportTrainResponse =
+        await trainReportValidation.findByIdTrainAndWeek(
+          train_id,
+          detailWeekReponse.semana_id
+        );
+      if (reportTrainResponse.success) {
+        const day = obtenerCampoPorDia(dailyPart.fecha);
+        const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
+        const priceHourResponse = await priceHourWorkforceValidation.findByDate(
+          dailyPart.fecha
+        );
+        if (priceHourResponse.success) {
+          const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
+          const detailsPriceHourMOResponse =
+            await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+              priceHourMO.id
+            );
+          const detailsPriceHourMO =
+            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+          if (dailyPartMO.ManoObra.CategoriaObrero?.id != null) {
+            const detail = detailsPriceHourMO.find(
+              (element) =>
+                element.categoria_obrero_id ===
+                dailyPartMO.ManoObra.CategoriaObrero?.id
+            );
+            if (
+              detail?.hora_normal != null &&
+              detail?.hora_extra_60 != null &&
+              detail?.hora_extra_100 != null
+            ) {
+              const subtotal =
+                detail?.hora_normal * hn +
+                detail?.hora_extra_60 * h60 +
+                detail?.hora_extra_100 * h100;
+              const totalAdd = reportTrain[day] + subtotal;
+              await trainReportValidation.update(reportTrain.id, totalAdd, day);
+            }
+          }
+        }
+      }
+    }
   }
 
   async findAll(

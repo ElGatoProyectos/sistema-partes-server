@@ -78,21 +78,25 @@ class DailyPartDepartureService {
           dailyPartDepartureFormat,
           dailyPartDeparture.id
         );
-      
-     
-      const day= obtenerCampoPorDia()
-      const date=new Date();
+      const date= dailyPartDeparture.ParteDiario.fecha ? dailyPartDeparture.ParteDiario.fecha : new Date(); 
       date.setUTCHours(0,0,0,0);
+      const day= obtenerCampoPorDia(date)
       const detailWeekProjectResponse= await detailWeekProjectValidation.findByDateAndProject(date,dailyPartDeparture.ParteDiario.proyecto_id)
       if(detailWeekProjectResponse.success){
         const cuantityNewTotal=dailyPartDeparture.Partida.precio * data.quantity_used;
         const cuantityOldTotal=dailyPartDeparture.Partida.precio * dailyPartDeparture.cantidad_utilizada;
+        let subtotal=0;
+        if(cuantityNewTotal>cuantityOldTotal ){
+           subtotal= cuantityNewTotal-cuantityOldTotal
+        }else{
+           subtotal=cuantityOldTotal - cuantityNewTotal
+        }
+
         const detailWeekReponse= detailWeekProjectResponse.payload as DetalleSemanaProyecto;
         const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(dailyPartDeparture.ParteDiario.Trabajo.tren_id,detailWeekReponse.semana_id)
         if(reportTrainResponse.success){
           const reportTrain= reportTrainResponse.payload as ReporteAvanceTren
-          const totalAdd= reportTrain[day] + cuantityNewTotal -cuantityOldTotal
-
+          const totalAdd= reportTrain[day] + subtotal
           await trainReportValidation.update(reportTrain.id,totalAdd,day)
         }
       }

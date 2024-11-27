@@ -1,7 +1,10 @@
 import {
+  DetalleSemanaProyecto,
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioRecurso,
+  Recurso,
+  ReporteAvanceTren,
 } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
@@ -16,6 +19,11 @@ import {
   I_UpdateDailyPartResourceBody,
 } from "./models/dailyPartResources.interface";
 import { prismaDailyPartResourceRepository } from "./prisma-dailyPartRepository.repository";
+import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
+import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
+import { obtenerCampoPorDia } from "../../common/utils/day";
+import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
+import { I_Resources } from "../../resources/models/resources.interface";
 
 class DailyPartResourceService {
   async createDailyPart(
@@ -81,12 +89,12 @@ class DailyPartResourceService {
     daily_part_resource_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const resultIdProject = await projectValidation.findById(project_id);
-      if (!resultIdProject.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el Parte Diario con el id del Proyecto proporcionado"
-        );
-      }
+      // const resultIdProject = await projectValidation.findById(project_id);
+      // if (!resultIdProject.success) {
+      //   return httpResponse.BadRequestException(
+      //     "No se puede crear el Parte Diario con el id del Proyecto proporcionado"
+      //   );
+      // }
 
       const dailyPartResourceResponse =
         await dailyPartResourceValidation.findById(daily_part_resource_id);
@@ -108,6 +116,10 @@ class DailyPartResourceService {
         );
       }
 
+      if(dailyPartResource.proyecto_id != project_id){
+        return httpResponse.BadRequestException("El id ingresado del Proyecto no pertenece al Part")
+      }
+
       const resourceResponse = await resourceValidation.findById(
         data.resource_id
       );
@@ -115,6 +127,8 @@ class DailyPartResourceService {
       if (!resourceResponse.success) {
         return resourceResponse;
       }
+
+      const resource= resourceResponse.payload as I_Resources;
 
       const dailyPartResouceFormat = {
         parte_diario_id: dailyPartResource.parte_diario_id,
@@ -128,6 +142,41 @@ class DailyPartResourceService {
           dailyPartResouceFormat,
           daily_part_resource_id
         );
+
+      // const date=new Date();
+      // date.setUTCHours(0,0,0,0);
+      // const detailWeekProjectResponse =
+      //   await detailWeekProjectValidation.findByDateAndProject(
+      //     date,
+      //     dailyPartResource.proyecto_id
+      //   );
+
+      // if(detailWeekProjectResponse){
+      //   const detailWeekReponse =
+      //   detailWeekProjectResponse.payload as DetalleSemanaProyecto;
+      // const reportTrainResponse =
+      //   await trainReportValidation.findByIdTrainAndWeek(
+      //     dailyPartResource.Proyecto.Trabajo.tren_id,
+      //     detailWeekReponse.semana_id
+      //   );
+      //   if(reportTrainResponse.success){
+      //     if(dailyPartResource.ParteDiario.fecha){
+      //       const day = obtenerCampoPorDia(dailyPartResource.ParteDiario?.fecha);
+      //       const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
+      //       if(resource.CategoriaRecurso.nombre.toUpperCase()==="MATERIALES"){
+      //        const price= dailyPartResource.
+      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="EQUIPOS"){
+
+      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="MANO DE OBRA"){
+
+      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="SUB-CONTRATAS"){
+
+      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="MATERIALES"){
+
+      //       }
+      //     }
+      //   }
+      // }
 
       return httpResponse.CreatedResponse(
         "Parte Diario del Recurso actualizado correctamente",

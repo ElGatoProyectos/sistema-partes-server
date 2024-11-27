@@ -5,8 +5,8 @@ export type DiasSemana = 'domingo' | 'lunes' | 'martes' | 'miercoles' | 'jueves'
  * Obtiene el nombre del campo según el día actual de la semana.
  * @returns El nombre del día de la semana correspondiente al día actual.
  */
-export const obtenerCampoPorDia = (): DiasSemana => {
-  const diaActual = new Date().getUTCDay(); // Obtiene el número del día actual (0 = Domingo, 6 = Sábado)
+export const obtenerCampoPorDia = (date:Date): DiasSemana => {
+  const diaActual = date.getUTCDay(); // Obtiene el número del día actual (0 = Domingo, 6 = Sábado)
 
   const camposPorDia: Record<number, DiasSemana> = {
     0: 'domingo',

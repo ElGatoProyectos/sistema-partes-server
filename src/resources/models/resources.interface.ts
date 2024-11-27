@@ -10,7 +10,9 @@ export interface I_UpdateResourcesBody extends Omit<Recurso, "id"> {}
 export interface I_UpdateResourcesBodyValidation
   extends Omit<Recurso, "id" | "eliminado" | "fecha_creacion"> {}
 
-export interface I_Resources extends Omit<Recurso, "eliminado"> {}
+export interface I_Resources extends Omit<Recurso, "eliminado"> {
+  CategoriaRecurso:CategoriaRecurso
+}
 
 export interface I_ResourcesExcel {
   "NOMBRE INDICE UNIFICADO": string;

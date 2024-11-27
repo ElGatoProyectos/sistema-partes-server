@@ -133,6 +133,9 @@ class PrismaProjectRepository implements ProjectRepository {
       where: {
         id: idProject,
       },
+      include:{
+        Trabajo:true
+      },
       omit: {
         eliminado: true,
       },

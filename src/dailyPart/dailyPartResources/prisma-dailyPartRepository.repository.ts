@@ -122,7 +122,11 @@ class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
             IndiceUnificado: true,
           },
         },
-        ParteDiario: true,
+        ParteDiario: {
+          include:{
+            Trabajo:true
+          }
+        },
       },
     });
     return dailyPartResource;
