@@ -41,6 +41,7 @@ import comboRouter from "./dailyPart/combo/combo.init";
 import dailyPartResourceRouter from "./dailyPart/dailyPartResources/dailyPartResources.init";
 import dailyPartPhotosRouter from "./dailyPart/photos/dailyPartPhotos.init";
 import dailyPartDepartureRouter from "./dailyPart/dailyPartDeparture/dailyPartDeparture.init";
+import trainReportRouter from "./train/trainReport/trainReport.init";
 
 const globalPrefix = "/api";
 
@@ -89,6 +90,7 @@ app.use(globalPrefix, comboRouter);
 app.use(globalPrefix, dailyPartResourceRouter);
 app.use(globalPrefix, dailyPartPhotosRouter);
 app.use(globalPrefix, dailyPartDepartureRouter);
+app.use(globalPrefix, trainReportRouter);
 
 app.listen(envConfig.port, () => {
   console.log(`listening on port ${envConfig.port}`);

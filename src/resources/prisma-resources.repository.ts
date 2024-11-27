@@ -213,6 +213,9 @@ class PrismaResourcesRepository implements ResourcesRepository {
         id: resource_id,
         eliminado: E_Estado_BD.n,
       },
+      include:{
+        CategoriaRecurso:true
+      },
       omit: {
         eliminado: true,
       },

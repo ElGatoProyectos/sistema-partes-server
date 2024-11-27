@@ -4,6 +4,7 @@ import { ParteDiarioMO } from "@prisma/client";
 import { T_FindAllDailyPartMO } from "./models/dailyPartMO.types";
 import {
   I_DailyPartWorkforce,
+  I_DailyPartWorkforceId,
   I_DailyPartWorkforcePdf,
   I_UpdateDailyPartMOBD,
 } from "./models/dailyPartMO.interface";
@@ -67,14 +68,24 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
       },
     });
   }
-  async findById(daily_part_mo_id: number): Promise<ParteDiarioMO | null> {
+  async findById(daily_part_mo_id: number): Promise<I_DailyPartWorkforceId | null> {
     const dailyPartMO = await prisma.parteDiarioMO.findFirst({
       where: {
         id: daily_part_mo_id,
       },
       include: {
-        ManoObra: true,
+        ManoObra: {
+          include:{
+            CategoriaObrero:true,
+            Unidad:true
+          }
+        },
         Proyecto: true,
+        ParteDiario:{
+          include:{
+            Trabajo:true
+          }
+        }
       },
     });
     return dailyPartMO;

@@ -1,8 +1,9 @@
-import { ParteDiarioMO } from "@prisma/client";
+import { ParteDiario, ParteDiarioMO, Proyecto } from "@prisma/client";
 import {
   I_JobAndCategoryWorkforce,
   I_JobAndCategoryWorkforceForPdf,
 } from "../../../job/models/job.interface";
+import { I_DailyPart } from "../../models/dailyPart.interface";
 
 export interface I_UpdateDailyPartMOBD
   extends Omit<
@@ -38,6 +39,11 @@ export interface I_DailyPartWorkforce extends ParteDiarioMO {
 }
 export interface I_DailyPartWorkforcePdf extends ParteDiarioMO {
   ManoObra: I_JobAndCategoryWorkforceForPdf;
+}
+export interface I_DailyPartWorkforceId extends ParteDiarioMO {
+  ManoObra: I_JobAndCategoryWorkforceForPdf;
+  Proyecto: Proyecto,
+  ParteDiario: I_DailyPart
 }
 
 export interface I_DailyPartBody {
