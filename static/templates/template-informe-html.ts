@@ -8,7 +8,6 @@ import { I_DailyPartDepartureForId } from "../../src/dailyPart/dailyPartDepartur
 import { DailyPartPdf } from "../../src/dailyPart/dailyPartMO/models/dailyPartMO.interface";
 import { I_DailyPartResourceForPdf } from "../../src/dailyPart/dailyPartResources/models/dailyPartResources.interface";
 export function TemplateHtmlInformeParteDiario(
-  user_id: number,
   daily_part_id: number,
   project: Proyecto,
   dailyPart: I_ParteDiarioPdf,

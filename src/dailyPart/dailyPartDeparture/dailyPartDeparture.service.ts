@@ -1,7 +1,9 @@
 import {
+  DetalleSemanaProyecto,
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
   ParteDiarioPartida,
+  ReporteAvanceTren,
 } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
@@ -15,6 +17,9 @@ import {
 import { prismaDailyPartDepartureRepository } from "./prisma-dailyPartDeparture.repository";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
 import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
+import { obtenerCampoPorDia } from "../../common/utils/day";
+import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
+import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
 
 class DailyPartDepartureService {
   async updateDailyPartDeparture(
@@ -74,7 +79,23 @@ class DailyPartDepartureService {
           dailyPartDeparture.id
         );
       
-      const totalAdd=dailyPartDeparture.Partida.precio * data.quantity_used;
+     
+      const day= obtenerCampoPorDia()
+      const date=new Date();
+      date.setUTCHours(0,0,0,0);
+      const detailWeekProjectResponse= await detailWeekProjectValidation.findByDateAndProject(date,dailyPartDeparture.ParteDiario.proyecto_id)
+      if(detailWeekProjectResponse.success){
+        const cuantityNewTotal=dailyPartDeparture.Partida.precio * data.quantity_used;
+        const cuantityOldTotal=dailyPartDeparture.Partida.precio * dailyPartDeparture.cantidad_utilizada;
+        const detailWeekReponse= detailWeekProjectResponse.payload as DetalleSemanaProyecto;
+        const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(dailyPartDeparture.ParteDiario.Trabajo.tren_id,detailWeekReponse.semana_id)
+        if(reportTrainResponse.success){
+          const reportTrain= reportTrainResponse.payload as ReporteAvanceTren
+          const totalAdd= reportTrain[day] + cuantityNewTotal -cuantityOldTotal
+
+          await trainReportValidation.update(reportTrain.id,totalAdd,day)
+        }
+      }
       
       
       return httpResponse.SuccessResponse(

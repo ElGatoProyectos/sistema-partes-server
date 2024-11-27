@@ -27,9 +27,9 @@ export interface I_DailyPartDepartureForPdf {
 }
 
 export interface I_DailyPartDepartureForId {
-  item: string | undefined ;
-  partida: string | undefined; 
-  unidad: string | undefined;
-  cantidad_programada: number | undefined;
-  cantidad_utilizada: number | undefined;
+  item: string | string ;
+  partida: string | string; 
+  unidad: string | string;
+  cantidad_programada: number | string;
+  cantidad_utilizada: number | string;
 }
