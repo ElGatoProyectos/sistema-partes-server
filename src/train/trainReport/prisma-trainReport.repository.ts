@@ -1,11 +1,11 @@
 import { TrainReportRepository } from "./trainReport.repository";
 import prisma from "../../config/prisma.config";
 import { I_CreateReportTrainBD, I_UpdateReportTrainBD } from "./models/trainReport.interface";
-import { ResporteAvanceTren } from "@prisma/client";
+import { ReporteAvanceTren } from "@prisma/client";
 
 class PrismaTrainReportRepository implements TrainReportRepository {
-  async updateReportsForTrain(report_train_id:number,value: number,field:string): Promise<ResporteAvanceTren | null>  {
-    const report= await prisma.resporteAvanceTren.update({
+  async updateReportsForTrain(report_train_id:number,value: number,field:string): Promise<ReporteAvanceTren | null>  {
+    const report= await prisma.reporteAvanceTren.update({
       where:{
         id:report_train_id
       },
@@ -15,8 +15,8 @@ class PrismaTrainReportRepository implements TrainReportRepository {
     })
     return report
   }
-  async findByIdTrainAndWeek(train_id: number, week_id: number): Promise<ResporteAvanceTren | null> {
-    const train = await prisma.resporteAvanceTren.findFirst({
+  async findByIdTrainAndWeek(train_id: number, week_id: number): Promise<ReporteAvanceTren | null> {
+    const train = await prisma.reporteAvanceTren.findFirst({
       where: {
         tren_id: train_id,
         semana_id: week_id
@@ -24,14 +24,14 @@ class PrismaTrainReportRepository implements TrainReportRepository {
     });
     return train;
   }
-  async createReportsForTrain(data: I_CreateReportTrainBD):Promise<ResporteAvanceTren | null>  {
-    const report= await prisma.resporteAvanceTren.create({
+  async createReportsForTrain(data: I_CreateReportTrainBD):Promise<ReporteAvanceTren | null>  {
+    const report= await prisma.reporteAvanceTren.create({
       data:data
     })
     return report
   }
-  async findByIdTrain(train_id: number): Promise<ResporteAvanceTren | null> {
-    const train = await prisma.resporteAvanceTren.findFirst({
+  async findByIdTrain(train_id: number): Promise<ReporteAvanceTren | null> {
+    const train = await prisma.reporteAvanceTren.findFirst({
       where: {
         tren_id: train_id,
       },

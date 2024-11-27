@@ -229,7 +229,7 @@ model Semana {
   fecha_inicio          DateTime
   fecha_fin             DateTime
   DetalleSemanaProyecto DetalleSemanaProyecto[]
-  ResporteAvanceTren ResporteAvanceTren[]
+  ResporteAvanceTren ReporteAvanceTren[]
 }
 
 model DetalleSemanaProyecto {
@@ -609,7 +609,7 @@ model Tren {
   proyecto_id        Int
   Trabajo            Trabajo[]
   Proyecto           Proyecto             @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
-  ResporteAvanceTren ResporteAvanceTren[]
+  ResporteAvanceTren ReporteAvanceTren[]
 }
 
 //[success] actual
@@ -914,7 +914,7 @@ model ReportePartida {
   Proyecto       Proyecto @relation(fields: [proyecto_id], references: [id], onDelete: Cascade)
 }
 
-model ResporteAvanceTren {
+model ReporteAvanceTren {
   id                 Int         @id @default(autoincrement())
   tren_id            Int
   costo_total        Int

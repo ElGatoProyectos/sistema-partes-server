@@ -11,6 +11,7 @@ import {
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
+  ParteDiarioPartida,
   PrecioHoraMO,
   Trabajo,
 } from "@prisma/client";
@@ -39,6 +40,8 @@ import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
 import { prismaDailyPartDepartureRepository } from "./dailyPartDeparture/prisma-dailyPartDeparture.repository";
 import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWeekProject.validation";
 import { trainReportValidation } from "../train/trainReport/trainReport.validation";
+import { dailyPartDepartureValidation } from "./dailyPartDeparture/dailyPartDeparture.validation";
+import { I_DailyPartDeparture } from "./dailyPartDeparture/models/dailyPartDeparture.interface";
 
 class DailyPartService {
   async createDailyPart(
@@ -385,26 +388,37 @@ class DailyPartService {
         return dailyPartResponse;
       }
       const dailyPart = dailyPartResponse.payload as ParteDiario;
-      const detailsJobDepartureResponse =
-        await departureJobValidation.findAllWithOutPaginationForJob(
-          dailyPart.trabajo_id
-        );
-      const detailsJobDeparture =
-        (await detailsJobDepartureResponse.payload) as I_DetailDepartureJob[];
+
+     const dailyPartDepartureResponse= await dailyPartDepartureValidation.findAllForDailyPart(dailyPart.id)
+     const dailyPartDeparture= dailyPartDepartureResponse.payload as I_DailyPartDeparture[]
+
+      // const detailsJobDepartureResponse =
+      //   await departureJobValidation.findAllWithOutPaginationForJob(
+      //     dailyPart.trabajo_id
+      //   );
+      // const detailsJobDeparture =
+      //   detailsJobDepartureResponse.payload as I_DetailDepartureJob[];
       let sumaMetadoPorPrecio = 0;
       let sumaManoObraBBDD = 0;
-      if (detailsJobDeparture.length > 0) {
-        detailsJobDeparture.map((detail) => {
-          sumaMetadoPorPrecio +=
-            detail.metrado_utilizado * detail.Partida.precio;
-
-          sumaManoObraBBDD +=
-            detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
-        });
+      if(dailyPartDeparture.length>0){
+        dailyPartDeparture.forEach((detail)=>{
+        
+          sumaMetadoPorPrecio += detail.cantidad_utilizada * detail.Partida.precio
+          sumaManoObraBBDD += detail.cantidad_utilizada * detail.Partida.mano_de_obra_unitaria
+        })
       }
+      // if (detailsJobDeparture.length > 0) {
+      //   detailsJobDeparture.map((detail) => {
+      //     // sumaMetadoPorPrecio +=
+      //     //   detail.metrado_utilizado * detail.Partida.precio;
+
+      //     sumaManoObraBBDD +=
+      //       detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
+      //   });
+      // }
       if (!dailyPart.fecha) {
         return httpResponse.BadRequestException(
-          "El Parte Diario no tiene fecha para buscar en la tabla"
+          "El Parte Diario no tiene fecha para buscar en la tabla salarial"
         );
       }
       const priceHourResponse = await priceHourWorkforceValidation.findByDate(

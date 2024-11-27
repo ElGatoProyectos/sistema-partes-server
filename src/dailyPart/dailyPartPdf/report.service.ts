@@ -135,11 +135,12 @@ export class ReportService {
       }
       const dailyPart = dailyPartResponse.payload as I_ParteDiarioPdf;
 
+      //acá traigo para ver hasta la cantidad q puede ejecutar
       const detailsDepartureJobResponse =
         await departureJobValidation.findAllWithOutPaginationForJob(
           dailyPart.trabajo_id
         );
-
+    
       const detailsDepartureJob =
         detailsDepartureJobResponse.payload as DetalleTrabajoPartida[];
 
@@ -183,8 +184,8 @@ export class ReportService {
             unidad: detailDailyPart?.Partida.Unidad?.simbolo
               ? detailDailyPart?.Partida.Unidad?.simbolo
               : "",
-            cantidad_programada: detail.metrado_utilizado,
-            cantidad_utilizada: detailDailyPart?.cantidad_utilizada,
+            cantidad_programada: detail.metrado_utilizado ? detail.metrado_utilizado :"",
+            cantidad_utilizada: detailDailyPart?.cantidad_utilizada ? detailDailyPart?.cantidad_utilizada : "",
           };
         }
       );
@@ -237,7 +238,6 @@ export class ReportService {
       const detailComments= detailCommentsResponse.payload as DetalleParteDiarioFoto[]
 
       const template = TemplateHtmlInformeParteDiario(
-        userResponse.id,
         dailyPart.id,
         project,
         dailyPart,
