@@ -11,8 +11,9 @@ import {
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
-  ParteDiarioPartida,
   PrecioHoraMO,
+  ReporteAvanceTren,
+  Semana,
   Trabajo,
 } from "@prisma/client";
 import { prismaDailyPartRepository } from "./prisma-dailyPart.repository";
@@ -33,7 +34,6 @@ import validator from "validator";
 import { assistsWorkforceValidation } from "../assists/assists.validation";
 import { dailyPartMOValidation } from "./dailyPartMO/dailyPartMO.validation";
 import { departureJobValidation } from "../departure/departure-job/departureJob.validation";
-import { I_DetailDepartureJob } from "../departure/departure-job/models/departureJob.interface";
 import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { priceHourWorkforceValidation } from "../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
@@ -42,6 +42,7 @@ import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWee
 import { trainReportValidation } from "../train/trainReport/trainReport.validation";
 import { dailyPartDepartureValidation } from "./dailyPartDeparture/dailyPartDeparture.validation";
 import { I_DailyPartDeparture } from "./dailyPartDeparture/models/dailyPartDeparture.interface";
+import { weekValidation } from "../week/week.validation";
 
 class DailyPartService {
   async createDailyPart(
@@ -96,10 +97,10 @@ class DailyPartService {
           ids_departures,
           responseDailyPart.id
         );
-        const detailWeekProjectResponse= await detailWeekProjectValidation.findByDateAndProject(date,project_id)
-        if(detailWeekProjectResponse.success){
-          const detailWeekReponse= detailWeekProjectResponse.payload as DetalleSemanaProyecto;
-          const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(job.tren_id,detailWeekReponse.semana_id)
+        const weekResponse = await weekValidation.findByDate(date);
+        if(weekResponse.success){
+          const week = weekResponse.payload as Semana;
+          const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(job.tren_id,week.id)
           if(!reportTrainResponse.success){
             const reportTrainFormat={
               tren_id            : job.tren_id,
@@ -114,9 +115,20 @@ class DailyPartService {
               sabado             :0,
               domingo            :0,
               parcial            :0,
-              semana_id          :detailWeekReponse.semana_id
+              semana_id          :week.id
             }
-            await trainReportValidation.create(reportTrainFormat)
+            const reportTrainCreatedResponse= await trainReportValidation.create(reportTrainFormat)
+            if(reportTrainCreatedResponse.success){
+              const reportTrainPreviousResponse= await trainReportValidation.findByIdTrainAndWeek(job.tren_id,week.id-1);
+              if(reportTrainPreviousResponse.success){
+                const reportTrainPrevious= reportTrainPreviousResponse.payload as ReporteAvanceTren;
+                const reportTrainCreated = reportTrainCreatedResponse.payload as ReporteAvanceTren;
+                const reportTrainUpdated= await trainReportValidation.updateForEjecutedPrevious(reportTrainCreated.id,reportTrainPrevious.costo_total)
+                if(!reportTrainUpdated.success){
+                  return reportTrainUpdated;
+                }
+              }
+            }
           }
          
         }

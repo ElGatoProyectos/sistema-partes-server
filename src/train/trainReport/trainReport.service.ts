@@ -17,8 +17,6 @@ class TrainReportService {
       }
 
       const project = projectResponse.payload as I_ProjectForID;
-
-      let week: Semana | undefined;
       if (data.queryParams.week) {
         const weekOfTheYear = Array.from({ length: 52 }, (v, i) =>
           String(i + 1).padStart(2, "0")
@@ -35,24 +33,39 @@ class TrainReportService {
       const result = await prismaTrainReportRepository.findAll(
         skip,
         data,
-        +project_id,
+        +project_id
       );
 
-      const { reportsTrains, total } = result;
+      const { reportsTrains, total, week } = result;
       if (reportsTrains.length === 0 && data.queryParams.week) {
-        tren_id: project.Trabajo.tren_id;
-        costo_total: 0;
-        ejecutado_anterior: 0;
-        ejecutado_actual: 0;
-        lunes: 0;
-        martes: 0;
-        miercoles: 0;
-        jueves: 0;
-        viernes: 0;
-        sabado: 0;
-        domingo: 0;
-        parcial: 0;
-        semana_id: data.queryParams.week;
+        const reportFormat = {
+        //   tren_id: project.Trabajo.Tren.nombre,
+          costo_total: 0,
+          ejecutado_anterior: 0,
+          ejecutado_actual: 0,
+          lunes: 0,
+          martes: 0,
+          miercoles: 0,
+          jueves: 0,
+          viernes: 0,
+          sabado: 0,
+          domingo: 0,
+          parcial: 0,
+          semana_id: week.codigo,
+        };
+        const formData = {
+          total:1,
+          page: data.queryParams.page,
+          // x ejemplo 20
+          limit: data.queryParams.limit,
+          //cantidad de paginas que hay
+          pageCount: 1,
+          data: reportFormat,
+        };
+        return httpResponse.SuccessResponse(
+          "Éxito al traer todos los Reporte de los Trenes",
+          formData
+        );
       }
       const pageCount = Math.ceil(total / data.queryParams.limit);
       const formData = {
@@ -69,6 +82,7 @@ class TrainReportService {
         formData
       );
     } catch (error) {
+      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Reporte de los Trenes",
         error

@@ -9,6 +9,7 @@ import {
   ParteDiarioMO,
   PrecioHoraMO,
   ReporteAvanceTren,
+  Semana,
 } from "@prisma/client";
 import { projectValidation } from "../../project/project.validation";
 import { dailyPartReportValidation } from "../dailyPart.validation";
@@ -26,9 +27,10 @@ import {
 } from "./models/dailyPartMO.interface";
 import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
-import { obtenerCampoPorDia } from "../../common/utils/day";
+import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
+import { weekValidation } from "../../week/week.validation";
 
 class DailyPartMOService {
   async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
@@ -294,27 +296,12 @@ class DailyPartMOService {
       proyecto_id: assists.proyecto_id,
     };
 
-    await assistsWorkforceValidation.updateAssists(
-      assistsFormat,
-      assists.id,
-      dailyPartMO.mano_obra_id
-    );
+    const weekResponse = await weekValidation.findByDate(date);
 
-    const detailWeekProjectResponse =
-      await detailWeekProjectValidation.findByDateAndProject(
-        date,
-        dailyPart.proyecto_id
-      );
-
-      
-    if (detailWeekProjectResponse.success) {
-      const detailWeekReponse =
-        detailWeekProjectResponse.payload as DetalleSemanaProyecto;
+    if (weekResponse.success) {
+      const week = weekResponse.payload as Semana;
       const reportTrainResponse =
-        await trainReportValidation.findByIdTrainAndWeek(
-          train_id,
-          detailWeekReponse.semana_id
-        );
+        await trainReportValidation.findByIdTrainAndWeek(train_id, week.id);
       if (reportTrainResponse.success) {
         const day = obtenerCampoPorDia(dailyPart.fecha);
         const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
@@ -338,19 +325,42 @@ class DailyPartMOService {
             if (
               detail?.hora_normal != null &&
               detail?.hora_extra_60 != null &&
-              detail?.hora_extra_100 != null
+              detail?.hora_extra_100 != null &&
+              assists.hora_normal != null &&
+              assists.horas_60 != null &&
+              assists.horas_100 != null
             ) {
-              const subtotal =
+              const subtotalNew =
                 detail?.hora_normal * hn +
                 detail?.hora_extra_60 * h60 +
                 detail?.hora_extra_100 * h100;
-              const totalAdd = reportTrain[day] + subtotal;
-              await trainReportValidation.update(reportTrain.id, totalAdd, day);
+              const subTotalOld =
+                assists.hora_normal * detail.hora_normal +
+                assists.horas_60 * detail.hora_extra_60 +
+                assists.horas_100 * detail.hora_extra_100;
+              const totalAdd = reportTrain[day] + subtotalNew - subTotalOld;
+              const totalDay = reportTrain[day] + subtotalNew - subTotalOld;
+              let current_executed = 0;
+              current_executed = calculateTotalNew(day, reportTrain, totalDay);
+              const total = current_executed - reportTrain.ejecutado_anterior;
+              await trainReportValidation.update(
+                reportTrain.id,
+                totalAdd,
+                day,
+                current_executed,
+                total
+              );
             }
           }
         }
       }
     }
+
+    await assistsWorkforceValidation.updateAssists(
+      assistsFormat,
+      assists.id,
+      dailyPartMO.mano_obra_id
+    );
   }
 
   async findAll(
@@ -431,35 +441,25 @@ class DailyPartMOService {
       if (!dailyPartMOResponse.success) {
         return dailyPartMOResponse;
       }
-      const dailyPartMO = dailyPartMOResponse.payload as ParteDiarioMO;
-
-      const dailyPartResponse =
-        await dailyPartReportValidation.findByIdValidation(
-          dailyPartMO.parte_diario_id
-        );
-      if (!dailyPartResponse.success) {
-        return dailyPartResponse;
-      }
-
-      const dailyPart = dailyPartResponse.payload as ParteDiario;
+      const dailyPartMO = dailyPartMOResponse.payload as I_DailyPartWorkforceId;
 
       if (
-        dailyPart.etapa === E_Etapa_Parte_Diario.TERMINADO ||
-        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+        dailyPartMO.ParteDiario.etapa === E_Etapa_Parte_Diario.TERMINADO ||
+        dailyPartMO.ParteDiario.etapa === E_Etapa_Parte_Diario.INGRESADO
       ) {
         return httpResponse.BadRequestException(
           "Por la etapa del Parte Diario, no se puede modificar"
         );
       }
 
-      if (dailyPart.fecha) {
-        const date = dailyPart.fecha;
+      if (dailyPartMO.ParteDiario.fecha) {
+        const date = dailyPartMO.ParteDiario.fecha;
         date?.setUTCHours(0, 0, 0, 0);
         const assistsResponse =
           await assistsWorkforceValidation.findByDateAndWorkforce(
             date,
             dailyPartMO.mano_obra_id,
-            dailyPart.proyecto_id
+            dailyPartMO.ParteDiario.proyecto_id
           );
 
         if (!assistsResponse.success) {
@@ -520,7 +520,7 @@ class DailyPartMOService {
         const dailyPartsResponseMO =
           await dailyPartMOValidation.findAllForWorkforceIdAndDate(
             dailyPartMO.mano_obra_id,
-            dailyPart.fecha
+            dailyPartMO.ParteDiario.fecha
           );
 
         const dailyPartsMO = dailyPartsResponseMO.payload as ParteDiarioMO[];
@@ -537,6 +537,77 @@ class DailyPartMOService {
           assists.id,
           dailyPartMO.mano_obra_id
         );
+
+        const weekResponse = await weekValidation.findByDate(
+          dailyPartMO.ParteDiario.fecha
+        );
+        if (weekResponse.success) {
+          const week = weekResponse.payload as Semana;
+
+          const reportTrainResponse =
+            await trainReportValidation.findByIdTrainAndWeek(
+              dailyPartMO.ParteDiario.Trabajo.tren_id,
+              week.id
+            );
+
+          if (reportTrainResponse.success) {
+            const day = obtenerCampoPorDia(dailyPartMO.ParteDiario?.fecha);
+            const reportTrain =
+              reportTrainResponse.payload as ReporteAvanceTren;
+
+            const priceHourResponse =
+              await priceHourWorkforceValidation.findByDate(
+                dailyPartMO.ParteDiario.fecha
+              );
+            if (priceHourResponse.success) {
+              const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
+              const detailsPriceHourMOResponse =
+                await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+                  priceHourMO.id
+                );
+              const detailsPriceHourMO =
+                detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+              if (dailyPartMO.ManoObra.CategoriaObrero?.id != null) {
+                const detail = detailsPriceHourMO.find(
+                  (element) =>
+                    element.categoria_obrero_id ===
+                    dailyPartMO.ManoObra.CategoriaObrero?.id
+                );
+                if (
+                  detail?.hora_normal != null &&
+                  detail?.hora_extra_60 != null &&
+                  detail?.hora_extra_100 != null &&
+                  dailyPartMO.hora_normal != null &&
+                  dailyPartMO.hora_60 != null &&
+                  dailyPartMO.hora_100 != null
+                ) {
+                  const subtract =
+                    detail?.hora_normal * dailyPartMO.hora_normal +
+                    detail?.hora_extra_60 * dailyPartMO.hora_60 +
+                    detail?.hora_extra_100 * dailyPartMO.hora_100;
+
+                  const totalAdd = reportTrain[day] - subtract;
+                  const totalDay = reportTrain[day] - subtract;
+                  let current_executed = 0;
+                  current_executed = calculateTotalNew(
+                    day,
+                    reportTrain,
+                    totalDay
+                  );
+                  const total =
+                    current_executed - reportTrain.ejecutado_anterior;
+                  await trainReportValidation.update(
+                    reportTrain.id,
+                    totalAdd,
+                    day,
+                    current_executed,
+                    total
+                  );
+                }
+              }
+            }
+          }
+        }
       }
 
       await prismaDailyPartMORepository.delete(daily_part_mo_id);

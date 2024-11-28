@@ -6,7 +6,18 @@ import { T_FindAllTrainReport } from "./models/trainReport.types";
 import { weekValidation } from "../../week/week.validation";
 
 class PrismaTrainReportRepository implements TrainReportRepository {
-  async findAll(skip: number, data: T_FindAllTrainReport, project_id: number): Promise<{ reportsTrains: ReporteAvanceTren[]; total: number }> {
+  async updateReportsForEjecutedPrevious(report_train_id: number, executed_previous: number):Promise<ReporteAvanceTren | null >{
+    const report= await prisma.reporteAvanceTren.update({
+      where:{
+        id: report_train_id
+      },
+      data:{
+        ejecutado_anterior:executed_previous
+      }
+    })
+    return report;
+  }
+  async findAll(skip: number, data: T_FindAllTrainReport, project_id: number): Promise<{ reportsTrains: ReporteAvanceTren[]; total: number,week:Semana }> {
     let filters: any = {};
     let week:Semana;
     if (data.queryParams.week) {
@@ -42,15 +53,18 @@ class PrismaTrainReportRepository implements TrainReportRepository {
         },
       }),
     ]);
-    return { reportsTrains, total };
+    return { reportsTrains, total,week };
   }
-  async updateReportsForTrain(report_train_id:number,value: number,field:string): Promise<ReporteAvanceTren | null>  {
+  async updateReportsForTrain(report_train_id:number,value: number,day:string,current_executed:number,total:number): Promise<ReporteAvanceTren | null>  {
     const report= await prisma.reporteAvanceTren.update({
       where:{
         id:report_train_id
       },
       data:{
-       [field]:value
+        costo_total:total,
+        ejecutado_actual:current_executed,
+        parcial:current_executed,
+       [day]:value
       }
     })
     return report

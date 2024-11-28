@@ -10,7 +10,6 @@ class ProjectValidation {
       }
       return httpResponse.SuccessResponse("Proyecto encontrado", project);
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error al buscar proyecto",
         error

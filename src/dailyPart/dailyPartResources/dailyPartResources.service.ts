@@ -5,6 +5,7 @@ import {
   ParteDiarioRecurso,
   Recurso,
   ReporteAvanceTren,
+  Semana,
 } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
@@ -21,9 +22,10 @@ import {
 import { prismaDailyPartResourceRepository } from "./prisma-dailyPartRepository.repository";
 import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
-import { obtenerCampoPorDia } from "../../common/utils/day";
+import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { I_Resources } from "../../resources/models/resources.interface";
+import { weekValidation } from "../../week/week.validation";
 
 class DailyPartResourceService {
   async createDailyPart(
@@ -143,40 +145,39 @@ class DailyPartResourceService {
           daily_part_resource_id
         );
 
-      // const date=new Date();
-      // date.setUTCHours(0,0,0,0);
-      // const detailWeekProjectResponse =
-      //   await detailWeekProjectValidation.findByDateAndProject(
-      //     date,
-      //     dailyPartResource.proyecto_id
-      //   );
+        const date = dailyPartResource.ParteDiario.fecha
+        ? dailyPartResource.ParteDiario.fecha
+        : new Date();
 
-      // if(detailWeekProjectResponse){
-      //   const detailWeekReponse =
-      //   detailWeekProjectResponse.payload as DetalleSemanaProyecto;
-      // const reportTrainResponse =
-      //   await trainReportValidation.findByIdTrainAndWeek(
-      //     dailyPartResource.Proyecto.Trabajo.tren_id,
-      //     detailWeekReponse.semana_id
-      //   );
-      //   if(reportTrainResponse.success){
-      //     if(dailyPartResource.ParteDiario.fecha){
-      //       const day = obtenerCampoPorDia(dailyPartResource.ParteDiario?.fecha);
-      //       const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
-      //       if(resource.CategoriaRecurso.nombre.toUpperCase()==="MATERIALES"){
-      //        const price= dailyPartResource.
-      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="EQUIPOS"){
+      const weekResponse = await weekValidation.findByDate(date);
+      if(weekResponse.success){
+        const week = weekResponse.payload as Semana;
 
-      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="MANO DE OBRA"){
-
-      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="SUB-CONTRATAS"){
-
-      //       }else if(resource.CategoriaRecurso.nombre.toUpperCase()==="MATERIALES"){
-
-      //       }
-      //     }
-      //   }
-      // }
+      const reportTrainResponse =
+        await trainReportValidation.findByIdTrainAndWeek(
+          dailyPartResource.ParteDiario.Trabajo.tren_id,
+          week.id
+        );
+        if(reportTrainResponse.success){
+          if(dailyPartResource.ParteDiario.fecha){
+            const day = obtenerCampoPorDia(dailyPartResource.ParteDiario?.fecha);
+            const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
+            if(resource.precio != null){
+              const cuantityNewTotal=resource.precio * data.amount;
+              const cuantityOldTotal=resource.precio * dailyPartResource.cantidad;
+              // esto es para el dia 
+                const dayAdd= reportTrain[day] + cuantityNewTotal -cuantityOldTotal;
+                //esto para el total 
+                const totalDay=reportTrain[day] + cuantityNewTotal - cuantityOldTotal
+                let current_executed=0
+                current_executed = calculateTotalNew(day, reportTrain, totalDay);
+                const total= current_executed -reportTrain.ejecutado_anterior; 
+                await trainReportValidation.update(reportTrain.id,dayAdd,day,current_executed,total)
+            }
+           
+          }
+        }
+      }
 
       return httpResponse.CreatedResponse(
         "Parte Diario del Recurso actualizado correctamente",
@@ -267,7 +268,45 @@ class DailyPartResourceService {
         );
       }
 
-      await prismaDailyPartResourceRepository.delete(daily_part_resource_id);
+      if(dailyPartResource.ParteDiario.fecha){
+        const weekResponse = await weekValidation.findByDate(dailyPartResource.ParteDiario.fecha);
+        if(weekResponse.success){
+          const week = weekResponse.payload as Semana;
+        
+          const reportTrainResponse =
+          await trainReportValidation.findByIdTrainAndWeek(
+            dailyPartResource.ParteDiario.Trabajo.tren_id,
+            week.id
+          );
+
+          if(reportTrainResponse.success){
+            if(dailyPartResource.ParteDiario.fecha){
+              const day = obtenerCampoPorDia(dailyPartResource.ParteDiario?.fecha);
+              const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
+              if(dailyPartResource.Recurso.precio){
+                const cuantitySubtract=dailyPartResource.Recurso.precio * dailyPartResource.cantidad;
+                const dayAdd= reportTrain[day] -cuantitySubtract; 
+                const totalDay=reportTrain[day] - cuantitySubtract
+                  let current_executed=0
+                  current_executed = calculateTotalNew(day, reportTrain, totalDay);
+                  const total= current_executed -reportTrain.ejecutado_anterior; 
+                  await trainReportValidation.update(reportTrain.id,dayAdd,day,current_executed,total)
+              }
+                
+             
+            }
+          }
+          
+        }
+      }
+
+
+
+
+        await prismaDailyPartResourceRepository.delete(daily_part_resource_id);
+       
+      
+
       return httpResponse.SuccessResponse(
         "Elemento del Parte Diario del Recurso eliminado correctamente"
       );
