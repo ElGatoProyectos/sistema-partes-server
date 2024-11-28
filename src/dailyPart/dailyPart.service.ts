@@ -45,6 +45,11 @@ import { trainReportValidation } from "../train/trainReport/trainReport.validati
 import { dailyPartDepartureValidation } from "./dailyPartDeparture/dailyPartDeparture.validation";
 import { I_DailyPartDeparture } from "./dailyPartDeparture/models/dailyPartDeparture.interface";
 import { weekValidation } from "../week/week.validation";
+import { obtenerCampoPorDia } from "../common/utils/day";
+import { dailyPartDepartureService } from "./dailyPartDeparture/dailyPartDeparture.service";
+import { dailyPartMOService } from "./dailyPartMO/dailyPartMO.service";
+import { dailyPartResourceService } from "./dailyPartResources/dailyPartResources.service";
+import { prismaDailyPartPhotoRepository } from "./photos/prisma-dailyPartPhotos.repository";
 
 class DailyPartService {
   async createDailyPart(
@@ -506,19 +511,42 @@ class DailyPartService {
       }
       const dailyPart = dailyPartResponse.payload as I_ParteDiarioId;
       
+      if (
+        dailyPart.etapa ===
+          E_Etapa_Parte_Diario.REVISADO ||
+        dailyPart.etapa === E_Etapa_Parte_Diario.INGRESADO
+      ) {
+        return httpResponse.BadRequestException(
+          "Por la etapa del Parte Diario, no se puede eliminar"
+        );
+      }
+
       const trainReportResponse= await trainReportValidation.findByIdTrain(dailyPart.Trabajo.Tren.id);
 
       if(trainReportResponse.success){
-        const trainReport= trainReportResponse.payload as ReporteAvanceTren
 
+        if(dailyPart.fecha){
+          const trainReport= trainReportResponse.payload as ReporteAvanceTren
+          const day = obtenerCampoPorDia(dailyPart.fecha);
+          const subtractDailyPartDeparture= await dailyPartDepartureService.deleteAllDailyPartDepartures(dailyPart)
+          const subtractDailyPartMO= await dailyPartMOService.deleteAllMOForDailyPart(dailyPart)
+          const subtractDailyPartResource= await dailyPartResourceService.deleteAllDailyPartResources(dailyPart)
+          await prismaDailyPartPhotoRepository.deleteAllForDailyPart(dailyPart.id);
+          const totalDay = trainReport[day] - subtractDailyPartDeparture - subtractDailyPartMO - subtractDailyPartResource;
+          const current_executed= trainReport.ejecutado_actual - subtractDailyPartDeparture - subtractDailyPartMO - subtractDailyPartResource
+          const costTotal= current_executed - trainReport.ejecutado_anterior
+          await trainReportValidation.update(trainReport.id,totalDay,day,totalDay,costTotal)
+        }
       }
+       
+      await prismaDailyPartRepository.deleteDailyPart(dailyPart.id)
 
       return httpResponse.SuccessResponse(
-        "Éxito al traer todos los Partes Diarios",
+        "Éxito al eliminar el Parte Diario",
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(
-        "Error al traer todos los Partes Diarios",
+        "Error al eliminar el Parte Diario",
         error
       );
     } finally {

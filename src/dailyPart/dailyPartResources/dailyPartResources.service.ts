@@ -26,6 +26,7 @@ import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { I_Resources } from "../../resources/models/resources.interface";
 import { weekValidation } from "../../week/week.validation";
+import { I_ParteDiarioId } from "../models/dailyPart.interface";
 
 class DailyPartResourceService {
   async createDailyPart(
@@ -162,9 +163,9 @@ class DailyPartResourceService {
           if(dailyPartResource.ParteDiario.fecha){
             const day = obtenerCampoPorDia(dailyPartResource.ParteDiario?.fecha);
             const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
-            if(resource.precio != null){
+            if(resource.precio != null && dailyPartResource.Recurso.precio != null){
               const cuantityNewTotal=resource.precio * data.amount;
-              const cuantityOldTotal=resource.precio * dailyPartResource.cantidad;
+              const cuantityOldTotal=dailyPartResource.Recurso.precio * dailyPartResource.cantidad;
               // esto es para el dia 
                 const dayAdd= reportTrain[day] + cuantityNewTotal -cuantityOldTotal;
                 //esto para el total 
@@ -344,6 +345,32 @@ class DailyPartResourceService {
     } finally {
       await prisma.$disconnect();
     }
+  }
+
+  async deleteAllDailyPartResources(
+    daily_part: I_ParteDiarioId,
+  ): Promise< number> {
+    let sumaSubtract = 0;
+  
+    if (daily_part.fecha) {
+      const result =
+        await prismaDailyPartResourceRepository.findAllWithOutPaginationForDailyPart(
+          daily_part.id,
+        );
+  
+      if (result != null && result.length > 0) {
+        result.forEach((element) => {
+          if(element.Recurso.precio){
+            sumaSubtract += element.cantidad * element.Recurso.precio;
+          }
+        });
+      }
+  
+      return sumaSubtract
+        
+    }
+  
+    return sumaSubtract ;
   }
 }
 

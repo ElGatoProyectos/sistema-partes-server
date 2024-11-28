@@ -23,6 +23,7 @@ import prisma from "../../config/prisma.config";
 import {
   I_DailyPartMO,
   I_DailyPartWorkforceId,
+  I_DailyPartWorkforcePdf,
   I_UpdateDailyPartBody,
 } from "./models/dailyPartMO.interface";
 import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
@@ -34,6 +35,7 @@ import { weekValidation } from "../../week/week.validation";
 import { envConfig } from "../../config/env.config";
 import path from "path";
 import { fork } from "child_process";
+import { I_ParteDiarioId } from "../models/dailyPart.interface";
 
 class DailyPartMOService {
   async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
@@ -238,14 +240,6 @@ class DailyPartMOService {
       return assistsResponse;
     }
     const assists = assistsResponse.payload as Asistencia;
-    // console.log(
-    //   "resutado 0 de hacer  asistencia hora parcial " +
-    //     (assists.hora_parcial || 0) +
-    //     "DATA HORA PARCIAL " +
-    //     data.hora_parcial +
-    //     " parte diario mo " +
-    //     dailyPartMO.hora_parcial
-    // );
     let hp = 0;
     if (
       assists.hora_parcial !== undefined &&
@@ -314,14 +308,12 @@ class DailyPartMOService {
       String(hn),
       String(h60),
       String(h100),
-      day
+      day,
     ]);
 
     child.on("exit", (code) => {
       console.log(`El proceso hijo terminó con el código ${code}`);
     });
-
-   
 
     await assistsWorkforceValidation.updateAssists(
       assistsFormat,
@@ -588,6 +580,128 @@ class DailyPartMOService {
         error
       );
     }
+  }
+
+  async deleteAllMOForDailyPart(
+    daily_part: I_ParteDiarioId
+  ): Promise<number> {
+    let sumaSubtract = 0;
+
+    if (daily_part.fecha) {
+      console.log("entramos a eliminar la mano de obra")
+      //acá me traigo todos los partes diarios de MO
+      const result =
+        await prismaDailyPartMORepository.findAllWithOutPaginationForIdDailysPart(
+          daily_part.id
+        );
+
+      if (result != null && result.length > 0) {
+        const priceHourResponse = await priceHourWorkforceValidation.findByDate(
+          daily_part.fecha
+        );
+        if (priceHourResponse.success) {
+          const priceHourMO =
+            priceHourResponse.payload as I_DailyPartWorkforcePdf;
+          const detailsPriceHourMOResponse =
+            await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+              priceHourMO.id
+            );
+          const detailsPriceHourMO =
+            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+
+          if(detailsPriceHourMO.length >0){
+            console.log("ya pase detalle ")
+            result.forEach((element) => {
+              const categoriaId = element.ManoObra?.CategoriaObrero?.id;
+              if (categoriaId != null) {
+                const detail = detailsPriceHourMO.find(
+                  (detail) => detail.categoria_obrero_id === categoriaId
+                );
+  
+                if (
+                  detail &&
+                  element.hora_normal != null &&
+                  element.hora_60 != null &&
+                  element.hora_100 != null
+                ) {
+                   sumaSubtract +=
+                    detail?.hora_normal * element.hora_normal +
+                    detail?.hora_extra_60 * element.hora_60 +
+                    detail?.hora_extra_100 * element.hora_100;
+                }
+              }
+            });
+          }
+          
+        }
+
+        //acá hago para desccontar la asistencia
+        const assistsReponse =
+          await assistsWorkforceValidation.findAllWithOutPaginationByDateAndProject(
+            daily_part.fecha,
+            daily_part.proyecto_id
+          );
+        const assists= assistsReponse.payload as Asistencia[]
+        const actualizaciones: { id: number; data: any }[] = [];
+
+        if (assistsReponse.success && assists.length>0) {
+          
+          for (const workforceOfTheDailyMO of result) {
+            
+          const assistWorkforce= assists.find(
+            (assist) => assist.mano_obra_id === workforceOfTheDailyMO.mano_obra_id
+          );
+
+          if(assistWorkforce && assistWorkforce != null && assistWorkforce.hora_normal != null && workforceOfTheDailyMO.hora_normal && 
+            assistWorkforce.horas_60 != null && workforceOfTheDailyMO.hora_60 && 
+            assistWorkforce.horas_100 != null && workforceOfTheDailyMO.hora_100 &&
+            assistWorkforce.hora_parcial != null && workforceOfTheDailyMO.hora_parcial 
+          ){
+            let hP = assistWorkforce.hora_parcial - workforceOfTheDailyMO.hora_parcial;
+            let hn = assistWorkforce.hora_normal - workforceOfTheDailyMO.hora_normal;
+            let h60 = assistWorkforce.horas_60 - workforceOfTheDailyMO.hora_60;
+            let h100 = assistWorkforce.horas_100 - workforceOfTheDailyMO.hora_100;
+            let estado_asignacion:E_Estado_Asistencia_BD= assistWorkforce.estado_asignacion;
+            let asistencia:E_Asistencia_BD= assistWorkforce.asistencia;
+            let horas_trabajadas= hP + hn+ h60 + h100;
+            if(assistWorkforce.estado_asignacion === E_Estado_Asistencia_BD.DOBLEMENTE_ASIGNADO){
+              estado_asignacion= E_Estado_Asistencia_BD.ASIGNADO
+            }else if(assistWorkforce.estado_asignacion === E_Estado_Asistencia_BD.ASIGNADO){
+              estado_asignacion= E_Estado_Asistencia_BD.NO_ASIGNADO
+            }
+            actualizaciones.push({
+              id: assistWorkforce.id,
+              data: {
+                horas_trabajadas   :horas_trabajadas,
+                hora_parcial       : hP,
+                hora_normal        : hn,
+                horas_60           : h60,
+                horas_100          : h100,
+                estado_asignacion  : estado_asignacion,
+                asistencia         : asistencia,
+              },
+            });
+          }
+          }
+
+        }
+
+        if (actualizaciones.length > 0) {
+          await Promise.all(
+            actualizaciones.map((asists) =>
+              prisma.asistencia.update({
+                where: { id: asists.id },
+                data: asists.data,
+              })
+            )
+          );
+        }
+      }
+
+      return sumaSubtract;
+    }
+    return sumaSubtract;
+
   }
 }
 export const dailyPartMOService = new DailyPartMOService();
