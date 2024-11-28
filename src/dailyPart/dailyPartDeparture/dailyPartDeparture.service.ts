@@ -218,24 +218,25 @@ class DailyPartDepartureService {
   }
   async deleteAllDailyPartDepartures(
     daily_part: I_ParteDiarioId,
-  ):Promise<Number | null>{
-      let sumaSubtract=0
-      
-      if(daily_part.fecha){
-        const result =
-        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForidDailyPart(daily_part.id);
-
-      if(result != null && result.length>0){
-        result.forEach(element => {
-          sumaSubtract += element.Partida.precio * element.cantidad_utilizada
+  ): Promise< number> {
+    let sumaSubtract = 0;
+  
+    if (daily_part.fecha) {
+      const result =
+        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForidDailyPart(
+          daily_part.id,
+        );
+  
+      if (result != null && result.length > 0) {
+        result.forEach((element) => {
+          sumaSubtract += element.Partida.precio * element.cantidad_utilizada;
         });
       }
-
-      const day = obtenerCampoPorDia(daily_part.fecha)
-       return sumaSubtract
-      }
-    
-      return null
+  
+      return sumaSubtract
+        
+    }
+    return sumaSubtract
   }
 }
 

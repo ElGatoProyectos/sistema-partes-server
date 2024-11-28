@@ -9,6 +9,13 @@ import {
 import prisma from "../../config/prisma.config";
 
 class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
+  async deleteAllForDailyPart(daily_part_id: number) {
+    await prisma.detalleParteDiarioFoto.deleteMany({
+      where:{
+        parte_diario_id:daily_part_id
+      }
+    })
+  }
   async findAllWithOutPaginationForIdDailyPart(daily_part_id: number): Promise<DetalleParteDiarioFoto[] | null> {
     const details = await prisma.detalleParteDiarioFoto.findMany({
       where: {
@@ -46,12 +53,9 @@ class PrismaDailyPartPhotoRepository implements DailyPartPhotoRepository {
   async createDailyPartPhotos(
     data: I_CreateDetailPhotosBD
   ): Promise<DetalleParteDiarioFoto | null> {
-    console.log("------------");
-    console.log(data);
     const detail = await prisma.detalleParteDiarioFoto.create({
       data: data,
     });
-    console.log(detail);
     return detail;
   }
   async updateDailyPartPhotos(

@@ -18,4 +18,6 @@ export abstract class DailyPartPhotoRepository {
   findAllForIdsDailyPart(idsDailyPart: number[]): void {}
 
   findAllWithOutPaginationForIdDailyPart(daily_part_id: number): void {}
+
+  deleteAllForDailyPart(daily_part_id:number):void{}
 }

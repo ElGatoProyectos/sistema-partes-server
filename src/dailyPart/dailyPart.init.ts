@@ -116,5 +116,16 @@ dailyPartRouter.get(
   ]),
   dailyPartController.findByInformation
 );
+dailyPartRouter.delete(
+  `${prefix}/:id`,
+  dailyPartMiddleware.verifyHeadersFieldsId,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
+  dailyPartController.delete
+);
 
 export default dailyPartRouter;

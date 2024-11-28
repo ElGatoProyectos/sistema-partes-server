@@ -182,6 +182,12 @@ class DailyPartController {
     );
     response.status(result.statusCode).json(result);
   }
+
+  async delete(request: express.Request, response: express.Response) {
+    const daily_part_id = Number(request.params.id);
+    const result = await dailyPartService.deleteAllFromDailyPart(daily_part_id);
+    response.status(result.statusCode).json(result);
+  }
 }
 
 export const dailyPartController = new DailyPartController();
