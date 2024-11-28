@@ -26,5 +26,7 @@ export abstract class DailyPartDepartureRepository {
     daily_part_id: number
   ): void {}
 
+  findAllWithOutPaginationForidDailyPart(daily_part_id: number): void {}
+
   findAllWithOutPaginationForidsDailyPart(idsDailyPart: number[]): void {}
 }

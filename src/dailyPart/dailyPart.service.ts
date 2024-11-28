@@ -2,6 +2,8 @@ import {
   I_DailyPart,
   I_DailyPartCreateBody,
   I_DailyPartUpdateBody,
+  I_ParteDiarioId,
+  I_ParteDiarioPdf,
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
 import {
@@ -484,6 +486,35 @@ class DailyPartService {
       return httpResponse.SuccessResponse(
         "Se trajo con éxito la informacion del Parte Diario",
         resultFormat
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer todos los Partes Diarios",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async deleteAllFromDailyPart(daily_part_id:number){
+    try {
+      const dailyPartResponse =
+        await dailyPartReportValidation.findByIdValidation(daily_part_id);
+      if (!dailyPartResponse.success) {
+        return dailyPartResponse;
+      }
+      const dailyPart = dailyPartResponse.payload as I_ParteDiarioId;
+      
+      const trainReportResponse= await trainReportValidation.findByIdTrain(dailyPart.Trabajo.Tren.id);
+
+      if(trainReportResponse.success){
+        const trainReport= trainReportResponse.payload as ReporteAvanceTren
+
+      }
+
+      return httpResponse.SuccessResponse(
+        "Éxito al traer todos los Partes Diarios",
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

@@ -1,15 +1,13 @@
 import {
-  DetalleSemanaProyecto,
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
-  ParteDiarioPartida,
   ReporteAvanceTren,
   Semana,
 } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
 import { dailyPartReportValidation } from "../dailyPart.validation";
-import { I_DailyPart } from "../models/dailyPart.interface";
+import { I_DailyPart, I_ParteDiarioId } from "../models/dailyPart.interface";
 import { dailyPartDepartureValidation } from "./dailyPartDeparture.validation";
 import {
   I_DailyPartDeparture,
@@ -20,7 +18,6 @@ import { departureJobValidation } from "../../departure/departure-job/departureJ
 import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
 import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
-import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
 import { weekValidation } from "../../week/week.validation";
 
 class DailyPartDepartureService {
@@ -213,6 +210,39 @@ class DailyPartDepartureService {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al traer todas los Trabajos y sus Partidas de acuerdo al Parte Diario que se ha pasado",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  async deleteAllDailyPartDepartures(
+    daily_part: I_ParteDiarioId,
+    ReporteAvanceTren:ReporteAvanceTren
+  ) {
+    try {
+      let sumaSubtract=0
+      
+      if(daily_part.fecha){
+        const result =
+        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForidDailyPart(daily_part.id);
+
+      if(result != null && result.length>0){
+        result.forEach(element => {
+          sumaSubtract += element.Partida.precio * element.cantidad_utilizada
+        });
+      }
+
+      const day = obtenerCampoPorDia(daily_part.fecha)
+       return httpResponse.SuccessResponse(
+        "Éxito al traer lo q vas a restar y en que dia",
+        // formData
+      );
+      }
+     
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al al traer lo q vas a restar y en que dia",
         error
       );
     } finally {

@@ -14,4 +14,7 @@ export abstract class TrainReportRepository {
   updateReportsForEjecutedPrevious(report_train_id:number,executed_previous:number):void{}
 
   findAll(skip: number, data: T_FindAllTrainReport, project_id: number):void{}
+
+  getInformationForWeekAndProject(week_id:number,project_id:number):void{}
+
 }

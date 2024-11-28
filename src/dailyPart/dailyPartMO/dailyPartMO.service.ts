@@ -31,6 +31,9 @@ import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { priceHourWorkforceValidation } from "../../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
 import { detailPriceHourWorkforceValidation } from "../../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { weekValidation } from "../../week/week.validation";
+import { envConfig } from "../../config/env.config";
+import path from "path";
+import { fork } from "child_process";
 
 class DailyPartMOService {
   async createDailyPartMO(data: I_DailyPartMO, project_id: number) {
@@ -296,65 +299,29 @@ class DailyPartMOService {
       proyecto_id: assists.proyecto_id,
     };
 
-    const weekResponse = await weekValidation.findByDate(date);
+    const route = envConfig.DEV
+      ? path.join(__dirname, "../../scripts/dailyPartMO.ts")
+      : path.join(__dirname, "../../scripts/dailyPartMO.js");
+    const scriptPath = route;
 
-    if (weekResponse.success) {
-      const week = weekResponse.payload as Semana;
-      const reportTrainResponse =
-        await trainReportValidation.findByIdTrainAndWeek(train_id, week.id);
-      if (reportTrainResponse.success) {
-        const day = obtenerCampoPorDia(dailyPart.fecha);
-        const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
-        const priceHourResponse = await priceHourWorkforceValidation.findByDate(
-          dailyPart.fecha
-        );
-        if (priceHourResponse.success) {
-          const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-          const detailsPriceHourMOResponse =
-            await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-              priceHourMO.id
-            );
-          const detailsPriceHourMO =
-            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
-          if (dailyPartMO.ManoObra.CategoriaObrero?.id != null) {
-            const detail = detailsPriceHourMO.find(
-              (element) =>
-                element.categoria_obrero_id ===
-                dailyPartMO.ManoObra.CategoriaObrero?.id
-            );
-            if (
-              detail?.hora_normal != null &&
-              detail?.hora_extra_60 != null &&
-              detail?.hora_extra_100 != null &&
-              assists.hora_normal != null &&
-              assists.horas_60 != null &&
-              assists.horas_100 != null
-            ) {
-              const subtotalNew =
-                detail?.hora_normal * hn +
-                detail?.hora_extra_60 * h60 +
-                detail?.hora_extra_100 * h100;
-              const subTotalOld =
-                assists.hora_normal * detail.hora_normal +
-                assists.horas_60 * detail.hora_extra_60 +
-                assists.horas_100 * detail.hora_extra_100;
-              const totalAdd = reportTrain[day] + subtotalNew - subTotalOld;
-              const totalDay = reportTrain[day] + subtotalNew - subTotalOld;
-              let current_executed = 0;
-              current_executed = calculateTotalNew(day, reportTrain, totalDay);
-              const total = current_executed - reportTrain.ejecutado_anterior;
-              await trainReportValidation.update(
-                reportTrain.id,
-                totalAdd,
-                day,
-                current_executed,
-                total
-              );
-            }
-          }
-        }
-      }
-    }
+    const day = obtenerCampoPorDia(dailyPart.fecha);
+    const child = fork(scriptPath, [
+      String(date),
+      String(train_id),
+      JSON.stringify(dailyPart),
+      JSON.stringify(dailyPartMO),
+      JSON.stringify(assists),
+      String(hn),
+      String(h60),
+      String(h100),
+      day
+    ]);
+
+    child.on("exit", (code) => {
+      console.log(`El proceso hijo terminó con el código ${code}`);
+    });
+
+   
 
     await assistsWorkforceValidation.updateAssists(
       assistsFormat,

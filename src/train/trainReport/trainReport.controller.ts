@@ -21,6 +21,12 @@ class TrainReportController {
     response.status(result.statusCode).json(result);
   }
 
+  async getInformation(request: express.Request, response: express.Response) {
+    const project_id = request.get("project-id") as string;
+    const result = await trainReportService.getInformation(+project_id);
+    response.status(result.statusCode).json(result);
+  }
+
 
 }
 

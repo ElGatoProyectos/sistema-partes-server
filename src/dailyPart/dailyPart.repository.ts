@@ -42,4 +42,6 @@ export abstract class DailyPartRepository {
   findAllForDateSend(dates: string[]): void {}
 
   findAllForIds(ids: number[]): void {}
+
+  deleteDailyPart(daily_part_id:number):void{}
 }

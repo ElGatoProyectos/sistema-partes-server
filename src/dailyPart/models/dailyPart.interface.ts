@@ -4,7 +4,7 @@ import {
   I_RiskDailyPartForId,
   I_RiskDailyPartForPdf,
 } from "../riskDailyPart/models/riskDailyPart.interface";
-import { I_Trabajo, I_TrabajoPdf } from "../../job/models/job.interface";
+import { I_Trabajo, I_TrabajoForId, I_TrabajoPdf } from "../../job/models/job.interface";
 
 export interface I_CreateDailyPartBD
   extends Omit<
@@ -63,6 +63,11 @@ export interface I_ParteDiarioPdf extends ParteDiario {
   Trabajo: I_TrabajoPdf;
   RiesgoParteDiario: I_RiskDailyPartForId | null;
 }
+export interface I_ParteDiarioId extends ParteDiario {
+  Trabajo: I_TrabajoForId;
+}
+
+
 
 export interface I_DailyPartId
   extends Omit<
