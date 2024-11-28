@@ -218,9 +218,7 @@ class DailyPartDepartureService {
   }
   async deleteAllDailyPartDepartures(
     daily_part: I_ParteDiarioId,
-    ReporteAvanceTren:ReporteAvanceTren
-  ) {
-    try {
+  ):Promise<Number | null>{
       let sumaSubtract=0
       
       if(daily_part.fecha){
@@ -234,20 +232,10 @@ class DailyPartDepartureService {
       }
 
       const day = obtenerCampoPorDia(daily_part.fecha)
-       return httpResponse.SuccessResponse(
-        "Éxito al traer lo q vas a restar y en que dia",
-        // formData
-      );
+       return sumaSubtract
       }
-     
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al al traer lo q vas a restar y en que dia",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
+    
+      return null
   }
 }
 

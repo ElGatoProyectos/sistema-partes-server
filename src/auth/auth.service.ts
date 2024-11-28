@@ -24,45 +24,78 @@ class AuthService {
         where: {
           OR: [{ email: body.username }, { dni: body.username }],
           eliminado: E_Estado_BD.n,
-          //contrasena: data.contrasena,
         },
       });
+  
+      let userData: any = user; 
+      let userType: 'usuario' | 'manoObra' = 'usuario';
+      let role = ''; // Rol final
+  
       if (!user) {
-        return httpResponse.UnauthorizedException(
-          "Credenciales incorrectas",
-          null
-        );
+        const userWorkforce = await prisma.manoObra.findFirst({
+          where: {
+            OR: [
+              { email_personal: body.username },
+              { documento_identidad: body.username },
+            ],
+            eliminado: E_Estado_BD.n,
+          },
+        });
+  
+        if (!userWorkforce) {
+          return httpResponse.UnauthorizedException(
+            "Credenciales incorrectas",
+            null
+          );
+        }
+  
+        userData = userWorkforce;
+        userType = 'manoObra';
+        role = 'MANO_OBRA';
+  
+        if (body.password !== userData.documento_identidad) {
+          return httpResponse.UnauthorizedException(
+            "Credenciales incorrectas",
+            null
+          );
+        }
+      } else {
+        const roleResponse = await rolService.findById(userData.rol_id);
+        if (!roleResponse.success) {
+          return httpResponse.InternalServerErrorException(
+            "Error al obtener el rol del usuario",
+            null
+          );
+        }
+        const rolePayload = roleResponse.payload as Rol;
+        role = rolePayload.rol;
+  
+        if (!bcryptService.comparePassword(body.password, userData.contrasena)) {
+          return httpResponse.UnauthorizedException(
+            "Credenciales incorrectas",
+            null
+          );
+        }
       }
-      // validar password
-      if (!bcryptService.comparePassword(body.password, user.contrasena)) {
-        return httpResponse.UnauthorizedException(
-          "Credenciales incorrectas",
-          null
-        );
-      }
-      const role = await rolService.findById(user.rol_id);
-      const responseRole = role.payload as Rol;
-
-      const userResponse = new LoginResponseMapper(user, responseRole.rol);
-
-      const rolePayload = role.payload as Rol;
-
-      //const { estatus, contrasena, ...userWithoutSensitiveData } = user;
-      // retornarjwt
+  
+      const userResponse = new LoginResponseMapper(userData, role);
+  
       const token = jwtService.sign({
-        id: user.id,
-        username: user.email,
-        role: rolePayload.rol,
+        id: userData.id,
+        username:
+          userType === 'usuario' ? userData.email : userData.email_personal,
+        role,
       });
+  
       return httpResponse.SuccessResponse("Usuario logueado con éxito", {
         user: userResponse,
         token,
       });
     } catch (error) {
       return httpResponse.InternalServerErrorException("Error", error);
-    } finally {
     }
   }
+  
 
   verifyRolProjectAdminUser(authorization: string) {
     try {
