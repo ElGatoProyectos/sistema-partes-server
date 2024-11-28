@@ -91,6 +91,10 @@ export interface I_TrabajoForPdf {
   costo_partida: number;
   UnidadProduccion: UnidadProduccion;
 }
+export interface I_TrabajoForId extends Trabajo {
+  Tren: Tren;
+  UnidadProduccion: UnidadProduccion;
+}
 export interface I_JobAndCategoryWorkforce extends ManoObra {
   CategoriaObrero: CategoriaObrero | null;
 }

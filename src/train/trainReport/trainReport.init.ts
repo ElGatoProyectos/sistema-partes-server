@@ -19,5 +19,18 @@ trainReportRouter.get(
   ]),
   trainReportController.allTrainReports
 );
+trainReportRouter.get(
+  `${prefix}/information`,
+  trainReportMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  trainReportController.getInformation
+);
 
 export default trainReportRouter;

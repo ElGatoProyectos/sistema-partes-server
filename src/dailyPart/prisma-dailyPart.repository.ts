@@ -15,6 +15,13 @@ import {
 import { converToDate } from "../common/utils/date";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
+  async deleteDailyPart(daily_part_id: number) {
+   await prisma.parteDiario.delete({
+    where:{
+      id:daily_part_id
+    }
+   })
+  }
   async findAllForIds(ids: number[]): Promise<I_ParteDiario[] | null> {
     const dailyParts = await prisma.parteDiario.findMany({
       where: {
