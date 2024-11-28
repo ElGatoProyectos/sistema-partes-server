@@ -4,6 +4,7 @@ import {
   E_Etapa_Parte_Diario,
   ParteDiarioPartida,
   ReporteAvanceTren,
+  Semana,
 } from "@prisma/client";
 import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import prisma from "../../config/prisma.config";
@@ -17,9 +18,10 @@ import {
 import { prismaDailyPartDepartureRepository } from "./prisma-dailyPartDeparture.repository";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
 import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
-import { obtenerCampoPorDia } from "../../common/utils/day";
+import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
 import { detailWeekProjectValidation } from "../../week/detailWeekProject/detailWeekProject.validation";
+import { weekValidation } from "../../week/week.validation";
 
 class DailyPartDepartureService {
   async updateDailyPartDeparture(
@@ -78,30 +80,37 @@ class DailyPartDepartureService {
           dailyPartDepartureFormat,
           dailyPartDeparture.id
         );
-      const date= dailyPartDeparture.ParteDiario.fecha ? dailyPartDeparture.ParteDiario.fecha : new Date(); 
-      date.setUTCHours(0,0,0,0);
-      const day= obtenerCampoPorDia(date)
-      const detailWeekProjectResponse= await detailWeekProjectValidation.findByDateAndProject(date,dailyPartDeparture.ParteDiario.proyecto_id)
-      if(detailWeekProjectResponse.success){
-        const cuantityNewTotal=dailyPartDeparture.Partida.precio * data.quantity_used;
-        const cuantityOldTotal=dailyPartDeparture.Partida.precio * dailyPartDeparture.cantidad_utilizada;
-        let subtotal=0;
-        if(cuantityNewTotal>cuantityOldTotal ){
-           subtotal= cuantityNewTotal-cuantityOldTotal
-        }else{
-           subtotal=cuantityOldTotal - cuantityNewTotal
-        }
 
-        const detailWeekReponse= detailWeekProjectResponse.payload as DetalleSemanaProyecto;
-        const reportTrainResponse= await trainReportValidation.findByIdTrainAndWeek(dailyPartDeparture.ParteDiario.Trabajo.tren_id,detailWeekReponse.semana_id)
-        if(reportTrainResponse.success){
-          const reportTrain= reportTrainResponse.payload as ReporteAvanceTren
-          const totalAdd= reportTrain[day] + subtotal
-          await trainReportValidation.update(reportTrain.id,totalAdd,day)
+      const date = dailyPartDeparture.ParteDiario.fecha
+        ? dailyPartDeparture.ParteDiario.fecha
+        : new Date();
+      date.setUTCHours(0, 0, 0, 0);
+      const day = obtenerCampoPorDia(date);
+      const weekResponse = await weekValidation.findByDate(date);
+      if (weekResponse.success) {
+        const week = weekResponse.payload as Semana;
+        const reportTrainResponse =
+          await trainReportValidation.findByIdTrainAndWeek(
+            dailyPartDeparture.ParteDiario.Trabajo.tren_id,
+            week.id
+          );
+        if (reportTrainResponse.success) {
+          const reportTrain = reportTrainResponse.payload as ReporteAvanceTren;
+          const cuantityNewTotal =
+            dailyPartDeparture.Partida.precio * data.quantity_used;
+          const cuantityOldTotal =
+            dailyPartDeparture.Partida.precio *
+            dailyPartDeparture.cantidad_utilizada;
+          const totalAdd =
+            reportTrain[day] + cuantityNewTotal - cuantityOldTotal;
+          const totalDay = reportTrain[day] + cuantityNewTotal - cuantityOldTotal;
+          let current_executed = 0;
+          current_executed = calculateTotalNew(day, reportTrain, totalDay);
+          const total= current_executed -reportTrain.ejecutado_anterior;
+          await trainReportValidation.update(reportTrain.id, totalAdd, day,current_executed,total);
         }
       }
-      
-      
+
       return httpResponse.SuccessResponse(
         "Parte Diario Partida modificado correctamente",
         responseDailyPartDeparture

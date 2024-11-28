@@ -1,3 +1,5 @@
+import { ReporteAvanceTren } from "@prisma/client";
+
 // Define el tipo de los campos
 export type DiasSemana = 'domingo' | 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado';
 
@@ -20,3 +22,91 @@ export const obtenerCampoPorDia = (date:Date): DiasSemana => {
 
   return camposPorDia[diaActual];
 };
+
+export function calculateTotalNew(day: string, reportTrain: ReporteAvanceTren, totalDay: number): number {
+  let current_executed = 0;
+
+  switch (day) {
+    case "domingo":
+      current_executed = 
+        reportTrain.lunes + 
+        reportTrain.martes + 
+        reportTrain.miercoles + 
+        reportTrain.jueves + 
+        reportTrain.viernes + 
+        reportTrain.sabado + 
+        totalDay;
+      break;
+
+    case "lunes":
+      current_executed = 
+        totalDay + 
+        reportTrain.martes + 
+        reportTrain.miercoles + 
+        reportTrain.jueves + 
+        reportTrain.viernes + 
+        reportTrain.sabado + 
+        reportTrain.domingo;
+      break;
+
+    case "martes":
+      current_executed = 
+        reportTrain.lunes + 
+        totalDay + 
+        reportTrain.miercoles + 
+        reportTrain.jueves + 
+        reportTrain.viernes + 
+        reportTrain.sabado + 
+        reportTrain.domingo;
+      break;
+
+    case "miercoles":
+      current_executed = 
+        reportTrain.lunes + 
+        reportTrain.martes + 
+        totalDay + 
+        reportTrain.jueves + 
+        reportTrain.viernes + 
+        reportTrain.sabado + 
+        reportTrain.domingo;
+      break;
+
+    case "jueves":
+      current_executed = 
+        reportTrain.lunes + 
+        reportTrain.martes + 
+        reportTrain.miercoles + 
+        totalDay + 
+        reportTrain.viernes + 
+        reportTrain.sabado + 
+        reportTrain.domingo;
+      break;
+
+    case "viernes":
+      current_executed = 
+        reportTrain.lunes + 
+        reportTrain.martes + 
+        reportTrain.miercoles + 
+        reportTrain.jueves + 
+        totalDay + 
+        reportTrain.sabado + 
+        reportTrain.domingo;
+      break;
+
+    case "sabado":
+      current_executed = 
+        reportTrain.lunes + 
+        reportTrain.martes + 
+        reportTrain.miercoles + 
+        reportTrain.jueves + 
+        reportTrain.viernes + 
+        totalDay + 
+        reportTrain.domingo;
+      break;
+
+    default:
+      break
+  }
+
+  return current_executed;
+}

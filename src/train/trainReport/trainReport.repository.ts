@@ -9,7 +9,9 @@ export abstract class TrainReportRepository {
 
   createReportsForTrain(data:I_CreateReportTrainBD):void{}
 
-  updateReportsForTrain(report_train_id:number,value:number,fieldDay:string):void{}
+  updateReportsForTrain(report_train_id:number,value:number,day:string,current_executed:number,total:number):void{}
+
+  updateReportsForEjecutedPrevious(report_train_id:number,executed_previous:number):void{}
 
   findAll(skip: number, data: T_FindAllTrainReport, project_id: number):void{}
 }

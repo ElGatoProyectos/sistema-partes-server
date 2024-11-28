@@ -23,9 +23,9 @@ class TrainReportValidation {
       );
     }
   }
-  async update(report_train_id:number,value: number,field:string): Promise<T_HttpResponse> {
+  async update(report_train_id:number,value: number,day:string,current_executed:number,total:number): Promise<T_HttpResponse> {
     try {
-      const trainReport = await prismaTrainReportRepository.updateReportsForTrain(report_train_id,value,field);
+      const trainReport = await prismaTrainReportRepository.updateReportsForTrain(report_train_id,value,day,current_executed,total);
       if (!trainReport) {
         return httpResponse.NotFoundException(
           "No se pudo actualizar el Reporte por Tren",
@@ -39,6 +39,26 @@ class TrainReportValidation {
     } catch (error) {
       return httpResponse.InternalServerErrorException(
         "Error al actualizar el Reporte por Tren",
+        error
+      );
+    }
+  }
+  async updateForEjecutedPrevious(report_train_id: number, executed_previous: number): Promise<T_HttpResponse> {
+    try {
+      const trainReport = await prismaTrainReportRepository.updateReportsForEjecutedPrevious(report_train_id,executed_previous);
+      if (!trainReport) {
+        return httpResponse.NotFoundException(
+          "No se pudo actualizar el ejecutado Anterior del Reporte por Tren",
+          trainReport
+        );
+      }
+      return httpResponse.SuccessResponse(
+        "El ejecutado Anterior del Reporte por Tren fue actualizado con éxito",
+        trainReport
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al actualizar el ejecutado Anterior del Reporte por Tren",
         error
       );
     }
