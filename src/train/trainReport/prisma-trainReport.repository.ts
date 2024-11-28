@@ -130,7 +130,6 @@ class PrismaTrainReportRepository implements TrainReportRepository {
         },
       })
 
-
       reportsTrainsSecondOption = trains.map((train) => ({
         id_tren: train.codigo, 
         tren: train.nombre,
