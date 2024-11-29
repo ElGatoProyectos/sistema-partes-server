@@ -9,6 +9,19 @@ const prefixDetail = "/daily-part/departure";
 const prefixWithDailyPartAndDetail = "/daily-part/:id/departure";
 
 dailyPartDepartureRouter.get(
+  `${prefixDetail}/task-week`,
+  dailyPartDepartureMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+    "INGENIERO_PRODUCCION",
+    "ASISTENTE_PRODUCCION",
+  ]),
+  dailyPartDepartureController.getTaskWeek
+);
+dailyPartDepartureRouter.get(
   `${prefixWithDailyPartAndDetail}`,
   dailyPartDepartureMiddleware.verifyHeadersFieldsId,
   authRoleMiddleware.authorizeRoles([

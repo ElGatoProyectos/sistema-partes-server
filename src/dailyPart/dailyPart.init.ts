@@ -93,7 +93,17 @@ dailyPartRouter.put(
   ]),
   dailyPartController.update
 );
-
+dailyPartRouter.get(
+  `${prefix}/total-week`,
+  dailyPartMiddleware.verifyHeadersFieldsIdProject,
+  authRoleMiddleware.authorizeRoles([
+    "ADMIN",
+    "USER",
+    "CONTROL_COSTOS",
+    "ASISTENTE_CONTROL_COSTOS",
+  ]),
+  dailyPartController.getTotalWeek
+);
 dailyPartRouter.get(
   `${prefix}/:id`,
   dailyPartMiddleware.verifyHeadersFieldsId,
@@ -116,6 +126,7 @@ dailyPartRouter.get(
   ]),
   dailyPartController.findByInformation
 );
+
 dailyPartRouter.delete(
   `${prefix}/:id`,
   dailyPartMiddleware.verifyHeadersFieldsId,

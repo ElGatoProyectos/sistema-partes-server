@@ -46,6 +46,11 @@ class DailyPartController {
     const result = await dailyPartService.findById(id);
     response.status(result.statusCode).json(result);
   }
+  async getTotalWeek(request: express.Request, response: express.Response) {
+    const project_id = request.get("project-id") as string;
+    const result = await dailyPartService.getTotalForProject(+project_id);
+    response.status(result.statusCode).json(result);
+  }
   async findReport(request: express.Request, response: express.Response) {
     const project_id = request.get("project-id") as string;
 

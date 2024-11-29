@@ -1,4 +1,4 @@
-import { ParteDiario, RiesgoParteDiario, Trabajo } from "@prisma/client";
+import { ParteDiario, Proyecto, RiesgoParteDiario, Trabajo } from "@prisma/client";
 import {
   I_RiskDailyPart,
   I_RiskDailyPartForId,
@@ -62,6 +62,7 @@ export interface I_ParteDiario extends ParteDiario {
 export interface I_ParteDiarioPdf extends ParteDiario {
   Trabajo: I_TrabajoPdf;
   RiesgoParteDiario: I_RiskDailyPartForId | null;
+  Proyecto: Proyecto
 }
 export interface I_ParteDiarioId extends ParteDiario {
   Trabajo: I_TrabajoForId;

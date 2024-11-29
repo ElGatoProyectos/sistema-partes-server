@@ -3,6 +3,7 @@ import {
   DetalleParteDiarioFoto,
   DetallePrecioHoraMO,
   DetalleTrabajoPartida,
+  ParteDiarioRecurso,
   PrecioHoraMO,
   Proyecto,
   Semana,
@@ -15,6 +16,7 @@ import { httpResponse, T_HttpResponse } from "../../common/http.response";
 import { DailyPartPdfService } from "./dailyPartPdf.service";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import {
+  I_DailyPart,
   I_DailyPartPdf,
   I_ParteDiario,
   I_ParteDiarioPdf,
@@ -41,9 +43,7 @@ import { weekValidation } from "../../week/week.validation";
 import { converToDate } from "../../common/utils/date";
 import { assistsWorkforceValidation } from "../../assists/assists.validation";
 import { dailyPartResourceValidation } from "../dailyPartResources/dailyPartResources.validation";
-import {
-  I_DailyPartResourceForPdf,
-} from "../dailyPartResources/models/dailyPartResources.interface";
+import { I_DailyPartResourceForPdf } from "../dailyPartResources/models/dailyPartResources.interface";
 
 const pdfService = new DailyPartPdfService();
 
@@ -86,7 +86,7 @@ export class ReportService {
       }
       const dailyPartsResponseSend =
         await dailyPartReportValidation.findByDateAllDailyPartSend(fechas);
-      
+
       if (dailyPartsResponseSend.success) {
         const dailysPartWeek =
           dailyPartsResponseSend.payload as I_ParteDiario[];
@@ -102,7 +102,7 @@ export class ReportService {
         await this.ifDateIsNotPresent(user_id, project, date);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return {
         success: false,
         message: "Error al crear informe",
@@ -116,13 +116,13 @@ export class ReportService {
     project_id: string
   ) {
     try {
-      const resultIdProject = await projectValidation.findById(+project_id);
-      if (!resultIdProject.success) {
-        return httpResponse.BadRequestException(
-          "No se puede crear el Reporte con el id del Proyecto proporcionado"
-        );
-      }
-      const project = resultIdProject.payload as Proyecto;
+      // const resultIdProject = await projectValidation.findById(+project_id);
+      // if (!resultIdProject.success) {
+      //   return httpResponse.BadRequestException(
+      //     "No se puede crear el Reporte con el id del Proyecto proporcionado"
+      //   );
+      // }
+      // const project = resultIdProject.payload as Proyecto;
       const userTokenResponse = await jwtService.getUserFromToken(
         tokenWithBearer
       );
@@ -135,12 +135,17 @@ export class ReportService {
       }
       const dailyPart = dailyPartResponse.payload as I_ParteDiarioPdf;
 
+      if (dailyPart.proyecto_id != +project_id) {
+        return httpResponse.BadRequestException(
+          "El Id del Proyecto ingresado no es igual al del Parte Diario"
+        );
+      }
       //acá traigo para ver hasta la cantidad q puede ejecutar
       const detailsDepartureJobResponse =
         await departureJobValidation.findAllWithOutPaginationForJob(
           dailyPart.trabajo_id
         );
-    
+
       const detailsDepartureJob =
         detailsDepartureJobResponse.payload as DetalleTrabajoPartida[];
 
@@ -162,10 +167,10 @@ export class ReportService {
       const assistsForDateResponse =
         await assistsWorkforceValidation.findAllWithOutPaginationByDateAndProject(
           date,
-          project.id
+          dailyPart.proyecto_id
         );
       const assistsForDate = assistsForDateResponse.payload as Asistencia[];
-      
+
       const details: I_DailyPartDepartureForId[] = detailsDepartureJob.map(
         (detail) => {
           const detailDailyPart = detailsDailyPartDeparture.find(
@@ -184,8 +189,12 @@ export class ReportService {
             unidad: detailDailyPart?.Partida.Unidad?.simbolo
               ? detailDailyPart?.Partida.Unidad?.simbolo
               : "",
-            cantidad_programada: detail.metrado_utilizado ? detail.metrado_utilizado :"",
-            cantidad_utilizada: detailDailyPart?.cantidad_utilizada ? detailDailyPart?.cantidad_utilizada : "",
+            cantidad_programada: detail.metrado_utilizado
+              ? detail.metrado_utilizado
+              : "",
+            cantidad_utilizada: detailDailyPart?.cantidad_utilizada
+              ? detailDailyPart?.cantidad_utilizada
+              : "",
           };
         }
       );
@@ -233,13 +242,15 @@ export class ReportService {
           dailyPart.Recurso.CategoriaRecurso.nombre === "Sub-contratas"
       );
 
-      const detailCommentsResponse= await dailyPartPhotoValidation.findAllForIdDailyPart(dailyPart.id)
+      const detailCommentsResponse =
+        await dailyPartPhotoValidation.findAllForIdDailyPart(dailyPart.id);
 
-      const detailComments= detailCommentsResponse.payload as DetalleParteDiarioFoto[]
+      const detailComments =
+        detailCommentsResponse.payload as DetalleParteDiarioFoto[];
 
       const template = TemplateHtmlInformeParteDiario(
         dailyPart.id,
-        project,
+        dailyPart.Proyecto,
         dailyPart,
         details,
         dailyPartMOFind,
@@ -249,19 +260,19 @@ export class ReportService {
         detailComments
       );
 
-      await pdfService.createPdfPD(template, userResponse.id,dailyPart.id);
+      await pdfService.createPdfPD(template, userResponse.id, dailyPart.id);
 
       return {
         success: true,
         message: "Error",
         payload: {
           id: userResponse.id,
-          user_id:userResponse.id,
-          daily_part_id: dailyPart.id
+          user_id: userResponse.id,
+          daily_part_id: dailyPart.id,
         },
       };
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return {
         success: false,
         message: "Error al crear informe",
@@ -283,10 +294,15 @@ export class ReportService {
       (dailyPart) => dailyPart.fecha?.getTime() === date.getTime()
     );
 
-    const dailyPartsIdToday = dailyParts.map((dailyPart) => dailyPart.id);
+    // const dailyPartsIdToday = dailyParts.map((dailyPart) => dailyPart.id);
 
-    //[message] creamos la imagen del primer gráfico
-    await pdfService.createImage(user_id, dailysPartWeek, fechas);
+    const dailyPartResourceResponse =
+      await dailyPartResourceValidation.findAllWithPaginationForidsDailyPart(
+        idsDailyPartWeek
+      );
+
+    const dailyPartResource =
+      dailyPartResourceResponse.payload as ParteDiarioRecurso[];
 
     //[note] acá comenzamos el proceso de buscar los datos
 
@@ -311,14 +327,18 @@ export class ReportService {
       });
     }
 
-    //[note] busco las partidas del Trabajo
+    //[note] busco los partes diarios de la semana
     const dailysPartDepartureResponse =
       await dailyPartDepartureValidation.findAllForIdsDailyPart(
-        dailyPartsIdToday
+        idsDailyPartWeek
       );
 
     const dailysPartsDeparture =
-      dailysPartDepartureResponse.payload as I_DailyPartDepartureForPdf[];
+      dailysPartDepartureResponse.payload as I_DailyPartDeparture[];
+
+    const dailyPartToday = dailysPartsDeparture.filter(
+      (dailyPart) => dailyPart.ParteDiario.fecha?.getTime() === date.getTime()
+    );
 
     //[note] acá busco la mano de obra de la semana
     const dailyPartWokrforceResponse =
@@ -410,6 +430,22 @@ export class ReportService {
       | DetallePrecioHoraMO[]
       | [];
 
+    let workforces: any = [];
+
+    let totalRealWorkforceProduction = 0;
+
+    const desviation = totalProductionWorkforce - totalRealWorkforceProduction;
+
+    //busco los comentarios
+    const dailyPartComentaryResponse =
+      await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPartWeek);
+
+    const dailyPartComentary =
+      dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
+
+    //[message] creamos la imagen del primer gráfico
+    await pdfService.createImage(user_id, dailysPartWeek, fechas);
+
     //[message] creamos la imagen que tiene 3 lineas
     await pdfService.createImageForTripleChart(
       user_id,
@@ -419,25 +455,13 @@ export class ReportService {
       detailsPriceHourMO
     );
 
-    let workforces: any = [];
-
-    let totalRealWorkforceProduction = 0;
-
-    const desviation = totalProductionWorkforce - totalRealWorkforceProduction;
-
-    const dailyPartComentaryResponse =
-      await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPartWeek);
-
-    const dailyPartComentary =
-      dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
-
     //[message] creamos el template dle gráfico
     const template = await TemplateHtmlInforme(
       user_id,
       project,
       dailyParts,
       detailsDepartureJob,
-      dailysPartsDeparture,
+      dailyPartToday,
       workforces,
       date,
       productionForDay,

@@ -1,5 +1,5 @@
 import express from "../../config/express.config";
-import { T_FindAllTrainReport } from "./models/trainReport.types";
+import { T_FindAllTrainReport, T_FindAllTrainReportInformation } from "./models/trainReport.types";
 import { trainReportService } from "./trainReport.service";
 
 
@@ -23,7 +23,13 @@ class TrainReportController {
 
   async getInformation(request: express.Request, response: express.Response) {
     const project_id = request.get("project-id") as string;
-    const result = await trainReportService.getInformation(+project_id);
+    const week = request.query.week as string;
+    let paginationOptions: T_FindAllTrainReportInformation = {
+      queryParams: {
+        week: week,
+      },
+    };
+    const result = await trainReportService.getInformation(paginationOptions,+project_id);
     response.status(result.statusCode).json(result);
   }
 

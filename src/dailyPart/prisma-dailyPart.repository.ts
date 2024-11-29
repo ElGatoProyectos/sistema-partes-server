@@ -15,6 +15,22 @@ import {
 import { converToDate } from "../common/utils/date";
 
 class PrismaDailyPartRepository implements DailyPartRepository {
+  async getAllDailyPartForProject(project_id: number,date_start:Date,date_end:Date): Promise<ParteDiario[] | null> {
+    const date_start_new= date_start;
+    date_start_new.setUTCHours(0,0,0,0);
+    const date_end_new= date_end;
+    date_end_new.setUTCHours(0,0,0,0);
+    const details= await prisma.parteDiario.findMany({
+      where:{
+        proyecto_id:project_id,
+        fecha: {
+          gte: date_start, 
+          lte: date_end,  
+        },
+      }
+    })
+    return details
+  }
   async deleteDailyPart(daily_part_id: number) {
    await prisma.parteDiario.delete({
     where:{
@@ -239,6 +255,8 @@ class PrismaDailyPartRepository implements DailyPartRepository {
             UnidadProduccion:true
           }
         },
+        Proyecto:true,
+        RiesgoParteDiario:true
       },
     });
 

@@ -5,14 +5,14 @@ import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "../../src/project/models/project.constant";
 import { I_ParteDiario } from "../../src/dailyPart/models/dailyPart.interface";
 import { I_DepartureJobForPdf } from "../../src/departure/departure-job/models/departureJob.interface";
-import { I_DailyPartDepartureForPdf } from "../../src/dailyPart/dailyPartDeparture/models/dailyPartDeparture.interface";
+import { I_DailyPartDeparture } from "../../src/dailyPart/dailyPartDeparture/models/dailyPartDeparture.interface";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
   project: Proyecto,
   daily_parts: I_ParteDiario[] = [],
   detailsDepartureJob: I_DepartureJobForPdf[] = [],
-  dailysPartsDeparture: I_DailyPartDepartureForPdf[] = [],
+  dailysPartsDeparture: I_DailyPartDeparture[] = [],
   workforces: any[] = [],
   date: Date,
   productionForDay: number,

@@ -1,6 +1,7 @@
 import {
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
+  Partida,
   ReporteAvanceTren,
   Semana,
 } from "@prisma/client";
@@ -19,6 +20,9 @@ import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
 import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
 import { weekValidation } from "../../week/week.validation";
+import { projectValidation } from "../../project/project.validation";
+import { departureValidation } from "../../departure/departure.validation";
+import { prismaDailyPartRepository } from "../prisma-dailyPart.repository";
 
 class DailyPartDepartureService {
   async updateDailyPartDeparture(
@@ -100,11 +104,18 @@ class DailyPartDepartureService {
             dailyPartDeparture.cantidad_utilizada;
           const totalAdd =
             reportTrain[day] + cuantityNewTotal - cuantityOldTotal;
-          const totalDay = reportTrain[day] + cuantityNewTotal - cuantityOldTotal;
+          const totalDay =
+            reportTrain[day] + cuantityNewTotal - cuantityOldTotal;
           let current_executed = 0;
           current_executed = calculateTotalNew(day, reportTrain, totalDay);
-          const total= current_executed -reportTrain.ejecutado_anterior;
-          await trainReportValidation.update(reportTrain.id, totalAdd, day,current_executed,total);
+          const total = current_executed - reportTrain.ejecutado_anterior;
+          await trainReportValidation.update(
+            reportTrain.id,
+            totalAdd,
+            day,
+            current_executed,
+            total
+          );
         }
       }
 
@@ -217,27 +228,133 @@ class DailyPartDepartureService {
     }
   }
   async deleteAllDailyPartDepartures(
-    daily_part: I_ParteDiarioId,
-  ): Promise< number> {
+    daily_part: I_ParteDiarioId
+  ): Promise<number> {
     let sumaSubtract = 0;
-  
+
     if (daily_part.fecha) {
       const result =
         await prismaDailyPartDepartureRepository.findAllWithOutPaginationForidDailyPart(
-          daily_part.id,
+          daily_part.id
         );
-  
+
       if (result != null && result.length > 0) {
         result.forEach((element) => {
           sumaSubtract += element.Partida.precio * element.cantidad_utilizada;
         });
       }
-  
-      return sumaSubtract
-        
+
+      return sumaSubtract;
     }
-    return sumaSubtract
+    return sumaSubtract;
   }
+
+  async taskWeekDailyPartDeparture(project_id: string) {
+    try {
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede buscar los Partes Diarios con el ID del proyecto proporcionado"
+        );
+      }
+  
+      const departureResponse = await departureValidation.findAllWithOutPagination(+project_id);
+      if (!departureResponse.success) {
+        return httpResponse.SuccessResponse(
+          "Éxito al traer el Tareo Semanal de la Partida",
+          []
+        );
+      }
+  
+      const departures = departureResponse.payload as Partida[];
+  
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+  
+      const weekTodayResponse = await weekValidation.findByDate(today);
+      if (!weekTodayResponse.success) {
+        return httpResponse.SuccessResponse("No se encontró la semana actual", []);
+      }
+      const currentWeek = weekTodayResponse.payload as Semana;
+  
+      const lastWeekResponse = await weekValidation.findById(currentWeek.id - 1);
+      if (!lastWeekResponse.success) {
+        return httpResponse.SuccessResponse("No se encontró la semana anterior", []);
+      }
+      const lastWeek = lastWeekResponse.payload as Semana;
+  
+      const dailyParts = await prismaDailyPartRepository.getAllDailyPartForProject(
+        +project_id,
+        currentWeek.fecha_inicio,
+        currentWeek.fecha_fin
+      );
+      if (!dailyParts || dailyParts.length === 0) {
+        return httpResponse.SuccessResponse(
+          "No hay partes diarios para la semana actual",
+          []
+        );
+      }
+  
+      const dailyPartIds = dailyParts.map((part) => part.id);
+  
+      const response = await Promise.all(
+        departures.map(async (partida) => {
+
+          const [currentParts, lastParts] = await Promise.all([
+            prisma.parteDiarioPartida.findMany({
+              where: {
+                partida_id: partida.id,
+                ParteDiario: {
+                  id: { in: dailyPartIds },
+                  fecha: {
+                    gte: currentWeek.fecha_inicio,
+                    lte: currentWeek.fecha_fin,
+                  },
+                },
+              },
+            }),
+            prisma.parteDiarioPartida.findMany({
+              where: {
+                partida_id: partida.id,
+                ParteDiario: {
+                  fecha: {
+                    gte: lastWeek.fecha_inicio,
+                    lte: lastWeek.fecha_fin,
+                  },
+                },
+              },
+            }),
+          ]);
+  
+          const calculateAvance = (parts: typeof currentParts) =>
+            parts.reduce((sum, part) => sum + (part.cantidad_utilizada || 0), 0);
+  
+          const avanceActual = calculateAvance(currentParts);
+          const avanceAnterior = calculateAvance(lastParts);
+  
+          return {
+            partida,
+            ejecutado_anterior: avanceAnterior,
+            ejecutado_actual: avanceActual,
+            saldo: partida.metrado_inicial - (avanceAnterior + avanceActual),
+          };
+        })
+      );
+  
+      return httpResponse.SuccessResponse(
+        "Éxito al traer el Tareo Semanal de la Partida",
+        response
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer el Tareo Semanal de la Partida",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+  
 }
 
 export const dailyPartDepartureService = new DailyPartDepartureService();

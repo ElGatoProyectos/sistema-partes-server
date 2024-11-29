@@ -6,3 +6,9 @@ export type T_FindAllTrainReport = {
     };
   };
   
+export type T_FindAllTrainReportInformation = {
+    queryParams: {
+      week: string;
+    };
+  };
+  

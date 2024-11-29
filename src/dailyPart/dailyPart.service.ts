@@ -3,16 +3,16 @@ import {
   I_DailyPartCreateBody,
   I_DailyPartUpdateBody,
   I_ParteDiarioId,
-  I_ParteDiarioPdf,
 } from "./models/dailyPart.interface";
 import { dailyPartReportValidation } from "./dailyPart.validation";
 import {
   DetallePrecioHoraMO,
-  DetalleSemanaProyecto,
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
   ParteDiario,
   ParteDiarioMO,
+  ParteDiarioPartida,
+  ParteDiarioRecurso,
   PrecioHoraMO,
   ReporteAvanceTren,
   Semana,
@@ -38,18 +38,19 @@ import { dailyPartMOValidation } from "./dailyPartMO/dailyPartMO.validation";
 import { departureJobValidation } from "../departure/departure-job/departureJob.validation";
 import { detailPriceHourWorkforceValidation } from "../workforce/detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 import { priceHourWorkforceValidation } from "../workforce/priceHourWorkforce/priceHourWorkforce.valdation";
-import { I_DailyPartBody } from "./dailyPartMO/models/dailyPartMO.interface";
+import { I_DailyPartBody, I_DailyPartWorkforce } from "./dailyPartMO/models/dailyPartMO.interface";
 import { prismaDailyPartDepartureRepository } from "./dailyPartDeparture/prisma-dailyPartDeparture.repository";
-import { detailWeekProjectValidation } from "../week/detailWeekProject/detailWeekProject.validation";
 import { trainReportValidation } from "../train/trainReport/trainReport.validation";
 import { dailyPartDepartureValidation } from "./dailyPartDeparture/dailyPartDeparture.validation";
-import { I_DailyPartDeparture } from "./dailyPartDeparture/models/dailyPartDeparture.interface";
+import { I_DailyPartDeparture, I_DailyPartDepartureForPdf } from "./dailyPartDeparture/models/dailyPartDeparture.interface";
 import { weekValidation } from "../week/week.validation";
 import { obtenerCampoPorDia } from "../common/utils/day";
 import { dailyPartDepartureService } from "./dailyPartDeparture/dailyPartDeparture.service";
 import { dailyPartMOService } from "./dailyPartMO/dailyPartMO.service";
 import { dailyPartResourceService } from "./dailyPartResources/dailyPartResources.service";
 import { prismaDailyPartPhotoRepository } from "./photos/prisma-dailyPartPhotos.repository";
+import { dailyPartResourceValidation } from "./dailyPartResources/dailyPartResources.validation";
+import { I_DailyPartResourceForPdf } from "./dailyPartResources/models/dailyPartResources.interface";
 
 class DailyPartService {
   async createDailyPart(
@@ -553,5 +554,113 @@ class DailyPartService {
       await prisma.$disconnect();
     }
   }
+  async getTotalForProject(project_id:number){
+    try {
+      const projectReponse =
+        await projectValidation.findById(project_id);
+      if (!projectReponse.success) {
+        return projectReponse;
+      }
+
+      const date= new Date();
+      date.setUTCHours(0,0,0,0)
+
+      let total=0
+      const weekResponse= await weekValidation.findByDate(date)
+      const week= weekResponse.payload as Semana;
+
+      if(weekResponse.success){
+        const dailyParts= await prismaDailyPartRepository.getAllDailyPartForProject(project_id,week.fecha_inicio,week.fecha_fin)
+        if(dailyParts && dailyParts.length >0){
+          const ids_daily_part= dailyParts.map((daily_part)=>daily_part.id)
+          //acá sumamos lo q hicimos en partida
+          const dailyPartDepartue= await dailyPartDepartureValidation.findAllForIdsDailyPart(ids_daily_part)
+          if(dailyPartDepartue.success){
+            const dailyPartDeparture= dailyPartDepartue.payload as I_DailyPartDepartureForPdf[]
+            if(dailyPartDeparture.length>0){
+              dailyPartDeparture.forEach((element) => {
+                total += element.Partida.precio * element.cantidad_utilizada;
+              });
+            }
+          }
+          // acá lo q hicimos en recursos
+          const dailyPartResourcesResponse= await dailyPartResourceValidation.findAllWithPaginationForidsDailyPart(ids_daily_part);
+          if(dailyPartResourcesResponse.success){
+            const dailyPartResources= dailyPartResourcesResponse.payload as I_DailyPartResourceForPdf[]
+            if(dailyPartResources.length>0){
+              dailyPartResources.forEach((element) => {
+                if(element.Recurso.precio){
+                  total += element.cantidad * element.Recurso.precio;
+                }
+              });
+            }
+          }
+
+          // acá lo que hicimos en recursos
+          const dailyPartMOResponse= await dailyPartMOValidation.findAllForIdsDailysParts(ids_daily_part);
+          if(dailyPartMOResponse.success){
+            const dailyPartMO= dailyPartMOResponse.payload as I_DailyPartWorkforce[]
+            if(dailyPartMO.length>0){
+              const priceHourResponse =
+              await priceHourWorkforceValidation.findByDate(
+               date
+              );
+              if (priceHourResponse.success) {
+                const priceHourMO =
+                priceHourResponse.payload as PrecioHoraMO;
+              const detailsPriceHourMOResponse =
+                await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+                  priceHourMO.id
+                );
+              const detailsPriceHourMO =
+                detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+    
+              if(detailsPriceHourMO.length >0){
+                dailyPartMO.forEach((element) => {
+                  const categoriaId = element.ManoObra?.CategoriaObrero?.id;
+                  if (categoriaId != null) {
+                    const detail = detailsPriceHourMO.find(
+                      (detail) => detail.categoria_obrero_id === categoriaId
+                    );
+      
+                    if (
+                      detail &&
+                      element.hora_normal != null &&
+                      element.hora_60 != null &&
+                      element.hora_100 != null
+                    ) {
+                       total +=
+                        detail?.hora_normal * element.hora_normal +
+                        detail?.hora_extra_60 * element.hora_60 +
+                        detail?.hora_extra_100 * element.hora_100;
+                    }
+                  }
+                });
+              }
+              
+              }
+            }
+          }
+        }
+      }
+
+      const totalFormat={
+        produccion_semana: total
+      }
+      return httpResponse.SuccessResponse(
+        `Éxito al traer el total de la producción por la Semana ${week.codigo}`,
+        totalFormat
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al traer el total de la producción por la Semana ",
+        error
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  
 }
 export const dailyPartService = new DailyPartService();
