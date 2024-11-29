@@ -7,9 +7,10 @@ const dailyPartDepartureRouter = express.Router();
 const prefix = "/daily-part-departure";
 const prefixDetail = "/daily-part/departure";
 const prefixWithDailyPartAndDetail = "/daily-part/:id/departure";
+const prefixReport= "/report-departure"
 
 dailyPartDepartureRouter.get(
-  `${prefixDetail}/task-week`,
+  `${prefixReport}/task-week`,
   dailyPartDepartureMiddleware.verifyHeadersFieldsIdProject,
   authRoleMiddleware.authorizeRoles([
     "ADMIN",
