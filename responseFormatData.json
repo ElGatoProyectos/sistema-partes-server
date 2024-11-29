@@ -1,0 +1,6497 @@
+[
+  {
+    "trabajo_id": 16,
+    "partida_id": 16,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 16,
+    "partida_id": 18,
+    "metrado_utilizado": 155
+  },
+  {
+    "trabajo_id": 16,
+    "partida_id": 33,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 36,
+    "partida_id": 30,
+    "metrado_utilizado": 1547
+  },
+  {
+    "trabajo_id": 36,
+    "partida_id": 67,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 176,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 176,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 176,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 176,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 26,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 26,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 26,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 26,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 15,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 15,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 15,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 15,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 18,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 18,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 18,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 18,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 24,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 24,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 24,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 24,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 46,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 46,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 46,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 46,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 17,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 17,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 17,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 17,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 23,
+    "partida_id": 102,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 23,
+    "partida_id": 22,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 23,
+    "partida_id": 93,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 23,
+    "partida_id": 108,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 27,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 80,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 21,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 40,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 33,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 72,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 19,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 120,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 26,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 37,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 50,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 73,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 17,
+    "metrado_utilizado": 0.125
+  },
+  {
+    "trabajo_id": 55,
+    "partida_id": 85,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 20,
+    "partida_id": 479,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 20,
+    "partida_id": 480,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 20,
+    "partida_id": 470,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 32,
+    "partida_id": 483,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 121,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 159,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 143,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 146,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 154,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 144,
+    "partida_id": 483,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 22,
+    "partida_id": 483,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 91,
+    "partida_id": 476,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 91,
+    "partida_id": 485,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 91,
+    "partida_id": 494,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 91,
+    "partida_id": 489,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 91,
+    "partida_id": 491,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 51,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 51,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 51,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 51,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 51,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 45,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 45,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 45,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 45,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 45,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 99,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 99,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 99,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 99,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 99,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 87,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 87,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 87,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 87,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 87,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 103,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 103,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 103,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 103,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 103,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 35,
+    "partida_id": 476,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 35,
+    "partida_id": 485,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 35,
+    "partida_id": 494,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 35,
+    "partida_id": 489,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 35,
+    "partida_id": 491,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 61,
+    "partida_id": 476,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 61,
+    "partida_id": 485,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 61,
+    "partida_id": 494,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 61,
+    "partida_id": 489,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 61,
+    "partida_id": 491,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 58,
+    "partida_id": 488,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 58,
+    "partida_id": 490,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 74,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 74,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 66,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 66,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 82,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 82,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 101,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 101,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 31,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 31,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 156,
+    "partida_id": 488,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 156,
+    "partida_id": 490,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 164,
+    "partida_id": 488,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 164,
+    "partida_id": 490,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 139,
+    "partida_id": 492,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 163,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 138,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 151,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 38,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 49,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 135,
+    "partida_id": 492,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 147,
+    "partida_id": 492,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 157,
+    "partida_id": 501,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 157,
+    "partida_id": 493,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 142,
+    "partida_id": 496,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 142,
+    "partida_id": 498,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 142,
+    "partida_id": 502,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 142,
+    "partida_id": 500,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 142,
+    "partida_id": 504,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 127,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 127,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 127,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 127,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 127,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 140,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 140,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 140,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 140,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 140,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 43,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 43,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 43,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 43,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 43,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 25,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 25,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 25,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 25,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 25,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 28,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 28,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 28,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 28,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 28,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 42,
+    "partida_id": 496,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 42,
+    "partida_id": 498,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 42,
+    "partida_id": 502,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 42,
+    "partida_id": 500,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 42,
+    "partida_id": 504,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 50,
+    "partida_id": 496,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 50,
+    "partida_id": 498,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 50,
+    "partida_id": 502,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 50,
+    "partida_id": 500,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 50,
+    "partida_id": 504,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 62,
+    "partida_id": 20,
+    "metrado_utilizado": 0.143
+  },
+  {
+    "trabajo_id": 62,
+    "partida_id": 44,
+    "metrado_utilizado": 7.143
+  },
+  {
+    "trabajo_id": 62,
+    "partida_id": 59,
+    "metrado_utilizado": 0.214
+  },
+  {
+    "trabajo_id": 62,
+    "partida_id": 71,
+    "metrado_utilizado": 4.286
+  },
+  {
+    "trabajo_id": 62,
+    "partida_id": 487,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 30,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 30,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 30,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 30,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 30,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 44,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 44,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 44,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 44,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 44,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 79,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 79,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 79,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 79,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 79,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 34,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 34,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 34,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 34,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 34,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 53,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 53,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 53,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 53,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 53,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 129,
+    "partida_id": 20,
+    "metrado_utilizado": 0.286
+  },
+  {
+    "trabajo_id": 129,
+    "partida_id": 44,
+    "metrado_utilizado": 14.286
+  },
+  {
+    "trabajo_id": 129,
+    "partida_id": 59,
+    "metrado_utilizado": 0.429
+  },
+  {
+    "trabajo_id": 129,
+    "partida_id": 71,
+    "metrado_utilizado": 8.571
+  },
+  {
+    "trabajo_id": 129,
+    "partida_id": 487,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 37,
+    "partida_id": 20,
+    "metrado_utilizado": 0.143
+  },
+  {
+    "trabajo_id": 37,
+    "partida_id": 44,
+    "metrado_utilizado": 7.143
+  },
+  {
+    "trabajo_id": 37,
+    "partida_id": 59,
+    "metrado_utilizado": 0.214
+  },
+  {
+    "trabajo_id": 37,
+    "partida_id": 71,
+    "metrado_utilizado": 4.286
+  },
+  {
+    "trabajo_id": 37,
+    "partida_id": 487,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 29,
+    "partida_id": 25,
+    "metrado_utilizado": 0.571
+  },
+  {
+    "trabajo_id": 29,
+    "partida_id": 292,
+    "metrado_utilizado": 1.218
+  },
+  {
+    "trabajo_id": 29,
+    "partida_id": 321,
+    "metrado_utilizado": 7.5
+  },
+  {
+    "trabajo_id": 41,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 41,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 41,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 71,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 71,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 71,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 161,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 161,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 161,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 145,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 145,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 145,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 137,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 137,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 137,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 152,
+    "partida_id": 25,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 152,
+    "partida_id": 292,
+    "metrado_utilizado": 2.436
+  },
+  {
+    "trabajo_id": 152,
+    "partida_id": 321,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 39,
+    "partida_id": 25,
+    "metrado_utilizado": 0.571
+  },
+  {
+    "trabajo_id": 39,
+    "partida_id": 292,
+    "metrado_utilizado": 1.218
+  },
+  {
+    "trabajo_id": 39,
+    "partida_id": 321,
+    "metrado_utilizado": 7.5
+  },
+  {
+    "trabajo_id": 65,
+    "partida_id": 57,
+    "metrado_utilizado": 110.54
+  },
+  {
+    "trabajo_id": 65,
+    "partida_id": 60,
+    "metrado_utilizado": 112.23
+  },
+  {
+    "trabajo_id": 65,
+    "partida_id": 68,
+    "metrado_utilizado": 65
+  },
+  {
+    "trabajo_id": 65,
+    "partida_id": 112,
+    "metrado_utilizado": 9696.675
+  },
+  {
+    "trabajo_id": 48,
+    "partida_id": 52,
+    "metrado_utilizado": 21169.38
+  },
+  {
+    "trabajo_id": 48,
+    "partida_id": 115,
+    "metrado_utilizado": 32798.03
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 61,
+    "metrado_utilizado": 587.175
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 39,
+    "metrado_utilizado": 1318.87
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 81,
+    "metrado_utilizado": 993.276
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 43,
+    "metrado_utilizado": 45.66
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 54,
+    "metrado_utilizado": 7150.04
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 78,
+    "metrado_utilizado": 1768.8
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 66,
+    "metrado_utilizado": 6581.7
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 128,
+    "metrado_utilizado": 1903.34
+  },
+  {
+    "trabajo_id": 85,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 61,
+    "metrado_utilizado": 575.24
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 39,
+    "metrado_utilizado": 825.52
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 81,
+    "metrado_utilizado": 374.04
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 54,
+    "metrado_utilizado": 1763
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 78,
+    "metrado_utilizado": 2325.24
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 66,
+    "metrado_utilizado": 1870.49
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 128,
+    "metrado_utilizado": 543.44
+  },
+  {
+    "trabajo_id": 67,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 61,
+    "metrado_utilizado": 425.95
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 39,
+    "metrado_utilizado": 1465.42
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 81,
+    "metrado_utilizado": 481.9
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 54,
+    "metrado_utilizado": 1108.9
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 78,
+    "metrado_utilizado": 2428.42
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 66,
+    "metrado_utilizado": 2169.31
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 128,
+    "metrado_utilizado": 617.71
+  },
+  {
+    "trabajo_id": 56,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 61,
+    "metrado_utilizado": 348.33
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 39,
+    "metrado_utilizado": 1177.22
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 81,
+    "metrado_utilizado": 588.44
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 54,
+    "metrado_utilizado": 1537.79
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 78,
+    "metrado_utilizado": 630.38
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 66,
+    "metrado_utilizado": 1454.09
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 128,
+    "metrado_utilizado": 511.35
+  },
+  {
+    "trabajo_id": 52,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 61,
+    "metrado_utilizado": 54.45
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 39,
+    "metrado_utilizado": 119.68
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 81,
+    "metrado_utilizado": 216.52
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 54,
+    "metrado_utilizado": 210.78
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 78,
+    "metrado_utilizado": 168.42
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 66,
+    "metrado_utilizado": 363.66
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 128,
+    "metrado_utilizado": 125.77
+  },
+  {
+    "trabajo_id": 54,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 81,
+    "metrado_utilizado": 101.34
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 54,
+    "metrado_utilizado": 114.71
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 78,
+    "metrado_utilizado": 166.92
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 66,
+    "metrado_utilizado": 183.55
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 128,
+    "metrado_utilizado": 57.49
+  },
+  {
+    "trabajo_id": 69,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 61,
+    "metrado_utilizado": 147.86
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 39,
+    "metrado_utilizado": 486.03
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 81,
+    "metrado_utilizado": 75.63
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 54,
+    "metrado_utilizado": 1479.5
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 78,
+    "metrado_utilizado": 997.37
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 66,
+    "metrado_utilizado": 1228.71
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 128,
+    "metrado_utilizado": 480.55
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 90,
+    "metrado_utilizado": 878.48
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 92,
+    "metrado_utilizado": 716.525
+  },
+  {
+    "trabajo_id": 57,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 61,
+    "metrado_utilizado": 137.02
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 39,
+    "metrado_utilizado": 539.76
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 81,
+    "metrado_utilizado": 343.88
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 54,
+    "metrado_utilizado": 1858.19
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 66,
+    "metrado_utilizado": 674.02
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 128,
+    "metrado_utilizado": 56.25
+  },
+  {
+    "trabajo_id": 68,
+    "partida_id": 88,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 81,
+    "metrado_utilizado": 309.26
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 54,
+    "metrado_utilizado": 125.2
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 78,
+    "metrado_utilizado": 2452.83
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 66,
+    "metrado_utilizado": 459.42
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 97,
+    "metrado_utilizado": 710.37
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 139,
+    "metrado_utilizado": 768.403
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 138,
+    "metrado_utilizado": 417.619
+  },
+  {
+    "trabajo_id": 88,
+    "partida_id": 144,
+    "metrado_utilizado": 92.43
+  },
+  {
+    "trabajo_id": 47,
+    "partida_id": 47,
+    "metrado_utilizado": 210
+  },
+  {
+    "trabajo_id": 47,
+    "partida_id": 106,
+    "metrado_utilizado": 1912.15
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 117,
+    "metrado_utilizado": 33.67
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 127,
+    "metrado_utilizado": 57.61
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 40,
+    "metrado_utilizado": 38.28
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 38,
+    "metrado_utilizado": 49.71
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 62,
+    "metrado_utilizado": 10.61
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 53,
+    "metrado_utilizado": 216
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 74,
+    "metrado_utilizado": 139.9
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 76,
+    "metrado_utilizado": 230.56
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 83,
+    "metrado_utilizado": 328.36
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 110,
+    "metrado_utilizado": 1345.53
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 60,
+    "partida_id": 109,
+    "metrado_utilizado": 79.46
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 117,
+    "metrado_utilizado": 29.12
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 127,
+    "metrado_utilizado": 6.7
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 40,
+    "metrado_utilizado": 34.94
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 38,
+    "metrado_utilizado": 33.72
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 53,
+    "metrado_utilizado": 74.26
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 74,
+    "metrado_utilizado": 126.23
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 76,
+    "metrado_utilizado": 70.9
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 83,
+    "metrado_utilizado": 102.94
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 110,
+    "metrado_utilizado": 857.66
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 149,
+    "partida_id": 109,
+    "metrado_utilizado": 14.43
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 117,
+    "metrado_utilizado": 35.2
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 127,
+    "metrado_utilizado": 14.3
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 40,
+    "metrado_utilizado": 35.2
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 38,
+    "metrado_utilizado": 50.63
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 53,
+    "metrado_utilizado": 46.76
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 74,
+    "metrado_utilizado": 143.74
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 76,
+    "metrado_utilizado": 91.75
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 83,
+    "metrado_utilizado": 124.99
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 110,
+    "metrado_utilizado": 1041.36
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 64,
+    "partida_id": 109,
+    "metrado_utilizado": 53.91
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 117,
+    "metrado_utilizado": 41.42
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 40,
+    "metrado_utilizado": 45.78
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 38,
+    "metrado_utilizado": 45.6
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 53,
+    "metrado_utilizado": 92.41
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 74,
+    "metrado_utilizado": 34.1
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 76,
+    "metrado_utilizado": 69.52
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 83,
+    "metrado_utilizado": 94.77
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 110,
+    "metrado_utilizado": 789.51
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 81,
+    "partida_id": 109,
+    "metrado_utilizado": 22.39
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 117,
+    "metrado_utilizado": 7.45
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 40,
+    "metrado_utilizado": 8.16
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 38,
+    "metrado_utilizado": 4.05
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 53,
+    "metrado_utilizado": 14.03
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 74,
+    "metrado_utilizado": 8.53
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 76,
+    "metrado_utilizado": 18.08
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 83,
+    "metrado_utilizado": 27.39
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 110,
+    "metrado_utilizado": 228.19
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 95,
+    "partida_id": 109,
+    "metrado_utilizado": 28.53
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 53,
+    "metrado_utilizado": 5.5
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 74,
+    "metrado_utilizado": 14.3
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 76,
+    "metrado_utilizado": 10.4
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 83,
+    "metrado_utilizado": 10.97
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 110,
+    "metrado_utilizado": 91.44
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 83,
+    "partida_id": 109,
+    "metrado_utilizado": 4.81
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 117,
+    "metrado_utilizado": 12.73
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 127,
+    "metrado_utilizado": 19.65
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 40,
+    "metrado_utilizado": 15.27
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 38,
+    "metrado_utilizado": 19.82
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 53,
+    "metrado_utilizado": 76.75
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 74,
+    "metrado_utilizado": 58.32
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 76,
+    "metrado_utilizado": 66.79
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 83,
+    "metrado_utilizado": 52
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 110,
+    "metrado_utilizado": 432.49
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 95,
+    "metrado_utilizado": 39.16
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 89,
+    "metrado_utilizado": 32.06
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 126,
+    "partida_id": 109,
+    "metrado_utilizado": 10.45
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 117,
+    "metrado_utilizado": 12.05
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 127,
+    "metrado_utilizado": 50.6
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 40,
+    "metrado_utilizado": 14.46
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 38,
+    "metrado_utilizado": 18.87
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 53,
+    "metrado_utilizado": 123.14
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 76,
+    "metrado_utilizado": 32.57
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 83,
+    "metrado_utilizado": 49.41
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 110,
+    "metrado_utilizado": 372.9
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 98,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 77,
+    "partida_id": 109,
+    "metrado_utilizado": 37.65
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 53,
+    "metrado_utilizado": 129.2
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 74,
+    "metrado_utilizado": 179.57
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 76,
+    "metrado_utilizado": 102.13
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 105,
+    "metrado_utilizado": 119.31
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 143,
+    "metrado_utilizado": 105.6
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 130,
+    "metrado_utilizado": 46.08
+  },
+  {
+    "trabajo_id": 63,
+    "partida_id": 141,
+    "metrado_utilizado": 28.35
+  },
+  {
+    "trabajo_id": 75,
+    "partida_id": 21,
+    "metrado_utilizado": 0.571
+  },
+  {
+    "trabajo_id": 59,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 73,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 70,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 111,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 93,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 96,
+    "partida_id": 21,
+    "metrado_utilizado": 1.143
+  },
+  {
+    "trabajo_id": 76,
+    "partida_id": 21,
+    "metrado_utilizado": 0.571
+  },
+  {
+    "trabajo_id": 86,
+    "partida_id": 28,
+    "metrado_utilizado": 784.67
+  },
+  {
+    "trabajo_id": 78,
+    "partida_id": 49,
+    "metrado_utilizado": 784.67
+  },
+  {
+    "trabajo_id": 90,
+    "partida_id": 41,
+    "metrado_utilizado": 784.67
+  },
+  {
+    "trabajo_id": 84,
+    "partida_id": 45,
+    "metrado_utilizado": 372.67
+  },
+  {
+    "trabajo_id": 84,
+    "partida_id": 51,
+    "metrado_utilizado": 356.56
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 32,
+    "metrado_utilizado": 23.72
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 126,
+    "metrado_utilizado": 7.29
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 116,
+    "metrado_utilizado": 17.35
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 27,
+    "metrado_utilizado": 12.47
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 121,
+    "metrado_utilizado": 4.42
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 34,
+    "metrado_utilizado": 19.76
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 114,
+    "metrado_utilizado": 5.4
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 48,
+    "metrado_utilizado": 20.01
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 42,
+    "metrado_utilizado": 0.8
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 55,
+    "metrado_utilizado": 20.61
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 65,
+    "metrado_utilizado": 13.95
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 70,
+    "metrado_utilizado": 28.399
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 87,
+    "metrado_utilizado": 42.204
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 84,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 98,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 32,
+    "metrado_utilizado": 2.56
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 116,
+    "metrado_utilizado": 18.99
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 27,
+    "metrado_utilizado": 7.68
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 121,
+    "metrado_utilizado": 0.52
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 34,
+    "metrado_utilizado": 22.79
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 114,
+    "metrado_utilizado": 3.38
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 48,
+    "metrado_utilizado": 9.03
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 55,
+    "metrado_utilizado": 8.24
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 65,
+    "metrado_utilizado": 12.6
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 70,
+    "metrado_utilizado": 8.59
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 87,
+    "metrado_utilizado": 9.07
+  },
+  {
+    "trabajo_id": 92,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 32,
+    "metrado_utilizado": 0.72
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 126,
+    "metrado_utilizado": 0.33
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 116,
+    "metrado_utilizado": 14.19
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 27,
+    "metrado_utilizado": 9.87
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 121,
+    "metrado_utilizado": 1.1
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 34,
+    "metrado_utilizado": 14.19
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 114,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 48,
+    "metrado_utilizado": 11.7
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 55,
+    "metrado_utilizado": 5.16
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 65,
+    "metrado_utilizado": 14.19
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 70,
+    "metrado_utilizado": 11.61
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 87,
+    "metrado_utilizado": 10.61
+  },
+  {
+    "trabajo_id": 89,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 32,
+    "metrado_utilizado": 22.71
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 126,
+    "metrado_utilizado": 6.05
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 116,
+    "metrado_utilizado": 19.05
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 27,
+    "metrado_utilizado": 10.05
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 34,
+    "metrado_utilizado": 20.96
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 114,
+    "metrado_utilizado": 4.82
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 48,
+    "metrado_utilizado": 14.31
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 55,
+    "metrado_utilizado": 7.62
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 65,
+    "metrado_utilizado": 3.06
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 70,
+    "metrado_utilizado": 8.49
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 87,
+    "metrado_utilizado": 8.02
+  },
+  {
+    "trabajo_id": 148,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 32,
+    "metrado_utilizado": 2.29
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 126,
+    "metrado_utilizado": 0.55
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 116,
+    "metrado_utilizado": 3.12
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 27,
+    "metrado_utilizado": 2.18
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 34,
+    "metrado_utilizado": 3.43
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 114,
+    "metrado_utilizado": 0.49
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 48,
+    "metrado_utilizado": 10.42
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 55,
+    "metrado_utilizado": 1.23
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 65,
+    "metrado_utilizado": 0.81
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 70,
+    "metrado_utilizado": 2.46
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 87,
+    "metrado_utilizado": 2.35
+  },
+  {
+    "trabajo_id": 106,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 32,
+    "metrado_utilizado": 1.13
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 126,
+    "metrado_utilizado": 0.18
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 48,
+    "metrado_utilizado": 1.96
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 55,
+    "metrado_utilizado": 0.57
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 65,
+    "metrado_utilizado": 1.26
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 70,
+    "metrado_utilizado": 1.2
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 87,
+    "metrado_utilizado": 0.93
+  },
+  {
+    "trabajo_id": 187,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 32,
+    "metrado_utilizado": 1.28
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 126,
+    "metrado_utilizado": 0.95
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 116,
+    "metrado_utilizado": 5.73
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 27,
+    "metrado_utilizado": 2.69
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 121,
+    "metrado_utilizado": 1.51
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 34,
+    "metrado_utilizado": 6.87
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 114,
+    "metrado_utilizado": 1.99
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 48,
+    "metrado_utilizado": 1.56
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 55,
+    "metrado_utilizado": 6.84
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 65,
+    "metrado_utilizado": 5.14
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 70,
+    "metrado_utilizado": 6.79
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 87,
+    "metrado_utilizado": 4.58
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 84,
+    "metrado_utilizado": 6.32
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 94,
+    "metrado_utilizado": 10.4
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 97,
+    "partida_id": 133,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 32,
+    "metrado_utilizado": 17.35
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 126,
+    "metrado_utilizado": 6.21
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 116,
+    "metrado_utilizado": 5.75
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 27,
+    "metrado_utilizado": 5.28
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 121,
+    "metrado_utilizado": 3.91
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 34,
+    "metrado_utilizado": 6.9
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 114,
+    "metrado_utilizado": 2.21
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 48,
+    "metrado_utilizado": 8.51
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 55,
+    "metrado_utilizado": 11.7
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 70,
+    "metrado_utilizado": 3.88
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 87,
+    "metrado_utilizado": 4.28
+  },
+  {
+    "trabajo_id": 167,
+    "partida_id": 91,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 48,
+    "metrado_utilizado": 5.13
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 55,
+    "metrado_utilizado": 9.72
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 65,
+    "metrado_utilizado": 20.04
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 70,
+    "metrado_utilizado": 3.14
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 99,
+    "metrado_utilizado": 47.7
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 96,
+    "metrado_utilizado": 7.75
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 133,
+    "metrado_utilizado": 31.11
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 134,
+    "metrado_utilizado": 17.86
+  },
+  {
+    "trabajo_id": 102,
+    "partida_id": 145,
+    "metrado_utilizado": 3.15
+  },
+  {
+    "trabajo_id": 94,
+    "partida_id": 154,
+    "metrado_utilizado": 392.35
+  },
+  {
+    "trabajo_id": 94,
+    "partida_id": 202,
+    "metrado_utilizado": 224.12
+  },
+  {
+    "trabajo_id": 105,
+    "partida_id": 154,
+    "metrado_utilizado": 119.81
+  },
+  {
+    "trabajo_id": 105,
+    "partida_id": 202,
+    "metrado_utilizado": 59.85
+  },
+  {
+    "trabajo_id": 100,
+    "partida_id": 154,
+    "metrado_utilizado": 178.54
+  },
+  {
+    "trabajo_id": 100,
+    "partida_id": 202,
+    "metrado_utilizado": 72.6
+  },
+  {
+    "trabajo_id": 113,
+    "partida_id": 154,
+    "metrado_utilizado": 107.55
+  },
+  {
+    "trabajo_id": 113,
+    "partida_id": 202,
+    "metrado_utilizado": 95.28
+  },
+  {
+    "trabajo_id": 130,
+    "partida_id": 154,
+    "metrado_utilizado": 61.56
+  },
+  {
+    "trabajo_id": 130,
+    "partida_id": 202,
+    "metrado_utilizado": 34.7
+  },
+  {
+    "trabajo_id": 109,
+    "partida_id": 154,
+    "metrado_utilizado": 54.82
+  },
+  {
+    "trabajo_id": 109,
+    "partida_id": 202,
+    "metrado_utilizado": 13.59
+  },
+  {
+    "trabajo_id": 104,
+    "partida_id": 154,
+    "metrado_utilizado": 70.9
+  },
+  {
+    "trabajo_id": 104,
+    "partida_id": 202,
+    "metrado_utilizado": 21.59
+  },
+  {
+    "trabajo_id": 117,
+    "partida_id": 154,
+    "metrado_utilizado": 93.19
+  },
+  {
+    "trabajo_id": 117,
+    "partida_id": 202,
+    "metrado_utilizado": 59.2
+  },
+  {
+    "trabajo_id": 134,
+    "partida_id": 155,
+    "metrado_utilizado": 233.79
+  },
+  {
+    "trabajo_id": 114,
+    "partida_id": 170,
+    "metrado_utilizado": 327.61
+  },
+  {
+    "trabajo_id": 114,
+    "partida_id": 176,
+    "metrado_utilizado": 36.82
+  },
+  {
+    "trabajo_id": 114,
+    "partida_id": 196,
+    "metrado_utilizado": 17.55
+  },
+  {
+    "trabajo_id": 118,
+    "partida_id": 170,
+    "metrado_utilizado": 74.66
+  },
+  {
+    "trabajo_id": 118,
+    "partida_id": 176,
+    "metrado_utilizado": 50.46
+  },
+  {
+    "trabajo_id": 118,
+    "partida_id": 196,
+    "metrado_utilizado": 16.07
+  },
+  {
+    "trabajo_id": 122,
+    "partida_id": 170,
+    "metrado_utilizado": 61.5
+  },
+  {
+    "trabajo_id": 122,
+    "partida_id": 176,
+    "metrado_utilizado": 77.59
+  },
+  {
+    "trabajo_id": 122,
+    "partida_id": 196,
+    "metrado_utilizado": 44.64
+  },
+  {
+    "trabajo_id": 125,
+    "partida_id": 170,
+    "metrado_utilizado": 76.16
+  },
+  {
+    "trabajo_id": 125,
+    "partida_id": 176,
+    "metrado_utilizado": 6.21
+  },
+  {
+    "trabajo_id": 125,
+    "partida_id": 196,
+    "metrado_utilizado": 9.1
+  },
+  {
+    "trabajo_id": 120,
+    "partida_id": 170,
+    "metrado_utilizado": 32.73
+  },
+  {
+    "trabajo_id": 115,
+    "partida_id": 176,
+    "metrado_utilizado": 13
+  },
+  {
+    "trabajo_id": 115,
+    "partida_id": 196,
+    "metrado_utilizado": 16.79
+  },
+  {
+    "trabajo_id": 116,
+    "partida_id": 170,
+    "metrado_utilizado": 12.05
+  },
+  {
+    "trabajo_id": 116,
+    "partida_id": 176,
+    "metrado_utilizado": 6.65
+  },
+  {
+    "trabajo_id": 116,
+    "partida_id": 177,
+    "metrado_utilizado": 54
+  },
+  {
+    "trabajo_id": 116,
+    "partida_id": 184,
+    "metrado_utilizado": 7.68
+  },
+  {
+    "trabajo_id": 116,
+    "partida_id": 196,
+    "metrado_utilizado": 8.5
+  },
+  {
+    "trabajo_id": 112,
+    "partida_id": 170,
+    "metrado_utilizado": 26.87
+  },
+  {
+    "trabajo_id": 112,
+    "partida_id": 176,
+    "metrado_utilizado": 17.66
+  },
+  {
+    "trabajo_id": 112,
+    "partida_id": 196,
+    "metrado_utilizado": 23.41
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 176,
+    "metrado_utilizado": 46.95
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 173,
+    "metrado_utilizado": 64.5
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 191,
+    "metrado_utilizado": 228.75
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 183,
+    "metrado_utilizado": 27.17
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 189,
+    "metrado_utilizado": 228.75
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 180,
+    "metrado_utilizado": 68.63
+  },
+  {
+    "trabajo_id": 119,
+    "partida_id": 196,
+    "metrado_utilizado": 53.8
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 161,
+    "metrado_utilizado": 105.48
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 168,
+    "metrado_utilizado": 382.86
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 163,
+    "metrado_utilizado": 225.04
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 167,
+    "metrado_utilizado": 402.44
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 166,
+    "metrado_utilizado": 123.29
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 162,
+    "metrado_utilizado": 290.68
+  },
+  {
+    "trabajo_id": 110,
+    "partida_id": 178,
+    "metrado_utilizado": 373.81
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 161,
+    "metrado_utilizado": 23.82
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 168,
+    "metrado_utilizado": 49.5
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 163,
+    "metrado_utilizado": 45.37
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 167,
+    "metrado_utilizado": 223.43
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 166,
+    "metrado_utilizado": 37.94
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 162,
+    "metrado_utilizado": 126.31
+  },
+  {
+    "trabajo_id": 128,
+    "partida_id": 178,
+    "metrado_utilizado": 212.58
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 168,
+    "metrado_utilizado": 125.56
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 163,
+    "metrado_utilizado": 151.61
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 167,
+    "metrado_utilizado": 204.94
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 166,
+    "metrado_utilizado": 49.12
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 162,
+    "metrado_utilizado": 101.86
+  },
+  {
+    "trabajo_id": 123,
+    "partida_id": 178,
+    "metrado_utilizado": 70.14
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 161,
+    "metrado_utilizado": 32.59
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 168,
+    "metrado_utilizado": 174.25
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 163,
+    "metrado_utilizado": 211.31
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 167,
+    "metrado_utilizado": 175.22
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 166,
+    "metrado_utilizado": 37.25
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 162,
+    "metrado_utilizado": 147.45
+  },
+  {
+    "trabajo_id": 132,
+    "partida_id": 178,
+    "metrado_utilizado": 108.77
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 168,
+    "metrado_utilizado": 81.57
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 163,
+    "metrado_utilizado": 31.29
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 167,
+    "metrado_utilizado": 29.95
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 166,
+    "metrado_utilizado": 9.69
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 162,
+    "metrado_utilizado": 12.8
+  },
+  {
+    "trabajo_id": 107,
+    "partida_id": 178,
+    "metrado_utilizado": 54.15
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 168,
+    "metrado_utilizado": 38.53
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 163,
+    "metrado_utilizado": 24.64
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 167,
+    "metrado_utilizado": 22.7
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 166,
+    "metrado_utilizado": 5.58
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 162,
+    "metrado_utilizado": 13.8
+  },
+  {
+    "trabajo_id": 108,
+    "partida_id": 178,
+    "metrado_utilizado": 10.15
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 168,
+    "metrado_utilizado": 111.18
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 163,
+    "metrado_utilizado": 86.14
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 167,
+    "metrado_utilizado": 138.85
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 166,
+    "metrado_utilizado": 41.85
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 158,
+    "metrado_utilizado": 31.46
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 162,
+    "metrado_utilizado": 30.95
+  },
+  {
+    "trabajo_id": 124,
+    "partida_id": 178,
+    "metrado_utilizado": 45.84
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 161,
+    "metrado_utilizado": 54.23
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 168,
+    "metrado_utilizado": 118.69
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 163,
+    "metrado_utilizado": 161.02
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 167,
+    "metrado_utilizado": 149.94
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 166,
+    "metrado_utilizado": 17.45
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 162,
+    "metrado_utilizado": 81.8
+  },
+  {
+    "trabajo_id": 131,
+    "partida_id": 178,
+    "metrado_utilizado": 56.04
+  },
+  {
+    "trabajo_id": 141,
+    "partida_id": 167,
+    "metrado_utilizado": 179.57
+  },
+  {
+    "trabajo_id": 141,
+    "partida_id": 186,
+    "metrado_utilizado": 39.6
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 171,
+    "metrado_utilizado": 40.6
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 174,
+    "metrado_utilizado": 287.01
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 181,
+    "metrado_utilizado": 0
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 193,
+    "metrado_utilizado": 105.48
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 190,
+    "metrado_utilizado": 4.56
+  },
+  {
+    "trabajo_id": 133,
+    "partida_id": 197,
+    "metrado_utilizado": 178.88
+  },
+  {
+    "trabajo_id": 165,
+    "partida_id": 181,
+    "metrado_utilizado": 74.66
+  },
+  {
+    "trabajo_id": 165,
+    "partida_id": 193,
+    "metrado_utilizado": 23.82
+  },
+  {
+    "trabajo_id": 165,
+    "partida_id": 197,
+    "metrado_utilizado": 48.95
+  },
+  {
+    "trabajo_id": 136,
+    "partida_id": 174,
+    "metrado_utilizado": 61.5
+  },
+  {
+    "trabajo_id": 136,
+    "partida_id": 192,
+    "metrado_utilizado": 9.1
+  },
+  {
+    "trabajo_id": 136,
+    "partida_id": 197,
+    "metrado_utilizado": 31.58
+  },
+  {
+    "trabajo_id": 155,
+    "partida_id": 171,
+    "metrado_utilizado": 8.63
+  },
+  {
+    "trabajo_id": 155,
+    "partida_id": 181,
+    "metrado_utilizado": 67.53
+  },
+  {
+    "trabajo_id": 155,
+    "partida_id": 193,
+    "metrado_utilizado": 32.59
+  },
+  {
+    "trabajo_id": 155,
+    "partida_id": 192,
+    "metrado_utilizado": 5.89
+  },
+  {
+    "trabajo_id": 155,
+    "partida_id": 197,
+    "metrado_utilizado": 63.45
+  },
+  {
+    "trabajo_id": 181,
+    "partida_id": 171,
+    "metrado_utilizado": 32.73
+  },
+  {
+    "trabajo_id": 181,
+    "partida_id": 190,
+    "metrado_utilizado": 3.06
+  },
+  {
+    "trabajo_id": 181,
+    "partida_id": 192,
+    "metrado_utilizado": 24
+  },
+  {
+    "trabajo_id": 162,
+    "partida_id": 171,
+    "metrado_utilizado": 2.25
+  },
+  {
+    "trabajo_id": 162,
+    "partida_id": 181,
+    "metrado_utilizado": 9.8
+  },
+  {
+    "trabajo_id": 162,
+    "partida_id": 190,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 162,
+    "partida_id": 192,
+    "metrado_utilizado": 5.35
+  },
+  {
+    "trabajo_id": 162,
+    "partida_id": 197,
+    "metrado_utilizado": 12.1
+  },
+  {
+    "trabajo_id": 169,
+    "partida_id": 171,
+    "metrado_utilizado": 26.87
+  },
+  {
+    "trabajo_id": 169,
+    "partida_id": 193,
+    "metrado_utilizado": 54.23
+  },
+  {
+    "trabajo_id": 169,
+    "partida_id": 190,
+    "metrado_utilizado": 3.58
+  },
+  {
+    "trabajo_id": 169,
+    "partida_id": 192,
+    "metrado_utilizado": 26.13
+  },
+  {
+    "trabajo_id": 173,
+    "partida_id": 225,
+    "metrado_utilizado": 382.86
+  },
+  {
+    "trabajo_id": 173,
+    "partida_id": 227,
+    "metrado_utilizado": 225.04
+  },
+  {
+    "trabajo_id": 173,
+    "partida_id": 220,
+    "metrado_utilizado": 402.44
+  },
+  {
+    "trabajo_id": 173,
+    "partida_id": 238,
+    "metrado_utilizado": 123.29
+  },
+  {
+    "trabajo_id": 173,
+    "partida_id": 223,
+    "metrado_utilizado": 373.81
+  },
+  {
+    "trabajo_id": 150,
+    "partida_id": 225,
+    "metrado_utilizado": 49.5
+  },
+  {
+    "trabajo_id": 150,
+    "partida_id": 227,
+    "metrado_utilizado": 45.37
+  },
+  {
+    "trabajo_id": 150,
+    "partida_id": 220,
+    "metrado_utilizado": 223.43
+  },
+  {
+    "trabajo_id": 150,
+    "partida_id": 238,
+    "metrado_utilizado": 37.94
+  },
+  {
+    "trabajo_id": 150,
+    "partida_id": 223,
+    "metrado_utilizado": 212.58
+  },
+  {
+    "trabajo_id": 166,
+    "partida_id": 225,
+    "metrado_utilizado": 125.56
+  },
+  {
+    "trabajo_id": 166,
+    "partida_id": 227,
+    "metrado_utilizado": 151.61
+  },
+  {
+    "trabajo_id": 166,
+    "partida_id": 220,
+    "metrado_utilizado": 204.94
+  },
+  {
+    "trabajo_id": 166,
+    "partida_id": 238,
+    "metrado_utilizado": 49.12
+  },
+  {
+    "trabajo_id": 166,
+    "partida_id": 223,
+    "metrado_utilizado": 70.14
+  },
+  {
+    "trabajo_id": 160,
+    "partida_id": 225,
+    "metrado_utilizado": 174.25
+  },
+  {
+    "trabajo_id": 160,
+    "partida_id": 227,
+    "metrado_utilizado": 211.31
+  },
+  {
+    "trabajo_id": 160,
+    "partida_id": 220,
+    "metrado_utilizado": 175.22
+  },
+  {
+    "trabajo_id": 160,
+    "partida_id": 238,
+    "metrado_utilizado": 37.25
+  },
+  {
+    "trabajo_id": 160,
+    "partida_id": 223,
+    "metrado_utilizado": 140.23
+  },
+  {
+    "trabajo_id": 172,
+    "partida_id": 225,
+    "metrado_utilizado": 81.57
+  },
+  {
+    "trabajo_id": 172,
+    "partida_id": 227,
+    "metrado_utilizado": 31.29
+  },
+  {
+    "trabajo_id": 172,
+    "partida_id": 220,
+    "metrado_utilizado": 29.95
+  },
+  {
+    "trabajo_id": 172,
+    "partida_id": 238,
+    "metrado_utilizado": 9.69
+  },
+  {
+    "trabajo_id": 172,
+    "partida_id": 223,
+    "metrado_utilizado": 54.15
+  },
+  {
+    "trabajo_id": 170,
+    "partida_id": 225,
+    "metrado_utilizado": 38.53
+  },
+  {
+    "trabajo_id": 170,
+    "partida_id": 227,
+    "metrado_utilizado": 24.64
+  },
+  {
+    "trabajo_id": 170,
+    "partida_id": 220,
+    "metrado_utilizado": 22.7
+  },
+  {
+    "trabajo_id": 170,
+    "partida_id": 238,
+    "metrado_utilizado": 5.58
+  },
+  {
+    "trabajo_id": 170,
+    "partida_id": 223,
+    "metrado_utilizado": 10.15
+  },
+  {
+    "trabajo_id": 153,
+    "partida_id": 225,
+    "metrado_utilizado": 111.18
+  },
+  {
+    "trabajo_id": 153,
+    "partida_id": 227,
+    "metrado_utilizado": 86.14
+  },
+  {
+    "trabajo_id": 153,
+    "partida_id": 220,
+    "metrado_utilizado": 138.85
+  },
+  {
+    "trabajo_id": 153,
+    "partida_id": 238,
+    "metrado_utilizado": 41.85
+  },
+  {
+    "trabajo_id": 153,
+    "partida_id": 223,
+    "metrado_utilizado": 45.84
+  },
+  {
+    "trabajo_id": 158,
+    "partida_id": 225,
+    "metrado_utilizado": 118.69
+  },
+  {
+    "trabajo_id": 158,
+    "partida_id": 227,
+    "metrado_utilizado": 161.02
+  },
+  {
+    "trabajo_id": 158,
+    "partida_id": 220,
+    "metrado_utilizado": 149.94
+  },
+  {
+    "trabajo_id": 158,
+    "partida_id": 238,
+    "metrado_utilizado": 17.45
+  },
+  {
+    "trabajo_id": 158,
+    "partida_id": 223,
+    "metrado_utilizado": 56.04
+  },
+  {
+    "trabajo_id": 183,
+    "partida_id": 220,
+    "metrado_utilizado": 179.57
+  },
+  {
+    "trabajo_id": 202,
+    "partida_id": 129,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 202,
+    "partida_id": 136,
+    "metrado_utilizado": 16
+  },
+  {
+    "trabajo_id": 202,
+    "partida_id": 135,
+    "metrado_utilizado": 357
+  },
+  {
+    "trabajo_id": 202,
+    "partida_id": 142,
+    "metrado_utilizado": 358.4
+  },
+  {
+    "trabajo_id": 202,
+    "partida_id": 131,
+    "metrado_utilizado": 16
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 146,
+    "metrado_utilizado": 49.2
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 140,
+    "metrado_utilizado": 21
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 148,
+    "metrado_utilizado": 189
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 149,
+    "metrado_utilizado": 36.6
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 150,
+    "metrado_utilizado": 36
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 156,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 174,
+    "partida_id": 153,
+    "metrado_utilizado": 102.4
+  },
+  {
+    "trabajo_id": 168,
+    "partida_id": 201,
+    "metrado_utilizado": 453.18
+  },
+  {
+    "trabajo_id": 182,
+    "partida_id": 201,
+    "metrado_utilizado": 128.79
+  },
+  {
+    "trabajo_id": 179,
+    "partida_id": 179,
+    "metrado_utilizado": 290.85
+  },
+  {
+    "trabajo_id": 191,
+    "partida_id": 175,
+    "metrado_utilizado": 147.8
+  },
+  {
+    "trabajo_id": 177,
+    "partida_id": 233,
+    "metrado_utilizado": 32.62
+  },
+  {
+    "trabajo_id": 177,
+    "partida_id": 228,
+    "metrado_utilizado": 21.8
+  },
+  {
+    "trabajo_id": 189,
+    "partida_id": 203,
+    "metrado_utilizado": 11.44
+  },
+  {
+    "trabajo_id": 189,
+    "partida_id": 210,
+    "metrado_utilizado": 2.7
+  },
+  {
+    "trabajo_id": 189,
+    "partida_id": 228,
+    "metrado_utilizado": 28.8
+  },
+  {
+    "trabajo_id": 185,
+    "partida_id": 212,
+    "metrado_utilizado": 2.34
+  },
+  {
+    "trabajo_id": 185,
+    "partida_id": 203,
+    "metrado_utilizado": 26.26
+  },
+  {
+    "trabajo_id": 185,
+    "partida_id": 218,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 175,
+    "partida_id": 228,
+    "metrado_utilizado": 8.4
+  },
+  {
+    "trabajo_id": 190,
+    "partida_id": 226,
+    "metrado_utilizado": 117.6
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 213,
+    "metrado_utilizado": 11
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 324,
+    "metrado_utilizado": 19.28
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 206,
+    "metrado_utilizado": 10.82
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 200,
+    "metrado_utilizado": 41.1
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 207,
+    "metrado_utilizado": 20.76
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 216,
+    "metrado_utilizado": 48
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 215,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 171,
+    "partida_id": 214,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 199,
+    "metrado_utilizado": 5.46
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 324,
+    "metrado_utilizado": 4.84
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 200,
+    "metrado_utilizado": 10.3
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 216,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 215,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 194,
+    "partida_id": 214,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 213,
+    "metrado_utilizado": 3.08
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 199,
+    "metrado_utilizado": 2.39
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 324,
+    "metrado_utilizado": 2.25
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 200,
+    "metrado_utilizado": 7.72
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 216,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 215,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 206,
+    "partida_id": 214,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 188,
+    "partida_id": 324,
+    "metrado_utilizado": 16.38
+  },
+  {
+    "trabajo_id": 188,
+    "partida_id": 206,
+    "metrado_utilizado": 20.9
+  },
+  {
+    "trabajo_id": 188,
+    "partida_id": 200,
+    "metrado_utilizado": 37.28
+  },
+  {
+    "trabajo_id": 188,
+    "partida_id": 216,
+    "metrado_utilizado": 28
+  },
+  {
+    "trabajo_id": 188,
+    "partida_id": 214,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 180,
+    "partida_id": 324,
+    "metrado_utilizado": 4.95
+  },
+  {
+    "trabajo_id": 180,
+    "partida_id": 200,
+    "metrado_utilizado": 4.95
+  },
+  {
+    "trabajo_id": 180,
+    "partida_id": 216,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 180,
+    "partida_id": 214,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 196,
+    "partida_id": 324,
+    "metrado_utilizado": 2.34
+  },
+  {
+    "trabajo_id": 196,
+    "partida_id": 200,
+    "metrado_utilizado": 2.34
+  },
+  {
+    "trabajo_id": 196,
+    "partida_id": 216,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 196,
+    "partida_id": 214,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 203,
+    "partida_id": 324,
+    "metrado_utilizado": 4.43
+  },
+  {
+    "trabajo_id": 203,
+    "partida_id": 200,
+    "metrado_utilizado": 4.43
+  },
+  {
+    "trabajo_id": 203,
+    "partida_id": 216,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 203,
+    "partida_id": 214,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 192,
+    "partida_id": 324,
+    "metrado_utilizado": 18.58
+  },
+  {
+    "trabajo_id": 192,
+    "partida_id": 200,
+    "metrado_utilizado": 18.58
+  },
+  {
+    "trabajo_id": 192,
+    "partida_id": 216,
+    "metrado_utilizado": 32
+  },
+  {
+    "trabajo_id": 192,
+    "partida_id": 214,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 197,
+    "partida_id": 209,
+    "metrado_utilizado": 37.24
+  },
+  {
+    "trabajo_id": 197,
+    "partida_id": 222,
+    "metrado_utilizado": 55.52
+  },
+  {
+    "trabajo_id": 215,
+    "partida_id": 209,
+    "metrado_utilizado": 57.55
+  },
+  {
+    "trabajo_id": 215,
+    "partida_id": 222,
+    "metrado_utilizado": 19.89
+  },
+  {
+    "trabajo_id": 184,
+    "partida_id": 222,
+    "metrado_utilizado": 45.5
+  },
+  {
+    "trabajo_id": 207,
+    "partida_id": 209,
+    "metrado_utilizado": 10.08
+  },
+  {
+    "trabajo_id": 207,
+    "partida_id": 222,
+    "metrado_utilizado": 21.27
+  },
+  {
+    "trabajo_id": 220,
+    "partida_id": 222,
+    "metrado_utilizado": 6.9
+  },
+  {
+    "trabajo_id": 195,
+    "partida_id": 222,
+    "metrado_utilizado": 2.44
+  },
+  {
+    "trabajo_id": 241,
+    "partida_id": 222,
+    "metrado_utilizado": 3.98
+  },
+  {
+    "trabajo_id": 186,
+    "partida_id": 222,
+    "metrado_utilizado": 8.71
+  },
+  {
+    "trabajo_id": 208,
+    "partida_id": 31,
+    "metrado_utilizado": 109.27
+  },
+  {
+    "trabajo_id": 208,
+    "partida_id": 113,
+    "metrado_utilizado": 18.23
+  },
+  {
+    "trabajo_id": 208,
+    "partida_id": 111,
+    "metrado_utilizado": 33.36
+  },
+  {
+    "trabajo_id": 208,
+    "partida_id": 112,
+    "metrado_utilizado": 113.8
+  },
+  {
+    "trabajo_id": 201,
+    "partida_id": 31,
+    "metrado_utilizado": 78.97
+  },
+  {
+    "trabajo_id": 201,
+    "partida_id": 113,
+    "metrado_utilizado": 17.15
+  },
+  {
+    "trabajo_id": 201,
+    "partida_id": 111,
+    "metrado_utilizado": 7.52
+  },
+  {
+    "trabajo_id": 201,
+    "partida_id": 112,
+    "metrado_utilizado": 77.28
+  },
+  {
+    "trabajo_id": 222,
+    "partida_id": 31,
+    "metrado_utilizado": 68.84
+  },
+  {
+    "trabajo_id": 222,
+    "partida_id": 113,
+    "metrado_utilizado": 8.7
+  },
+  {
+    "trabajo_id": 222,
+    "partida_id": 111,
+    "metrado_utilizado": 17.52
+  },
+  {
+    "trabajo_id": 222,
+    "partida_id": 112,
+    "metrado_utilizado": 75.18
+  },
+  {
+    "trabajo_id": 199,
+    "partida_id": 31,
+    "metrado_utilizado": 105.01
+  },
+  {
+    "trabajo_id": 199,
+    "partida_id": 113,
+    "metrado_utilizado": 15.75
+  },
+  {
+    "trabajo_id": 199,
+    "partida_id": 111,
+    "metrado_utilizado": 17.15
+  },
+  {
+    "trabajo_id": 199,
+    "partida_id": 112,
+    "metrado_utilizado": 111.58
+  },
+  {
+    "trabajo_id": 178,
+    "partida_id": 31,
+    "metrado_utilizado": 21.49
+  },
+  {
+    "trabajo_id": 178,
+    "partida_id": 113,
+    "metrado_utilizado": 1.94
+  },
+  {
+    "trabajo_id": 178,
+    "partida_id": 111,
+    "metrado_utilizado": 6.44
+  },
+  {
+    "trabajo_id": 178,
+    "partida_id": 112,
+    "metrado_utilizado": 24.44
+  },
+  {
+    "trabajo_id": 205,
+    "partida_id": 31,
+    "metrado_utilizado": 5.4
+  },
+  {
+    "trabajo_id": 205,
+    "partida_id": 113,
+    "metrado_utilizado": 0.33
+  },
+  {
+    "trabajo_id": 205,
+    "partida_id": 111,
+    "metrado_utilizado": 2.5
+  },
+  {
+    "trabajo_id": 205,
+    "partida_id": 112,
+    "metrado_utilizado": 6.32
+  },
+  {
+    "trabajo_id": 213,
+    "partida_id": 31,
+    "metrado_utilizado": 49.98
+  },
+  {
+    "trabajo_id": 213,
+    "partida_id": 113,
+    "metrado_utilizado": 5.25
+  },
+  {
+    "trabajo_id": 213,
+    "partida_id": 111,
+    "metrado_utilizado": 2.48
+  },
+  {
+    "trabajo_id": 213,
+    "partida_id": 112,
+    "metrado_utilizado": 55.91
+  },
+  {
+    "trabajo_id": 198,
+    "partida_id": 31,
+    "metrado_utilizado": 40.05
+  },
+  {
+    "trabajo_id": 198,
+    "partida_id": 113,
+    "metrado_utilizado": 3.58
+  },
+  {
+    "trabajo_id": 198,
+    "partida_id": 111,
+    "metrado_utilizado": 10.41
+  },
+  {
+    "trabajo_id": 198,
+    "partida_id": 112,
+    "metrado_utilizado": 45.59
+  },
+  {
+    "trabajo_id": 237,
+    "partida_id": 31,
+    "metrado_utilizado": 1153.8
+  },
+  {
+    "trabajo_id": 237,
+    "partida_id": 113,
+    "metrado_utilizado": 94.21
+  },
+  {
+    "trabajo_id": 238,
+    "partida_id": 235,
+    "metrado_utilizado": 312.4
+  },
+  {
+    "trabajo_id": 230,
+    "partida_id": 235,
+    "metrado_utilizado": 56.8
+  },
+  {
+    "trabajo_id": 204,
+    "partida_id": 235,
+    "metrado_utilizado": 213.5
+  },
+  {
+    "trabajo_id": 226,
+    "partida_id": 235,
+    "metrado_utilizado": 6.8
+  },
+  {
+    "trabajo_id": 224,
+    "partida_id": 235,
+    "metrado_utilizado": 95.2
+  },
+  {
+    "trabajo_id": 228,
+    "partida_id": 235,
+    "metrado_utilizado": 44.4
+  },
+  {
+    "trabajo_id": 254,
+    "partida_id": 235,
+    "metrado_utilizado": 41.6
+  },
+  {
+    "trabajo_id": 214,
+    "partida_id": 235,
+    "metrado_utilizado": 144
+  },
+  {
+    "trabajo_id": 200,
+    "partida_id": 237,
+    "metrado_utilizado": 148.57
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 299,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 295,
+    "metrado_utilizado": 26.05
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 296,
+    "metrado_utilizado": 0.96
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 301,
+    "metrado_utilizado": 14.4
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 316,
+    "metrado_utilizado": 187.92
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 319,
+    "metrado_utilizado": 37.37
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 322,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 320,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 311,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 315,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 310,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 317,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 326,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 333,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 328,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 217,
+    "partida_id": 340,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 299,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 295,
+    "metrado_utilizado": 17.7
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 296,
+    "metrado_utilizado": 0.96
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 301,
+    "metrado_utilizado": 14.4
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 316,
+    "metrado_utilizado": 187.91
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 319,
+    "metrado_utilizado": 14.95
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 322,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 320,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 311,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 315,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 310,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 317,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 326,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 333,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 328,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 209,
+    "partida_id": 340,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 299,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 295,
+    "metrado_utilizado": 6.85
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 296,
+    "metrado_utilizado": 0.48
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 301,
+    "metrado_utilizado": 7.2
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 316,
+    "metrado_utilizado": 93.96
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 311,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 310,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 317,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 326,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 328,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 193,
+    "partida_id": 340,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 299,
+    "metrado_utilizado": 29.1
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 295,
+    "metrado_utilizado": 23.95
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 296,
+    "metrado_utilizado": 0.36
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 301,
+    "metrado_utilizado": 5.4
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 316,
+    "metrado_utilizado": 72.37
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 319,
+    "metrado_utilizado": 15.99
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 320,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 311,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 315,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 310,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 317,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 326,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 333,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 328,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 227,
+    "partida_id": 340,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 311,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 315,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 310,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 317,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 326,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 333,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 328,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 259,
+    "partida_id": 340,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 296,
+    "metrado_utilizado": 0.48
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 301,
+    "metrado_utilizado": 7.2
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 316,
+    "metrado_utilizado": 93.96
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 311,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 315,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 310,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 317,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 326,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 333,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 328,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 223,
+    "partida_id": 340,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 319,
+    "metrado_utilizado": 19.18
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 322,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 320,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 311,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 315,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 310,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 317,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 326,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 333,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 328,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 211,
+    "partida_id": 340,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 289,
+    "metrado_utilizado": 16.34
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 299,
+    "metrado_utilizado": 22.5
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 295,
+    "metrado_utilizado": 28
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 294,
+    "metrado_utilizado": 48.1
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 290,
+    "metrado_utilizado": 75.9
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 286,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 302,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 309,
+    "metrado_utilizado": 2.1
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 293,
+    "metrado_utilizado": 15.65
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 304,
+    "metrado_utilizado": 186.36
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 323,
+    "metrado_utilizado": 31.5
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 308,
+    "metrado_utilizado": 21
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 312,
+    "metrado_utilizado": 105
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 397,
+    "metrado_utilizado": 10.5
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 313,
+    "metrado_utilizado": 13.13
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 325,
+    "metrado_utilizado": 16.34
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 331,
+    "metrado_utilizado": 101.22
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 337,
+    "metrado_utilizado": 8.8
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 330,
+    "metrado_utilizado": 9.45
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 336,
+    "metrado_utilizado": 18.9
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 338,
+    "metrado_utilizado": 119.7
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 343,
+    "metrado_utilizado": 23
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 327,
+    "metrado_utilizado": 21
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 332,
+    "metrado_utilizado": 9
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 341,
+    "metrado_utilizado": 50
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 339,
+    "metrado_utilizado": 19
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 357,
+    "metrado_utilizado": 13
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 346,
+    "metrado_utilizado": 13
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 344,
+    "metrado_utilizado": 16
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 342,
+    "metrado_utilizado": 41
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 335,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 334,
+    "metrado_utilizado": 11
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 345,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 347,
+    "metrado_utilizado": 33
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 361,
+    "metrado_utilizado": 19
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 353,
+    "metrado_utilizado": 13
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 365,
+    "metrado_utilizado": 42.9
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 364,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 354,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 212,
+    "partida_id": 352,
+    "metrado_utilizado": 0.95
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 242,
+    "metrado_utilizado": 24
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 252,
+    "metrado_utilizado": 61.55
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 254,
+    "metrado_utilizado": 32.79
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 255,
+    "metrado_utilizado": 49.47
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 261,
+    "metrado_utilizado": 30
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 259,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 258,
+    "metrado_utilizado": 18
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 260,
+    "metrado_utilizado": 16
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 269,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 271,
+    "metrado_utilizado": 25
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 273,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 275,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 272,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 210,
+    "partida_id": 279,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 242,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 252,
+    "metrado_utilizado": 6.11
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 254,
+    "metrado_utilizado": 13.58
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 261,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 260,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 271,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 273,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 275,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 219,
+    "partida_id": 272,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 236,
+    "partida_id": 242,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 236,
+    "partida_id": 252,
+    "metrado_utilizado": 2.84
+  },
+  {
+    "trabajo_id": 236,
+    "partida_id": 254,
+    "metrado_utilizado": 11.13
+  },
+  {
+    "trabajo_id": 236,
+    "partida_id": 255,
+    "metrado_utilizado": 32.98
+  },
+  {
+    "trabajo_id": 236,
+    "partida_id": 282,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 242,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 252,
+    "metrado_utilizado": 14.51
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 254,
+    "metrado_utilizado": 18.58
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 261,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 259,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 258,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 260,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 271,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 273,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 275,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 232,
+    "partida_id": 272,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 242,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 252,
+    "metrado_utilizado": 1.68
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 271,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 273,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 275,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 218,
+    "partida_id": 272,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 242,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 252,
+    "metrado_utilizado": 7.56
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 254,
+    "metrado_utilizado": 2.94
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 261,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 259,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 258,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 260,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 271,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 273,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 275,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 272,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 278,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 280,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 277,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 216,
+    "partida_id": 281,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 242,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 252,
+    "metrado_utilizado": 14.93
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 254,
+    "metrado_utilizado": 16.31
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 261,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 259,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 258,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 260,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 271,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 273,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 275,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 235,
+    "partida_id": 272,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 242,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 252,
+    "metrado_utilizado": 3.78
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 254,
+    "metrado_utilizado": 86.31
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 249,
+    "metrado_utilizado": 78.24
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 247,
+    "metrado_utilizado": 25.42
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 253,
+    "metrado_utilizado": 4.73
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 261,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 258,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 260,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 262,
+    "metrado_utilizado": 30
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 265,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 270,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 263,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 266,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 268,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 274,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 247,
+    "partida_id": 276,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 236,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 232,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 246,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 240,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 264,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 275,
+    "partida_id": 256,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 303,
+    "partida_id": 229,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 303,
+    "partida_id": 232,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 303,
+    "partida_id": 234,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 303,
+    "partida_id": 264,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 303,
+    "partida_id": 256,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 234,
+    "partida_id": 240,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 234,
+    "partida_id": 256,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 253,
+    "partida_id": 229,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 253,
+    "partida_id": 232,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 253,
+    "partida_id": 234,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 253,
+    "partida_id": 264,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 253,
+    "partida_id": 256,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 242,
+    "partida_id": 240,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 280,
+    "partida_id": 234,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 280,
+    "partida_id": 240,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 280,
+    "partida_id": 244,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 285,
+    "partida_id": 229,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 285,
+    "partida_id": 246,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 285,
+    "partida_id": 264,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 285,
+    "partida_id": 256,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 233,
+    "partida_id": 245,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 425,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 427,
+    "metrado_utilizado": 24.66
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 429,
+    "metrado_utilizado": 15
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 430,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 434,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 428,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 443,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 436,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 437,
+    "metrado_utilizado": 58.55
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 454,
+    "metrado_utilizado": 10.52
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 435,
+    "metrado_utilizado": 33
+  },
+  {
+    "trabajo_id": 221,
+    "partida_id": 448,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 425,
+    "metrado_utilizado": 5.2
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 427,
+    "metrado_utilizado": 29.4
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 429,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 430,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 434,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 428,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 443,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 436,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 225,
+    "partida_id": 437,
+    "metrado_utilizado": 5.05
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 425,
+    "metrado_utilizado": 2.8
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 427,
+    "metrado_utilizado": 9
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 429,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 430,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 443,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 436,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 454,
+    "metrado_utilizado": 7.19
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 435,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 261,
+    "partida_id": 448,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 454,
+    "metrado_utilizado": 0.5
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 435,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 448,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 431,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 441,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 442,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 255,
+    "partida_id": 444,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 373,
+    "metrado_utilizado": 66
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 360,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 358,
+    "metrado_utilizado": 33
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 372,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 362,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 368,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 395,
+    "metrado_utilizado": 336.63
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 379,
+    "metrado_utilizado": 63.8
+  },
+  {
+    "trabajo_id": 231,
+    "partida_id": 380,
+    "metrado_utilizado": 37.8
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 373,
+    "metrado_utilizado": 18
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 360,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 363,
+    "metrado_utilizado": 16
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 358,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 372,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 356,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 367,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 395,
+    "metrado_utilizado": 108.13
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 378,
+    "metrado_utilizado": 19.25
+  },
+  {
+    "trabajo_id": 248,
+    "partida_id": 380,
+    "metrado_utilizado": 146.2
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 373,
+    "metrado_utilizado": 22
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 358,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 372,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 362,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 368,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 371,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 395,
+    "metrado_utilizado": 70.24
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 378,
+    "metrado_utilizado": 14.3
+  },
+  {
+    "trabajo_id": 249,
+    "partida_id": 380,
+    "metrado_utilizado": 95.66
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 373,
+    "metrado_utilizado": 29
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 363,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 358,
+    "metrado_utilizado": 23
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 372,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 356,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 368,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 395,
+    "metrado_utilizado": 171.99
+  },
+  {
+    "trabajo_id": 240,
+    "partida_id": 379,
+    "metrado_utilizado": 51.7
+  },
+  {
+    "trabajo_id": 246,
+    "partida_id": 373,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 246,
+    "partida_id": 358,
+    "metrado_utilizado": 9
+  },
+  {
+    "trabajo_id": 246,
+    "partida_id": 395,
+    "metrado_utilizado": 75.19
+  },
+  {
+    "trabajo_id": 268,
+    "partida_id": 373,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 268,
+    "partida_id": 358,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 268,
+    "partida_id": 372,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 268,
+    "partida_id": 395,
+    "metrado_utilizado": 14.14
+  },
+  {
+    "trabajo_id": 268,
+    "partida_id": 379,
+    "metrado_utilizado": 25.3
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 373,
+    "metrado_utilizado": 17
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 360,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 355,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 363,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 358,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 372,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 366,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 367,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 378,
+    "metrado_utilizado": 24.2
+  },
+  {
+    "trabajo_id": 290,
+    "partida_id": 379,
+    "metrado_utilizado": 37.73
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 373,
+    "metrado_utilizado": 17
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 358,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 372,
+    "metrado_utilizado": 7
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 356,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 395,
+    "metrado_utilizado": 103.97
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 378,
+    "metrado_utilizado": 62.15
+  },
+  {
+    "trabajo_id": 297,
+    "partida_id": 379,
+    "metrado_utilizado": 16.5
+  },
+  {
+    "trabajo_id": 252,
+    "partida_id": 372,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 252,
+    "partida_id": 356,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 252,
+    "partida_id": 374,
+    "metrado_utilizado": 24
+  },
+  {
+    "trabajo_id": 252,
+    "partida_id": 369,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 382,
+    "metrado_utilizado": 843.81
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 381,
+    "metrado_utilizado": 230
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 393,
+    "metrado_utilizado": 64.57
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 384,
+    "metrado_utilizado": 37.32
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 400,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 390,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 412,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 387,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 402,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 404,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 414,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 406,
+    "metrado_utilizado": 10
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 415,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 411,
+    "metrado_utilizado": 56
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 409,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 264,
+    "partida_id": 405,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 382,
+    "metrado_utilizado": 164.01
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 381,
+    "metrado_utilizado": 65
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 398,
+    "metrado_utilizado": 18.1
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 384,
+    "metrado_utilizado": 246.18
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 400,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 390,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 412,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 387,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 402,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 404,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 406,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 415,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 411,
+    "metrado_utilizado": 9
+  },
+  {
+    "trabajo_id": 269,
+    "partida_id": 405,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 382,
+    "metrado_utilizado": 251.44
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 381,
+    "metrado_utilizado": 81.81
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 398,
+    "metrado_utilizado": 14.4
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 384,
+    "metrado_utilizado": 176.22
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 388,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 400,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 390,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 412,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 387,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 396,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 402,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 404,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 414,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 415,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 411,
+    "metrado_utilizado": 12
+  },
+  {
+    "trabajo_id": 291,
+    "partida_id": 409,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 382,
+    "metrado_utilizado": 125.24
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 381,
+    "metrado_utilizado": 167.81
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 393,
+    "metrado_utilizado": 54.56
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 400,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 390,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 412,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 394,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 402,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 406,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 411,
+    "metrado_utilizado": 24
+  },
+  {
+    "trabajo_id": 305,
+    "partida_id": 409,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 229,
+    "partida_id": 382,
+    "metrado_utilizado": 167.42
+  },
+  {
+    "trabajo_id": 229,
+    "partida_id": 381,
+    "metrado_utilizado": 71.45
+  },
+  {
+    "trabajo_id": 229,
+    "partida_id": 409,
+    "metrado_utilizado": 4
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 382,
+    "metrado_utilizado": 126.06
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 381,
+    "metrado_utilizado": 42.41
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 393,
+    "metrado_utilizado": 39.6
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 400,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 390,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 412,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 402,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 404,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 413,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 239,
+    "partida_id": 415,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 381,
+    "metrado_utilizado": 91.74
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 398,
+    "metrado_utilizado": 22.1
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 393,
+    "metrado_utilizado": 92.62
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 400,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 392,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 390,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 412,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 387,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 402,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 404,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 414,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 406,
+    "metrado_utilizado": 8
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 415,
+    "metrado_utilizado": 5
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 409,
+    "metrado_utilizado": 6
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 405,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 250,
+    "partida_id": 416,
+    "metrado_utilizado": 3
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 382,
+    "metrado_utilizado": 342.6
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 381,
+    "metrado_utilizado": 108.24
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 393,
+    "metrado_utilizado": 12.65
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 400,
+    "metrado_utilizado": 1
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 390,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 412,
+    "metrado_utilizado": 2
+  },
+  {
+    "trabajo_id": 265,
+    "partida_id": 387,
+    "metrado_utilizado": 1
+  }
+]
