@@ -25,6 +25,13 @@ class DailyPartDepartureController {
     );
     response.status(result.statusCode).json(result);
   }
+  async getTaskWeek(request: express.Request, response: express.Response) {
+    const project_id = request.get("project-id") as string;
+    const result = await dailyPartDepartureService.taskWeekDailyPartDeparture(
+      project_id
+    );
+    response.status(result.statusCode).json(result);
+  }
 
   async allForJob(request: express.Request, response: express.Response) {
     const page = parseInt(request.query.page as string) || 1;

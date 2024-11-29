@@ -601,7 +601,7 @@ class DailyPartMOService {
         );
         if (priceHourResponse.success) {
           const priceHourMO =
-            priceHourResponse.payload as I_DailyPartWorkforcePdf;
+            priceHourResponse.payload as PrecioHoraMO;
           const detailsPriceHourMOResponse =
             await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
               priceHourMO.id
@@ -610,7 +610,6 @@ class DailyPartMOService {
             detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
 
           if(detailsPriceHourMO.length >0){
-            console.log("ya pase detalle ")
             result.forEach((element) => {
               const categoriaId = element.ManoObra?.CategoriaObrero?.id;
               if (categoriaId != null) {

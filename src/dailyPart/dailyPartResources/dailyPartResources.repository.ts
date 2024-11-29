@@ -27,4 +27,6 @@ export abstract class DailyPartResourceRepository {
   delete(daily_part_resource_id: number): void {}
 
   findAllWithOutPaginationForDailyPart(daily_part_id:number):void{}
+
+  findAllWithOutPaginationForIdsDailyPart(ids:number[]):void{}
 }

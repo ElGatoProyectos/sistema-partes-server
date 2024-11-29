@@ -9,6 +9,28 @@ import {
 import { T_FindAllDailyPartResource } from "./models/dailyPartResource.types";
 
 class PrismaDailyPartResourceRepository implements DailyPartResourceRepository {
+  async findAllWithOutPaginationForIdsDailyPart(ids: number[]): Promise<I_DailyPartResourceForPdf[] | null> {
+    const dailyParts= await prisma.parteDiarioRecurso.findMany({
+      where:{
+        ParteDiario: {
+          id: {
+            in: ids,
+          },
+        },
+      },
+      include:{
+        ParteDiario:true,
+        Recurso:{
+          include:{
+            Unidad:true,
+            IndiceUnificado:true,
+            CategoriaRecurso:true
+          }
+        }
+      }
+    })
+    return dailyParts
+  }
   async findAllWithOutPaginationForDailyPart(daily_part_id: number): Promise<I_DailyPartResourceForPdf[] | null> {
     const dailyParts= await prisma.parteDiarioRecurso.findMany({
       where:{

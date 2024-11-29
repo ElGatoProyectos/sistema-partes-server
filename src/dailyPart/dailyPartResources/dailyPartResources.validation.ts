@@ -43,6 +43,24 @@ class DailyPartResourceValidation {
       );
     }
   }
+  async findAllWithPaginationForidsDailyPart(ids: number[]): Promise<T_HttpResponse> {
+    try {
+      const dailyPartResource =
+        await prismaDailyPartResourceRepository.findAllWithOutPaginationForIdsDailyPart(
+          ids
+        );
+     
+      return httpResponse.SuccessResponse(
+        "Los Partes Diarios del Recurso por los ids de los Partes Diarios fueron encontrados",
+        dailyPartResource
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Partes Diarios del Recurso por los ids de los Partes Diarios",
+        error
+      );
+    }
+  }
 }
 
 export const dailyPartResourceValidation = new DailyPartResourceValidation();

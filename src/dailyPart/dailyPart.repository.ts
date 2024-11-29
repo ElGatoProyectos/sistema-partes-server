@@ -44,4 +44,6 @@ export abstract class DailyPartRepository {
   findAllForIds(ids: number[]): void {}
 
   deleteDailyPart(daily_part_id:number):void{}
+
+  getAllDailyPartForProject(project_id:number,date_start:Date,date_end:Date):void{}
 }
