@@ -296,13 +296,30 @@ export class ReportService {
 
     // const dailyPartsIdToday = dailyParts.map((dailyPart) => dailyPart.id);
 
+    let totalDays=[0,0,0,0,0,0,0]
     const dailyPartResourceResponse =
       await dailyPartResourceValidation.findAllWithPaginationForidsDailyPart(
         idsDailyPartWeek
       );
 
     const dailyPartResource =
-      dailyPartResourceResponse.payload as ParteDiarioRecurso[];
+      dailyPartResourceResponse.payload as I_DailyPartResourceForPdf[];
+
+    if(dailyPartResource.length>0){
+      dailyPartResource.forEach((obj) => {
+        const fechaParteDiario = obj.ParteDiario.fecha;
+       if(fechaParteDiario && fechaParteDiario != null){
+         fechas.forEach((fecha, index) => {
+          const date = new Date(fecha);
+          date.setUTCHours(0,0,0,0);
+           if (date.getTime() === fechaParteDiario.getTime() && obj.Recurso.precio != null) {
+            let suma= obj.cantidad * obj.Recurso.precio
+            totalDays[index] += suma ;
+           }
+         });
+       }
+      });
+    }
 
     //[note] acá comenzamos el proceso de buscar los datos
 
