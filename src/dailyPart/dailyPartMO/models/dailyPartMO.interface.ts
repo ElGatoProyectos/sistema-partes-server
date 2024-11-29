@@ -36,6 +36,7 @@ export interface I_Mano {
 }
 export interface I_DailyPartWorkforce extends ParteDiarioMO {
   ManoObra: I_JobAndCategoryWorkforce;
+  ParteDiario: ParteDiario
 }
 export interface I_DailyPartWorkforcePdf extends ParteDiarioMO {
   ManoObra: I_JobAndCategoryWorkforceForPdf;

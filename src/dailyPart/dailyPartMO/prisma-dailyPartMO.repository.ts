@@ -43,6 +43,7 @@ class PrismaDailyPartMORepository implements DailyPartMORepository {
             CategoriaObrero: true,
           },
         },
+        ParteDiario:true
       },
     });
     return dailyPartWorkforce;

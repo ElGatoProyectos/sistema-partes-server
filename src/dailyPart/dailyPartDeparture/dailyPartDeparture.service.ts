@@ -289,9 +289,15 @@ class DailyPartDepartureService {
         currentWeek.fecha_fin
       );
       if (!dailyParts || dailyParts.length === 0) {
+        const departuresFormat= departures.map((element) => ({
+          partida:element,
+          ejecutado_anterior: 0,
+          ejecutado_actual: 0,
+          saldo: 0,
+        }));
         return httpResponse.SuccessResponse(
-          "No hay partes diarios para la semana actual",
-          []
+          "No hay partidas en los Partes Diarios de la semana actual",
+          departuresFormat
         );
       }
   

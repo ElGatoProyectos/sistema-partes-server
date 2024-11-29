@@ -17,6 +17,8 @@ import { DailyPartPdfService } from "./dailyPartPdf.service";
 import { dailyPartReportValidation } from "../dailyPart.validation";
 import {
   I_DailyPart,
+  I_DailyPartForId,
+  I_DailyPartId,
   I_DailyPartPdf,
   I_ParteDiario,
   I_ParteDiarioPdf,
@@ -290,13 +292,23 @@ export class ReportService {
     const idsDailyPartWeek = dailysPartWeek.map((dailyPart) => dailyPart.id);
 
     //[note] acá saco los partes diarios del dia
-    const dailyParts = dailysPartWeek.filter(
+    const dailyParts:I_DailyPartForId[] = dailysPartWeek.filter(
       (dailyPart) => dailyPart.fecha?.getTime() === date.getTime()
-    );
+    ).map((dailyPart) => ({
+      id: dailyPart.id, 
+      idTrabajo: dailyPart.trabajo_id,
+      codigo_trabajo: dailyPart.Trabajo.codigo, 
+      nombre_trabajo:dailyPart.Trabajo.nombre,
+      descripcion: dailyPart.descripcion_actividad ? dailyPart.descripcion_actividad : "",
+      unidad: dailyPart.Trabajo.UnidadProduccion.nombre ? dailyPart.Trabajo.UnidadProduccion.nombre : "",
+      total: 0
+    }));
 
     // const dailyPartsIdToday = dailyParts.map((dailyPart) => dailyPart.id);
 
-    let totalDays=[0,0,0,0,0,0,0]
+    let totalDays = [0, 0, 0, 0, 0, 0, 0];
+
+    //Saco el total del recursos de la semana
     const dailyPartResourceResponse =
       await dailyPartResourceValidation.findAllWithPaginationForidsDailyPart(
         idsDailyPartWeek
@@ -305,20 +317,12 @@ export class ReportService {
     const dailyPartResource =
       dailyPartResourceResponse.payload as I_DailyPartResourceForPdf[];
 
-    if(dailyPartResource.length>0){
-      dailyPartResource.forEach((obj) => {
-        const fechaParteDiario = obj.ParteDiario.fecha;
-       if(fechaParteDiario && fechaParteDiario != null){
-         fechas.forEach((fecha, index) => {
-          const date = new Date(fecha);
-          date.setUTCHours(0,0,0,0);
-           if (date.getTime() === fechaParteDiario.getTime() && obj.Recurso.precio != null) {
-            let suma= obj.cantidad * obj.Recurso.precio
-            totalDays[index] += suma ;
-           }
-         });
-       }
-      });
+
+    if (dailyPartResource.length > 0) {
+        dailyPartResource.forEach((obj) => {
+          const fechaParteDiario = obj.ParteDiario.fecha;
+          this.calculateTotalForDate(fechaParteDiario, fechas, obj, totalDays,dailyParts);
+        });
     }
 
     //[note] acá comenzamos el proceso de buscar los datos
@@ -327,6 +331,33 @@ export class ReportService {
       .filter((dailyPart) => dailyPart.fecha?.getTime() === date.getTime())
       .map((dailyPart) => dailyPart.trabajo_id);
 
+    //[note] busco los partes diarios partida de la semana
+    const dailysPartDepartureResponse =
+      await dailyPartDepartureValidation.findAllForIdsDailyPart(
+        idsDailyPartWeek
+      );
+
+    const dailysPartsDeparture =
+      dailysPartDepartureResponse.payload as I_DailyPartDeparture[];
+
+    const dailyPartDepartureToday = dailysPartsDeparture.filter((dailyPart) => {
+      if (dailyPart.ParteDiario.fecha) {
+        const dailyPartDate = new Date(dailyPart.ParteDiario.fecha);
+        dailyPartDate.setUTCHours(0, 0, 0, 0); // Ajustar horas a cero
+
+        return dailyPartDate.getTime() === date.getTime();
+      }
+      return false;
+    });
+
+    if (dailysPartsDeparture.length > 0) {
+      dailysPartsDeparture.forEach((obj) => {
+        const fechaParteDiario = obj.ParteDiario.fecha;
+        this.calculateTotalForDeparture(fechaParteDiario, fechas, obj, totalDays,dailyParts);
+      });
+    }
+
+    ////////////esto se debe borrar
     const detailsDepartureJobsResponse =
       await departureJobValidation.findAllWithOutPaginationForIdsJob(idsJob);
     const detailsDepartureJob =
@@ -343,19 +374,7 @@ export class ReportService {
           detail.metrado_utilizado * detail.Partida.mano_de_obra_unitaria;
       });
     }
-
-    //[note] busco los partes diarios de la semana
-    const dailysPartDepartureResponse =
-      await dailyPartDepartureValidation.findAllForIdsDailyPart(
-        idsDailyPartWeek
-      );
-
-    const dailysPartsDeparture =
-      dailysPartDepartureResponse.payload as I_DailyPartDeparture[];
-
-    const dailyPartToday = dailysPartsDeparture.filter(
-      (dailyPart) => dailyPart.ParteDiario.fecha?.getTime() === date.getTime()
-    );
+    ////////////// acatermina
 
     //[note] acá busco la mano de obra de la semana
     const dailyPartWokrforceResponse =
@@ -364,7 +383,6 @@ export class ReportService {
     const dailysPartsWorkforce =
       dailyPartWokrforceResponse.payload as I_DailyPartWorkforce[];
 
-    //[note] acá busco la mano de obra de hoy
     let workforcesToday: I_DailyPartWorkforce[] = [];
     dailyParts.forEach((dailyPart) => {
       const workforces = dailysPartsWorkforce.filter((workforce) => {
@@ -379,13 +397,14 @@ export class ReportService {
     let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
 
     const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-    if (workforcesToday.length > 0 && priceHourResponse.success) {
-      detailsPriceHourMOResponse =
-        await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-          priceHourMO.id
-        );
 
-      workforcesToday.forEach((workforce) => {
+    //acá saco de cuanto fue en la semana
+    detailsPriceHourMOResponse =
+      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+        priceHourMO.id
+      );
+    if (priceHourResponse.success && dailysPartsWorkforce.length > 0) {
+      dailysPartsWorkforce.forEach((workforce) => {
         if (workforce.ManoObra.CategoriaObrero) {
           const categoriaId = workforce.ManoObra.CategoriaObrero.id;
 
@@ -396,7 +415,44 @@ export class ReportService {
             detail &&
             workforce.hora_60 != null &&
             workforce.hora_100 != null &&
-            workforce.hora_normal != null
+            workforce.hora_normal != null &&
+            workforce.ParteDiario.fecha != null
+          ) {
+            let sumaCategoryMOForDay = 0;
+            sumaCategoryMOForDay =
+              detail.hora_normal * workforce.hora_normal +
+              detail.hora_extra_60 * workforce.hora_60 +
+              detail.hora_extra_100 * workforce.hora_100;
+            fechas.forEach((fecha, index) => {
+              const date = new Date(fecha);
+              date.setUTCHours(0, 0, 0, 0);
+              const dateDailyPart = workforce.ParteDiario.fecha;
+              dateDailyPart?.setUTCHours(0, 0, 0, 0);
+              if (date.getTime() === dateDailyPart?.getTime() ) {
+                totalDays[index] += sumaCategoryMOForDay;
+              }
+            });
+          }
+        }
+      });
+    }
+
+    //acá saco cuanto es por el dia
+    if (workforcesToday.length > 0 && priceHourResponse.success) {
+      workforcesToday.forEach((workforce) => {
+        if (workforce.ManoObra.CategoriaObrero) {
+          const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+
+          const detail = detailsPriceHourMO.find(
+            (detail) => detail.categoria_obrero_id === categoriaId
+          );
+          const dailyPartFind= dailyParts.find((element)=> element.idTrabajo === workforce.ParteDiario.trabajo_id)
+
+          if (
+            detail &&
+            workforce.hora_60 != null &&
+            workforce.hora_100 != null &&
+            workforce.hora_normal != null && dailyPartFind
           ) {
             let sumaCategoryMOForDay = 0;
             totalRealWorkforceProduction +=
@@ -407,6 +463,7 @@ export class ReportService {
               detail.hora_normal * workforce.hora_normal +
               detail.hora_extra_60 * workforce.hora_60 +
               detail.hora_extra_100 * workforce.hora_100;
+            dailyPartFind.total += sumaCategoryMOForDay
             //[note] si está todo bien vamos a hacer agregarlo
             workforces.push({
               codigo: workforce.ManoObra.codigo,
@@ -461,7 +518,7 @@ export class ReportService {
       dailyPartComentaryResponse.payload as DetalleParteDiarioFoto[];
 
     //[message] creamos la imagen del primer gráfico
-    await pdfService.createImage(user_id, dailysPartWeek, fechas);
+    await pdfService.createImage(user_id, totalDays, fechas);
 
     //[message] creamos la imagen que tiene 3 lineas
     await pdfService.createImageForTripleChart(
@@ -478,7 +535,7 @@ export class ReportService {
       project,
       dailyParts,
       detailsDepartureJob,
-      dailyPartToday,
+      dailyPartDepartureToday,
       workforces,
       date,
       productionForDay,
@@ -520,6 +577,57 @@ export class ReportService {
     );
     await pdfService.createPdf(template, user_id);
   }
+
+   calculateTotalForDate(
+    fechaParteDiario: Date | null,
+    fechas: string[],
+    obj: I_DailyPartResourceForPdf,
+    totalDays: number[],
+    dailyParts: I_DailyPartForId[] 
+  ): void {
+    if (fechaParteDiario) {
+      fechaParteDiario.setUTCHours(0, 0, 0, 0);
+      fechas.forEach((fecha, index) => {
+        const date = new Date(fecha);
+        date.setUTCHours(0, 0, 0, 0);
+        const jobFind = dailyParts.find((part) => part.idTrabajo === obj.ParteDiario.trabajo_id);
+        if (
+          date.getTime() === fechaParteDiario.getTime() &&
+          obj.Recurso.precio != null && 
+          jobFind
+        ) {
+          const suma = obj.cantidad * obj.Recurso.precio;
+          totalDays[index] += suma;
+          jobFind.total != suma
+        }
+      });
+    }
+
+  }
+
+   calculateTotalForDeparture(
+    fechaParteDiario: Date | null,
+    fechas: string[],
+    obj: I_DailyPartDeparture,
+    totalDays: number[],
+    dailyParts:I_DailyPartForId[]
+  ): void {
+    if (fechaParteDiario) {
+      fechaParteDiario.setUTCHours(0, 0, 0, 0);
+      fechas.forEach((fecha, index) => {
+        const date = new Date(fecha);
+        date.setUTCHours(0, 0, 0, 0);
+        const dailyPartDepartue = dailyParts.find((part) => part.idTrabajo === obj.ParteDiario.trabajo_id);
+        if (date.getTime() === fechaParteDiario.getTime() && dailyPartDepartue) {
+          const suma = obj.Partida.precio * obj.cantidad_utilizada;
+          totalDays[index] += suma;
+          dailyPartDepartue.total != suma
+        }
+      });
+    }
+  }
+  
+  
 }
 
 export const reportService = new ReportService();
