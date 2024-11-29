@@ -31,25 +31,25 @@ export class DailyPartPdfService {
 
   async createImage(
     user_id: number,
-    dailysPart: I_ParteDiario[],
+    total: number[],
     fechas: string[]
   ) {
     const chart = new QuickChart();
 
-    const total = [0, 0, 0, 0, 0, 0, 0];
+    // const total = [0, 0, 0, 0, 0, 0, 0];
 
-    dailysPart.forEach((element) => {
-      const elementDate = element.fecha
-        ? element.fecha.toISOString().slice(0, 10)
-        : "";
-      // Buscamos la posición de la fecha en el array `fechas`
-      const index = fechas.indexOf(elementDate);
+    // dailysPart.forEach((element) => {
+    //   const elementDate = element.fecha
+    //     ? element.fecha.toISOString().slice(0, 10)
+    //     : "";
+    //   // Buscamos la posición de la fecha en el array `fechas`
+    //   const index = fechas.indexOf(elementDate);
 
-      if (index !== -1) {
-        // Si la fecha existe en el array `fechas`, sumamos el valor deseado
-        total[index] += element.Trabajo?.costo_partida || 0;
-      }
-    });
+    //   if (index !== -1) {
+    //     // Si la fecha existe en el array `fechas`, sumamos el valor deseado
+    //     total[index] += element.Trabajo?.costo_partida || 0;
+    //   }
+    // });
 
     chart
       .setConfig({

@@ -3,14 +3,14 @@ import path from "path";
 import fs from "fs";
 import appRootPath from "app-root-path";
 import { ProjectMulterProperties } from "../../src/project/models/project.constant";
-import { I_ParteDiario } from "../../src/dailyPart/models/dailyPart.interface";
+import { I_DailyPartForId } from "../../src/dailyPart/models/dailyPart.interface";
 import { I_DepartureJobForPdf } from "../../src/departure/departure-job/models/departureJob.interface";
 import { I_DailyPartDeparture } from "../../src/dailyPart/dailyPartDeparture/models/dailyPartDeparture.interface";
 
 export const TemplateHtmlInforme = async (
   user_id: number,
   project: Proyecto,
-  daily_parts: I_ParteDiario[] = [],
+  daily_parts: I_DailyPartForId[] = [],
   detailsDepartureJob: I_DepartureJobForPdf[] = [],
   dailysPartsDeparture: I_DailyPartDeparture[] = [],
   workforces: any[] = [],
@@ -55,10 +55,10 @@ export const TemplateHtmlInforme = async (
     .map((detail) => {
       return `
         <tr>
-          <td>${detail.Trabajo.codigo || "N/A"}</td>
-          <td>${detail.Trabajo?.nombre || "N/A"}</td>
-          <td>${detail.descripcion_actividad || "N/A"}</td>
-         <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+          <td>${detail.codigo_trabajo || "N/A"}</td>
+          <td>${detail.nombre_trabajo || "N/A"}</td>
+          <td>${detail.descripcion || "N/A"}</td>
+         <td>${detail.unidad || "N/A"}</td>
          
         </tr>
       `;

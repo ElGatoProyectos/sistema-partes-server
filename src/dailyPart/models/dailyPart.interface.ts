@@ -67,6 +67,15 @@ export interface I_ParteDiarioPdf extends ParteDiario {
 export interface I_ParteDiarioId extends ParteDiario {
   Trabajo: I_TrabajoForId;
 }
+export interface I_DailyPartForId {
+  id: number, 
+  idTrabajo:number,
+  codigo_trabajo: string, 
+  nombre_trabajo: string,
+  descripcion: string,
+  unidad: string,
+  total: number
+}
 
 
 
