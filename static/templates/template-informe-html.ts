@@ -247,7 +247,8 @@ const tablePhoto = `
         <tr>
           <td rowspan="2">
             <img
-              width="200"
+              width="50"
+              heigth="20"
               src=${base64TypeProject}
               alt=""
             />

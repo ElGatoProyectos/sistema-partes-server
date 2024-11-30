@@ -11,7 +11,6 @@ export const TemplateHtmlInforme = async (
   user_id: number,
   project: Proyecto,
   daily_parts: I_DailyPartForId[] = [],
-  detailsDepartureJob: I_DepartureJobForPdf[] = [],
   dailysPartsDeparture: I_DailyPartDeparture[] = [],
   workforces: any[] = [],
   date: Date,
@@ -64,16 +63,16 @@ export const TemplateHtmlInforme = async (
       `;
     })
     .join("");
-  const detailsForJob = detailsDepartureJob
+  const detailsForJob = daily_parts
     .map((detail) => {
       return `
         <tr>
-          <td>${detail.Trabajo?.codigo || "N/A"}</td>
-          <td>${detail.Trabajo?.nombre || "N/A"}</td>
+          <td>${detail.codigo_trabajo|| "N/A"}</td>
+          <td>${detail.nombre_trabajo || "N/A"}</td>
           <td>S/. ${formatNumberToDecimal(
-            detail.Trabajo?.costo_partida || 0
+            detail.total || 0
           )}</td>
-          <td>${detail.Trabajo?.UnidadProduccion.nombre || "N/A"}</td>
+          <td>${detail.unidad || "N/A"}</td>
         </tr>
       `;
     })
