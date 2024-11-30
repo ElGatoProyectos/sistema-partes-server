@@ -106,7 +106,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         codigo: Partida.item,
         partida: Partida.partida,
         unidad: Unidad?.nombre ? Unidad?.nombre : null,
-        cantidad_utilizada: ResData.metrado_utilizado,
+        cantidad_utilizada: ResData.cantidad_total,
       };
     });
 
@@ -146,7 +146,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       },
       data: {
         partida_id: departure_Id,
-        metrado_utilizado: metrado,
+        cantidad_total: metrado,
       },
     });
     return detail;
@@ -317,7 +317,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       }
       departureJobMap.get(trabajoId).partidas.push({
         ...item.Partida,
-        metrado_utilizado: item.metrado_utilizado,
+        cantidad_total: item.cantidad_total,
         id_detalle: item.id,
       });
     });
@@ -418,7 +418,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
         data: data,
         trabajo: Trabajo,
         partida: Partida,
-        metrado_utilizado: item.metrado_utilizado,
+        cantidad_total: item.cantidad_total,
       };
     });
     return {
@@ -436,7 +436,7 @@ class PrismaDepartureJobRepository implements DepartureJobRepository {
       data: {
         trabajo_id: job_id,
         partida_id: departure_Id,
-        metrado_utilizado: metrado,
+        cantidad_total: metrado,
       },
     });
     return departure_job;

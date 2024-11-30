@@ -172,7 +172,7 @@ class DepartureJobController {
         idTrabajo: detail.Trabajo.codigo,
         trabajos: detail.Trabajo.nombre,
         partida: detail.Partida.id_interno + "  " + detail.Partida.partida,
-        metrado: detail.metrado_utilizado,
+        metrado: detail.cantidad_total,
       });
       row.getCell("idTrabajo").numFmt = "@";
       row.getCell("trabajos").numFmt = "@";

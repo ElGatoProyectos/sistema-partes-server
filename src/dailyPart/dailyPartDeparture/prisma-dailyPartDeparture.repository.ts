@@ -10,6 +10,16 @@ import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
 class PrismaDailyPartDepartureRepository
   implements DailyPartDepartureRepository
 {
+  async findAllWithOutPaginationForDeparture(
+    departure_id: number
+  ): Promise<ParteDiarioPartida[] | null> {
+    const detailsDailyPartDeparture = await prisma.parteDiarioPartida.findMany({
+      where: {
+        partida_id:departure_id
+      },
+    });
+    return detailsDailyPartDeparture;
+  }
   async findAllWithOutPaginationForidDailyPart(
     daily_part_id: number
   ): Promise<I_DailyPartDepartureForPdf[] | null> {

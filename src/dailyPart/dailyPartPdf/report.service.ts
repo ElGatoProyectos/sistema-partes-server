@@ -145,7 +145,6 @@ export class ReportService {
       await dailyPartResourceValidation.findAllWithPaginationForidsDailyPart(
         idsDailyPartWeek
       );
-console.log("paso la busqueda de resource")
     const dailyPartResource =
       dailyPartResourceResponse.payload as I_DailyPartResourceForPdf[];
 
@@ -156,12 +155,14 @@ console.log("paso la busqueda de resource")
           fechaParteDiario,
           fechas,
           obj,
-          totalDays,
-          dailyParts
+          totalDays
         );
       });
+      dailyPartResource.forEach((obj) => {
+        this.calculateTotalResourceForDailyParts(obj, dailyParts);
+      });
     }
-    console.log("llego a buscar todos las partidas")
+
     //[note] busco los partes diarios partida de la semana
     const dailysPartDepartureResponse =
       await dailyPartDepartureValidation.findAllForIdsDailyPart(
@@ -171,19 +172,20 @@ console.log("paso la busqueda de resource")
     const dailysPartsDeparture =
       dailysPartDepartureResponse.payload as I_DailyPartDeparture[];
 
-    let dailyPartDepartureToday:any[]=[]
-    if(dailysPartsDeparture.length>0){
+    let dailyPartDepartureToday: any[] = [];
+    if (dailysPartsDeparture.length > 0) {
       dailyPartDepartureToday = dailysPartsDeparture.filter((dailyPart) => {
         if (dailyPart.ParteDiario.fecha) {
           const dailyPartDate = new Date(dailyPart.ParteDiario.fecha);
           dailyPartDate.setUTCHours(0, 0, 0, 0); // Ajustar horas a cero
-  
+
           return dailyPartDate.getTime() === date.getTime();
         }
         return false;
       });
     }
-   
+    let totalProductionWorkforce = 0;
+
 
     if (dailysPartsDeparture.length > 0) {
       dailysPartsDeparture.forEach((obj) => {
@@ -192,14 +194,21 @@ console.log("paso la busqueda de resource")
           fechaParteDiario,
           fechas,
           obj,
-          totalDays,
-          dailyParts
+          totalDays
         );
       });
+
+      dailysPartsDeparture.forEach((obj) => {
+        this.calculateTotalDeparturesForDailyPart(obj, dailyParts);
+      });
+
+      dailysPartsDeparture.forEach((obj) => {
+        totalProductionWorkforce += obj.Partida.mano_de_obra_unitaria * obj.cantidad_utilizada
+      });
+
+
     }
-   console.log("llego a buscar mo")
     //[note] acá busco la mano de obra de la semana
-    let totalProductionWorkforce = 0;
 
     const dailyPartWokrforceResponse =
       await dailyPartMOValidation.findAllForIdsDailysParts(idsDailyPartWeek);
@@ -208,109 +217,147 @@ console.log("paso la busqueda de resource")
       dailyPartWokrforceResponse.payload as I_DailyPartWorkforce[];
 
     let workforcesToday: I_DailyPartWorkforce[] = [];
+    let workforces: any[] = [];
+    // let workforcesf: any[] = [];
     dailyParts.forEach((dailyPart) => {
-      const workforces = dailysPartsWorkforce.filter((workforce) => {
+      const workforcesFind = dailysPartsWorkforce.filter((workforce) => {
         return workforce.parte_diario_id === dailyPart.id;
       });
 
-      workforcesToday = workforcesToday.concat(workforces);
+      workforcesToday = workforcesToday.concat(workforcesFind);
     });
 
     let priceHourResponse = await priceHourWorkforceValidation.findByDate(date);
     let detailsPriceHourMOResponse: any = [];
     let detailsPriceHourMO: DetallePrecioHoraMO[] = [];
+    let totalRealWorkforceProduction = 0;
 
+   
     const priceHourMO = priceHourResponse.payload as PrecioHoraMO;
-
     //acá saco de cuanto fue en la semana
-    detailsPriceHourMOResponse =
-      await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
-        priceHourMO.id
-      );
-    if (priceHourResponse.success && dailysPartsWorkforce.length > 0) {
-      dailysPartsWorkforce.forEach((workforce) => {
-        if (workforce.ManoObra.CategoriaObrero) {
-          const categoriaId = workforce.ManoObra.CategoriaObrero.id;
-
-          const detail = detailsPriceHourMO.find(
-            (detail) => detail.categoria_obrero_id === categoriaId
-          );
-          if (
-            detail &&
-            workforce.hora_60 != null &&
-            workforce.hora_100 != null &&
-            workforce.hora_normal != null &&
-            workforce.ParteDiario.fecha != null
-          ) {
-            let sumaCategoryMOForDay = 0;
-            sumaCategoryMOForDay =
-              detail.hora_normal * workforce.hora_normal +
-              detail.hora_extra_60 * workforce.hora_60 +
-              detail.hora_extra_100 * workforce.hora_100;
-            fechas.forEach((fecha, index) => {
-              const date = new Date(fecha);
-              date.setUTCHours(0, 0, 0, 0);
-              const dateDailyPart = workforce.ParteDiario.fecha;
-              dateDailyPart?.setUTCHours(0, 0, 0, 0);
-              const jobFind = dailyParts.find(
-                (part) => part.idTrabajo === workforce.ParteDiario.trabajo_id
-              );
-              if (date.getTime() === dateDailyPart?.getTime() && jobFind) {
-                totalDays[index] += sumaCategoryMOForDay;
-                jobFind.total += sumaCategoryMOForDay;
-              }
-            });
+    if (priceHourResponse.success) {
+      detailsPriceHourMOResponse =
+        await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+          priceHourMO.id
+        );
+        detailsPriceHourMO = detailsPriceHourMOResponse.payload as
+        | DetallePrecioHoraMO[]
+        | [];
+      if (priceHourResponse.success && dailysPartsWorkforce.length > 0 && detailsPriceHourMO.length>0) {
+         
+        dailysPartsWorkforce.forEach((workforce) => {
+          if (workforce.ManoObra.CategoriaObrero) {
+            const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+            const detail = detailsPriceHourMO.find(
+              (detail) => detail.categoria_obrero_id === categoriaId
+            );
+            if (
+              detail?.hora_normal != null &&
+              detail?.hora_extra_60 != null &&
+              detail?.hora_extra_100 != null &&
+              workforce.hora_60 != null &&
+              workforce.hora_100 != null &&
+              workforce.hora_normal != null
+            ) {
+              let sumaCategoryMOForDay = 0;
+              sumaCategoryMOForDay =
+                detail.hora_normal * workforce.hora_normal +
+                detail.hora_extra_60 * workforce.hora_60 +
+                detail.hora_extra_100 * workforce.hora_100;
+              fechas.forEach((fecha, index) => {
+                const date = new Date(fecha);
+                date.setUTCHours(0, 0, 0, 0);
+                const dateDailyPart = workforce.ParteDiario.fecha;
+                dateDailyPart?.setUTCHours(0, 0, 0, 0);
+                if (date.getTime() === dateDailyPart?.getTime()) {
+                  totalDays[index] += sumaCategoryMOForDay;
+                }
+              });
+            }
           }
-        }
-      });
-    }
-
-    //acá saco cuanto es por el dia
-    if (workforcesToday.length > 0 && priceHourResponse.success) {
-      workforcesToday.forEach((workforce) => {
-        if (workforce.ManoObra.CategoriaObrero) {
-          const categoriaId = workforce.ManoObra.CategoriaObrero.id;
-
-          const detail = detailsPriceHourMO.find(
-            (detail) => detail.categoria_obrero_id === categoriaId
-          );
-          const dailyPartFind = dailyParts.find(
-            (element) => element.idTrabajo === workforce.ParteDiario.trabajo_id
-          );
-
-          if (
-            detail &&
-            workforce.hora_60 != null &&
-            workforce.hora_100 != null &&
-            workforce.hora_normal != null &&
-            dailyPartFind
-          ) {
-            let sumaCategoryMOForDay = 0;
-            totalRealWorkforceProduction +=
-              detail.hora_normal * workforce.hora_normal +
-              detail.hora_extra_60 * workforce.hora_60 +
-              detail.hora_extra_100 * workforce.hora_100;
-            sumaCategoryMOForDay =
-              detail.hora_normal * workforce.hora_normal +
-              detail.hora_extra_60 * workforce.hora_60 +
-              detail.hora_extra_100 * workforce.hora_100;
-            dailyPartFind.total += sumaCategoryMOForDay;
-            //[note] si está todo bien vamos a hacer agregarlo
-            workforces.push({
-              codigo: workforce.ManoObra.codigo,
-              dni: workforce.ManoObra.documento_identidad,
-              nombre_completo:
-                workforce.ManoObra.nombre_completo +
-                workforce.ManoObra.apellido_materno +
-                workforce.ManoObra.apellido_paterno,
-              hora_normal: workforce.hora_normal,
-              hora_60: workforce.hora_60,
-              hora_100: workforce.hora_100,
-              costo_diario: sumaCategoryMOForDay,
-            });
+        });
+        //acá calculo cuanto sería para los partes diarios del día
+        dailysPartsWorkforce.forEach((workforce) => {
+          if (workforce.ManoObra.CategoriaObrero) {
+            const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+            const detail = detailsPriceHourMO.find(
+              (detail) => detail.categoria_obrero_id === categoriaId
+            );
+            if (
+              detail?.hora_normal != null &&
+              detail?.hora_extra_60 != null &&
+              detail?.hora_extra_100 != null &&
+              workforce.hora_60 != null &&
+              workforce.hora_100 != null &&
+              workforce.hora_normal != null
+            ) {
+              let sumaCategoryMOForDay = 0;
+              sumaCategoryMOForDay =
+                detail.hora_normal * workforce.hora_normal +
+                detail.hora_extra_60 * workforce.hora_60 +
+                detail.hora_extra_100 * workforce.hora_100;
+            
+                const jobFind = dailyParts.find(
+                  (part) => part.idTrabajo === workforce.ParteDiario.trabajo_id
+                );
+                if (jobFind) {
+                  jobFind.total += sumaCategoryMOForDay;
+                }
+            }
           }
-        }
-      });
+        });
+
+      
+      }
+
+      //acá saco cuanto es por el dia
+      if (workforcesToday.length > 0 && priceHourResponse.success) {
+        workforcesToday.forEach((workforce) => {
+          if (workforce.ManoObra.CategoriaObrero) {
+            const categoriaId = workforce.ManoObra.CategoriaObrero.id;
+
+            const detail = detailsPriceHourMO.find(
+              (detail) => detail.categoria_obrero_id === categoriaId
+            );
+            const dailyPartFind = dailyParts.find(
+              (element) =>
+                element.idTrabajo === workforce.ParteDiario.trabajo_id
+            );
+
+            if (
+              detail &&
+              workforce.hora_60 != null &&
+              workforce.hora_100 != null &&
+              workforce.hora_normal != null &&
+              dailyPartFind
+            ) {
+              let sumaCategoryMOForDay = 0;
+              totalRealWorkforceProduction +=
+                detail.hora_normal * workforce.hora_normal +
+                detail.hora_extra_60 * workforce.hora_60 +
+                detail.hora_extra_100 * workforce.hora_100;
+              sumaCategoryMOForDay =
+                detail.hora_normal * workforce.hora_normal +
+                detail.hora_extra_60 * workforce.hora_60 +
+                detail.hora_extra_100 * workforce.hora_100;
+              dailyPartFind.total += sumaCategoryMOForDay;
+              //[note] si está todo bien vamos a hacer agregarlo
+              workforces.push({
+                codigo: workforce.ManoObra.codigo,
+                dni: workforce.ManoObra.documento_identidad,
+                nombre_completo:
+                  workforce.ManoObra.nombre_completo +
+                  workforce.ManoObra.apellido_materno +
+                  workforce.ManoObra.apellido_paterno,
+                hora_normal: workforce.hora_normal,
+                hora_60: workforce.hora_60,
+                hora_100: workforce.hora_100,
+                costo_diario: sumaCategoryMOForDay,
+              });
+            }
+          }
+        });
+      }
     }
 
     if (!priceHourResponse.success && workforcesToday.length > 0) {
@@ -331,19 +378,10 @@ console.log("paso la busqueda de resource")
       });
     }
 
-    detailsPriceHourMO = detailsPriceHourMOResponse.payload as
-      | DetallePrecioHoraMO[]
-      | [];
 
-    let workforces: any = [];
-
-    let totalRealWorkforceProduction = 0;
 
     const desviation = totalProductionWorkforce - totalRealWorkforceProduction;
 
-    console.log("llego a buscar comentarios")
-
-    console.log(dailyParts)
     //busco los comentarios
     const dailyPartComentaryResponse =
       await dailyPartPhotoValidation.findAllForIdsDailyParts(idsDailyPartWeek);
@@ -362,6 +400,8 @@ console.log("paso la busqueda de resource")
       fechas,
       detailsPriceHourMO
     );
+
+    // console.log(dailyParts);
 
     const productionForDay = dailyParts.reduce(
       (acumulador, item) => acumulador + item.total,
@@ -415,7 +455,7 @@ console.log("paso la busqueda de resource")
     );
     await pdfService.createPdf(template, user_id);
   }
-  
+
   async createInformeParteDiario(
     daily_part_id: number,
     tokenWithBearer: string,
@@ -470,14 +510,14 @@ console.log("paso la busqueda de resource")
       const date = new Date();
       date.setUTCHours(0, 0, 0, 0);
 
-      const details: I_DailyPartDepartureForId[] = detailsDailyPartDeparture.map(
-        (detailDailyPart) => {
+      const details: I_DailyPartDepartureForId[] =
+        detailsDailyPartDeparture.map((detailDailyPart) => {
           const detailJob = detailsDepartureJob.find(
             (detailJob) =>
               detailJob.partida_id === detailDailyPart.partida_id &&
               detailJob.trabajo_id === dailyPart.trabajo_id
           );
-      
+
           return {
             item: detailDailyPart.Partida.item
               ? detailDailyPart.Partida.item
@@ -488,15 +528,14 @@ console.log("paso la busqueda de resource")
             unidad: detailDailyPart.Partida.Unidad?.simbolo
               ? detailDailyPart.Partida.Unidad?.simbolo
               : "",
-            cantidad_programada: detailJob?.metrado_utilizado
-              ? detailJob?.metrado_utilizado
+            cantidad_programada: detailJob?.cantidad_total
+              ? detailJob?.cantidad_total
               : 0,
             cantidad_utilizada: detailDailyPart.cantidad_utilizada
               ? detailDailyPart.cantidad_utilizada
               : 0,
           };
-        }
-      );
+        });
 
       const dailyPartMOFind: DailyPartPdf[] = dailysPartsWMO.map(
         (dailyPartMO) => {
@@ -575,34 +614,40 @@ console.log("paso la busqueda de resource")
       };
     }
   }
- 
-  
 
   calculateTotalForDailyPartResource(
     fechaParteDiario: Date | null,
     fechas: string[],
     obj: I_DailyPartResourceForPdf,
-    totalDays: number[],
-    dailyParts: I_DailyPartForId[]
+    totalDays: number[]
   ): void {
     if (fechaParteDiario) {
       fechaParteDiario.setUTCHours(0, 0, 0, 0);
       fechas.forEach((fecha, index) => {
         const date = new Date(fecha);
         date.setUTCHours(0, 0, 0, 0);
-        const jobFind = dailyParts.find(
-          (part) => part.idTrabajo === obj.ParteDiario.trabajo_id
-        );
+
         if (
           date.getTime() === fechaParteDiario.getTime() &&
-          obj.Recurso.precio != null &&
-          jobFind
+          obj.Recurso.precio != null
         ) {
           const total = obj.cantidad * obj.Recurso.precio;
           totalDays[index] += total;
-          jobFind.total += total;
         }
       });
+    }
+  }
+  calculateTotalResourceForDailyParts(
+    obj: I_DailyPartResourceForPdf,
+    dailyParts: I_DailyPartForId[]
+  ): void {
+    const dailyPartFind = dailyParts.find(
+      (part) => part.idTrabajo === obj.ParteDiario.trabajo_id
+    );
+
+    if (dailyPartFind && obj.Recurso.precio != null) {
+      const total = obj.cantidad * obj.Recurso.precio;
+      dailyPartFind.total += total;
     }
   }
 
@@ -610,26 +655,31 @@ console.log("paso la busqueda de resource")
     fechaParteDiario: Date | null,
     fechas: string[],
     obj: I_DailyPartDeparture,
-    totalDays: number[],
-    dailyParts: I_DailyPartForId[]
+    totalDays: number[]
   ): void {
     if (fechaParteDiario) {
       fechaParteDiario.setUTCHours(0, 0, 0, 0);
       fechas.forEach((fecha, index) => {
         const date = new Date(fecha);
         date.setUTCHours(0, 0, 0, 0);
-        const dailyPartDepartue = dailyParts.find(
-          (part) => part.idTrabajo === obj.ParteDiario.trabajo_id
-        );
-        if (
-          date.getTime() === fechaParteDiario.getTime() &&
-          dailyPartDepartue
-        ) {
+
+        if (date.getTime() === fechaParteDiario.getTime()) {
           const suma = obj.Partida.precio * obj.cantidad_utilizada;
           totalDays[index] += suma;
-          dailyPartDepartue.total += suma;
         }
       });
+    }
+  }
+  calculateTotalDeparturesForDailyPart(
+    obj: I_DailyPartDeparture,
+    dailyParts: I_DailyPartForId[]
+  ): void {
+    const dailyPartDepartue = dailyParts.find(
+      (part) => part.idTrabajo === obj.ParteDiario.trabajo_id
+    );
+    if (dailyPartDepartue) {
+      const suma = obj.Partida.precio * obj.cantidad_utilizada;
+      dailyPartDepartue.total += suma;
     }
   }
 }

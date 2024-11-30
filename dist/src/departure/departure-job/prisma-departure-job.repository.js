@@ -47,7 +47,7 @@ class PrismaDepartureJobRepository {
                 return {
                     trabajo: Trabajo,
                     partida: Partida,
-                    metrado_utilizado: item.metrado_utilizado,
+                    cantidad_total: item.cantidad_total,
                 };
             });
             return { detailsDepartureJob, total };
@@ -59,7 +59,7 @@ class PrismaDepartureJobRepository {
                 data: {
                     trabajo_id: job_id,
                     partida_id: departure_Id,
-                    metrado_utilizado: metrado,
+                    cantidad_total: metrado,
                 },
             });
             return departure_job;
