@@ -7,6 +7,7 @@ import {
 } from "./models/departure.interface";
 import { T_FindAllDeparture } from "./models/departure.types";
 import prisma from "../config/prisma.config";
+import { T_FindAllTaskDailyPartDeparture } from "../dailyPart/dailyPartDeparture/models/dailyPartDeparture.types";
 
 class PrismaDepartureRepository implements DepartureRepository {
   async updateMetradoTotal(
@@ -97,6 +98,85 @@ class PrismaDepartureRepository implements DepartureRepository {
         }),
       ]);
     return { departures, total };
+  }
+  async findAllForTask(
+    idsDailyPart: number[]= [],
+    project_id:number
+  ): Promise<{ departures: I_Departure[]; total: number; totalDailyPartDeparture:number }> {
+
+    const result= await prisma.parteDiarioPartida.count({
+      where:{
+        ParteDiario:{
+          id:{
+            in:idsDailyPart
+          }
+        }
+      }
+    })
+
+    if(result===0){
+      const [departures, total]: [I_Departure[], number] =
+      await prisma.$transaction([
+        prisma.partida.findMany({
+          where: {
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+          include: {
+            Unidad: true,
+          },
+          omit: {
+            eliminado: true,
+          },
+          orderBy: {
+            item: "asc",
+          },
+        }),
+        prisma.partida.count({
+          where: {
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+        }),
+      ]);
+    return { departures, total, totalDailyPartDeparture:result };
+    }else{
+      const [departures, total]: [I_Departure[], number] =
+      await prisma.$transaction([
+        prisma.partida.findMany({
+          where: {
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+            ParteDiarioPartida:{
+              some:{
+                ParteDiario:{
+                  id:{
+                    in: idsDailyPart
+                  }
+                }
+              }
+            }
+          },
+          include: {
+            Unidad: true,
+          },
+          omit: {
+            eliminado: true,
+          },
+          orderBy: {
+            item: "asc",
+          },
+        }),
+        prisma.partida.count({
+          where: {
+            eliminado: E_Estado_BD.n,
+            proyecto_id: project_id,
+          },
+        }),
+      ]);
+    return { departures, total , totalDailyPartDeparture:result };
+    }
+    
   }
   async findById(departure_id: number): Promise<I_Departure | null> {
     const departure = await prisma.partida.findFirst({

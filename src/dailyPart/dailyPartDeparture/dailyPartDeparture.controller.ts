@@ -1,7 +1,7 @@
 import express from "../../config/express.config";
 import { dailyPartDepartureService } from "./dailyPartDeparture.service";
 import { I_DailyPartDepartureBody } from "./models/dailyPartDeparture.interface";
-import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
+import { T_FindAllDailyPartDeparture, T_FindAllTaskDailyPartDeparture } from "./models/dailyPartDeparture.types";
 
 class DailyPartDepartureController {
   async update(request: express.Request, response: express.Response) {
@@ -27,7 +27,16 @@ class DailyPartDepartureController {
   }
   async getTaskWeek(request: express.Request, response: express.Response) {
     const project_id = request.get("project-id") as string;
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 20;
+    let paginationOptions: T_FindAllTaskDailyPartDeparture = {
+      queryParams: {
+        page: page,
+        limit: limit,
+      },
+    };
     const result = await dailyPartDepartureService.taskWeekDailyPartDeparture(
+      paginationOptions,
       project_id
     );
     response.status(result.statusCode).json(result);

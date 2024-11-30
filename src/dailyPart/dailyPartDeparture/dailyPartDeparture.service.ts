@@ -16,13 +16,14 @@ import {
 } from "./models/dailyPartDeparture.interface";
 import { prismaDailyPartDepartureRepository } from "./prisma-dailyPartDeparture.repository";
 import { departureJobValidation } from "../../departure/departure-job/departureJob.validation";
-import { T_FindAllDailyPartDeparture } from "./models/dailyPartDeparture.types";
+import { T_FindAllDailyPartDeparture, T_FindAllTaskDailyPartDeparture } from "./models/dailyPartDeparture.types";
 import { calculateTotalNew, obtenerCampoPorDia } from "../../common/utils/day";
 import { trainReportValidation } from "../../train/trainReport/trainReport.validation";
 import { weekValidation } from "../../week/week.validation";
 import { projectValidation } from "../../project/project.validation";
 import { departureValidation } from "../../departure/departure.validation";
 import { prismaDailyPartRepository } from "../prisma-dailyPart.repository";
+import { prismaDepartureRepository } from "../../departure/prisma-departure.repository";
 
 class DailyPartDepartureService {
   async updateDailyPartDeparture(
@@ -249,25 +250,9 @@ class DailyPartDepartureService {
     return sumaSubtract;
   }
 
-  async taskWeekDailyPartDeparture(project_id: string) {
+  async taskWeekDailyPartDeparture(data: T_FindAllTaskDailyPartDeparture,project_id: string) {
     try {
-      const resultIdProject = await projectValidation.findById(+project_id);
-      if (!resultIdProject.success) {
-        return httpResponse.BadRequestException(
-          "No se puede buscar los Partes Diarios con el ID del proyecto proporcionado"
-        );
-      }
-  
-      const departureResponse = await departureValidation.findAllWithOutPagination(+project_id);
-      if (!departureResponse.success) {
-        return httpResponse.SuccessResponse(
-          "Éxito al traer el Tareo Semanal de la Partida",
-          []
-        );
-      }
-  
-      const departures = departureResponse.payload as Partida[];
-  
+      const skip = (data.queryParams.page - 1) * data.queryParams.limit;
       const today = new Date();
       today.setUTCHours(0, 0, 0, 0);
   
@@ -282,34 +267,71 @@ class DailyPartDepartureService {
         return httpResponse.SuccessResponse("No se encontró la semana anterior", []);
       }
       const lastWeek = lastWeekResponse.payload as Semana;
-  
+
+
+      const resultIdProject = await projectValidation.findById(+project_id);
+      if (!resultIdProject.success) {
+        return httpResponse.BadRequestException(
+          "No se puede buscar los Partes Diarios con el ID del proyecto proporcionado"
+        );
+      }
       const dailyParts = await prismaDailyPartRepository.getAllDailyPartForProject(
         +project_id,
         currentWeek.fecha_inicio,
         currentWeek.fecha_fin
       );
-      if (!dailyParts || dailyParts.length === 0) {
+
+      const dailyPartIds: number[] = (dailyParts ?? []).map((part) => part.id);
+
+      const departureResponse = await prismaDepartureRepository.findAllForTask(dailyPartIds,+project_id);
+  
+      const { departures, total,totalDailyPartDeparture } = departureResponse;
+     
+      if(departures.length==0){
+        const formData = {
+          total,
+          page: data.queryParams.page,
+          // x ejemplo 20
+          limit: data.queryParams.limit,
+          //cantidad de paginas que hay
+          pageCount:0,
+          data: [],
+        };
+        return httpResponse.SuccessResponse(
+          "No hay Partidas en el Proyecto",
+          formData
+        );
+      }
+     
+      if (totalDailyPartDeparture==0 )  {
+        const pageCount = Math.ceil(total / data.queryParams.limit);
+       
         const departuresFormat= departures.map((element) => ({
           partida:element,
           ejecutado_anterior: 0,
           ejecutado_actual: 0,
           saldo: 0,
         }));
+        const formData = {
+          total,
+          page: data.queryParams.page,
+          // x ejemplo 20
+          limit: data.queryParams.limit,
+          //cantidad de paginas que hay
+          pageCount,
+          data: departuresFormat,
+        };
         return httpResponse.SuccessResponse(
           "No hay partidas en los Partes Diarios de la semana actual",
-          departuresFormat
+          formData
         );
       }
-  
-      const dailyPartIds = dailyParts.map((part) => part.id);
-  
       const response = await Promise.all(
         departures.map(async (partida) => {
 
           const [currentParts, lastParts] = await Promise.all([
             prisma.parteDiarioPartida.findMany({
               where: {
-                partida_id: partida.id,
                 ParteDiario: {
                   id: { in: dailyPartIds },
                   fecha: {
@@ -321,7 +343,6 @@ class DailyPartDepartureService {
             }),
             prisma.parteDiarioPartida.findMany({
               where: {
-                partida_id: partida.id,
                 ParteDiario: {
                   fecha: {
                     gte: lastWeek.fecha_inicio,
@@ -330,6 +351,7 @@ class DailyPartDepartureService {
                 },
               },
             }),
+         
           ]);
   
           const calculateAvance = (parts: typeof currentParts) =>
@@ -346,10 +368,35 @@ class DailyPartDepartureService {
           };
         })
       );
-  
+      const total_daily_part=await  prisma.parteDiarioPartida.count({
+        where: {
+          ParteDiario:{
+            id:{
+              in:dailyPartIds
+            },
+            fecha: {
+              gte: currentWeek.fecha_inicio,
+              lte: currentWeek.fecha_fin,
+            },
+          }
+          
+        },
+      })
+      const paginatedResponse = response.slice(skip, skip + data.queryParams.limit);
+      const pageCount = Math.ceil(total_daily_part / data.queryParams.limit);
+       
+      const formData = {
+        total:total_daily_part,
+        page: data.queryParams.page,
+        // x ejemplo 20
+        limit: data.queryParams.limit,
+        //cantidad de paginas que hay
+        pageCount,
+        data: paginatedResponse ,
+      };
       return httpResponse.SuccessResponse(
-        "Éxito al traer el Tareo Semanal de la Partida",
-        response
+        "Éxito al traer todas las partidas del tareo semanal",
+        formData
       );
     } catch (error) {
       return httpResponse.InternalServerErrorException(

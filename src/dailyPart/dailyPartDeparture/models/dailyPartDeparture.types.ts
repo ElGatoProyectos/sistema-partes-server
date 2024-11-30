@@ -5,3 +5,9 @@ export type T_FindAllDailyPartDeparture = {
     search: string;
   };
 };
+export type T_FindAllTaskDailyPartDeparture = {
+  queryParams: {
+    page: number;
+    limit: number;
+  };
+};

@@ -50,6 +50,7 @@ class PrismaDailyPartDepartureRepository
             Unidad: true,
           },
         },
+        ParteDiario:true
       },
       omit: {
         parte_diario_id: true,
