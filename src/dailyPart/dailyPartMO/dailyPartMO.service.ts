@@ -588,7 +588,6 @@ class DailyPartMOService {
     let sumaSubtract = 0;
 
     if (daily_part.fecha) {
-      console.log("entramos a eliminar la mano de obra")
       //acá me traigo todos los partes diarios de MO
       const result =
         await prismaDailyPartMORepository.findAllWithOutPaginationForIdDailysPart(

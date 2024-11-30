@@ -673,7 +673,7 @@ model DetalleTrabajoPartida {
   id                Int     @id @default(autoincrement())
   trabajo_id        Int
   partida_id        Int
-  metrado_utilizado Float
+  cantidad_total Float
   Trabajo           Trabajo @relation(fields: [trabajo_id], references: [id], onDelete: Cascade)
   Partida           Partida @relation(fields: [partida_id], references: [id], onDelete: Cascade)
 }

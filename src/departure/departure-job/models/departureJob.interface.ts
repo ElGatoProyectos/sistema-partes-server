@@ -22,7 +22,7 @@ export interface I_DetailDepartureJob {
   partida_id: number;
   Trabajo: I_Job;
   Partida: I_Departure;
-  metrado_utilizado: number;
+  cantidad_total: number;
 }
 
 export interface I_Departure extends Partida {}
@@ -41,7 +41,7 @@ export interface I_DepartureJobBBDD {
   id: number;
   trabajo_id: number;
   partida_id: number;
-  metrado_utilizado: number;
+  cantidad_total: number;
   Partida: Partida;
   Trabajo: Trabajo;
 }
@@ -49,20 +49,20 @@ export interface I_DepartureJobBBDD {
 export interface createDetailWorkDeparture {
   trabajo_id: number;
   partida_id: number;
-  metrado_utilizado: number;
+  cantidad_total: number;
 }
 export interface existsDetailWorkDeparture {
   id: number;
   trabajo_id: number;
   partida_id: number;
-  metrado_utilizado: number;
+  cantidad_total: number;
 }
 
 export interface I_DepartureJobForPdf {
   id: number;
   trabajo_id: number;
   partida_id: number;
-  metrado_utilizado: number;
+  cantidad_total: number;
   Partida: Partida;
   Trabajo: I_TrabajoForPdf;
 }

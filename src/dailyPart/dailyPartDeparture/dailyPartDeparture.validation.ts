@@ -53,6 +53,24 @@ class DailyPartDepartureValidation {
       );
     }
   }
+  async findAllForDeparture(departure_id: number): Promise<T_HttpResponse> {
+    try {
+      const dailyPart =
+        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForDeparture(
+          departure_id
+        );
+
+      return httpResponse.SuccessResponse(
+        "Los Partes Diarios Partida por la Partida fueron encontrado",
+        dailyPart
+      );
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar los Partes Diarios Partida por la Partida",
+        error
+      );
+    }
+  }
   async findAllForDailyPart(daily_part_id: number): Promise<T_HttpResponse> {
     try {
       const dailyPart =

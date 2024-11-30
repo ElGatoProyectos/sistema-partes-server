@@ -20,6 +20,8 @@ export abstract class DailyPartDepartureRepository {
   ): void {}
   findAllForDailyPart(daily_part_id: number): void {}
 
+  findAllWithOutPaginationForDeparture(departure_id: number): void {}
+
   findAllForDailyPartDeparture(
     skip: number,
     data: T_FindAllDailyPartDeparture,

@@ -1,6 +1,7 @@
 import {
   DetalleTrabajoPartida,
   E_Etapa_Parte_Diario,
+  ParteDiarioPartida,
   Partida,
   ReporteAvanceTren,
   Semana,
@@ -31,6 +32,7 @@ class DailyPartDepartureService {
     daily_part_departure_id: number
   ): Promise<T_HttpResponse> {
     try {
+
       const dailyPartDepartureResponse =
         await dailyPartDepartureValidation.findByIdValidation(
           daily_part_departure_id
@@ -43,6 +45,7 @@ class DailyPartDepartureService {
       const dailyPartDeparture =
         dailyPartDepartureResponse.payload as I_DailyPartDeparture;
 
+     
       if (
         dailyPartDeparture.ParteDiario.etapa ===
           E_Etapa_Parte_Diario.TERMINADO ||
@@ -53,10 +56,21 @@ class DailyPartDepartureService {
         );
       }
 
+      const dailysPartDepartureResponse= await dailyPartDepartureValidation.findAllForDeparture(dailyPartDeparture.partida_id);
+
+      const dailysPartDeparture= dailysPartDepartureResponse.payload as ParteDiarioPartida[]
+
+      let total=0;
+
+      if(dailysPartDeparture.length>0){
+        dailysPartDeparture.forEach((element)=>{
+          total += element.cantidad_utilizada
+        })
+      }
+
       const detailResponse =
-        await departureJobValidation.findByForDepartureAndJob(
+        await departureJobValidation.findByForDeparture(
           dailyPartDeparture.partida_id,
-          dailyPartDeparture.ParteDiario.Trabajo.id
         );
 
       if (!detailResponse.success) {
@@ -65,7 +79,9 @@ class DailyPartDepartureService {
 
       const detail = detailResponse.payload as DetalleTrabajoPartida;
 
-      if (data.quantity_used > detail.metrado_utilizado) {
+      const totalAddNew= total+ data.quantity_used;
+      
+      if (totalAddNew > detail.cantidad_total) {
         return httpResponse.BadRequestException(
           "La cantidad ingresada es superior a la establecida"
         );
