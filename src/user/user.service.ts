@@ -170,16 +170,20 @@ class UserService {
       if (!responseEmail.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await userValidation.findByDni(data.dni);
-      if (responseByDni.success)
-        return httpResponse.BadRequestException(
-          `El usuario con el dni ${data.dni} ya existe`
-        );
+      // const responseByDni = await userValidation.findByDni(data.dni);
+      // if (responseByDni.success)
+      //   return httpResponse.BadRequestException(
+      //     `El usuario con el dni ${data.dni} ya existe`
+      //   );
       const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
+      }
+
+      if(data.dni){
+        return httpResponse.BadRequestException("El dni sólo puede contener 8 digitos")
       }
 
       const resultPhone = lettersInNumbers(data.telefono);
@@ -226,11 +230,11 @@ class UserService {
       if (!responseEmailUser.success)
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await userValidation.findByDni(data.dni);
-      if (responseByDni.success)
-        return httpResponse.BadRequestException(
-          `El usuario con el dni ${data.dni} ya existe`
-        );
+      // const responseByDni = await userValidation.findByDni(data.dni);
+      // if (responseByDni.success)
+      //   return httpResponse.BadRequestException(
+      //     `El usuario con el dni ${data.dni} ya existe`
+      //   );
 
       if (!validator.isEmail(data.email)) {
         return httpResponse.BadRequestException(
@@ -379,10 +383,10 @@ class UserService {
         const responseEmailUser = await userValidation.findByEmail(data.email);
         if (!responseEmailUser.success) return responseEmailUser;
       }
-      if (user.dni != data.dni) {
-        const responseByDni = await userValidation.findByDni(data.dni);
-        if (responseByDni.success) return responseByDni;
-      }
+      // if (user.dni != data.dni) {
+      //   const responseByDni = await userValidation.findByDni(data.dni);
+      //   if (responseByDni.success) return responseByDni;
+      // }
 
       if (!validator.isEmail(data.email)) {
         return httpResponse.BadRequestException(
@@ -577,9 +581,9 @@ class UserService {
         );
       }
 
-      // const responseEmail = await userValidation.findByDni(data.email);
-      // if (!responseEmail.success)
-      //   return httpResponse.BadRequestException(`El email ingresado ya existe`);
+      const responseEmail = await userValidation.findByEmail(data.email);
+      if (!responseEmail.success)
+        return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
       // const responseByDni = await userValidation.findByDni(data.dni);
       // if (responseByDni.success){
@@ -724,24 +728,7 @@ class UserService {
       await prisma.$disconnect();
     }
   }
-  async findByDni(dni: string): Promise<T_HttpResponse> {
-    try {
-      const user = await prismaUserRepository.findByDni(dni);
-      // este error me valida que no esta el usuario
-      if (!user) {
-        return httpResponse.NotFoundException("Usuario no encontrado");
-      }
-      return httpResponse.SuccessResponse("Usuario encontrado", user);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar usuario",
-        error
-      );
-    } finally {
-      await prisma.$disconnect();
-    }
-  }
-
+ 
   async findById(id: number): Promise<T_HttpResponse> {
     try {
       const user = await prismaUserRepository.findById(id);
@@ -781,14 +768,14 @@ class UserService {
         }
       }
 
-      if (userFind.dni != data.dni) {
-        const responseByDni = await userValidation.findByDni(data.dni);
-        if (responseByDni.success) {
-          return httpResponse.BadRequestException(
-            `El usuario con el dni ${data.dni} ya existe`
-          );
-        }
-      }
+      // if (userFind.dni != data.dni) {
+      //   const responseByDni = await userValidation.findByDni(data.dni);
+      //   if (responseByDni.success) {
+      //     return httpResponse.BadRequestException(
+      //       `El usuario con el dni ${data.dni} ya existe`
+      //     );
+      //   }
+      // }
 
       const resultDni = lettersInNumbers(data.dni);
       if (resultDni) {

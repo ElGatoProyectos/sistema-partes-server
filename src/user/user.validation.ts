@@ -68,20 +68,20 @@ class UserValidation {
     }
   }
 
-  async findByDni(dni: string): Promise<T_HttpResponse> {
-    try {
-      const user = await prismaUserRepository.findByDni(dni);
-      if (!user) {
-        return httpResponse.NotFoundException("Usuario no encontrado");
-      }
-      return httpResponse.SuccessResponse("Usuario encontrado", user);
-    } catch (error) {
-      return httpResponse.InternalServerErrorException(
-        "Error al buscar usuario",
-        error
-      );
-    }
-  }
+  // async findByDni(dni: string): Promise<T_HttpResponse> {
+  //   try {
+  //     const user = await prismaUserRepository.findByDni(dni);
+  //     if (!user) {
+  //       return httpResponse.NotFoundException("Usuario no encontrado");
+  //     }
+  //     return httpResponse.SuccessResponse("Usuario encontrado", user);
+  //   } catch (error) {
+  //     return httpResponse.InternalServerErrorException(
+  //       "Error al buscar usuario",
+  //       error
+  //     );
+  //   }
+  // }
   
 
   async findById(id: number): Promise<T_HttpResponse> {

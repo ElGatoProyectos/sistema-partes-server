@@ -133,6 +133,9 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
               include: {
                 Rol: true,
               },
+              omit:{
+                contrasena:true
+              }
             },
           },
           skip,

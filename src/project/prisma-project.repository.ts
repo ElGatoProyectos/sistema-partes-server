@@ -6,10 +6,22 @@ import {
   I_UpdateColorsProject,
 } from "./models/project.interface";
 import { ProjectRepository } from "./project.repository";
-import { E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
+import { DetalleUsuarioProyecto, E_Estado_BD, E_Proyecto_Estado, Proyecto } from "@prisma/client";
 import { T_FindAllProject } from "./dto/project.type";
 
 class PrismaProjectRepository implements ProjectRepository {
+ 
+  async findByIdInDetailProyecto(user_id: number): Promise<DetalleUsuarioProyecto | null > {
+    const detail= await prisma.detalleUsuarioProyecto.findFirst({
+      where:{
+        usuario_id:user_id
+      },
+      include:{
+        Proyecto:true
+      }
+    })
+    return detail
+  }
  async  findAllWithOutPagination(): Promise<Proyecto[]| null> {
    const projects= await prisma.proyecto.findMany({
     where:{

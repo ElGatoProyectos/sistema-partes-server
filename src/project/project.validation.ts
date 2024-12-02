@@ -30,6 +30,20 @@ class ProjectValidation {
       );
     }
   }
+  async findByIdUserInDetail(user_id: number): Promise<T_HttpResponse> {
+    try {
+      const detail = await prismaProyectoRepository.findByIdInDetailProyecto(user_id);
+      if (!detail) {
+        return httpResponse.NotFoundException("Id del usuario no encontrado en el Detalle Usuario Proyecto");
+      }
+      return httpResponse.SuccessResponse("Id del usuario encontrado en el Detalle Usuario Proyecto", detail);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar el id del usuario encontrado en el Detalle Usuario Proyecto",
+        error
+      );
+    }
+  }
   async codeMoreHigh(company_id: number): Promise<T_HttpResponse> {
     try {
       const project = await prismaProyectoRepository.codeMoreHigh(company_id);

@@ -17,7 +17,10 @@ import { authValidation } from "./auth.validation";
 import { companyValidation } from "../company/company.validation";
 import { rolValidation } from "../rol/rol.validation";
 import { projectValidation } from "../project/project.validation";
-import { I_ProjectWithCompany } from "../project/models/project.interface";
+import {
+  I_DetailUserProject,
+  I_ProjectWithCompany,
+} from "../project/models/project.interface";
 
 class AuthService {
   async login(body: any): Promise<T_HttpResponse> {
@@ -162,82 +165,68 @@ class AuthService {
       return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }
+
   async findMe(token: string) {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
-      if (!userTokenResponse)
-        return httpResponse.UnauthorizedException("Token inválido");
+      if (!userTokenResponse) return userTokenResponse;
       const userResponse = userTokenResponse.payload as Usuario;
 
-      let user: any;
+      const permisos = await authValidation.findRolPermisssion(
+        userResponse.rol_id
+      );
 
-      let role = "MANO_OBRA"; // Rol harcodeado
-
-      let userType: "usuario" | "manoObra" = "usuario";
-      let formattedUser: any={};
-
-      if (!userResponse) {
-        const [bearer, tokenWIthOutBearer] = token.split(" ");
-        const tokenDecrypted = jwtService.verify(
-          tokenWIthOutBearer
-        ) as T_ResponseToken;
-        user = await prisma.manoObra.findUnique({
-          where: { id: tokenDecrypted.id },
-        });
-
-        if (!user) {
-          return httpResponse.UnauthorizedException("Usuario no encontrado");
-        }
-
-        userType = "manoObra";
-        role = "MANO_OBRA"; 
-
-        formattedUser = {
-          usuario: user,
-          empresa: null,
-          role,
-        };
+      const rolResponseUser = await rolValidation.findByName("USER");
+      const rolResponseAdmin = await rolValidation.findByName("ADMIN");
+      if (!rolResponseUser.success) {
+        return rolResponseUser;
       }
-
-      let permisos: any = [];
-      let detailcompanyResponse: any = {};
-      if (userType === "usuario") {
-        
-        permisos = await authValidation.findRolPermisssion(userResponse.rol_id);
-        role = permisos ? permisos.id : [];
-        const { contrasena, ...data } = userResponse;
-
-        formattedUser = {
-          usuario: data,
-          permisos: permisos.payload,
-          role,
-        };
-        const companyResponse= await companyValidation.findByIdUser(userResponse.id)
-
-        if(companyResponse.success){
-          const company= companyResponse.payload as Empresa;
-          formattedUser.empresa=company
-        }else{
-          detailcompanyResponse = await detailUserCompanyValidation.findByIdUser(
-            userResponse.id
-          );
-          if (!detailcompanyResponse.success) {
-            return detailcompanyResponse;
-          }
-          const detail = detailcompanyResponse.payload as DetalleUsuarioEmpresa;
-          const companyFind = await companyValidation.findById(detail.empresa_id);
-          formattedUser.empresa=companyFind
+      if (!rolResponseAdmin.success) {
+        return rolResponseAdmin;
+      }
+      let companyResponse: any = {};
+      let formatUser: any = {};
+      formatUser = {
+        usuario: userResponse,
+        permisos: permisos.payload,
+      };
+      const rolUser = rolResponseUser.payload as Rol;
+      const rolAdmin = rolResponseAdmin.payload as Rol;
+      if (
+        userResponse.rol_id === rolUser.id ||
+        userResponse.rol_id === rolAdmin.id
+      ) {
+        companyResponse = await companyValidation.findByIdUser(userResponse.id);
+        if (!companyResponse.success) {
+          return companyResponse;
         }
-       
-       
+        formatUser.empresa = companyResponse.payload;
+      } else {
+        companyResponse = await detailUserCompanyValidation.findByIdUser(
+          userResponse.id
+        );
+        if (!companyResponse.success) {
+          return companyResponse;
+        }
+        const detail = companyResponse.payload as DetalleUsuarioEmpresa;
+        const companyFind = await companyValidation.findById(detail.empresa_id);
+        formatUser.empresa = companyFind.payload;
+      }
+      const detailUserProjectResponse =
+        await projectValidation.findByIdUserInDetail(userResponse.id);
+
+      if (detailUserProjectResponse.success) {
+        const detail = detailUserProjectResponse.payload as I_DetailUserProject;
+        formatUser.proyecto = detail.Proyecto;
+      } else {
+        formatUser.proyecto = null;
       }
 
       return httpResponse.SuccessResponse(
         "Éxito en la autenticación",
-        formattedUser
+        formatUser
       );
     } catch (error) {
-      console.log(error);
       return httpResponse.InternalServerErrorException(
         "Error en la autenticación del usuario",
         error
@@ -246,66 +235,113 @@ class AuthService {
       await prisma.$disconnect();
     }
   }
-  // async findMe(token: string) {
-  //   try {
-  //     const userTokenResponse = await jwtService.getUserFromToken(token);
-  //     if (!userTokenResponse) return userTokenResponse;
-  //     const userResponse = userTokenResponse.payload as Usuario;
-
-  //     const permisos = await authValidation.findRolPermisssion(
-  //       userResponse.rol_id
-  //     );
-
-  //     const rolResponseUser = await rolValidation.findByName("USER");
-  //     const rolResponseAdmin = await rolValidation.findByName("ADMIN");
-  //     if (!rolResponseUser.success) {
-  //       return rolResponseUser;
-  //     }
-  //     if (!rolResponseAdmin.success) {
-  //       return rolResponseAdmin;
-  //     }
-  //     let companyResponse: any = {};
-  //     let formatUser: any = {};
-  //     formatUser = {
-  //       usuario: userResponse,
-  //       permisos: permisos.payload,
-  //     };
-  //     const rolUser = rolResponseUser.payload as Rol;
-  //     const rolAdmin = rolResponseAdmin.payload as Rol;
-  //     if (
-  //       userResponse.rol_id === rolUser.id ||
-  //       userResponse.rol_id === rolAdmin.id
-  //     ) {
-  //       companyResponse = await companyValidation.findByIdUser(userResponse.id);
-  //       if (!companyResponse.success) {
-  //         return companyResponse;
-  //       }
-  //       formatUser.empresa = companyResponse.payload;
-  //     } else {
-  //       companyResponse = await detailUserCompanyValidation.findByIdUser(
-  //         userResponse.id
-  //       );
-  //       if (!companyResponse.success) {
-  //         return companyResponse;
-  //       }
-  //       const detail = companyResponse.payload as DetalleUsuarioEmpresa;
-  //       const companyFind = await companyValidation.findById(detail.empresa_id);
-  //       formatUser.empresa = companyFind.payload;
-  //     }
-
-  //     return httpResponse.SuccessResponse(
-  //       "Éxito en la autenticación",
-  //       formatUser
-  //     );
-  //   } catch (error) {
-  //     return httpResponse.InternalServerErrorException(
-  //       "Error en la autenticación del usuario",
-  //       error
-  //     );
-  //   } finally {
-  //     await prisma.$disconnect();
-  //   }
-  // }
 }
 
 export const authService = new AuthService();
+
+// async findMe(token: string) {
+//   try {
+//     const userTokenResponse = await jwtService.getUserFromToken(token);
+//     if (!userTokenResponse)
+//       return httpResponse.UnauthorizedException("Token inválido");
+//     const userResponse = userTokenResponse.payload as Usuario;
+
+//     console.log(userResponse)
+//     let user: any;
+
+//     let role = "MANO_OBRA"; // Rol harcodeado
+
+//     let userType: "usuario" | "manoObra" = "usuario";
+//     let formattedUser: any={};
+
+//     if (!userResponse) {
+//       console.log("entro a no es mano de obra")
+//       const [bearer, tokenWIthOutBearer] = token.split(" ");
+//       const tokenDecrypted = jwtService.verify(
+//         tokenWIthOutBearer
+//       ) as T_ResponseToken;
+//       user = await prisma.manoObra.findUnique({
+//         where: { id: tokenDecrypted.id },
+//       });
+
+//       if (!user) {
+//         return httpResponse.UnauthorizedException("Usuario no encontrado");
+//       }
+
+//       console.log(user)
+
+//       const detailUserProjectResponse= await projectValidation.findByIdUserInDetail(user.id)
+
+//       formattedUser = {
+//         usuario: user,
+//         empresa: null,
+//         role,
+//       };
+
+//       if(detailUserProjectResponse.success){
+//        const detail= detailUserProjectResponse.payload as I_DetailUserProject;
+//        formattedUser.proyecto= detail.Proyecto;
+//       }else{
+//         formattedUser.proyecto= null
+//       }
+
+//       userType = "manoObra";
+//       role = "MANO_OBRA";
+
+//     }
+
+//     let permisos: any = [];
+//     let detailcompanyResponse: any = {};
+//     if (userType === "usuario") {
+
+//       permisos = await authValidation.findRolPermisssion(userResponse.rol_id);
+//       role = permisos ? permisos.id : [];
+//       const { contrasena, ...data } = userResponse;
+
+//       formattedUser = {
+//         usuario: data,
+//         permisos: permisos.payload,
+//         role,
+//       };
+//       const companyResponse= await companyValidation.findByIdUser(userResponse.id)
+
+//       if(companyResponse.success){
+//         const company= companyResponse.payload as Empresa;
+//         formattedUser.empresa=company
+//       }else{
+//         detailcompanyResponse = await detailUserCompanyValidation.findByIdUser(
+//           userResponse.id
+//         );
+//         if (!detailcompanyResponse.success) {
+//           return detailcompanyResponse;
+//         }
+//         const detail = detailcompanyResponse.payload as DetalleUsuarioEmpresa;
+//         const companyFind = await companyValidation.findById(detail.empresa_id);
+//         formattedUser.empresa=companyFind.payload
+//       }
+
+//       const detailUserProjectResponse= await projectValidation.findByIdUserInDetail(userResponse.id)
+
+//       if(detailUserProjectResponse.success){
+//         const detail= detailUserProjectResponse.payload as I_DetailUserProject;
+//         formattedUser.proyecto= detail.Proyecto;
+//        }else{
+//          formattedUser.proyecto= null
+//        }
+
+//     }
+
+//     return httpResponse.SuccessResponse(
+//       "Éxito en la autenticación",
+//       formattedUser
+//     );
+//   } catch (error) {
+//     console.log(error);
+//     return httpResponse.InternalServerErrorException(
+//       "Error en la autenticación del usuario",
+//       error
+//     );
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }

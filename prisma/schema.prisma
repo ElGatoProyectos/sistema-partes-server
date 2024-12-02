@@ -121,7 +121,7 @@ model Permisos {
 model Usuario {
   id                        Int                                     @id @default(autoincrement())
   email                     String
-  dni                       String                                  @unique
+  dni                       String                                 
   nombre_completo           String
   telefono                  String
   limite_proyecto           Int                                     @default(1)

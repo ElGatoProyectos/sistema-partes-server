@@ -1,4 +1,4 @@
-import { E_Proyecto_Estado, Empresa, Proyecto, Trabajo } from "@prisma/client";
+import { DetalleUsuarioProyecto, E_Proyecto_Estado, Empresa, Proyecto, Trabajo } from "@prisma/client";
 
 export interface I_CreateProjectBD extends Omit<Proyecto, "id"> {}
 
@@ -13,6 +13,9 @@ export interface I_ProjectForID extends Proyecto{
 }
 export interface I_ProjectWithCompany extends Proyecto{
   Empresa: Empresa
+}
+export interface I_DetailUserProject extends DetalleUsuarioProyecto{
+  Proyecto: Proyecto
 }
 
 export interface I_CreateCompanyBody
