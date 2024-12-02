@@ -36,6 +36,7 @@ class PrismaDetailMasterBuilderForemanRepository
     user_id: number
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
+    filters.estado= E_Estado_BD.y;
     let total: any;
     if (data.queryParams.name) {
       filters.nombre_completo = {
@@ -49,7 +50,6 @@ class PrismaDetailMasterBuilderForemanRepository
         proyecto_id: project_id,
         Capataz: {
           ...filters,
-          estado: E_Estado_BD.y
         },
       },
       include: {
@@ -78,7 +78,6 @@ class PrismaDetailMasterBuilderForemanRepository
         proyecto_id: project_id,
         Capataz: {
           ...filters,
-          estado: E_Estado_BD.y
         },
       },
     });

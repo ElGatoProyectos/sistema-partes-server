@@ -106,6 +106,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
     nameRol: string
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
+    filters.estado= E_Estado_BD.y;
     let users: any = [];
     let userAll: any = [];
     let total: any;
@@ -125,7 +126,6 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
             projecto_id: project_id,
             Usuario: {
               ...filters,
-              estado: E_Estado_BD.y
             },
           },
           include: {
@@ -143,7 +143,6 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
             projecto_id: project_id,
             Usuario: {
               ...filters,
-              estado: E_Estado_BD.y
             },
           },
         }),
