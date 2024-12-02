@@ -29,6 +29,7 @@ class AuthService {
         where: {
           OR: [{ email: body.username }, { dni: body.username }],
           eliminado: E_Estado_BD.n,
+          estado: E_Estado_BD.y
         },
       });
 
