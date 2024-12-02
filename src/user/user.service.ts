@@ -577,18 +577,16 @@ class UserService {
         );
       }
 
-      const responseEmail = await userValidation.findByEmailInDetail(data.email,company.id);
-      if (responseEmail.success){
-        return httpResponse.BadRequestException(`El email ingresado ya existe`);
+      // const responseEmail = await userValidation.findByDni(data.email);
+      // if (!responseEmail.success)
+      //   return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      }
-
-      const responseByDni = await userValidation.findByDniInDetail(data.dni,company.id);
-      if (responseByDni.success){
-        return httpResponse.BadRequestException(
-          `El usuario con el dni ${data.dni} ya existe`
-        );
-      }
+      // const responseByDni = await userValidation.findByDni(data.dni);
+      // if (responseByDni.success){
+      //   return httpResponse.BadRequestException(
+      //     `El usuario con el dni ${data.dni} ya existe`
+      //   );
+      // }
 
       const rolResponse = await rolValidation.findByName("NO_ASIGNADO");
       if (!rolResponse.success) {

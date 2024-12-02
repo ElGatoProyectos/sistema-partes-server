@@ -35,6 +35,7 @@ class PrismaDetailForemanGroupLeaderRepository
     user_id: number
   ): Promise<{ userAll: any[]; total: number }> {
     let filters: any = {};
+    filters.estado= E_Estado_BD.y;
     let total: any;
     if (data.queryParams.name) {
       filters.nombre_completo = {
@@ -48,7 +49,6 @@ class PrismaDetailForemanGroupLeaderRepository
         proyecto_id: project_id,
         JefeGrupo: {
           ...filters,
-          estado: E_Estado_BD.y
         },
       },
       include: {
