@@ -1,4 +1,4 @@
-import { DetalleCapatazJefeGrupo } from "@prisma/client";
+import { DetalleCapatazJefeGrupo, E_Estado_BD } from "@prisma/client";
 import { DetailForemanGroupLeaderRepository } from "./detailForemanGroupLeader.repository";
 import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
@@ -48,6 +48,7 @@ class PrismaDetailForemanGroupLeaderRepository
         proyecto_id: project_id,
         JefeGrupo: {
           ...filters,
+          estado: E_Estado_BD.y
         },
       },
       include: {

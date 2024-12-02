@@ -8,12 +8,34 @@ import {
   IAssignUserPermissions,
 } from "./models/user.interface";
 import { UserRepository } from "./user.repository";
-import { E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
+import { DetalleUsuarioEmpresa, E_Estado_BD, Empresa, Rol, Usuario } from "@prisma/client";
 import { companyValidation } from "../company/company.validation";
 import { I_Empresa } from "../company/models/company.interface";
 import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {
+  async findEmailAndCompanyInDetailCompany(email: string, company: number): Promise<DetalleUsuarioEmpresa | null> {
+    const detail= await prisma.detalleUsuarioEmpresa.findFirst({
+      where:{
+        Usuario:{
+          email:email
+        },
+        empresa_id:company
+      }
+    })
+    return detail
+  }
+  async findDniAndCompanyInDetailCompany(dni: string, company_id: number): Promise<DetalleUsuarioEmpresa | null> {
+    const detail= await prisma.detalleUsuarioEmpresa.findFirst({
+      where:{
+        Usuario:{
+          dni:dni
+        },
+        empresa_id:company_id
+      }
+    })
+    return detail
+  }
   
   async findManyId(ids: number[]): Promise<Usuario[]> {
     const users = await prisma.usuario.findMany({

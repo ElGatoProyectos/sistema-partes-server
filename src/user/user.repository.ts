@@ -14,6 +14,10 @@ export abstract class UserRepository {
 
   findByIdValidation(user_id: number): void {}
 
+  findEmailAndCompanyInDetailCompany(email:String,company:number):void{}
+
+  findDniAndCompanyInDetailCompany(dni:String,company:number):void{}
+
   createUser(data: I_CreateUserBD): void {}
 
   updateUser(data: I_UpdateUser, user_id: number): void {}

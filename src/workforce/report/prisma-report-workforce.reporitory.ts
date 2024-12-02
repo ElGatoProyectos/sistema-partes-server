@@ -1,5 +1,6 @@
 import {
   Asistencia,
+  DetallePrecioHoraMO,
   E_Estado_BD,
   E_Estado_MO_BD,
   ManoObra,
@@ -11,6 +12,7 @@ import { ReportWorkforceRepository } from "./reportWorkforce.reporitory";
 import prisma from "../../config/prisma.config";
 import { httpResponse } from "../../common/http.response";
 import { I_AssistsId } from "../../assists/models/assists.interface";
+import { detailPriceHourWorkforceValidation } from "../detailPriceHourWorkforce/detailPriceHourWorkforce.validation";
 
 class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
   async findAll(
@@ -71,10 +73,83 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
           }
         },
         include: {
-          ManoObra:true
+          ManoObra:{
+            include:{
+              CategoriaObrero:true
+            }
+          }
         },
       });
 
+      if(assistWeekResponse.length>0){
+       const priceHour= await prisma.precioHoraMO.findFirst({
+          where: {
+            fecha_inicio: {
+              lte: filters.fecha,
+            },
+            fecha_fin: {
+              gte:filters.fecha,
+            },
+          },
+        });
+
+        if (priceHour) {
+          const detailsPriceHourMOResponse =
+            await detailPriceHourWorkforceValidation.findAllByIdPriceHour(
+              priceHour.id
+            );
+          const detailsPriceHourMO =
+            detailsPriceHourMOResponse.payload as DetallePrecioHoraMO[];
+
+
+          if(detailsPriceHourMO.length>0){
+
+            assistWeekResponse.forEach((assists)=>{
+              const detail = detailsPriceHourMO.find(
+                (element) =>
+                  element.categoria_obrero_id ===
+                  assists.ManoObra.CategoriaObrero?.id
+              );
+              if (
+                detail?.hora_normal != null &&
+                detail?.hora_extra_60 != null &&
+                detail?.hora_extra_100 != null &&
+                assists.hora_normal != null &&
+                assists.horas_60 != null &&
+                assists.horas_100 != null
+              ) {
+                // const subtract =
+                //   detail?.hora_normal * dailyPartMO.hora_normal +
+                //   detail?.hora_extra_60 * dailyPartMO.hora_60 +
+                //   detail?.hora_extra_100 * dailyPartMO.hora_100;
+  
+                // const totalAdd = reportTrain[day] - subtract;
+                // const totalDay = reportTrain[day] - subtract;
+                // let current_executed = 0;
+                // current_executed = calculateTotalNew(
+                //   day,
+                //   reportTrain,
+                //   totalDay
+                // );
+                // const total =
+                //   current_executed - reportTrain.ejecutado_anterior;
+                // await trainReportValidation.update(
+                //   reportTrain.id,
+                //   totalAdd,
+                //   day,
+                //   current_executed,
+                //   total
+                // );
+              }
+
+
+            })
+
+
+          }
+
+        }
+      }
 
     // const allResponse = await Promise.all(
     //   moResponse.map(async (mo) => {

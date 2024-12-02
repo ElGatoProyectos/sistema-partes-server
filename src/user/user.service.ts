@@ -395,6 +395,10 @@ class UserService {
           "El campo dni debe contener solo números"
         );
       }
+      
+      if(data.dni.length>8){
+        return httpResponse.BadRequestException("El Dni sólo puede contener 8 digitos")
+      }
 
       const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
@@ -573,15 +577,18 @@ class UserService {
         );
       }
 
-      const responseEmail = await userValidation.findByEmail(data.email);
-      if (!responseEmail.success)
+      const responseEmail = await userValidation.findByEmailInDetail(data.email,company.id);
+      if (responseEmail.success){
         return httpResponse.BadRequestException(`El email ingresado ya existe`);
 
-      const responseByDni = await userValidation.findByDni(data.dni);
-      if (responseByDni.success)
+      }
+
+      const responseByDni = await userValidation.findByDniInDetail(data.dni,company.id);
+      if (responseByDni.success){
         return httpResponse.BadRequestException(
           `El usuario con el dni ${data.dni} ya existe`
         );
+      }
 
       const rolResponse = await rolValidation.findByName("NO_ASIGNADO");
       if (!rolResponse.success) {
@@ -595,6 +602,10 @@ class UserService {
         return httpResponse.BadRequestException(
           "El campo dni debe contener solo números"
         );
+      }
+
+      if(data.dni.length>8){
+        return httpResponse.BadRequestException("El campo debe dni sólo puede contener 8 digitos")
       }
 
       const resultPhone = lettersInNumbers(data.telefono);
