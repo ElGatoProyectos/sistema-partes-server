@@ -12,6 +12,8 @@ export abstract class UserRepository {
 
   findById(user_id: number): void {}
 
+  findByIdValidation(user_id: number): void {}
+
   createUser(data: I_CreateUserBD): void {}
 
   updateUser(data: I_UpdateUser, user_id: number): void {}

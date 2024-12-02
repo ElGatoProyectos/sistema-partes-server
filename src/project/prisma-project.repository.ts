@@ -142,6 +142,20 @@ class PrismaProjectRepository implements ProjectRepository {
     });
     return project;
   };
+  findByIdValidation = async (idProject: number) => {
+    const project = await prisma.proyecto.findFirst({
+      where: {
+        id: idProject,
+      },
+      include:{
+        Empresa:true
+      },
+      omit: {
+        eliminado: true,
+      },
+    });
+    return project;
+  };
 
   async updateStatusProject(idProject: number): Promise<Proyecto> {
     const project = await prisma.proyecto.findFirst({

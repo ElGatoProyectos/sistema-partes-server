@@ -99,6 +99,22 @@ class UserValidation {
       );
     }
   }
+  async findByIdValidation(id: number): Promise<T_HttpResponse> {
+    try {
+      const user = await prismaUserRepository.findByIdValidation(id);
+      if (!user)
+        return httpResponse.NotFoundException(
+          "No se encontró el usuario solicitado"
+        );
+      // const userMapper = new UserResponseMapper(user);
+      return httpResponse.SuccessResponse("Usuario encontrado con éxito", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar usuario",
+        error
+      );
+    }
+  }
   async createUserAsAdmin(data: I_CreateUserBD): Promise<T_HttpResponse> {
     try {
       const role = await prismaRolRepository.existsName("ADMIN");

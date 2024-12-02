@@ -83,6 +83,7 @@ export interface I_CreateUserAndCompanyUpdate {
   telefono_empresa: string;
   email_empresa: string;
   contacto_responsable: string;
+  estado:string
 }
 
 export interface I_CreateUserAndCompanyBody {

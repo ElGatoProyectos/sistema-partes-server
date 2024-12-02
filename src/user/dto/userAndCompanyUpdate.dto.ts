@@ -17,4 +17,5 @@ export const userAndCompanyUpdateDto = z.object({
   direccion_empresa_oficina: z.string(),
   email_empresa: z.string(),
   contacto_responsable: z.string(),
+  estado: z.enum(["Y", "N"]),
 });
