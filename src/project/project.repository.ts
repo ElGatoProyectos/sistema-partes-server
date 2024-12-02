@@ -11,6 +11,7 @@ export abstract class ProjectRepository {
   createProject(data: I_CreateProjectBD): void {}
   updateProject(data: I_UpdateProyectBody, idProject: number): void {}
   findById(idProject: number): void {}
+  findByIdValidation(idProject: number): void {}
   updateStatusProject(idProject: number): void {}
   allProjectsAdminUser(
     company_id: number,

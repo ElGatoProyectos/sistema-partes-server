@@ -1,5 +1,5 @@
 import { sectionValidation } from "./../section/section.validation";
-import { Empresa, Proyecto, Rol, Usuario } from "@prisma/client";
+import { E_Estado_BD, Empresa, Proyecto, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyUpdate,
@@ -243,6 +243,11 @@ class UserService {
           "El campo dni debe contener solo números"
         );
       }
+      if (resultDni>8) {
+        return httpResponse.BadRequestException(
+          "El campo dni debe contener sólo 8 digito"
+        );
+      }
 
       const resultPhone = lettersInNumbers(data.telefono);
       if (resultPhone) {
@@ -359,7 +364,7 @@ class UserService {
     user_id: number
   ): Promise<T_HttpResponse> {
     try {
-      const responseUser = await userValidation.findById(user_id);
+      const responseUser = await userValidation.findByIdValidation(user_id);
       if (!responseUser.success) {
         return responseUser;
       }
@@ -466,21 +471,32 @@ class UserService {
           "El Rol que deseas buscar no existe"
         );
       }
+
+      const valuesAssists: { [key: string]: E_Estado_BD } = {
+        Y: E_Estado_BD.y,
+        N: E_Estado_BD.n,
+      };
+      const resultState = valuesAssists[data.estado];
       userFormat = {
         email: data.email,
         dni: data.dni,
         nombre_completo: data.nombre_completo,
         telefono: data.telefono_empresa,
-        eliminado: data.eliminado,
+        eliminado: user.eliminado,
         limite_proyecto: Number(data.limite_proyecto),
         limite_usuarios: Number(data.limite_usuarios),
         rol_id: role.id,
+        estado: resultState
       };
+      
 
       if (data.contrasena !== "") {
         hashContrasena = bcryptService.hashPassword(data.contrasena);
         userFormat.contrasena = hashContrasena;
       }
+
+
+     
 
       const resultUser = await prismaUserRepository.updateUser(
         userFormat,

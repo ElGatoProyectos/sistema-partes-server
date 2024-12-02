@@ -14,6 +14,7 @@ import { I_Empresa } from "../company/models/company.interface";
 import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {
+  
   async findManyId(ids: number[]): Promise<Usuario[]> {
     const users = await prisma.usuario.findMany({
       where: {
@@ -301,6 +302,17 @@ class PrismaUserRepository implements UserRepository {
       omit: {
         contrasena: true,
         eliminado: true,
+      },
+    });
+    return user;
+  }
+  async findByIdValidation(idUser: number): Promise<I_User | null> {
+    const user = await prisma.usuario.findFirst({
+      where: {
+        id: idUser,
+      },
+      include: {
+        Rol: true,
       },
     });
     return user;
