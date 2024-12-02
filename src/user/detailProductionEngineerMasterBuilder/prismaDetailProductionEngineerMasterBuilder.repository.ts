@@ -59,6 +59,9 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
             include: {
               Rol: true,
             },
+            omit:{
+              contrasena:true
+            }
           },
         },
         skip,

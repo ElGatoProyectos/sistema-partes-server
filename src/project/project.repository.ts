@@ -31,4 +31,6 @@ export abstract class ProjectRepository {
   deleteManyFromProyect(proyect_id:number):void{}
 
   findAllWithOutPagination():void{}
+
+  findByIdInDetailProyecto(user_id:number):void{}
 }

@@ -57,6 +57,9 @@ class PrismaDetailMasterBuilderForemanRepository
           include: {
             Rol: true,
           },
+          omit:{
+            contrasena:true
+          }
         },
       },
       skip,
