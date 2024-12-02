@@ -22,6 +22,16 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
   ): Promise<{ allResponse: any[]; total: number }> {
     let filters: any = {};
     if (data.queryParams.week) {
+      const weekResponse = await weekValidation.findByCode(
+        data.queryParams.week
+      );
+      const weekFind = weekResponse.payload as Semana;
+      filters.fecha = {
+        gte: weekFind.fecha_inicio,
+        lte: weekFind.fecha_fin,
+      };
+    
+    } else {
       const date = new Date();
       date.setUTCHours(0, 0, 0, 0);
 
@@ -31,15 +41,6 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
       filters.fecha = {
         gte: week.fecha_inicio,
         lte: week.fecha_fin,
-      };
-    } else {
-      const weekResponse = await weekValidation.findByCode(
-        data.queryParams.week
-      );
-      const weekFind = weekResponse.payload as Semana;
-      filters.fecha = {
-        gte: weekFind.fecha_inicio,
-        lte: weekFind.fecha_fin,
       };
     }
 
@@ -63,6 +64,8 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
 
     const idsWorkforces = moResponse.map((element) => element.id);
 
+    console.log(idsWorkforces)
+    console.log(filters.fecha)
     const assistWeekResponse = await prisma.asistencia.findMany({
       where: {
         fecha: filters.fecha,
@@ -83,6 +86,7 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
 
     const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+    console.log(assistWeekResponse)
 
     // Procesar los datos para agruparlos por `mano_obra_id` y organizar por día de la semana
     const resumenPorManoObra = assistWeekResponse.reduce((resumen:any, asistencia) => {
@@ -179,7 +183,6 @@ class PrismaReportWorkforceRepository implements ReportWorkforceRepository {
 
     //   }
     // }
-    console.log(resumenArray)
     return { allResponse: resumenArray, total:1};
   }
 
