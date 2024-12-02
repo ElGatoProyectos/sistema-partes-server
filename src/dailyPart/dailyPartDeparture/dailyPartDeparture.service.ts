@@ -56,32 +56,33 @@ class DailyPartDepartureService {
         );
       }
 
-      const dailysPartDepartureResponse= await dailyPartDepartureValidation.findAllForDeparture(dailyPartDeparture.partida_id);
+      if(dailyPartDeparture.cantidad_utilizada === data.quantity_used){
+        return httpResponse.SuccessResponse("Parte Diario Partida actualizado correctamente")
+      }
 
-      const dailysPartDeparture= dailysPartDepartureResponse.payload as ParteDiarioPartida[]
+      const detailDepartureJobResponse= await departureJobValidation.findByForDepartureAndJob(dailyPartDeparture.partida_id,dailyPartDeparture.ParteDiario.trabajo_id);
+ 
+      if(!detailDepartureJobResponse.success){
+        return detailDepartureJobResponse
+      }
+
+
+      const detailDepartureJob= detailDepartureJobResponse.payload as DetalleTrabajoPartida
+
+      const dailysPartDepartureResponse= await dailyPartDepartureValidation.findAllForDeparture(dailyPartDeparture.partida_id,dailyPartDeparture.ParteDiario.trabajo_id);
+
+      const dailysPartDeparture= dailysPartDepartureResponse.payload as ParteDiarioPartida[];
 
       let total=0;
 
-      if(dailysPartDeparture.length>0){
-        dailysPartDeparture.forEach((element)=>{
-          total += element.cantidad_utilizada
-        })
-      }
+      //acá sumo todos los partes diarios partida q tengan esa partida y el trabajo del Parte Diario para q no superen la cantidad total q se esstablecia 
+      dailysPartDeparture.forEach((element)=>{
+         total += element.cantidad_utilizada
+      })
 
-      const detailResponse =
-        await departureJobValidation.findByForDeparture(
-          dailyPartDeparture.partida_id,
-        );
+      const totalAdd= total + data.quantity_used
 
-      if (!detailResponse.success) {
-        return detailResponse;
-      }
-
-      const detail = detailResponse.payload as DetalleTrabajoPartida;
-
-      const totalAddNew= total+ data.quantity_used;
-      
-      if (totalAddNew > detail.cantidad_total) {
+      if (totalAdd > detailDepartureJob.cantidad_total) {
         return httpResponse.BadRequestException(
           "La cantidad ingresada es superior a la establecida"
         );
@@ -141,6 +142,7 @@ class DailyPartDepartureService {
         responseDailyPartDeparture
       );
     } catch (error) {
+      console.log(error)
       return httpResponse.InternalServerErrorException(
         "Error al modificar el Parte Diario Partida",
         error

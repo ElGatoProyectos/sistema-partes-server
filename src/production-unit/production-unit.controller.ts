@@ -31,7 +31,8 @@ class ProductionUnitController {
       request,
       response,
       async (error: any) => {
-        if (error) {
+        if (error && error.code !== "LIMIT_UNEXPECTED_FILE") {
+          // Maneja errores relacionados con la subida de la imagen.
           const customError = httpResponse.BadRequestException(
             "Error al procesar la imagen de la Unidad de Producción",
             error
@@ -50,58 +51,62 @@ class ProductionUnitController {
               rolsPermitted
             );
             const project_id = request.get("project-id") as string;
+  
             if (!responseValidate?.success) {
               return response.status(401).json(responseValidate);
-            } else {
-              prouductionUnitDto.parse(request.body);
-              if (!validator.isNumeric(project_id)) {
-                const customError = httpResponse.BadRequestException(
-                  "El id del projecto debe ser numérico",
-                  error
-                );
-                response.status(customError.statusCode).json(customError);
-              } else {
-                const data = request.body;
-                const result = await productionUnitService.createProductionUnit(
-                  data,
-                  +project_id
-                );
-                if (!result.success) {
-                  response.status(result.statusCode).json(result);
-                } else {
-                  const project = result.payload as UnidadProduccion;
-                  if (request.file) {
-                    const id = project.id;
-                    const direction = path.join(
-                      appRootPath.path,
-                      "static",
-                      ProductionUnitMulterProperties.folder
-                    );
-                    const ext = ".png";
-                    const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
-                    const filePath = path.join(direction, fileName);
-                    sharp(request.file.buffer)
-                      .resize({ width: 800 })
-                      .toFormat("png")
-                      .toFile(filePath, (err) => {
-                        if (err) {
-                          const customError = httpResponse.BadRequestException(
-                            "Error al guardar la imagen de la Unidad de Producción",
-                            err
-                          );
-                          response
-                            .status(customError.statusCode)
-                            .json(customError);
-                        } else {
-                          response.status(result.statusCode).json(result);
-                        }
-                      });
-                  } else {
-                    response.status(result.statusCode).json(result);
-                  }
-                }
-              }
             }
+  
+            prouductionUnitDto.parse(request.body);
+  
+            if (!validator.isNumeric(project_id)) {
+              const customError = httpResponse.BadRequestException(
+                "El id del proyecto debe ser numérico"
+              );
+              return response.status(customError.statusCode).json(customError);
+            }
+  
+            const data = request.body;
+            const result = await productionUnitService.createProductionUnit(
+              data,
+              +project_id
+            );
+  
+            if (!result.success) {
+              return response.status(result.statusCode).json(result);
+            }
+  
+            const project = result.payload as UnidadProduccion;
+  
+            // Procesa la imagen solo si está presente
+            if (request.file) {
+              const id = project.id;
+              const direction = path.join(
+                appRootPath.path,
+                "static",
+                ProductionUnitMulterProperties.folder
+              );
+              const ext = ".png";
+              const fileName = `${ProductionUnitMulterProperties.folder}_${id}${ext}`;
+              const filePath = path.join(direction, fileName);
+  
+              sharp(request.file.buffer)
+                .resize({ width: 800 })
+                .toFormat("png")
+                .toFile(filePath, (err) => {
+                  if (err) {
+                    const customError = httpResponse.BadRequestException(
+                      "Error al guardar la imagen de la Unidad de Producción",
+                      err
+                    );
+                    return response
+                      .status(customError.statusCode)
+                      .json(customError);
+                  }
+                });
+            }
+  
+            // Devuelve la respuesta final independientemente de si hay imagen o no
+            return response.status(result.statusCode).json(result);
           } catch (error) {
             const customError = httpResponse.BadRequestException(
               "Error al validar los campos de la Unidad de Producción",
@@ -113,6 +118,7 @@ class ProductionUnitController {
       }
     );
   };
+  
 
   deleteImage = async (
     request: express.Request,
@@ -252,9 +258,8 @@ class ProductionUnitController {
                           response.status(result.statusCode).json(result);
                         }
                       });
-                  } else {
-                    response.status(result.statusCode).json(result);
-                  }
+                  } 
+                  return response.status(result.statusCode).json(result);
                 }
               }
             }

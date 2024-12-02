@@ -43,7 +43,8 @@ class ProductionUnitService {
       const formattedCodigo = await this.getNextProductionUnitCode(project_id);
 
       const productionUnit = {
-        ...data,
+        nombre        : data.nombre,
+        nota          : data.nota,
         codigo: formattedCodigo,
         proyecto_id: project_id,
       };
@@ -117,7 +118,8 @@ class ProductionUnitService {
         );
       }
       const productionUnit = {
-        ...data,
+        nombre        : data.nombre,
+        nota          : data.nota,
         proyecto_id: project_id,
       };
       const responseProductionUnit =
