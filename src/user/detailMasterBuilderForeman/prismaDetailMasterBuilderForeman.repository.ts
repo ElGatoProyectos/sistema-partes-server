@@ -1,5 +1,5 @@
 import prisma from "../../config/prisma.config";
-import { DetalleMaestroObraCapataz } from "@prisma/client";
+import { DetalleMaestroObraCapataz, E_Estado_BD } from "@prisma/client";
 import { DetailMasterBuilderForemanRepository } from "./detailMasterBuilderForeman.repository";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
 
@@ -49,6 +49,7 @@ class PrismaDetailMasterBuilderForemanRepository
         proyecto_id: project_id,
         Capataz: {
           ...filters,
+          estado: E_Estado_BD.y
         },
       },
       include: {
@@ -77,6 +78,7 @@ class PrismaDetailMasterBuilderForemanRepository
         proyecto_id: project_id,
         Capataz: {
           ...filters,
+          estado: E_Estado_BD.y
         },
       },
     });

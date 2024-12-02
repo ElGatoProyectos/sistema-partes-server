@@ -1,4 +1,4 @@
-import { DetalleIngenieroProduccionMaestroObra } from "@prisma/client";
+import { DetalleIngenieroProduccionMaestroObra, E_Estado_BD } from "@prisma/client";
 import { DetailProductionEngineerMasterBuilder } from "./detailProductionEngineerMasterBuilder.repository";
 import prisma from "../../config/prisma.config";
 import { T_FindAllDetailUserProject } from "../detailUserProject/models/detailUserProject.types";
@@ -51,6 +51,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
           proyecto_id: project_id,
           MaestroObra: {
             ...filters,
+            estado: E_Estado_BD.y
           },
         },
         include: {
@@ -79,6 +80,7 @@ class PrismaDetailProductionEngineerMasterBuilderRepository
         proyecto_id: project_id,
         MaestroObra: {
           ...filters,
+          estado: E_Estado_BD.y
         },
       },
     });

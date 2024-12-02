@@ -5,7 +5,7 @@ import {
   I_CreateDetailUserProject,
   I_DetailUserProject,
 } from "./models/detailUserProject.interface";
-import { DetalleUsuarioProyecto, Rol } from "@prisma/client";
+import { DetalleUsuarioProyecto, E_Estado_BD, Rol } from "@prisma/client";
 import { prismaDetailProductionEngineerMasterBuilderRepository } from "../detailProductionEngineerMasterBuilder/prismaDetailProductionEngineerMasterBuilder.repository";
 import { prismaDetailMasterBuilderForemanRepository } from "../detailMasterBuilderForeman/prismaDetailMasterBuilderForeman.repository";
 import { prismaDetailForemanGroupLeaderRepository } from "../detailForemanGroupLeader/prisma-detailForemanGroupLeader.respository";
@@ -125,6 +125,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
             projecto_id: project_id,
             Usuario: {
               ...filters,
+              estado: E_Estado_BD.y
             },
           },
           include: {
@@ -142,6 +143,7 @@ class PrismaDetailUserProjectRepository implements DetailUserProjectRepository {
             projecto_id: project_id,
             Usuario: {
               ...filters,
+              estado: E_Estado_BD.y
             },
           },
         }),

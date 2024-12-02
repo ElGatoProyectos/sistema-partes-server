@@ -162,28 +162,19 @@ class AuthService {
       return httpResponse.UnauthorizedException("Error en la autenticación");
     }
   }
-  async findMe(token: string, project_id: string) {
+  async findMe(token: string) {
     try {
       const userTokenResponse = await jwtService.getUserFromToken(token);
       if (!userTokenResponse)
         return httpResponse.UnauthorizedException("Token inválido");
       const userResponse = userTokenResponse.payload as Usuario;
 
-      const projectResponse = await projectValidation.findByIdValidation(
-        +project_id
-      );
-      if (!projectResponse.success) {
-        return projectResponse;
-      }
-
-      const project = projectResponse.payload as I_ProjectWithCompany;
-
       let user: any;
 
       let role = "MANO_OBRA"; // Rol harcodeado
 
       let userType: "usuario" | "manoObra" = "usuario";
-      let formattedUser: any;
+      let formattedUser: any={};
 
       if (!userResponse) {
         const [bearer, tokenWIthOutBearer] = token.split(" ");
@@ -203,14 +194,15 @@ class AuthService {
 
         formattedUser = {
           usuario: user,
-          empresa: project.Empresa,
+          empresa: null,
           role,
         };
       }
 
       let permisos: any = [];
-   
+      let detailcompanyResponse: any = {};
       if (userType === "usuario") {
+        
         permisos = await authValidation.findRolPermisssion(userResponse.rol_id);
         role = permisos ? permisos.id : [];
         const { contrasena, ...data } = userResponse;
@@ -218,9 +210,25 @@ class AuthService {
         formattedUser = {
           usuario: data,
           permisos: permisos.payload,
-          empresa: project.Empresa,
           role,
         };
+        const companyResponse= await companyValidation.findByIdUser(userResponse.id)
+
+        if(companyResponse.success){
+          const company= companyResponse.payload as Empresa;
+          formattedUser.empresa=company
+        }else{
+          detailcompanyResponse = await detailUserCompanyValidation.findByIdUser(
+            userResponse.id
+          );
+          if (!detailcompanyResponse.success) {
+            return detailcompanyResponse;
+          }
+          const detail = detailcompanyResponse.payload as DetalleUsuarioEmpresa;
+          const companyFind = await companyValidation.findById(detail.empresa_id);
+          formattedUser.empresa=companyFind
+        }
+       
        
       }
 

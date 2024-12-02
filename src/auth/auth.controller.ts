@@ -12,7 +12,7 @@ class AuthController {
     const tokenWithBearer = request.headers.authorization;
     const project_id = request.get("project-id") as string;
     if (tokenWithBearer) {
-      const result = await authService.findMe(tokenWithBearer,project_id);
+      const result = await authService.findMe(tokenWithBearer);
       if (!result.success) {
         response.status(result.statusCode).json(result);
       } else {

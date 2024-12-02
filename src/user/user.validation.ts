@@ -82,6 +82,34 @@ class UserValidation {
       );
     }
   }
+  async findByDniInDetail(dni: string,company_id:number): Promise<T_HttpResponse> {
+    try {
+      const user = await prismaUserRepository.findDniAndCompanyInDetailCompany(dni,company_id);
+      if (!user) {
+        return httpResponse.NotFoundException("Usuario no encontrado en Detalle Usuario Empresa");
+      }
+      return httpResponse.SuccessResponse("Usuario encontrado en Detalle Usuario Empresa", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar usuario en Detalle Usuario Empresa",
+        error
+      );
+    }
+  }
+  async findByEmailInDetail(email: string,company_id:number): Promise<T_HttpResponse> {
+    try {
+      const user = await prismaUserRepository.findEmailAndCompanyInDetailCompany(email,company_id);
+      if (!user) {
+        return httpResponse.NotFoundException("Usuario no encontrado en Detalle Usuario Empresa");
+      }
+      return httpResponse.SuccessResponse("Usuario encontrado en Detalle Usuario Empresa", user);
+    } catch (error) {
+      return httpResponse.InternalServerErrorException(
+        "Error al buscar usuario en Detalle Usuario Empresa",
+        error
+      );
+    }
+  }
 
   async findById(id: number): Promise<T_HttpResponse> {
     try {
