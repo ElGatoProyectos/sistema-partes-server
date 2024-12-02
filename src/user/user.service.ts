@@ -1,5 +1,5 @@
 import { sectionValidation } from "./../section/section.validation";
-import { E_Estado_BD, Empresa, Proyecto, Rol, Usuario } from "@prisma/client";
+import { DetalleUsuarioEmpresa, E_Estado_BD, Empresa, Proyecto, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserAndCompany,
   I_CreateUserAndCompanyUpdate,
@@ -485,6 +485,16 @@ class UserService {
         N: E_Estado_BD.n,
       };
       const resultState = valuesAssists[data.estado];
+
+      const detailsUserCompanyResponse= await detailUserCompanyValidation.findAllByIdCompany(company.id);
+      if(detailsUserCompanyResponse.success){
+        const details= detailsUserCompanyResponse.payload as DetalleUsuarioEmpresa[]
+        if(details.length>0){
+          const ids= details.map((element)=>element.usuario_id)
+          await prismaUserRepository.updateManyStatus(ids,resultState)
+        }
+      }
+
       userFormat = {
         email: data.email,
         dni: data.dni,
@@ -502,9 +512,6 @@ class UserService {
         hashContrasena = bcryptService.hashPassword(data.contrasena);
         userFormat.contrasena = hashContrasena;
       }
-
-
-     
 
       const resultUser = await prismaUserRepository.updateUser(
         userFormat,

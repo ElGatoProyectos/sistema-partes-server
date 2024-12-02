@@ -5,6 +5,8 @@ export abstract class CompanyRepository {
 
   findByIdCompany(company_id: number): void {}
 
+  findAllByIdCompanyWithOutPagination(company_id: number): void {}
+
   findByIdUser(user_id: number): void {}
 
   getAllUsersOfProjectUnassigned(

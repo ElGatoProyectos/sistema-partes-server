@@ -1,4 +1,4 @@
-import { Rol, Usuario } from "@prisma/client";
+import { E_Estado_BD, Rol, Usuario } from "@prisma/client";
 import {
   I_CreateUserBD,
   I_UpdateUser,
@@ -21,6 +21,10 @@ export abstract class UserRepository {
   updateStatusUser(user_id: number): void {}
 
   updateRolUser(user_id: number, rol_id: number): void {}
+
+  updateManyStatus(
+    ids: number[],estado : E_Estado_BD,
+  ): void {}
 
   getUsersForCompany(
     skip: number,

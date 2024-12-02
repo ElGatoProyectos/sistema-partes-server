@@ -15,7 +15,19 @@ import { T_FindAllUser } from "./models/user.types";
 
 class PrismaUserRepository implements UserRepository {
   
-  
+  async updateManyStatus(
+    ids: number[],estado : E_Estado_BD,
+  ) {
+      await prisma.usuario.updateMany({
+        where: {
+          id: { in: ids },
+        },
+        data: {
+          estado: estado
+        },
+      });
+  }
+
   async findManyId(ids: number[]): Promise<Usuario[]> {
     const users = await prisma.usuario.findMany({
       where: {

@@ -5,6 +5,14 @@ import { T_FindAllDetailUserCompany } from "./models/detailsUserCompany.types";
 import { I_DetalleUsuarioEmpresa } from "./models/detailsUserCompany.interface";
 
 class PrismaDetailUserCompanyRepository implements CompanyRepository {
+  async findAllByIdCompanyWithOutPagination(company_id: number): Promise<DetalleUsuarioEmpresa[] | null> {
+    const details= await prisma.detalleUsuarioEmpresa.findMany({
+      where:{
+        empresa_id:company_id
+      }
+    })
+    return details
+  }
   async getAllUsersOfProjectUnassigned(
     skip: number,
     data: T_FindAllDetailUserCompany,
