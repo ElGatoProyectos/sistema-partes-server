@@ -53,11 +53,12 @@ class DailyPartDepartureValidation {
       );
     }
   }
-  async findAllForDeparture(departure_id: number): Promise<T_HttpResponse> {
+  async findAllForDeparture(departure_id: number,job_id:number): Promise<T_HttpResponse> {
     try {
       const dailyPart =
-        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForDeparture(
-          departure_id
+        await prismaDailyPartDepartureRepository.findAllWithOutPaginationForJobAndDeparture(
+          departure_id,
+          job_id
         );
 
       return httpResponse.SuccessResponse(

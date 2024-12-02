@@ -1,4 +1,4 @@
-import { Asistencia } from "@prisma/client";
+import { Asistencia, ManoObra } from "@prisma/client";
 
 export interface I_CreateAssistsWorkforceBD
   extends Omit<
@@ -27,4 +27,7 @@ export interface I_UpdateAssitsBD
 
 export interface I_AssistsBody {
   mano_obra_id: number;
+}
+export interface I_AssistsId extends Asistencia {
+  ManoObra: ManoObra;
 }
